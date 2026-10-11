@@ -49,6 +49,32 @@ gravado no alpha** (`surface.ts`, `glyph = .85`, sempre `toFixed(2)`).
 GLTF). O Pomorog adivinha pela cor em HSL, o que só funciona porque os modelos
 foram feitos à mão; a engine não pode depender disso.
 
+### 3.1 Estilo por parte (requisito do dono)
+
+O ajuste é sempre **por parte**, nunca só pelo objeto inteiro. Exemplo do
+dono: *"copa da árvore quero assim, mas o tronco quero assado"*. O próprio
+Pomorog já faz isso: na árvore, a copa é `body` e o tronco é `surface`.
+
+- **Parte** = um nó ou malha do modelo (`Object3D` com nome) ou um slot de
+  material. No GLTF, cada parte nomeada no Blender vira uma parte na engine.
+- Cada parte tem um **estilo de letras**: a técnica (`GlyphKind`) e os
+  parâmetros dela, como alfabeto, tamanho e espaçamento da letra, cor e
+  multiplicador de cor, força, vão escuro, degraus de sombra, aberto ou com
+  oclusor e animação (balanço, cintilação).
+- Os estilos vêm em camadas, e a mais específica vence:
+  `preset global → tipo de objeto (ex.: "árvore") → tipo de parte (ex.: "copa") → instância → parte da instância`.
+  Mudar a "copa" de todas as árvores e mudar só a copa desta árvore são
+  ações diferentes e as duas existem.
+- **API:** `engine.add(obj, { glyph, parts: { copa: { glyph: 'body', … }, tronco: { glyph: 'surface', … } } })`,
+  `engine.setPartStyle(alvo, parte, estilo)` e `userData.glyph`/`userData.glyphStyle`
+  por nó no GLTF.
+- **Editor:** clicar seleciona a **parte** sob o cursor, e um segundo clique ou
+  uma tecla sobe para o objeto. O painel mostra a técnica e os parâmetros
+  da parte com a escolha de onde salvar ("só esta", "todas desta parte
+  neste tipo de objeto", "estilo global"). Destaque visual da parte selecionada.
+- Na fase 1, desenhe as estruturas de dados já pensando nisso (estilo como
+  objeto de dados resolvido por camadas), mesmo que o editor venha depois.
+
 ## 4. Arquitetura
 
 ```text
@@ -108,18 +134,36 @@ Leitura de GLTF/GLB com `userData.glyph` (propriedades personalizadas do Blender
 um padrão razoável quando faltar a marcação, e `body` em malhas com esqueleto
 (amostrar posições a partir dos ossos).
 
-### Fase 4 — Editor
+Cada nó nomeado vira uma parte com estilo próprio (§3.1).
+
+### Fase 4 — Editor de ajustes
 
 Painel com os ajustes ao vivo (tabela de ajustes, `visual-pipeline.md` §16),
-presets salvos em JSON, captura de tela e comparação de imagens automática.
+**seleção por parte** com estilos em camadas (§3.1), presets salvos em JSON,
+captura de tela e comparação de imagens automática.
 
-### Fase 5 — O Pomorog volta a usar a engine
+### Fase 5 — Mapas e cenários
+
+Arquivo de cena em JSON que a engine carrega: objetos, terreno, água, clima,
+luz e estilos. No editor:
+
+1. **Cena:** posicionar, girar, escalar, duplicar, agrupar, desfazer e refazer;
+   pincel para espalhar árvores, pedras e grama com variação.
+2. **Terreno e água:** pintar o tipo de chão (que define o tapete `carpet`),
+   desenhar o contorno de lagos e o traçado de riachos (`waterEdge`), colocar
+   ponte e caminho.
+3. **Gerador procedural:** o mundo em circuito da floresta
+   (`forestWorld.ts`, `trailLoop.ts`) como ferramenta configurável (tamanho,
+   densidade, quantidade de água, bioma, semente). Gera, permite editar à mão e salva.
+4. **Ambiente:** chuva, neve, noite e luar, fogueira e luzes locais por cena.
+
+### Fase 6 — O Pomorog volta a usar a engine
 
 O jogo passa a importar `@ascii-engine/core`. Ele precisa ficar idêntico nas
 capturas aprovadas; isso prova que a extração foi fiel. Faça só com o dono
 autorizando, no repositório do Pomorog.
 
-### Fase 6 — Exportação
+### Fase 7 — Exportação
 
 Empacotar uma cena ou jogo pelo Tauri (desktop, depois Android e iOS) e pela web.
 
