@@ -7,6 +7,7 @@ interface PanelOptions {
   areaId: string
   mode: string
   capture: () => void
+  importFile: (file: File) => void
 }
 
 /**
@@ -14,7 +15,7 @@ interface PanelOptions {
  * brightness (the player's "Imagem" controls), zoom and rotation.
  * Changing area or mode reloads with the URL, so every view is shareable.
  */
-export function createPanel({ engine, view, areas, areaId, mode, capture }: PanelOptions) {
+export function createPanel({ engine, view, areas, areaId, mode, capture, importFile }: PanelOptions) {
   const root = document.getElementById('panel')!
   const go = (key: string, value: string) => { const p = new URLSearchParams(location.search); p.set(key, value); location.search = p.toString() }
   root.innerHTML = `
@@ -24,7 +25,8 @@ export function createPanel({ engine, view, areas, areaId, mode, capture }: Pane
     <label>luz <input data-k="light" type="range" min=".65" max="1.4" step=".05"><output></output></label>
     <label>zoom <input data-k="zoom" type="range" min=".75" max="1.5" step=".05"><output></output></label>
     <label>giro <input data-k="angle" type="range" min="-3.14" max="3.14" step=".05"><output></output></label>
-    <button data-k="pause">[ pausar ]</button> <button data-k="shot">[ captura ]</button>`
+    <button data-k="pause">[ pausar ]</button> <button data-k="shot">[ captura ]</button>
+    <label class="file">[ importar .glb/.gltf ]<input data-k="import" type="file" accept=".glb,.gltf" hidden></label>`
   const input = (k: string) => root.querySelector<HTMLInputElement>(`[data-k="${k}"]`)!
   root.querySelector<HTMLSelectElement>('[data-k="area"]')!.onchange = (e) => go('area', (e.target as HTMLSelectElement).value)
   root.querySelector<HTMLSelectElement>('[data-k="mode"]')!.onchange = (e) => go('ascii', (e.target as HTMLSelectElement).value)
@@ -43,6 +45,8 @@ export function createPanel({ engine, view, areas, areaId, mode, capture }: Pane
   const pause = root.querySelector<HTMLButtonElement>('[data-k="pause"]')!
   pause.onclick = () => { view.paused = !view.paused; pause.textContent = view.paused ? '[ continuar ]' : '[ pausar ]' }
   root.querySelector<HTMLButtonElement>('[data-k="shot"]')!.onclick = capture
+  const picker = input('import')
+  picker.onchange = () => { for (const file of picker.files ?? []) importFile(file); picker.value = '' }
   const refresh = () => shows.forEach((show) => show())
   refresh()
   return { refresh }

@@ -4,6 +4,8 @@ import { createForest } from './areas/forest'
 import { createMarsh, marshHooks } from './areas/marsh'
 import { createSnow } from './areas/snow'
 import { createCathedral, createMine } from './areas/interiors'
+import { createGltfDemo, importFile } from './areas/gltfDemo'
+import type { GlyphModel } from '@ascii-engine/core'
 import type { Area, AreaOptions } from './areas/types'
 import { buildReferenceScene } from './scene/reference'
 import { buildTerrainScene } from './scene/terrain'
@@ -27,6 +29,7 @@ export const AREAS: Record<string, AreaEntry> = {
   snow_pines: { title: 'Pinheiros Nevados', create: createSnow },
   old_mine: { title: 'Mina Antiga', create: createMine },
   sunken_cathedral: { title: 'Catedral Submersa', create: createCathedral },
+  gltf: { title: 'Importação GLTF (teste)', create: createGltfDemo },
   reference: { title: 'Cena de referência', create: (engine, options) => buildReferenceScene(engine, options.screen) },
   terrain: { title: 'Relevo (teste)', create: (engine) => buildTerrainScene(engine) },
 }
@@ -56,7 +59,13 @@ canvas.addEventListener('pointermove', (e) => { if (dragging) drag = (e.clientX 
 canvas.addEventListener('pointerup', () => { dragging = false })
 canvas.addEventListener('wheel', (e) => { e.preventDefault(); view.zoom = THREE.MathUtils.clamp(view.zoom * Math.exp(-e.deltaY * .001), .75, 1.5) }, { passive: false })
 
-const panel = createPanel({ engine, view, areas: AREAS, areaId, mode, capture: () => captureNext = true })
+const imported: GlyphModel[] = []
+const importAt = (file: File) => importFile(engine, file, area.focus(angle, new THREE.Vector3()).setY(0))
+  .then((model) => { imported.push(model); status.dataset.note = `importado: ${file.name} (${model.parts.length} partes)` })
+  .catch((error) => { status.dataset.note = `erro ao importar ${file.name}: ${error}` })
+addEventListener('dragover', (e) => e.preventDefault())
+addEventListener('drop', (e) => { e.preventDefault(); for (const file of e.dataTransfer?.files ?? []) void importAt(file) })
+const panel = createPanel({ engine, view, areas: AREAS, areaId, mode, capture: () => captureNext = true, importFile: (file) => void importAt(file) })
 const status = document.getElementById('status')!
 const focus = new THREE.Vector3()
 let last = 0, frames = 0, sample = 0, fps = 0, captureNext = false
@@ -69,13 +78,13 @@ function frame(now: number) {
   if (engine.time + dt > view.pauseAt) dt = Math.max(0, view.pauseAt - engine.time)
   const { width, height } = engine.size
   angle += (Math.PI / 7 + view.angle + drag - angle) * (1 - Math.exp(-6 * Math.min(real, .1)))
-  if (dt > 0) area.update(engine.time + dt, dt)
+  if (dt > 0) { area.update(engine.time + dt, dt); for (const model of imported) model.update(dt) }
   engine.frame(area.focus(angle, focus), pomorogSpan(height, width / height, view.zoom), angle)
   engine.render(dt)
   if (captureNext) { captureNext = false; download(canvas.toDataURL('image/png')) }
   frames++
   if (now - sample > 1000) { fps = Math.round(frames * 1000 / (now - sample)); frames = 0; sample = now; panel.refresh() }
-  status.textContent = `ascii-engine ${ENGINE_VERSION} · ${area.title}${mode !== 'letters' ? ` (${mode})` : ''} · ${fps} fps · ${area.state}`
+  status.textContent = `ascii-engine ${ENGINE_VERSION} · ${area.title}${mode !== 'letters' ? ` (${mode})` : ''} · ${fps} fps · ${area.state}${status.dataset.note ? ` · ${status.dataset.note}` : ''}`
   canvas.dataset.ready = 'true'; canvas.dataset.state = area.state; canvas.dataset.fps = String(fps)
 }
 requestAnimationFrame(frame)

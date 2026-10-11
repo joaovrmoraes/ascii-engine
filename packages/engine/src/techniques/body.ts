@@ -181,6 +181,8 @@ export function glyphBody(root: THREE.Object3D | THREE.Mesh[], shared: BodyUnifo
   let seed = 9173
   // One spacing hash per body: overlapping parts must not stack letters.
   const taken = new Set<string>()
+  /** Letter clouds that need a per-frame update (skinned). */
+  const created: THREE.Points[] = []
   for (const mesh of meshes) {
     mesh.userData.glyphDone = true
     const material = mesh.material as THREE.MeshStandardMaterial
@@ -198,9 +200,13 @@ export function glyphBody(root: THREE.Object3D | THREE.Mesh[], shared: BodyUnifo
         const c = new THREE.Color(1, 1, 1); if (mesh.instanceColor) mesh.getColorAt(i, c); colors.push(c)
       }
     } else { matrices.push(new THREE.Matrix4()); colors.push(white) }
-    const geometry = scatter(mesh.geometry, letter * (ramp === 'stone' ? .72 : open ? .9 : .82), matrices, colors, world, seed += 7919, mesh.matrixWorld, taken)
+    const spacing = letter * (ramp === 'stone' ? .72 : open ? .9 : .82)
+    // Skinned meshes: letters follow the bones (positions re-skinned each frame).
+    const skinned = mesh instanceof THREE.SkinnedMesh ? scatterSkinned(mesh, spacing, seed += 7919, taken) : undefined
+    const geometry = skinned?.geometry ?? scatter(mesh.geometry, spacing, matrices, colors, world, seed += 7919, mesh.matrixWorld, taken)
     const points = new THREE.Points(geometry, lettersMaterial(shared, material.color, material.emissive ?? noGlow, letter, ramp, open))
     points.userData.glyphDone = true; points.userData.glyphBodyOf = mesh; points.frustumCulled = false
+    if (skinned) { points.userData.skin = skinned.skin; created.push(points) }
     mesh.add(points)
     mesh.userData.glyphBodyMaterial = material
     if (open) {
@@ -210,6 +216,72 @@ export function glyphBody(root: THREE.Object3D | THREE.Mesh[], shared: BodyUnifo
     // Creatures keep a faint silhouette of their own colour (readable on snow).
     } else mesh.material = darkOccluder(material)
   }
+  return created
+}
+
+interface Skin { mesh: THREE.SkinnedMesh; corners: Uint32Array; weights: Float32Array }
+/**
+ * Letters over a skinned mesh: each letter keeps its triangle and barycentric
+ * weights, so it can be re-skinned every frame (`updateSkinnedBody`).
+ */
+function scatterSkinned(mesh: THREE.SkinnedMesh, spacing: number, seedBase: number, taken: Set<string>) {
+  const geometry = mesh.geometry, pos = geometry.attributes.position, index = geometry.index
+  const triangles = (index ? index.count : pos.count) / 3
+  const corner = (t: number, k: number) => index ? index.getX(t * 3 + k) : t * 3 + k
+  const a = new THREE.Vector3(), b = new THREE.Vector3(), c = new THREE.Vector3()
+  const cumulative = new Float32Array(triangles)
+  let total = 0
+  mesh.updateWorldMatrix(true, false)
+  const scale = new THREE.Vector3().setFromMatrixScale(mesh.matrixWorld)
+  for (let t = 0; t < triangles; t++) {
+    a.fromBufferAttribute(pos, corner(t, 0)); b.fromBufferAttribute(pos, corner(t, 1)); c.fromBufferAttribute(pos, corner(t, 2))
+    total += b.sub(a).cross(c.sub(a)).length() / 2
+    cumulative[t] = total
+  }
+  let seed = seedBase
+  const random = () => { seed = (Math.imul(seed, 1664525) + 1013904223) >>> 0; return seed / 4294967296 }
+  const count = Math.min(3000, Math.max(2, Math.round(total * (scale.x * scale.y + scale.y * scale.z + scale.x * scale.z) / 3 / (spacing * spacing))))
+  const corners: number[] = [], weights: number[] = [], seeds: number[] = []
+  const p = new THREE.Vector3(), w = new THREE.Vector3()
+  const key = (v: THREE.Vector3) => `${Math.floor(v.x / spacing)},${Math.floor(v.y / spacing)},${Math.floor(v.z / spacing)}`
+  for (let i = 0, tries = 0; i < count && tries < count * 6; tries++) {
+    const r = random() * total
+    let lo = 0, hi = triangles - 1
+    while (lo < hi) { const mid = (lo + hi) >> 1; if (cumulative[mid] < r) lo = mid + 1; else hi = mid }
+    let u = random(), v = random()
+    if (u + v > 1) { u = 1 - u; v = 1 - v }
+    const ia = corner(lo, 0), ib = corner(lo, 1), ic = corner(lo, 2)
+    a.fromBufferAttribute(pos, ia); b.fromBufferAttribute(pos, ib); c.fromBufferAttribute(pos, ic)
+    p.copy(a).multiplyScalar(1 - u - v).addScaledVector(b, u).addScaledVector(c, v)
+    w.copy(p).applyMatrix4(mesh.matrixWorld)
+    const k = key(w); if (taken.has(k)) continue
+    taken.add(k); i++
+    corners.push(ia, ib, ic); weights.push(1 - u - v, u, v); seeds.push(random())
+  }
+  const n = seeds.length
+  const out = new THREE.BufferGeometry()
+  out.setAttribute('position', new THREE.Float32BufferAttribute(new Float32Array(n * 3), 3).setUsage(THREE.DynamicDrawUsage))
+  out.setAttribute('normal', new THREE.Float32BufferAttribute(new Float32Array(n * 3), 3).setUsage(THREE.DynamicDrawUsage))
+  out.setAttribute('glyphColor', new THREE.Float32BufferAttribute(new Float32Array(n * 3).fill(1), 3))
+  out.setAttribute('seed', new THREE.Float32BufferAttribute(seeds, 1))
+  const skin: Skin = { mesh, corners: new Uint32Array(corners), weights: new Float32Array(weights) }
+  return { geometry: out, skin }
+}
+
+const va = new THREE.Vector3(), vb = new THREE.Vector3(), vc = new THREE.Vector3(), vp = new THREE.Vector3(), vn = new THREE.Vector3()
+/** Re-skins the letters of a skinned body (call after the animation, before rendering). */
+export function updateSkinnedBody(points: THREE.Points) {
+  const skin = points.userData.skin as Skin | undefined
+  if (!skin) return
+  const { mesh, corners, weights } = skin
+  const position = points.geometry.attributes.position as THREE.BufferAttribute, normal = points.geometry.attributes.normal as THREE.BufferAttribute
+  for (let i = 0; i < weights.length / 3; i++) {
+    mesh.getVertexPosition(corners[i * 3], va); mesh.getVertexPosition(corners[i * 3 + 1], vb); mesh.getVertexPosition(corners[i * 3 + 2], vc)
+    vp.copy(va).multiplyScalar(weights[i * 3]).addScaledVector(vb, weights[i * 3 + 1]).addScaledVector(vc, weights[i * 3 + 2])
+    vn.subVectors(vb, va).cross(vc.sub(va)).normalize()
+    position.setXYZ(i, vp.x, vp.y, vp.z); normal.setXYZ(i, vn.x, vn.y, vn.z)
+  }
+  position.needsUpdate = normal.needsUpdate = true
 }
 
 /** Per-frame: point size in pixels, moon and the warm lights that pick letters. */

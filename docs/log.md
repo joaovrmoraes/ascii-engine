@@ -263,3 +263,29 @@ conferência no Orca Browser com o painel visível.
   no passe de tela. Ligado à Floresta (`?peaceful=1` desliga). A câmera
   recentraliza como no Pomorog (1,25 m à frente, puxada 32% para a criatura).
 - Capturas: `floresta-combate-lobo.png` e `floresta-magias-aura-fogo.png`.
+
+## 11/10/2026 — Fase 3: importação GLTF
+
+- Núcleo: `import/gltf.ts`. `loadGlyphModel(url | ArrayBuffer)` lê .gltf/.glb.
+  As propriedades personalizadas do Blender chegam por `extras` → `userData`:
+  `glyph` (técnica), `glyph_surface`, `glyph_size` ou `glyphStyle` em JSON.
+  Cada nó com nome vira uma parte (§3.1), e o mixer toca todos os clipes.
+- Padrão quando falta marcação (`defaultGlyphStyle`), decidido por nome e
+  geometria, nunca por cor:
+  - malha com esqueleto → `body`;
+  - nomes de folhagem ou neve, ou geometria facetada → `body`;
+  - o resto → `surface`, com a família tirada do nome (casca, madeira, pedra, terra).
+- `body` em malhas com esqueleto: cada letra guarda o triângulo e o peso
+  baricêntrico e é re-esqueletizada a cada quadro (`updateSkinnedBody`), de
+  modo que as letras acompanham os ossos.
+- Editor:
+  - a área `?area=gltf` monta uma serpente com 6 ossos e animação, e uma
+    árvore com partes `tronco`/`copa` e propriedades no estilo do Blender;
+    exporta para GLB (`GLTFExporter`) e reimporta pelo leitor, ou seja, o
+    mesmo caminho de um arquivo do Blender;
+  - o painel ganhou "importar .glb/.gltf" e arrastar e soltar na janela.
+- Testes: 16 (novos: propriedades do Blender, padrão por nome e geometria,
+  nós já marcados preservados).
+- Captura: `gltf-serpente-arvore.png` (dois quadros da serpente nadando).
+- Pendência: sem um .glb real do Blender no repositório; o teste usa o
+  exportador do Three.

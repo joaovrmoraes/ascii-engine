@@ -5,7 +5,7 @@ import type { LightObstacle } from './exploration'
 import { pomorog, type AsciiStyle } from './presets/pomorog'
 import { nodeGlyphStyle, resolveGlyphStyle, type GlyphStyle, type ObjectTypeStyle } from './style'
 import type { SurfaceKind } from './surface'
-import { bodyUniforms, glyphBody, removeGlyphBody, updateGlyphBodies, type BodyRamp } from './techniques/body'
+import { bodyUniforms, glyphBody, removeGlyphBody, updateGlyphBodies, updateSkinnedBody, type BodyRamp } from './techniques/body'
 import { createCarpet, type Carpet, type GroundCover } from './techniques/carpet'
 import { createGlyphCloud, type GlyphCloud } from './techniques/particle'
 import { markScreen } from './techniques/screen'
@@ -86,6 +86,8 @@ export function createAsciiEngine(canvas: HTMLCanvasElement, options: AsciiEngin
   const bodies = bodyUniforms()
   const carpets: Carpet[] = [], clouds: GlyphCloud[] = [], waters: WaterSource[] = []
   const streaks: RainStreaks[] = []
+  /** Letter clouds over skinned meshes, re-skinned every frame. */
+  let skinnedLetters: THREE.Points[] = []
   /** Extra ink per particle layer (lightning brightens rain and bolts). */
   const gains = new Map<object, number>()
   /** Only the nearest water renders its mirror, within this distance (Pomorog: 11 m). */
@@ -204,7 +206,7 @@ export function createAsciiEngine(canvas: HTMLCanvasElement, options: AsciiEngin
       case 'body': {
         const ramp = s.surface ? BODY_RAMPS[s.surface] : undefined
         const scenery = ramp && ramp !== 'actor'
-        glyphBody(meshes, bodies, s.size ?? (scenery ? .19 : .155), 'actor', ramp)
+        skinnedLetters.push(...glyphBody(meshes, bodies, s.size ?? (scenery ? .19 : .155), 'actor', ramp))
         return
       }
       case 'carpet':
@@ -396,6 +398,12 @@ export function createAsciiEngine(canvas: HTMLCanvasElement, options: AsciiEngin
       const contacts = uniforms.contacts.value as THREE.Vector4[]
       if (actors.hero) contacts[0].set(actors.hero.x, actors.hero.z, .55, 1); else contacts[0].set(100, 100, 0, 0)
       if (actors.foe) contacts[1].set(actors.foe.x, actors.foe.z, Math.max(.5, actors.foeHeight * .45), 1); else contacts[1].set(100, 100, 0, 0)
+      skinnedLetters = skinnedLetters.filter((points) => points.parent)
+      if (skinnedLetters.length) {
+        // Bones are usually siblings of the mesh: settle the whole graph first.
+        scene.updateMatrixWorld()
+        for (const points of skinnedLetters) updateSkinnedBody(points)
+      }
       updateGlyphBodies(bodies, camera, height, lantern.position, lantern.on ? style.bodyLantern : 0, hearth.position, hearth.on ? hearth.power : 0, style.bodyAmbient)
       const hero = actors.hero ?? new THREE.Vector3(100, 0, 100)
       for (const carpet of carpets) carpet.update(time, hero, actors.foe, camera, focus, style.atmosphere, style.brightness)
