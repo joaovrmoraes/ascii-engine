@@ -10,12 +10,13 @@ import type { AsciiEngine, GlyphKind, GlyphStyle, SurfaceKind } from '@ascii-eng
 const KINDS: GlyphKind[] = ['surface', 'body', 'screen']
 const FAMILIES: SurfaceKind[] = ['earth', 'stone', 'wood', 'bark', 'foliage', 'snow', 'wetgrass', 'actor']
 
-export function createSelection(engine: AsciiEngine, canvas: HTMLCanvasElement, root: HTMLElement) {
-  let selected: ReturnType<AsciiEngine['pick']> & { level: 'part' | 'object' } | undefined
+export function createSelection(engine: AsciiEngine, canvas: HTMLCanvasElement, root: HTMLElement, callbacks: { select?: (object?: THREE.Object3D) => void; changed?: () => void } = {}) {
+  let selected: Omit<NonNullable<ReturnType<AsciiEngine['pick']>>, 'node'> & { node: THREE.Object3D; level: 'part' | 'object' } | undefined
   const box = new THREE.Box3Helper(new THREE.Box3(), 0xd3b27c)
   box.visible = false; engine.particleScene.add(box)
   root.innerHTML = `
     <div data-k="what">clique numa parte da cena</div>
+    <label>parte <select data-k="part"></select></label>
     <label>técnica <select data-k="glyph">${KINDS.map((k) => `<option>${k}</option>`).join('')}</select></label>
     <label>letras <select data-k="surface"><option value="">(herdar)</option>${FAMILIES.map((k) => `<option>${k}</option>`).join('')}</select></label>
     <label>tamanho <input data-k="size" type="number" min=".08" max=".5" step=".01" placeholder="(herdar)"></label>
@@ -35,23 +36,48 @@ export function createSelection(engine: AsciiEngine, canvas: HTMLCanvasElement, 
     const target = selected.level === 'part' ? selected.node : selected.object
     box.box.setFromObject(target); box.visible = true
     const style = selected.style ?? {}
+    const parts = el<HTMLSelectElement>('part')
+    parts.replaceChildren(new Option('Objeto inteiro', ''))
+    const names = new Set<string>()
+    selected.object.traverse(node => { if (node !== selected!.object && node.name && !node.userData.glyphBodyLetters && !(node instanceof THREE.Points)) names.add(node.name) })
+    names.forEach(name => parts.append(new Option(name, name)))
+    parts.value = selected.level === 'part' ? selected.part ?? '' : ''
     what.textContent = `${selected.type ? `tipo ${selected.type} · ` : ''}${selected.level === 'part' && selected.part ? `parte "${selected.part}"` : `objeto "${selected.object.name || selected.object.type}"`}`
     el<HTMLSelectElement>('glyph').value = style.glyph ?? 'surface'
     el<HTMLSelectElement>('surface').value = style.surface ?? ''
     el<HTMLInputElement>('size').value = style.size ? String(style.size) : ''
     el<HTMLSelectElement>('scope').querySelector<HTMLOptionElement>('[value="type"]')!.disabled = !selected.type
   }
+  el<HTMLSelectElement>('part').onchange = e => {
+    if (!selected) return
+    const name = (e.target as HTMLSelectElement).value
+    const node = name ? selected.object.getObjectByName(name) : selected.object
+    if (!node) return
+    selected.node = node; selected.part = name || undefined; selected.level = name ? 'part' : 'object'
+    selected.style = (node.userData.glyphResolved as GlyphStyle | undefined) ?? engine.instanceStyle(selected.object) ?? {}
+    show()
+  }
 
   let downX = 0, downY = 0
   canvas.addEventListener('pointerdown', (e) => { downX = e.clientX; downY = e.clientY })
   canvas.addEventListener('pointerup', (e) => {
+    if (e.button !== 0 || e.shiftKey) return
     if (Math.hypot(e.clientX - downX, e.clientY - downY) > 5) return
     const rect = canvas.getBoundingClientRect()
     const hit = engine.pick((e.clientX - rect.left) / rect.width * 2 - 1, -((e.clientY - rect.top) / rect.height) * 2 + 1)
-    if (!hit) { selected = undefined; show(); return }
+    if (!hit) { selected = undefined; show(); callbacks.select?.(); return }
     // Second click on the same part climbs to the whole object.
     const same = selected && selected.object === hit.object && (selected.part === hit.part)
     selected = { ...hit, level: same && selected!.level === 'part' || !hit.part ? 'object' : 'part' }
+    show(); callbacks.select?.(hit.object)
+  })
+  canvas.addEventListener('scene-replaced', () => { selected = undefined; show() })
+  canvas.addEventListener('select-scene-object', (event) => {
+    const object = (event as CustomEvent<THREE.Object3D>).detail
+    if (!object) { selected = undefined; show(); return }
+    const instance = engine.instanceStyle(object)
+    if (!instance) return
+    selected = { object, node: object, part: undefined, type: instance.type, instance, style: instance, point: object.position.clone(), level: 'object' }
     show()
   })
   addEventListener('keydown', (e) => {
@@ -75,6 +101,7 @@ export function createSelection(engine: AsciiEngine, canvas: HTMLCanvasElement, 
     // Re-read what the part resolves to now.
     selected.style = (selected.node.userData.glyphResolved as GlyphStyle | undefined) ?? style
     show()
+    callbacks.changed?.()
   }
   return { get selected() { return selected }, refresh: () => { if (selected) box.box.setFromObject(selected.level === 'part' ? selected.node : selected.object) } }
 }

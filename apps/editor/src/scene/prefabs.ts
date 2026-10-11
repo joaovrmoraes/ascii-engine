@@ -1,5 +1,5 @@
 import * as THREE from 'three'
-import { createCampfire, type AsciiEngine, type PrefabLibrary } from '@ascii-engine/core'
+import { createCampfire, POMOROG_EFFECTS, type AsciiEngine, type EffectInstance, type PrefabLibrary } from '@ascii-engine/core'
 import { cap, createCamp, createKit, createTree, log, rock } from './pomorogKit'
 
 /**
@@ -8,15 +8,12 @@ import { cap, createCamp, createKit, createTree, log, rock } from './pomorogKit'
  */
 export function createPrefabs(engine: AsciiEngine): PrefabLibrary {
   const kit = createKit()
-  const fireLetters = engine.createParticles(4000)
-  engine.add(fireLetters.mesh, { glyph: 'particle' })
-  const fires = new Map<THREE.Object3D, ReturnType<typeof createCampfire>>()
-  let lastClear = -1
+  const fires = new WeakMap<THREE.Object3D, { fire: ReturnType<typeof createCampfire>; letters: ReturnType<AsciiEngine['createParticles']> }>()
   const library: PrefabLibrary = {
     arvore: {
       title: 'árvore', style: { style: { glyph: 'surface', surface: 'bark' }, parts: { crown: { glyph: 'body', surface: 'foliage', size: .19 }, trunk: { glyph: 'surface', surface: 'bark' } } },
-      create() {
-        const tree = createTree(0, 0, 3.8 + Math.random() * 1.2, Math.floor(Math.random() * 1e6))
+      create({ random }) {
+        const tree = createTree(0, 0, 3.8 + random() * 1.2, Math.floor(random() * 1e6))
         tree.root.userData.animate = tree.animate
         return tree.root
       },
@@ -24,11 +21,11 @@ export function createPrefabs(engine: AsciiEngine): PrefabLibrary {
     },
     pedregulho: {
       title: 'pedregulho',
-      create() {
+      create({ random }) {
         const group = new THREE.Group()
         for (let k = 0; k < 3; k++) {
-          const s = .3 + Math.random() * .45
-          kit.add(rock, [0x6a706c, 0x787d78, 0x5c625f][k], (Math.random() - .5) * 1.1, s * .4, (Math.random() - .5) * 1.1, s, s * .8, s * .9, group, 'stone').rotation.set(Math.random(), Math.random() * 6, Math.random())
+          const s = .3 + random() * .45
+          kit.add(rock, [0x6a706c, 0x787d78, 0x5c625f][k], (random() - .5) * 1.1, s * .4, (random() - .5) * 1.1, s, s * .8, s * .9, group, 'stone').rotation.set(random(), random() * 6, random())
         }
         return group
       },
@@ -73,31 +70,49 @@ export function createPrefabs(engine: AsciiEngine): PrefabLibrary {
     },
     'tronco-caido': {
       title: 'tronco caído',
-      create() {
+      create({ random }) {
         const g = new THREE.Group()
         kit.add(log, 0x6d5a42, 0, .22, 0, .22, 3.4, .22, g, 'bark').rotation.set(Math.PI / 2, 0, 0)
-        for (let i = 0; i < 5; i++) kit.add(cap, 0xc9a96b, (Math.random() - .5) * .3, .35, (Math.random() - .5) * 2.6, .12, .06, .12, g, 'wood')
+        for (let i = 0; i < 5; i++) kit.add(cap, 0xc9a96b, (random() - .5) * .3, .35, (random() - .5) * 2.6, .12, .06, .12, g, 'wood')
         return g
       },
     },
+    bloco: { title: 'forma: bloco', create() { const g = new THREE.Group(); kit.box(0x8a8271, 0, .5, 0, 1, 1, 1, g, 'wood'); return g } },
+    cilindro: { title: 'forma: cilindro', create() { const g = new THREE.Group(); kit.add(log, 0x8a8271, 0, .5, 0, .5, 1, .5, g, 'wood'); return g } },
+    esfera: { title: 'forma: pedra facetada', create() { const g = new THREE.Group(); kit.add(rock, 0x8a8271, 0, .5, 0, .5, .5, .5, g, 'stone'); return g } },
     fogueira: {
       title: 'fogueira (com fogo e luz)',
+      dispose(object) { const entry = fires.get(object); if (entry) { engine.remove(entry.letters.mesh, { dispose: true }); entry.fire.light.dispose(); fires.delete(object) } },
       create() {
         const camp = createCamp(kit, false)
-        const fire = createCampfire(fireLetters, new THREE.Vector3())
+        const letters = engine.createParticles(1000)
+        engine.add(letters.mesh, { glyph: 'particle' })
+        const fire = createCampfire(letters, new THREE.Vector3())
         camp.add(fire.light); fire.light.position.set(0, 1.05, 0)
-        fires.set(camp, fire)
+        fires.set(camp, { fire, letters })
         return camp
       },
       update(object, time) {
-        const fire = fires.get(object)
-        if (!fire || !object.parent) return
-        if (time !== lastClear) { fireLetters.clear(); lastClear = time }
+        const entry = fires.get(object)
+        if (!entry || !object.parent) return
+        const { fire, letters } = entry
+        letters.clear()
+        if (!object.visible) return
         object.getWorldPosition(fire.position)
         fire.update(time, engine.camera)
         fire.light.position.set(0, 1.05, 0)
       },
     },
+  }
+  const effects = new WeakMap<THREE.Object3D, EffectInstance>()
+  for (const definition of POMOROG_EFFECTS.filter(effect => effect.name !== 'fogueira')) library[`fx:${definition.name}`] = {
+    title: `efeito: ${definition.name}`,
+    create() { return new THREE.Group() },
+    update(object) {
+      if (!object.visible) { effects.get(object)?.cancel(); effects.delete(object); return }
+      if (!effects.has(object)) effects.set(object, engine.fx.play(definition.name, object, { loop: true }))
+    },
+    dispose(object) { effects.get(object)?.cancel(); effects.delete(object) },
   }
   return library
 }

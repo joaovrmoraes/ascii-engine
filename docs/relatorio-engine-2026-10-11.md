@@ -1,5 +1,9 @@
 # Auditoria do ASCII Engine — 11/10/2026
 
+> Atualização posterior: os problemas centrais de persistência, sementes,
+> descarte e autoria básica foram tratados. Veja o [guia da entrega visual](guia-editor-visual.md)
+> e o [registro de validação](log.md). Este relatório preserva o estado anterior.
+
 **Diagnóstico:** existe um núcleo gráfico ASCII substancial e funcional, com
 cinco demonstrações do Pomorog. O editor ainda é um protótipo de ferramentas:
 não fecha com segurança o ciclo de criar, editar, salvar, reabrir e exportar

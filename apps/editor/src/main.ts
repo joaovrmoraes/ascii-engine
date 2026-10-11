@@ -16,7 +16,7 @@ import type { AsciiEngine, AsciiPassHook } from '@ascii-engine/core'
 
 export interface AreaEntry {
   title: string
-  create: (engine: AsciiEngine, options: AreaOptions) => Area
+  create: (engine: AsciiEngine, options: AreaOptions) => Area | Promise<Area>
   /** Screen-pass hooks the area needs (the engine builds the pass with them). */
   hooks?: AsciiPassHook[]
 }
@@ -57,12 +57,15 @@ const canvas = document.createElement('canvas')
 canvas.style.width = canvas.style.height = '100%'; canvas.style.display = 'block'
 host.appendChild(canvas)
 
-const areaId = params.get('area') ?? game?.area ?? (sceneDoc ? 'sandbox' : params.get('scene') ?? 'dark_forest')
+const areaId = params.get('area') ?? game?.area ?? (sceneDoc ? 'sandbox' : params.get('scene') ?? 'sandbox')
 const entry = AREAS[areaId] ?? AREAS.dark_forest
 const engine = createAsciiEngine(canvas, { hooks: entry.hooks, style: game?.style })
 const mode = params.get('ascii') ?? 'letters'
 engine.debug.raw = mode === 'raw'
-const area = entry.create(engine, { screen: mode === 'screen', camp: params.has('camp'), hunt: params.has('hunt') ? Number(params.get('hunt')) : undefined, at: params.has('at') ? Number(params.get('at')) : undefined, peaceful: params.has('peaceful'), scene: sceneDoc })
+const area = await Promise.resolve().then(() => entry.create(engine, { screen: mode === 'screen', camp: params.has('camp'), hunt: params.has('hunt') ? Number(params.get('hunt')) : undefined, at: params.has('at') ? Number(params.get('at')) : undefined, peaceful: params.has('peaceful'), scene: sceneDoc })).catch(error => {
+  const message = document.createElement('p'); message.textContent = `Não foi possível abrir a cena: ${error}`; message.style.cssText = 'position:fixed;inset:20px;z-index:10;background:#141219;padding:20px'; document.body.append(message)
+  throw error
+})
 const view = {
   angle: Number(params.get('angle') ?? 0), zoom: Number(params.get('zoom') ?? game?.zoom ?? .9),
   paused: false, pauseAt: params.has('pause') ? Number(params.get('pause')) : Infinity,
@@ -70,20 +73,34 @@ const view = {
 if (params.has('cell')) engine.setStyle({ cellSize: Number(params.get('cell')) })
 if (params.has('light')) engine.setStyle({ brightness: Number(params.get('light')) })
 
-let drag = 0, dragX = 0, dragging = false
-canvas.addEventListener('pointerdown', (e) => { dragging = true; dragX = e.clientX - drag / .006; canvas.setPointerCapture(e.pointerId) })
-canvas.addEventListener('pointermove', (e) => { if (dragging) drag = (e.clientX - dragX) * .006 })
+let drag = 0, dragX = 0, dragging = false, panning = false, lastX = 0, lastY = 0
+canvas.addEventListener('contextmenu', e => e.preventDefault())
+canvas.addEventListener('pointerdown', (e) => { dragging = true; panning = e.button !== 0 || e.shiftKey; lastX = e.clientX; lastY = e.clientY; dragX = e.clientX - drag / .006; canvas.setPointerCapture(e.pointerId) })
+canvas.addEventListener('pointermove', (e) => {
+  if (!dragging) return
+  if (panning && area.pan) {
+    const s = (engine.camera.top - engine.camera.bottom) / engine.size.height
+    const dx = (e.clientX - lastX) * s, dy = (e.clientY - lastY) * s * 1.4
+    area.pan(-dx * Math.cos(angle) + dy * Math.sin(angle), dx * Math.sin(angle) + dy * Math.cos(angle))
+    lastX = e.clientX; lastY = e.clientY
+  } else drag = (e.clientX - dragX) * .006
+})
 canvas.addEventListener('pointerup', () => { dragging = false })
-canvas.addEventListener('wheel', (e) => { e.preventDefault(); view.zoom = THREE.MathUtils.clamp(view.zoom * Math.exp(-e.deltaY * .001), .75, 1.5) }, { passive: false })
+canvas.addEventListener('wheel', (e) => { e.preventDefault(); view.zoom = THREE.MathUtils.clamp(view.zoom * Math.exp(-e.deltaY * .001), area.id === 'sandbox' ? .18 : .75, area.id === 'sandbox' ? 4 : 1.5) }, { passive: false })
 
 const imported: GlyphModel[] = []
 const importAt = (file: File) => importFile(engine, file, area.focus(angle, new THREE.Vector3()).setY(0))
   .then((model) => { imported.push(model); status.dataset.note = `importado: ${file.name} (${model.parts.length} partes)` })
   .catch((error) => { status.dataset.note = `erro ao importar ${file.name}: ${error}` })
 addEventListener('dragover', (e) => e.preventDefault())
-addEventListener('drop', (e) => { e.preventDefault(); for (const file of e.dataTransfer?.files ?? []) void importAt(file) })
-const panel = createPanel({ engine, view, areas: AREAS, areaId, mode, capture: () => captureNext = true, importFile: (file) => void importAt(file) })
-const selection = player ? { refresh() {} } : createSelection(engine, canvas, document.getElementById('selection')!)
+const importFiles = (files: File[]) => {
+  if (player) return
+  const action = area.importFiles ? area.importFiles(files) : Promise.all(files.map(importAt))
+  void action.catch(error => { status.dataset.note = String(error) })
+}
+addEventListener('drop', (e) => { e.preventDefault(); importFiles(Array.from(e.dataTransfer?.files ?? [])) })
+const panel = createPanel({ engine, view, areas: AREAS, areaId, mode, capture: () => captureNext = true, importFiles, changed: area.changed })
+const selection = player ? { refresh() {} } : createSelection(engine, canvas, document.getElementById('selection')!, { select: area.select, changed: area.changed })
 const status = document.getElementById('status')!
 const focus = new THREE.Vector3()
 let last = 0, frames = 0, sample = 0, fps = 0, captureNext = false

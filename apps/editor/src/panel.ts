@@ -1,4 +1,4 @@
-import type { AsciiEngine } from '@ascii-engine/core'
+import { parseScene, type AsciiEngine } from '@ascii-engine/core'
 
 interface PanelOptions {
   engine: AsciiEngine
@@ -7,7 +7,8 @@ interface PanelOptions {
   areaId: string
   mode: string
   capture: () => void
-  importFile: (file: File) => void
+  importFiles: (files: File[]) => void
+  changed?: () => void
 }
 
 /**
@@ -15,7 +16,7 @@ interface PanelOptions {
  * brightness (the player's "Imagem" controls), zoom and rotation.
  * Changing area or mode reloads with the URL, so every view is shareable.
  */
-export function createPanel({ engine, view, areas, areaId, mode, capture, importFile }: PanelOptions) {
+export function createPanel({ engine, view, areas, areaId, mode, capture, importFiles, changed }: PanelOptions) {
   const root = document.getElementById('panel')!
   const go = (key: string, value: string) => { const p = new URLSearchParams(location.search); p.set(key, value); location.search = p.toString() }
   root.innerHTML = `
@@ -23,10 +24,10 @@ export function createPanel({ engine, view, areas, areaId, mode, capture, import
     <label>modo <select data-k="mode">${[['letters', 'letras'], ['screen', 'tela (antigo)'], ['raw', 'sem passe de tela']].map(([v, t]) => `<option value="${v}"${v === mode ? ' selected' : ''}>${t}</option>`).join('')}</select></label>
     <label>tamanho <input data-k="cell" type="range" min="5" max="12" step="1"><output></output></label>
     <label>luz <input data-k="light" type="range" min=".65" max="1.4" step=".05"><output></output></label>
-    <label>zoom <input data-k="zoom" type="range" min=".75" max="1.5" step=".05"><output></output></label>
+    <label>zoom <input data-k="zoom" type="range" min="${areaId === 'sandbox' ? '.18' : '.75'}" max="${areaId === 'sandbox' ? '4' : '1.5'}" step=".05"><output></output></label>
     <label>giro <input data-k="angle" type="range" min="-3.14" max="3.14" step=".05"><output></output></label>
     <button data-k="pause">[ pausar ]</button> <button data-k="shot">[ captura ]</button>
-    <label class="file">[ importar .glb/.gltf ]<input data-k="import" type="file" accept=".glb,.gltf" hidden></label>
+    <label class="file">[ importar modelos e arquivos ]<input data-k="import" type="file" multiple accept=".glb,.gltf,.bin,.png,.jpg,.jpeg,.webp" hidden></label>
     <button data-k="save">[ salvar preset .json ]</button>
     <label class="file">[ carregar preset .json ]<input data-k="load" type="file" accept=".json" hidden></label>`
   const input = (k: string) => root.querySelector<HTMLInputElement>(`[data-k="${k}"]`)!
@@ -36,6 +37,7 @@ export function createPanel({ engine, view, areas, areaId, mode, capture, import
     const el = input(k), out = el.nextElementSibling as HTMLOutputElement
     const show = () => { el.value = String(get()); out.textContent = fmt(get()) }
     el.oninput = () => { set(Number(el.value)); show() }
+    el.onchange = () => { if (k === 'cell' || k === 'light') changed?.() }
     return show
   }
   const shows = [
@@ -48,7 +50,7 @@ export function createPanel({ engine, view, areas, areaId, mode, capture, import
   pause.onclick = () => { view.paused = !view.paused; pause.textContent = view.paused ? '[ continuar ]' : '[ pausar ]' }
   root.querySelector<HTMLButtonElement>('[data-k="shot"]')!.onclick = capture
   const picker = input('import')
-  picker.onchange = () => { for (const file of picker.files ?? []) importFile(file); picker.value = '' }
+  picker.onchange = () => { importFiles(Array.from(picker.files ?? [])); picker.value = '' }
   // Presets: the global letter layer, object types, lights and screen settings as JSON.
   root.querySelector<HTMLButtonElement>('[data-k="save"]')!.onclick = () => {
     const blob = new Blob([JSON.stringify(engine.exportStyle(), null, 2)], { type: 'application/json' })
@@ -59,7 +61,7 @@ export function createPanel({ engine, view, areas, areaId, mode, capture, import
   loader.onchange = async () => {
     const file = loader.files?.[0]; loader.value = ''
     if (!file) return
-    try { engine.setStyle(JSON.parse(await file.text())); refresh() } catch (error) { alert(`preset inválido: ${error}`) }
+    try { const doc = parseScene({ version: 1, objects: [], style: JSON.parse(await file.text()) }); engine.setStyle(doc.style!); refresh(); changed?.() } catch (error) { document.getElementById('status')!.dataset.note = `preset inválido: ${error}` }
   }
   const refresh = () => shows.forEach((show) => show())
   refresh()

@@ -26,4 +26,10 @@ export interface Area {
   focus(angle: number, target: THREE.Vector3): THREE.Vector3
   update(time: number, dt: number): void
   dispose(): void
+  importFiles?(files: File[]): Promise<void>
+  select?(object?: THREE.Object3D): void
+  changed?(): void
+  pan?(x: number, z: number): void
+  document?(): import('@ascii-engine/core').SceneDoc
+  openDocument?(doc: unknown): Promise<void>
 }

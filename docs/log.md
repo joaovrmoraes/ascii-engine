@@ -1,5 +1,51 @@
 # Registro de trabalho
 
+## 11/10/2026 — Autoria visual e exportação portável
+
+- Escopo confirmado pelo dono: terrenos, mapas, itens e afins; regras e
+  interface do jogo ficam fora. Plano em
+  [`plano-autoria-pomorog.md`](plano-autoria-pomorog.md), guia e limites em
+  [`guia-editor-visual.md`](guia-editor-visual.md).
+- Conferidos sem alteração `~/Documents/pomorog` (`main`, `f79d3c7`, com
+  mudanças locais do dono) e seu worktree visual `pearleye` (`27af922`).
+  A referência deste repositório corresponde ao segundo.
+- Documento: normalização/validação, identidades e sementes estáveis,
+  transformações 3D, visibilidade, nome, estilos globais/de tipo/por parte,
+  GLTF/GLB incorporados e escolha de clipe. A construção de uma cena que
+  falha limpa recursos; o editor mantém a anterior até a nova ficar pronta.
+- Editor: entrada padrão no sandbox; lista e inspetor de objetos/águas;
+  mover/girar/escalar/duplicar/apagar/focar; seleção de partes por lista;
+  mapa ou item sem terreno; inserir item salvo; desfazer/refazer por ação
+  e traço; rascunho em IndexedDB com erro visível; exportação visual JSON.
+- Ambiente: chuva/neve e efeitos da biblioteca no documento. Lago/riacho
+  escavam usando o mesmo `waterEdge` do componente. Máscara de grama fica
+  restrita ao contorno. Formas básicas permitem compor itens.
+- Descarte: carpet/partículas/chuva deixam os registros de atualização;
+  camadas removidas sem descarte podem ser readicionadas; efeitos possuem
+  cancelamento imediato; fogueiras têm buffers independentes. Observável
+  `engine.resources` usado nas verificações de recarga.
+- Testes: `pnpm check` passou (**41 testes**, tipos e build),
+  `pnpm verify:authoring /tmp/ascii-authoring-final` passou no Chromium real:
+  transformações, partes, histórico, item sem terreno, GLTF+bin, GLB,
+  clipes, dados malformados, falha durante construção, reabertura repetida,
+  clima, pincéis, lago e restauração após recarregar o navegador. Nenhuma
+  exceção não tratada na página. Aviso de bundle Vite >500 kB permanece.
+- `pnpm compare`: seis vistas dentro dos limites existentes, sem atualizar
+  baselines. [Capturas e métricas](captures/autoria-2026-10-11/README.md).
+- Exportação web criada em `/tmp/ascii-authoring-export`, servida na porta
+  1441 e capturada com `cdpshot.mjs`: modo jogador, 3 objetos, lago e chuva.
+  Orca Browser: inspeção por snapshot e captura do canvas renderizado;
+  screenshot da página completa falhou por timeout do compositor.
+- Exemplos para abrir em [`examples/`](examples/). Atualizados `START.md`
+  e `README.md`. Nenhuma alteração no Pomorog nem em `reference/`.
+- Pendências: importador do Pomorog, fidelidade completa das cinco áreas,
+  agrupamento/gizmos, biblioteca vinculada, editor de chunks/costuras,
+  águas/pincéis avançados e editor completo de efeitos. A autoria básica
+  está utilizável; o plano inteiro de engine não está concluído.
+- Branch local `feat/scene-authoring`. Sem push, publicação ou teste novo
+  de desktop/mobile.
+
+
 ## 11/10/2026 — Auditoria do estado real e retomada
 
 - Relatório: [`relatorio-engine-2026-10-11.md`](relatorio-engine-2026-10-11.md).

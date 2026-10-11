@@ -1,0 +1,25 @@
+body.authoring { --border: #34323b; --muted: #929098; --accent: #d3b27c; }
+body.authoring #app { inset: 54px 306px 30px 256px; }
+#authoring-toolbar { position: fixed; inset: 0 0 auto; min-height: 44px; padding: 5px 12px; display: flex; gap: 8px; align-items: center; background: #141219; border-bottom: 1px solid var(--border); z-index: 2; }
+#authoring-toolbar strong { color: var(--accent); white-space: nowrap; }
+#authoring-toolbar input { width: 120px; }
+#authoring-toolbar [data-k="note"] { color: var(--muted); font-size: 10px; max-width: 250px; }
+body.authoring button, body.authoring select, body.authoring input:not([type="range"]), body.authoring .file { font: inherit; color: inherit; background: #1b1821; border: 1px solid var(--border); border-radius: 3px; padding: 5px; min-width: 0; box-sizing: border-box; }
+body.authoring button, body.authoring .file { cursor: pointer; }
+body.authoring button:hover, body.authoring .file:hover { border-color: var(--accent); }
+body.authoring button:disabled { opacity: .35; cursor: default; }
+body.authoring [hidden] { display: none !important; }
+#hierarchy { position: fixed; left: 0; top: 55px; bottom: 30px; width: 231px; padding: 12px; overflow: auto; border-right: 1px solid var(--border); background: #100e15; }
+#hierarchy strong, #tools .title { color: var(--accent); font-size: 11px; letter-spacing: 1px; }
+#hierarchy [data-k="objects"] { display: grid; gap: 4px; margin: 14px 0; max-height: 210px; overflow: auto; }
+#hierarchy [data-k="objects"] button { text-align: left; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+#hierarchy button.active { border-color: var(--accent); background: #30291f; }
+#hierarchy [data-k="inspector"] { display: grid; gap: 6px; border-top: 1px solid var(--border); padding-top: 12px; }
+#hierarchy label { display: grid; grid-template-columns: 1fr 100px; align-items: center; gap: 6px; }
+#hierarchy p { color: var(--muted); margin: 8px 0 0; line-height: 1.5; }
+#authoring-sidebar { position: fixed; right: 0; top: 55px; bottom: 30px; width: 305px; border-left: 1px solid var(--border); overflow: auto; background: #100e15; }
+body.authoring #panel, body.authoring #tools, body.authoring #selection { position: static; min-width: 0; border: 0; border-bottom: 1px solid var(--border); background: transparent; margin: 0; padding: 12px; gap: 8px; }
+body.authoring #panel label { grid-template-columns: 64px 1fr 38px; }
+body.authoring #tools p { color: var(--muted); line-height: 1.65; margin: 6px 0 0; font-size: 10px; }
+body.authoring #status { inset: auto 0 0; height: 20px; padding: 5px 12px; background: #141219; border-top: 1px solid var(--border); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-size: 10px; }
+@media (max-width: 1050px) { #authoring-toolbar { flex-wrap: wrap; } #authoring-toolbar [data-k="note"] { display: none; } }

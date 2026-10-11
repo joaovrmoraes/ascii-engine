@@ -271,6 +271,24 @@ aprovadas e nenhum módulo do núcleo importa nada específico do jogo.
 
 ### Estado em 11/10/2026
 
+**Atualização de autoria visual:** o editor agora inicia no sandbox com
+hierarquia, transformações, partes, duplicação/exclusão, desfazer/refazer,
+rascunho em IndexedDB, modelos GLTF/GLB incorporados e exportação de
+`SceneDoc`. Mapas e itens sem terreno podem ser salvos/reabertos; chuva,
+neve e efeitos da biblioteca podem compor o documento. O pedido atual do
+dono se limita ao visual exportável, sem regras nem interface de jogo.
+Veja o [guia e limites da entrega](docs/guia-editor-visual.md) e os
+[exemplos](docs/examples/). Isso fecha o marco de persistência/autoria
+básica, mas não todos os recursos das fases abaixo.
+
+No núcleo, `world/validation.ts` valida documentos, `world/history.ts`
+guarda snapshots limitados, `import/assets.ts` resolve fontes incorporadas
+e `weather/sceneWeather.ts` liga as receitas de precipitação ao documento.
+As receitas de objetos do Pomorog continuam no editor. O futuro importador
+do jogo precisará fornecer uma biblioteca compatível a `buildScene`.
+
+**Diagnóstico anterior, preservado como contexto da auditoria:**
+
 Existe uma implementação inicial das fases 1 a 6 e 8, com as 5 áreas
 montadas **em código** e selecionáveis no editor. Isso ainda não cumpre o
 critério de montá-las pelas ferramentas do editor. A autoria de cenários,
