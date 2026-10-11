@@ -28,3 +28,4 @@ export { createRain, createRainStreaks, rainDrop, type RainOptions, type RainStr
 export { createRippleField } from './world/rippleField'
 export { createMarshWater, marshShoreGLSL, legacyReflectionGLSL, type MarshFrame, type MarshIsland, type MarshSurface, type MarshWater, type MarshWaterOptions, type FootPose } from './presets/marshWater'
 export { createSnowField, snowAccumulation, snowMeltRadius, snowflake, pomorogSnow, SNOW_TRACK_LIFE, type SnowBoot, type SnowField, type SnowOptions } from './presets/snow'
+export { createCombatEffects, IMPACT_DELAY, FIRE_TRAVEL_TIME, type CombatEffects, type CombatFrame, type Entry, type Spell } from './presets/combat'

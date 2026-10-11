@@ -245,3 +245,21 @@ equivalentes aos painéis de `all-areas-ground-cover.png`. 60 fps.
 As 5 áreas do Pomorog podem ser montadas na engine e escolhidas no editor
 (painel → área). Falta a comparação lado a lado aprovada pelo dono e a
 conferência no Orca Browser com o painel visível.
+
+## 11/10/2026 — Criaturas e efeitos de combate (Fase 2, combate)
+
+- Núcleo: `presets/combat.ts` com os efeitos de combate do Pomorog
+  (`effects.ts`), todos em letras e ×1,4: crescente da espada com estrela e
+  faíscas, garras vermelhas, raio em três colunas, bola de fogo com rastro e
+  explosão, espinhos de gelo, anel de engajamento, anel de impacto, aura de
+  conjuração com luz própria (que acende a grama via `carpet.setGlow`),
+  dissolução da criatura e entradas em cena (rachaduras e terra ao sair do
+  chão, poeira na investida, vento no voo). `fx.hit()` recebe o golpe como o
+  `feedback` do jogo.
+- Editor: `src/areas/encounters.ts`. Os encontros da demo (lobo, larva,
+  aranha, vespa, goblin) são criaturas de `models.ts`/`beasts.ts` com
+  `type: 'creature'` (corpo de letras .155 m, oclusor escuro da própria cor),
+  com entrada, golpes roteirizados, magias alternadas, morte e bolsa de saque
+  no passe de tela. Ligado à Floresta (`?peaceful=1` desliga). A câmera
+  recentraliza como no Pomorog (1,25 m à frente, puxada 32% para a criatura).
+- Capturas: `floresta-combate-lobo.png` e `floresta-magias-aura-fogo.png`.

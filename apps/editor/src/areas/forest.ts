@@ -8,6 +8,7 @@ import { createAdventurer } from '../pomorog/models'
 import { damp, smooth, turn } from '../pomorog/motion'
 import { loopLength, paceAt, solveBaseSpeed } from '../pomorog/pacing'
 import type { Area, AreaOptions } from './types'
+import { createEncounters } from './encounters'
 
 /**
  * Dark Forest (Pomorog `forestWorld.ts` + `scene.ts`): a closed winding trail
@@ -263,6 +264,11 @@ export function createForest(engine: AsciiEngine, options: AreaOptions = {}): Ar
   engine.add(ambient.mesh, { glyph: 'particle' })
   const dust = createDustTrail()
   engine.setActors({ hero: player.root.position })
+  // Walks between encounters, as in the demo (seconds of hunting).
+  const WALKS = [6, 16, 12, 18, 14]
+  const encounters = createEncounters(engine, player, options.screen ? undefined : carpet)
+  let walked = 0, walkIndex = 0
+  const toward = new THREE.Vector3()
 
   let lastArc = loop.nearest(player.root.position.x, player.root.position.z), huntProgress = 0
   let speed = 0, sitting = 0, phaseStart = 0, phase: 'hunt' | 'camp' | 'depart' = options.camp ? 'camp' : options.at ? 'hunt' : 'depart'
@@ -285,10 +291,13 @@ export function createForest(engine: AsciiEngine, options: AreaOptions = {}): Ar
   return {
     id: 'dark_forest', title: 'Floresta Sombria',
     hero: player.root.position,
-    get state() { return `${phase} ${huntProgress.toFixed(0)}/${loop.length} camp:${player.root.position.distanceTo(campSeat).toFixed(1)}` },
+    get state() { return `${phase} ${encounters.state} ${encounters.name} ${huntProgress.toFixed(0)}/${loop.length} camp:${player.root.position.distanceTo(campSeat).toFixed(1)}` },
     focus(angle, target) {
-      target.copy(player.root.position); target.y = 1.05
-      target.x -= Math.sin(angle) * 2; target.z -= Math.cos(angle) * 2
+      // Pomorog framing: 2 m ahead (1.25 in combat), pulled 32% toward the creature.
+      const foe = encounters.foe
+      target.copy(player.root.position); target.y = foe ? .75 : 1.05
+      target.x -= Math.sin(angle) * (foe ? 1.25 : 2); target.z -= Math.cos(angle) * (foe ? 1.25 : 2)
+      if (foe) { target.lerp(foe, .32); target.y = .75 }
       return target
     },
     update(time, dt) {
@@ -298,6 +307,17 @@ export function createForest(engine: AsciiEngine, options: AreaOptions = {}): Ar
       else if (phase === 'camp' && age > CAMP_SECONDS && !options.camp) { phase = 'depart'; phaseStart = time }
       else if (phase === 'depart' && age > DEPART_SECONDS) { phase = 'hunt'; phaseStart = time; huntProgress = 0 }
       const camping = phase === 'camp' || phase === 'depart' && age < DEPART_SECONDS * .5
+      // Encounters along the hunt: the creature comes down the trail ahead.
+      if (phase === 'hunt' && !encounters.active && !options.peaceful) {
+        walked += dt
+        if (walked > WALKS[walkIndex % WALKS.length]) {
+          walked = 0; walkIndex++
+          const ahead = loop.point(lastArc + 4)
+          toward.set(ahead.x - player.root.position.x, 0, ahead.z - player.root.position.z).normalize()
+          encounters.begin(time, toward, engine.camera)
+        }
+      }
+      const fighting = encounters.update(time, dt)
       if (camping) {
         // Around the circuit (the shorter way) to the bonfire, then the seat.
         const forward = loop.length - lastArc
@@ -320,10 +340,10 @@ export function createForest(engine: AsciiEngine, options: AreaOptions = {}): Ar
         pace = paceAt(time)
         base = solveBaseSpeed(loop.length - huntProgress, Math.max(1, HUNT_SECONDS - age))
       }
-      const targetSpeed = seated ? 0 : base * pace * smooth(distance / .45) * (1 - smooth(sitting * 1.5))
+      const targetSpeed = seated || fighting ? 0 : base * pace * smooth(distance / .45) * (1 - smooth(sitting * 1.5))
       speed = damp(speed, targetSpeed, targetSpeed > speed ? 6 : 10, dt)
       let travelled = 0
-      if (distance > .015 && speed > .005) {
+      if (distance > .015 && speed > .005 && !fighting) {
         const targetAngle = Math.atan2(delta.x, delta.z)
         player.root.rotation.y = turn(player.root.rotation.y, targetAngle, 6, dt)
         const alignment = .4 + .6 * Math.max(0, Math.cos(targetAngle - player.root.rotation.y))
@@ -338,7 +358,7 @@ export function createForest(engine: AsciiEngine, options: AreaOptions = {}): Ar
         const fireAngle = Math.atan2(camp.x - player.root.position.x, camp.z - player.root.position.z)
         player.root.rotation.y = turn(player.root.rotation.y, fireAngle, 5, dt)
       }
-      player.animate({ time, dt, speed, distance: travelled, attackAge: 9, hurtAge: 9, sitting })
+      if (!fighting) player.animate({ time, dt, speed, distance: travelled, attackAge: 9, hurtAge: 9, sitting })
       player.root.updateMatrixWorld(true)
       lanternModel.getWorldPosition(lantern.position); lantern.position.y += .5
       lantern.intensity = 7 + Math.sin(time * 3.7) * .7 + Math.sin(time * 7.3) * .35

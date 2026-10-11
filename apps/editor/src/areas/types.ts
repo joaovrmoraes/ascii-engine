@@ -9,6 +9,8 @@ export interface AreaOptions {
   hunt?: number
   /** Start the traveller this many metres along the circuit (testing far from the camp). */
   at?: number
+  /** No encounters. */
+  peaceful?: boolean
 }
 
 /** One map of the game, built on the engine. */

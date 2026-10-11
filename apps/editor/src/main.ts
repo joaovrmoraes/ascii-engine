@@ -19,7 +19,7 @@ import { createPanel } from './panel'
 
 /**
  * ASCII Engine editor. URL: ?area=<id>, ?ascii=screen|raw, ?angle=<rad>,
- * ?zoom=<.75–1.5>, ?pause=<seconds>, ?camp=1, ?hunt=<seconds>, ?at=<metres>, ?cell=<px>, ?light=<.65–1.4>.
+ * ?zoom=<.75–1.5>, ?pause=<seconds>, ?camp=1, ?hunt=<seconds>, ?at=<metres>, ?peaceful=1, ?cell=<px>, ?light=<.65–1.4>.
  */
 export const AREAS: Record<string, AreaEntry> = {
   dark_forest: { title: 'Floresta Sombria', create: createForest },
@@ -42,7 +42,7 @@ const entry = AREAS[areaId] ?? AREAS.dark_forest
 const engine = createAsciiEngine(canvas, { hooks: entry.hooks })
 const mode = params.get('ascii') ?? 'letters'
 engine.debug.raw = mode === 'raw'
-const area = entry.create(engine, { screen: mode === 'screen', camp: params.has('camp'), hunt: params.has('hunt') ? Number(params.get('hunt')) : undefined, at: params.has('at') ? Number(params.get('at')) : undefined })
+const area = entry.create(engine, { screen: mode === 'screen', camp: params.has('camp'), hunt: params.has('hunt') ? Number(params.get('hunt')) : undefined, at: params.has('at') ? Number(params.get('at')) : undefined, peaceful: params.has('peaceful') })
 const view = {
   angle: Number(params.get('angle') ?? 0), zoom: Number(params.get('zoom') ?? .9),
   paused: false, pauseAt: params.has('pause') ? Number(params.get('pause')) : Infinity,
