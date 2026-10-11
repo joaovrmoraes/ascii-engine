@@ -1,37 +1,50 @@
 import * as THREE from 'three'
-import { ENGINE_VERSION } from '@ascii-engine/core'
+import { createAsciiEngine, ENGINE_VERSION, pomorogSpan } from '@ascii-engine/core'
+import { buildReferenceScene } from './scene/reference'
+import { buildTerrainScene } from './scene/terrain'
 
-// Cena mínima de verificação do ambiente. A fase 1 troca isto pelo
-// renderizador da engine com a cena de referência portada do Pomorog.
+// Reference scene of phase 1 (?scene=terrain: relief check). URL: ?ascii=screen (old screen pass), ?ascii=raw (no letters),
+// ?angle=<rad> (extra camera turn), ?zoom=<.75–1.5>, ?pause=<seconds>, ?yaw=<hero turn>.
+const params = new URLSearchParams(location.search)
 const host = document.getElementById('app')!
-const renderer = new THREE.WebGLRenderer({ antialias: false })
-renderer.setPixelRatio(1)
-host.appendChild(renderer.domElement)
+const canvas = document.createElement('canvas')
+canvas.style.width = canvas.style.height = '100%'; canvas.style.display = 'block'
+host.appendChild(canvas)
 
-const scene = new THREE.Scene()
-scene.background = new THREE.Color(0x09080e)
-const camera = new THREE.PerspectiveCamera(40, 1, 0.1, 100)
-camera.position.set(4, 3.2, 5)
-camera.lookAt(0, 0.5, 0)
-scene.add(new THREE.HemisphereLight(0xd6d5e7, 0x44323b, 2))
-const sun = new THREE.DirectionalLight(0xffe0af, 3)
-sun.position.set(-4, 7, 6)
-scene.add(sun)
-const box = new THREE.Mesh(new THREE.BoxGeometry(1, 1, 1), new THREE.MeshStandardMaterial({ color: 0xa17c51, flatShading: true }))
-box.position.y = 0.5
-scene.add(box)
+const engine = createAsciiEngine(canvas)
+const screenMode = params.get('ascii') === 'screen'
+engine.debug.raw = params.get('ascii') === 'raw'
+const terrain = params.get('scene') === 'terrain'
+const scene = terrain ? buildTerrainScene(engine) : buildReferenceScene(engine, screenMode, params.has('yaw') ? Number(params.get('yaw')) : undefined)
 
-function resize() {
-  const { clientWidth: w, clientHeight: h } = host
-  renderer.setSize(w, h)
-  camera.aspect = w / h
-  camera.updateProjectionMatrix()
+let angle = Number(params.get('angle') ?? 0), drag = 0, dragX = 0, dragging = false
+const zoom = Number(params.get('zoom') ?? .9)
+const pauseAt = params.has('pause') ? Number(params.get('pause')) : Infinity
+canvas.addEventListener('pointerdown', (e) => { dragging = true; dragX = e.clientX - drag / .006; canvas.setPointerCapture(e.pointerId) })
+canvas.addEventListener('pointermove', (e) => { if (dragging) drag = (e.clientX - dragX) * .006 })
+canvas.addEventListener('pointerup', () => { dragging = false })
+
+const status = document.getElementById('status')!
+const focus = new THREE.Vector3()
+let last = 0, frames = 0, sample = 0, fps = 0
+function frame(now: number) {
+  const dt = last ? (now - last) / 1000 : 0; last = now
+  const step = engine.time + dt > pauseAt ? Math.max(0, pauseAt - engine.time) : dt
+  const a = Math.PI / 7 + angle + drag
+  const { width, height } = engine.size
+  // Pomorog framing: focus 2 m ahead of the hero, at chest height.
+  if ('traveller' in scene) {
+    focus.copy(scene.traveller.root.position); focus.y = 1.05
+    focus.x -= Math.sin(a) * 2; focus.z -= Math.cos(a) * 2
+  } else focus.copy(scene.focus)
+  engine.frame(focus, pomorogSpan(height, width / height, zoom), a)
+  scene.update(engine.time + step)
+  engine.render(step)
+  frames++
+  if (now - sample > 1000) { fps = Math.round(frames * 1000 / (now - sample)); frames = 0; sample = now }
+  status.textContent = `ascii-engine ${ENGINE_VERSION} · ${terrain ? 'relevo' : 'cena de referência'}${screenMode ? ' (modo tela)' : ''} · ${fps} fps · arraste para girar`
+  canvas.dataset.ready = 'true'
+  requestAnimationFrame(frame)
 }
-addEventListener('resize', resize)
-resize()
-
-document.getElementById('status')!.textContent = `ascii-engine ${ENGINE_VERSION} · sem passe ASCII (fase 0)`
-renderer.setAnimationLoop((t) => {
-  box.rotation.y = t / 1600
-  renderer.render(scene, camera)
-})
+requestAnimationFrame(frame)
+Object.assign(window, { engine, referenceScene: scene })

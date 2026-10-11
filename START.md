@@ -209,6 +209,13 @@ ascii-engine/
 ```
 
 - O **núcleo** não conhece jogo, UI nem Tauri. Ele roda em qualquer navegador.
+  Módulos (fase 1): `surface.ts` (IDs no alpha), `illumination.ts` +
+  `exploration.ts` (luz local), `ascii.ts` (passe de tela, com ganchos
+  `AsciiPassHook` para bioma), `style.ts` (estilo por parte em camadas),
+  `techniques/` (`screen`, `surface`, `body`, `carpet`, `particle`),
+  `presets/` (`pomorog`, fogueira `HeatGridSpec`) e `engine.ts`
+  (`createAsciiEngine`, `add` com `type`/`parts`, `setPartStyle`,
+  `setTypeStyle`, `render`).
 - O **editor** é a vitrine e a ferramenta: cena de teste, ajustes ao vivo e,
   depois, importação e exportação.
 - O **Tauri** só entra para o que o navegador não faz: arquivos e empacotamento.
