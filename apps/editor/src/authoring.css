@@ -234,3 +234,13 @@ body.effect-studio-active #app > canvas { visibility: hidden; }
 #editor-workspace .studio-save .primary { background: #436891; border-color: #7395be; color: #fff; }
 #editor-workspace .studio-save .primary:hover { background: #557fae; }
 @media (max-width: 1200px) { .fx-templates { grid-template-columns: repeat(2, minmax(0,1fr)); } }
+.fx-preview-title button { pointer-events: auto; border: 1px solid #59697e; background: #293a50; color: #d5e5ff; border-radius: 4px; padding: 7px 9px; cursor: pointer; margin-top: 8px; }
+.fx-position { display: grid; gap: 9px; margin: 0 0 12px; padding: 10px; background: #292d34; border: 1px solid #454c58; border-radius: 4px; }
+.fx-position > label { display: grid; grid-template-columns: 110px 1fr; align-items: center; gap: 8px; font-size: 11px; }
+.fx-position > button { justify-self: end; }
+#camera-view-bar { position: absolute; top: 10px; left: 50%; transform: translateX(-50%); z-index: 4; display: flex; gap: 12px; align-items: center; background: #202934eb; padding: 7px 10px; border: 1px solid #587393; border-radius: 4px; }
+#camera-view-bar[hidden] { display: none; }
+#camera-view-bar button { border: 1px solid #57687e; background: #344459; color: #e3ecfa; padding: 5px 9px; cursor: pointer; border-radius: 3px; }
+.camera-actions { display: grid; gap: 6px; }
+
+body.effect-studio-active #camera-view-bar { display: none; }

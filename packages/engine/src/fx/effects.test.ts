@@ -14,6 +14,17 @@ function fakeCloud() {
 }
 
 describe('effect system', () => {
+  it.each(['heat', 'ribbon'] as const)('preserves XYZ layer offsets for %s', render => {
+    function sample(offset: [number,number,number]) {
+      const points: number[][] = [], cloud = { push: (x:number,y:number,z:number) => points.push([x,y,z]) }
+      const fx = createEffectSystem(cloud as never, new THREE.Scene())
+      fx.play({ name:'Camada', duration:2, emitters:[{name:'Minha camada',render,offset}] }, new THREE.Vector3())
+      fx.update(.02, .5, new THREE.PerspectiveCamera()); fx.dispose(); return points
+    }
+    const before = sample([0,0,0]), after = sample([2,3,-4])
+    expect(before.length).toBeGreaterThan(0); expect(after).toHaveLength(before.length)
+    after.forEach((point, i) => point.forEach((value, axis) => expect(value).toBeCloseTo(before[i][axis] + [2,3,-4][axis])))
+  })
   it('plays portable definitions with the same name independently, without replacing a preset', () => {
     const { pushed, cloud } = fakeCloud(), fx = createEffectSystem(cloud as never, new THREE.Scene())
     const definition = { name: 'custom', duration: 1, emitters: [{ bursts: [{ at: 0, count: 1 }], glyphs: '+', life: 1 }] }

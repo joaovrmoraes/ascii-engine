@@ -1,5 +1,6 @@
 /** Small editor symbols, independent of the ASCII art in the scene. */
 const paths: Record<string, string> = {
+  camera: '<path d="M3 7h12v12H3zM15 11l6-4v12l-6-4M6 7V4h6v3"/>',
   cursor: '<path d="m5 3 13 9-6 1-3 6z"/>',
   move: '<path d="M12 3v18M3 12h18m-12-6 3-3 3 3M9 18l3 3 3-3M6 9l-3 3 3 3m12-6 3 3-3 3"/>',
   rotate: '<path d="M19 8a8 8 0 1 0 1 7M19 3v6h-6"/>',

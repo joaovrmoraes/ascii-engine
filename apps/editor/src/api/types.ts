@@ -8,5 +8,5 @@ export interface AuthoringEditor {
   lock(value: boolean): void
   catalog(): { id: string; title: string; kind: 'builtin' | 'asset' | 'effect' | 'atmosphere' }[]
   inspect(id: string): unknown
-  view(focus?: [number, number, number], studio?: 'scene' | 'effects' | 'atmosphere'): void
+  view(focus?: [number, number, number], studio?: 'scene' | 'effects' | 'atmosphere', cameraId?: string | null): void
 }

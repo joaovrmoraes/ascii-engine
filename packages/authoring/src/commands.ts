@@ -15,7 +15,7 @@ export function mergeJson(base: unknown, patch: unknown): unknown {
 export function summarizeScene(doc: SceneDoc) {
   return { name: doc.name, objects: doc.objects, terrain: doc.terrain ? { size: doc.terrain.size, resolution: doc.terrain.resolution, layers: doc.terrain.layers, minHeight: doc.terrain.heights.reduce((a,b)=>Math.min(a,b), Infinity), maxHeight: doc.terrain.heights.reduce((a,b)=>Math.max(a,b), -Infinity) } : null,
     waters: doc.waters?.map((w,index)=>({ index, ...w, shape: { ...w.shape, mask: w.shape.mask ? { resolution: w.shape.mask.resolution, followsTerrain: !!w.shape.mask.heights } : undefined } })),
-    assets: Object.entries(doc.assets ?? {}).map(([id, asset])=>({ id, name: asset.name })), effects: doc.effects, atmospheres: doc.atmospheres, environment: doc.environment, style: doc.style }
+    assets: Object.entries(doc.assets ?? {}).map(([id, asset])=>({ id, name: asset.name })), effects: doc.effects, atmospheres: doc.atmospheres, cameras: doc.cameras, activeCamera: doc.activeCamera, environment: doc.environment, style: doc.style }
 }
 
 /** Re-sample only water explicitly authored to follow terrain. */
@@ -115,6 +115,14 @@ export function applyCommands(source: SceneDoc, input: unknown): SceneDoc {
         doc.style = mergeJson(doc.style ?? {}, asset.style) as SceneDoc['style']; break
       }
       case 'atmosphere.set': doc.style = mergeJson(mergeJson(pomorog, doc.style ?? {}), { ...cmd.style, bodySceneLighting: true, inkFog: true }) as SceneDoc['style']; break
+      case 'camera.define': (doc.cameras ??= {})[cmd.id] = structuredClone(cmd.camera) as unknown as NonNullable<SceneDoc['cameras']>[string]; break
+      case 'camera.update':
+        if (!doc.cameras?.[cmd.id]) throw new Error('Câmera inexistente: ' + cmd.id)
+        doc.cameras[cmd.id] = mergeJson(doc.cameras[cmd.id], cmd.patch) as NonNullable<SceneDoc['cameras']>[string]; break
+      case 'camera.remove':
+        if (!doc.cameras?.[cmd.id]) throw new Error('Câmera inexistente: ' + cmd.id)
+        delete doc.cameras[cmd.id]; if (doc.activeCamera === cmd.id) delete doc.activeCamera; break
+      case 'camera.activate': if (cmd.id === null) delete doc.activeCamera; else doc.activeCamera = cmd.id; break
       case 'environment.set': doc.environment = { weather: cmd.weather, intensity: cmd.intensity }; break
     }
     // Validate between commands as later operations may allocate geometry.

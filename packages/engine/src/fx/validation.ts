@@ -24,6 +24,7 @@ export function parseEffect(input: unknown): EffectDef {
   num(root.duration, 'duração', .01, 3600); bool(root.loop, 'repetir')
   for (const [i, raw] of list(root.emitters, 'emissores', 32).entries()) {
     const e = record(raw, `emissor ${i + 1}`), path = `emissor ${i + 1}`
+    if (e.name !== undefined && (typeof e.name !== 'string' || e.name.length > 120)) fail(`${path}: nome`)
     if (e.render !== undefined && !['particle', 'ring', 'beam', 'ribbon', 'heat', 'decal', 'flipbook'].includes(String(e.render))) fail(`${path}: técnica`)
     for (const key of ['rate','start','duration','gravity','drag','noise','glow','max']) if (e[key] !== undefined) num(e[key], `${path}.${key}`, 0)
     for (const key of ['attract','spin']) if (e[key] !== undefined) num(e[key], `${path}.${key}`)

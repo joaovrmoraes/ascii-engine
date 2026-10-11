@@ -120,6 +120,28 @@ Não há dependência do caminho do arquivo na máquina após a importação.
 Texturas externas em GLB e formatos que precisam de decodificadores extras
 não foram validados; prefira GLB incorporado ou GLTF com acompanhantes.
 
+## Câmeras de composição
+
+**Criar câmera**, na barra superior, captura o enquadramento atual e cria
+um objeto na hierarquia. Se for a primeira câmera, ela se torna a câmera
+inicial do documento. Selecione-a para editar:
+
+- **Posição / Rotação** no inspetor, ou **W / E** com o gizmo na cena.
+- **Altura enquadrada** aproxima ou afasta a composição ortográfica.
+- **Formato** escolhe 16:9, 4:3, 1:1 ou 9:16, sem esticar a imagem.
+- **Ver pela câmera** mostra esse enquadramento. **Voltar à navegação**
+  retorna à câmera livre do editor; o enquadramento salvo não muda.
+- **Capturar enquadramento atual** substitui a pose pela vista do editor.
+- **Apontar para o centro da vista** orienta a câmera para o foco atual.
+- **Usar como câmera inicial** escolhe a vista do player/exportação.
+- **Duplicar câmera** permite testar outro plano sem perder o anterior.
+
+Câmeras podem ser removidas e desfeitas/refeitas. Nome, pose, tamanho e
+proporção acompanham salvar, reabrir, rascunho local e exportação. O ícone
+e o volume de visão são auxiliares do editor; não aparecem no jogo.
+A projeção atual é ortográfica, coerente com o visual do Pomorog;
+não há câmera em perspectiva nem animação de câmera por keyframes ainda.
+
 ## Criar efeitos
 
 1. Clique em **Estúdio → Efeitos**, ou em **Criar efeito** na barra superior.
@@ -133,6 +155,9 @@ não foram validados; prefira GLB incorporado ou GLTF com acompanhantes.
    e cor, conforme o tipo. As camadas podem ser adicionadas, duplicadas ou
    excluídas. **Avançado** abre forma, velocidade XYZ, gravidade, aparência
    e JSON (curvas, calor e flipbooks).
+   Dê nomes às camadas e posicione sua **Origem X/Y/Z**, ou arraste o
+   gizmo na prévia. **W** mostra o gizmo, **Q** o oculta e **F** enquadra.
+   **Zerar posição** recoloca a camada na origem; o mapa não é alterado.
 4. A prévia atualiza ao editar. **Reiniciar, Pausar, Parar, Enquadrar** e
    velocidade ficam abaixo da prévia. Arrastar gira; botão direito move;
    roda aproxima. Efeitos de disparo repetem automaticamente só na prévia.
@@ -142,6 +167,12 @@ não foram validados; prefira GLB incorporado ou GLTF com acompanhantes.
    Duplo clique no asset salvo reabre a receita; salvar atualiza esse asset.
 6. **Importar ou baixar arquivo** contém **Baixar efeito** (`.effect.json`)
    e **Abrir efeito**. Depois de importar, salve para adicionar aos Assets.
+
+**Ctrl S**, dentro de cada Studio, salva nos Assets (efeito ou atmosfera).
+Os botões ↶/↷ e Ctrl Z/Ctrl Shift Z desfazem/refazem o rascunho do efeito.
+Um arrasto inteiro do gizmo conta como uma ação. O histórico do efeito é
+separado do histórico da cena. Salvar incorpora as posições à receita;
+**Salvar e colocar na cena** permite mover a composição inteira no mapa.
 
 **Emitir luz** configura a luz pontual que ilumina objetos e grama ao
 colocar o efeito no mapa. O espaço vazio não contém superfícies para

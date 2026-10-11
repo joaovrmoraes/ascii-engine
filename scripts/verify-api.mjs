@@ -82,6 +82,8 @@ try {
     {op:'atmosphere.set',style:{moon:{intensity:1.9,color:0xaabbff},inkTint:[.85,.95,1],fog:{color:0x0a1020,density:.018}}},
     {op:'atmosphere.define',id:'blue-night',name:'Noite azul',style:{moon:{intensity:2.2}}},
     {op:'atmosphere.apply',id:'blue-night'},
+    {op:'camera.define',id:'wide',camera:{name:'Plano MCP',projection:'orthographic',position:[10,12,16],rotation:[-.6,.3,0],span:10,aspect:16/9}},
+    {op:'camera.activate',id:'wide'},
     {op:'environment.set',weather:'rain',intensity:.2},
   ]
   assert((await invoke('scene_validate',{commands})).valid,'complete batch validates without mutation')
@@ -121,6 +123,12 @@ try {
   await writeFile(join(output,'mcp-cena.png'),Buffer.from(capture.content[0].data,'base64'))
   assert(capture.content[0].mimeType==='image/png'&&capture.content[0].data.length>10000,'MCP returns actual rendered scene as image content')
   assert((await invoke('engine_reference',{topic:'catalog'})).some(asset=>asset.id==='blue-night'&&asset.kind==='atmosphere'),'MCP atmosphere appears in asset catalog')
+  await invoke('editor_view',{cameraId:'wide'})
+  assert((await invoke('object_inspect',{id:'wide'})).camera.name==='Plano MCP','MCP inspects a saved camera')
+  const cameraCapture=await invoke('editor_capture')
+  await writeFile(join(output,'mcp-camera.png'),Buffer.from(cameraCapture.content[0].data,'base64'))
+  await check('MCP selects a saved composition camera', `document.querySelector('#app > canvas').dataset.cameraView==='Plano MCP' && engine.camera.position.x===10`)
+  await invoke('editor_view',{cameraId:null})
   await invoke('editor_view',{studio:'effects'})
   const effectCapture=await invoke('editor_capture')
   await writeFile(join(output,'mcp-efeito-void.png'),Buffer.from(effectCapture.content[0].data,'base64'))
@@ -130,7 +138,7 @@ try {
   const exported=join(output,'mcp-cenario.pomorog.json')
   await invoke('scene_export',{path:exported,overwrite:true})
   const data=JSON.parse(await readFile(exported,'utf8'))
-  assert(data.atmospheres['blue-night'].style.moon.intensity===2.2&&data.effects['fx:custom-blue']&&data.assets[imported.id].source.startsWith('data:')&&data.waters[0].shape.mask.heights.length===65*65,'export embeds models, effects, atmosphere, terrain and slope water')
+  assert(data.activeCamera==='wide'&&data.cameras.wide.span===10&&data.atmospheres['blue-night'].style.moon.intensity===2.2&&data.effects['fx:custom-blue']&&data.assets[imported.id].source.startsWith('data:')&&data.waters[0].shape.mask.heights.length===65*65,'export embeds models, effects, atmosphere, terrain and slope water')
   await invoke('scene_export',{path:exported},true)
   assert(JSON.parse(await readFile(exported,'utf8')).name===data.name,'export refuses accidental file overwrite')
   state=await invoke('scene_open',{revision:state.revision,path:exported,preview:false})

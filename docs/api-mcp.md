@@ -149,6 +149,28 @@ prévia e histórico incluem esses recursos, como os criados pelo estúdio.
 `atmosphere.set` continua ajustando a iluminação atual diretamente.
 `editor_capture` captura a prévia isolada quando o estúdio de efeitos está aberto.
 
+## Câmeras de composição
+
+`camera.define` recebe `id` e `camera`:
+
+```json
+{"op":"camera.define","id":"plano-geral","camera":{"name":"Plano geral","projection":"orthographic","position":[10,12,16],"rotation":[-0.6,0.3,0],"span":8,"aspect":1.7777777778}}
+```
+
+Rotação XYZ em radianos; `span` é metade da altura visível em metros.
+`near`/`far` são opcionais. `camera.update` altera a pose e o enquadramento;
+`camera.remove` exclui; `camera.activate` escolhe o id inicial do player
+(`id: null` limpa a escolha). Tudo integra prévia, histórico e exportação.
+`object_inspect` aceita o id de uma câmera.
+
+`editor_view(cameraId: "plano-geral")` abre esse enquadramento no editor;
+`cameraId: null` volta à navegação. Essa visualização não altera o documento.
+A captura preserva a proporção. Câmeras ficam em `SceneDoc.cameras` e a
+escolha inicial em `SceneDoc.activeCamera`. A projeção suportada é ortográfica.
+
+Emissores de efeito aceitam `name` e `offset: [x,y,z]`. Esse deslocamento
+funciona também em calor e rastros e é o mesmo manipulado pelo gizmo do Studio.
+
 ## API HTTP e JavaScript
 
 ```sh

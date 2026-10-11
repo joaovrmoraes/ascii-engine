@@ -20,6 +20,7 @@ export function createWorkspace() {
       </div>
       <div class="main-toolbar">
         <button data-k="library">${icon('plus')} Adicionar objeto</button>
+        <button data-k="create-camera">${icon('camera')} Criar câmera</button>
         <button data-k="create-effect">${icon('spark')} Criar efeito</button>
         <button data-k="save-short">${icon('save')} Salvar</button>
         <div class="preview-controls"><button data-k="preview">${icon('play')} Prévia</button><button data-k="pause" title="Pausar animação" aria-label="Pausar animação">${icon('pause')}</button></div>
@@ -34,7 +35,7 @@ export function createWorkspace() {
       <div class="hierarchy-footer">Tudo o que está neste mapa</div>
     </aside>
     <div id="scene-toolbar">
-      <div class="scene-tab"><span class="active">${icon('cube')} Cena</span><span class="scene-description">Perspectiva isométrica</span></div>
+      <div class="scene-tab"><span class="active">${icon('cube')} Cena</span><span class="scene-description">Vista do editor</span></div>
       <div class="scene-tools" role="toolbar" aria-label="Ferramentas da cena">
         <button data-mode="hand" title="Navegar (Q)">${icon('hand')}<span>Q</span></button>
         <button data-mode="translate" title="Mover (W)">${icon('move')}<span>W</span></button>

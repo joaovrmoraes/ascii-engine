@@ -1,5 +1,40 @@
 # Registro de trabalho
 
+## 11/10/2026 — Composição: câmeras salvas e posicionamento de efeitos
+
+- Pedido ampliado pelo dono: posicionar efeitos, posicionar câmeras na
+  cena e melhorar o fluxo de composição de arte 3D.
+- **Criar câmera** captura a vista atual. Câmeras nomeadas entram na
+  hierarquia, têm ícone e volume de visão na cena auxiliar do editor,
+  gizmo W/E, campos XYZ/rotação, altura enquadrada, proporção, duplicação,
+  exclusão e histórico. Ver pela câmera preserva proporção e pose;
+  voltar à navegação restaura a vista livre do editor.
+- Contrato `SceneDoc.cameras`/`activeCamera` e `applySceneCamera` no núcleo.
+  Câmera inicial funciona no player e nos documentos exportados. Nenhum
+  auxiliar da câmera entra na geometria do mundo ou no passe ASCII.
+- Camadas de efeito têm nomes, origem XYZ, gizmo no void, zerar posição,
+  desfazer/refazer local. Um arrasto é uma ação; o histórico da cena não
+  é alterado por um rascunho. Salvar incorpora posição/nome ao asset;
+  colocar na cena mantém o gizmo do objeto inteiro. Calor e rastro agora
+  respeitam os três eixos de `EmitterDef.offset` (calor ignorava o offset).
+- Ctrl S salva nos Assets dentro dos estúdios. Nomes de camadas das bases
+  facilitam encontrar Chama, Brasas, Faíscas e Fumaça. Receitas originais
+  permanecem intactas; nomes são colocados nas cópias de autoria.
+- API/MCP: `camera.define/update/remove/activate`; `editor_view.cameraId`
+  abre/fecha uma câmera salva; `object_inspect` aceita ids de câmera.
+  Exportação e histórico incluem câmeras e posições das camadas.
+- Validação: `pnpm check` passou (72 testes, tipos e build);
+  `pnpm verify:composition` passou com arrastos nativos dos gizmos de câmera
+  e camada, histórico, Ctrl S, colocação, recarga e player;
+  `pnpm verify:authoring`, `pnpm verify:api` e `pnpm verify:visual` passaram.
+  A verificação visual manteve respostas de reflexo (405 pixels) e luz
+  de fogueira (3640 pixels). Capturas reais por cdpshot e Orca Browser.
+- [Capturas e logs](captures/composicao-2026-10-11/README.md).
+- Limites explícitos: câmeras são ortográficas; perspectiva, animação por
+  keyframes, curvas/timeline gráficas de efeitos e biblioteca global entre
+  documentos continuam pendentes. O app nativo Tauri não foi aberto nesta
+  etapa. A composição não é um editor de regras de jogo.
+
 ## 11/10/2026 — Prévia vazia de efeitos e Assets de atmosfera
 
 - Efeitos têm uma engine de prévia separada, sem terreno, com órbita,

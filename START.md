@@ -305,7 +305,20 @@ simplificam a criação. `SceneDoc.effects` incorpora receitas,
 contém a iluminação aplicada. Ambos os estúdios salvam na biblioteca;
 atmosferas são aplicadas por clique e reabertas por duplo clique.
 Curvas complexas, calor e flipbooks continuam disponíveis pelo JSON avançado.
+Camadas têm nome, origem XYZ, gizmo e histórico próprio no Studio. Calor
+respeita o offset XYZ, assim como partículas e rastros. A posição salva
+entra na receita e é respeitada ao colocar o efeito no mapa.
 Linha do tempo e curvas gráficas ficam pendentes.
+
+**Câmeras de composição:** `SceneDoc.cameras` contém poses nomeadas,
+rotação XYZ em radianos, tamanho ortográfico e proporção; `activeCamera`
+escolhe o enquadramento inicial do player/exportação. `applySceneCamera`
+aplica essa pose sem depender do editor. No editor, câmeras aparecem na
+hierarquia e em uma cena auxiliar com ícone, volume de visão e gizmo;
+esses auxiliares não entram no mundo ASCII. É possível criar da vista
+atual, mover/girar, enquadrar, duplicar, excluir, desfazer/refazer e ver pela
+câmera com a proporção preservada. A navegação do editor é independente.
+Projeção em perspectiva ainda não faz parte desse contrato.
 
 **Água e colocação:** um pincel de água desenha máscaras contínuas, com
 modo plano ou seguindo relevo. Malha e ondulação seguem a encosta; não é

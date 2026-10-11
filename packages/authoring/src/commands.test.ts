@@ -4,6 +4,15 @@ import { applyCommands } from './commands'
 
 const initial = () => parseScene({ version: 1, name: 'Original', terrain: createTerrainData(16, 33), objects: [{ id: 'rock', prefab: 'pedregulho', position: [0,0,0] }] })
 describe('autoria atômica', () => {
+  it('cria, posiciona, ativa e remove câmeras de composição', () => {
+    const source=initial(), before=JSON.stringify(source)
+    const camera={name:'Geral',projection:'orthographic',position:[0,8,10],rotation:[-.4,0,0],span:5,aspect:16/9}
+    const doc=applyCommands(source,[{op:'camera.define',id:'wide',camera},{op:'camera.update',id:'wide',patch:{position:[2,8,10]}},{op:'camera.activate',id:'wide'}])
+    expect(JSON.stringify(source)).toBe(before); expect(doc.cameras!.wide.position).toEqual([2,8,10]); expect(doc.activeCamera).toBe('wide')
+    expect(doc.terrain).toEqual(source.terrain)
+    const removed=applyCommands(doc,[{op:'camera.remove',id:'wide'}]); expect(removed.activeCamera).toBeUndefined(); expect(removed.cameras).toEqual({})
+    expect(()=>applyCommands(source,[{op:'camera.activate',id:'missing'}])).toThrow('inexistente')
+  })
   it('preserva origem inteira quando uma operação posterior falha', () => {
     const doc = initial(), before = JSON.stringify(doc)
     expect(() => applyCommands(doc, [{ op: 'object.update', id: 'rock', patch: { position: [1,2,3] } }, { op: 'object.remove', ids: ['missing'] }])).toThrow('inexistente')

@@ -1,6 +1,6 @@
 import * as THREE from 'three'
 import * as core from '@ascii-engine/core'
-import { createAsciiEngine, ENGINE_VERSION, pomorogSpan } from '@ascii-engine/core'
+import { createAsciiEngine, ENGINE_VERSION, pomorogSpan, applySceneCamera } from '@ascii-engine/core'
 import { createForest } from './areas/forest'
 import { createMarsh, marshHooks } from './areas/marsh'
 import { createSnow } from './areas/snow'
@@ -102,7 +102,7 @@ canvas.addEventListener('pointermove', (e) => {
 })
 canvas.addEventListener('pointerup', () => { dragging = false })
 canvas.addEventListener('pointercancel', () => { dragging = false })
-canvas.addEventListener('wheel', (e) => { e.preventDefault(); view.zoom = THREE.MathUtils.clamp(view.zoom * Math.exp(-e.deltaY * .001), area.id === 'sandbox' ? .18 : .75, area.id === 'sandbox' ? 4 : 1.5) }, { passive: false })
+canvas.addEventListener('wheel', (e) => { e.preventDefault(); if (area.cameraView?.()) return; view.zoom = THREE.MathUtils.clamp(view.zoom * Math.exp(-e.deltaY * .001), area.id === 'sandbox' ? .18 : .75, area.id === 'sandbox' ? 4 : 1.5) }, { passive: false })
 
 const imported: GlyphModel[] = []
 const importAt = (file: File) => importFile(engine, file, area.focus(angle, new THREE.Vector3()).setY(0))
@@ -122,6 +122,19 @@ const status = document.getElementById('status')!
 const focus = new THREE.Vector3()
 let last = 0, frames = 0, sample = 0, fps = 0, captureNext = false
 let angle = Math.PI / 7
+function compositionCamera() {
+  const camera = area.cameraView?.()
+  if (camera) {
+    const width = Math.min(host.clientWidth, host.clientHeight * camera.aspect), height = width / camera.aspect
+    Object.assign(canvas.style, { width: `${width}px`, height: `${height}px`, position: 'absolute', left: '50%', top: '50%', transform: 'translate(-50%, -50%)' })
+    if (engine.size.width !== canvas.clientWidth || engine.size.height !== canvas.clientHeight) engine.resize()
+    canvas.dataset.cameraView = camera.name; applySceneCamera(engine.camera, camera); return true
+  }
+  if (canvas.dataset.cameraView) {
+    Object.assign(canvas.style, { width: '100%', height: '100%', position: '', left: '', top: '', transform: '' }); delete canvas.dataset.cameraView; engine.resize()
+  }
+  return false
+}
 function frame(now: number) {
   requestAnimationFrame(frame)
   if (document.hidden) { last = now; return }
@@ -132,10 +145,11 @@ function frame(now: number) {
   }
   let dt = view.paused ? 0 : THREE.MathUtils.clamp(real, 0, .08)
   if (engine.time + dt > view.pauseAt) dt = Math.max(0, view.pauseAt - engine.time)
+  const composed = compositionCamera()
   const { width, height } = engine.size
   angle += (Math.PI / 7 + view.angle + drag - angle) * (1 - Math.exp(-6 * Math.min(real, .1)))
   if (dt > 0) { area.update(engine.time + dt, dt); for (const model of imported) model.update(dt) }
-  engine.frame(area.focus(angle, focus), pomorogSpan(height, width / height, view.zoom), angle)
+  if (!composed) engine.frame(area.focus(angle, focus), pomorogSpan(height, width / height, view.zoom), angle)
   selection.refresh()
   engine.render(dt)
   area.renderOverlay?.()
@@ -156,9 +170,10 @@ if (!player) {
     const preview = area.capturePreview?.()
     if (preview) return preview
     // A tool capture must work even when the host suspends animation frames.
+    const composed = compositionCamera()
     const captureAngle = Math.PI / 7 + view.angle + drag, { width, height } = engine.size
     area.update(engine.time, 0)
-    engine.frame(area.focus(captureAngle, focus), pomorogSpan(height, width / height, view.zoom), captureAngle)
+    if (!composed) engine.frame(area.focus(captureAngle, focus), pomorogSpan(height, width / height, view.zoom), captureAngle)
     engine.render(0); area.renderOverlay?.()
     return canvas.toDataURL('image/png').split(',')[1]
   })

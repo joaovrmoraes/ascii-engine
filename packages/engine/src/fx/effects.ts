@@ -32,6 +32,8 @@ export interface ShapeDef {
 }
 
 export interface EmitterDef {
+  /** Optional authoring label, preserved in portable recipes. */
+  name?: string
   /** Render kind (default `particle`). */
   render?: 'particle' | 'ring' | 'beam' | 'ribbon' | 'heat' | 'decal' | 'flipbook'
   /** Letters per second while active. */
@@ -305,11 +307,11 @@ export function createEffectSystem(cloud: GlyphCloud, scene: THREE.Object3D, opt
       while (state.trail.length * spec.spacing > spec.length) state.trail.pop()
       state.trail.forEach((p, i) => {
         const l = look(e, i / Math.max(1, state.trail.length - 1), .5)
-        cloud.push(p.x, p.y + (e.offset?.[1] ?? 0), p.z, l.size, l.glyph, l.color, l.alpha)
+        cloud.push(p.x + (e.offset?.[0] ?? 0), p.y + (e.offset?.[1] ?? 0), p.z + (e.offset?.[2] ?? 0), l.size, l.glyph, l.color, l.alpha)
       })
     }
     function heatGrid(e: EmitterDef, time: number, camera: THREE.Camera) {
-      const spec = { ...POMOROG_FIRE, ...e.heat }
+      const spec = { ...POMOROG_FIRE, ...e.heat }, [ox, oy, oz] = e.offset ?? [0,0,0]
       const cols = spec.cols, rows = spec.rows, [cw, ch] = spec.cell
       const r = tmp.setFromMatrixColumn(camera.matrixWorld, 0).setY(0).normalize(), rx = r.x, rz = r.z
       const tw = new THREE.Vector3().setFromMatrixColumn(camera.matrixWorld, 2).setY(0).normalize().multiplyScalar(spec.toward)
@@ -325,7 +327,7 @@ export function createEffectSystem(cloud: GlyphCloud, scene: THREE.Object3D, opt
         if (heat < .14 || (h > .55 && flick > .8)) continue
         const k = Math.min(spec.ramp.length - 1, Math.floor((1 - Math.min(1, heat)) * spec.ramp.length))
         const [glyph, colour] = spec.ramp[k]
-        cloud.push(origin.x + tw.x + rx * c * cw, origin.y + .2 + row * ch, origin.z + tw.z + rz * c * cw, spec.letter, glyph, colour, .9 + Math.min(.1, heat * .1))
+        cloud.push(origin.x + ox + tw.x + rx * c * cw, origin.y + oy + .2 + row * ch, origin.z + oz + tw.z + rz * c * cw, spec.letter, glyph, colour, .9 + Math.min(.1, heat * .1))
       }
     }
     function flipbook(e: EmitterDef, elapsed: number) {

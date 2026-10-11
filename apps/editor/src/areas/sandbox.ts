@@ -10,6 +10,7 @@ import { createGizmos, type Gizmos } from '../editor/gizmos'
 import { assetInfo, icon } from '../editor/icons'
 import { createAtmosphereStudio } from '../editor/atmosphere'
 import { createPlacementPreview } from '../editor/placement'
+import { createSceneCameras } from '../editor/cameras'
 import { createEffectEditor } from '../editor/effects'
 
 type Tool = 'select' | Brush | 'water' | 'place' | 'erase'
@@ -36,7 +37,9 @@ export async function createSandbox(engine: AsciiEngine, options: AreaOptions = 
   }
   const placement = createPlacementPreview(engine, () => library)
   let name = initial?.name ?? 'Meu mapa', selected: THREE.Object3D | undefined, selectedWater = -1, busy = false, automationLocked = false
-  const snapshot = (): SceneDoc => ({ ...scene.toJSON(), name })
+  let cameraEditor: ReturnType<typeof createSceneCameras> | undefined
+  let initialCamera = initial?.cameras?.[initial.activeCamera ?? '']
+  const snapshot = (): SceneDoc => ({ ...scene.toJSON(), ...cameraEditor?.document(), name })
   const history = createHistory(snapshot(), 30)
   const focus = new THREE.Vector3(0, 1.6, -1.5), canvas = engine.renderer.domElement
   const signal = new AbortController()
@@ -56,13 +59,13 @@ export async function createSandbox(engine: AsciiEngine, options: AreaOptions = 
   }
   function changed() { if (player || busy) return; history.commit(snapshot()); refreshHierarchy(); refreshHistory(); canvas.dispatchEvent(new Event('scene-document-changed')); void persist() }
   function choose(object?: THREE.Object3D, fromCanvas = false) {
-    selected = scene.placed.find(p => p.object === object)?.object; selectedWater = -1
+    selected = cameraEditor?.isCamera(object) ? object : scene.placed.find(p => p.object === object)?.object; selectedWater = -1; cameraEditor?.select(selected)
     if (object && (object === scene.terrain?.mesh || scene.waters.some(water => water.mesh === object))) {
       selectedWater = scene.waters.findIndex(water => water.mesh === object)
       gizmos?.attach(); canvas.dispatchEvent(new CustomEvent('select-scene-object', { detail: undefined }))
       ui?.selectPane(selectedWater >= 0 ? 'object' : 'terrain'); refreshHierarchy(); refreshHint(); return
     }
-    if (!fromCanvas) canvas.dispatchEvent(new CustomEvent('select-scene-object', { detail: selected }))
+    if (!fromCanvas) canvas.dispatchEvent(new CustomEvent('select-scene-object', { detail: cameraEditor?.isCamera(selected) ? undefined : selected }))
     if (selected) { tool.kind = 'select'; ui?.selectPane('object') }
     gizmos?.attach(transformMode !== 'hand' && tool.kind === 'select' ? selected : undefined)
     refreshHierarchy(); refreshHint()
@@ -84,7 +87,7 @@ export async function createSandbox(engine: AsciiEngine, options: AreaOptions = 
       engine.setStyle({ ...nextStyle, types: { ...previousStyle.types, ...nextStyle.types } }, { replace: true })
       const next = buildScene(engine, doc, nextLibrary)
       effectEditor?.stop(); scene.dispose(); assets.dispose()
-      scene = next; assets = nextAssets; library = nextLibrary; name = doc.name ?? 'Sem título'
+      scene = next; cameraEditor?.load(doc); initialCamera = doc.cameras?.[doc.activeCamera ?? '']; assets = nextAssets; library = nextLibrary; name = doc.name ?? 'Sem título'
       engine.setStyle(nextStyle, { replace: true })
       selected = undefined; selectedWater = -1; gizmos?.attach(); gizmos?.cursor()
       canvas.dispatchEvent(new Event('scene-replaced'))
@@ -100,12 +103,14 @@ export async function createSandbox(engine: AsciiEngine, options: AreaOptions = 
     catch (error) { redo ? history.undo() : history.redo(); throw error }
   }
   function duplicate() {
+    if (cameraEditor?.selected) { cameraEditor.duplicate(); return }
     if (!selected) return
     const item = snapshot().objects[scene.placed.findIndex(p => p.object === selected)]
     const object = scene.place({ ...item, id: crypto.randomUUID(), name: `${selected.name || library[item.prefab].title} cópia`, position: [item.position[0] + 1, item.position[1], item.position[2] + 1] })
     choose(object); changed()
   }
   async function removeSelected() {
+    if (cameraEditor?.selected) { cameraEditor.remove(); return }
     if (selected) { scene.remove(selected); choose(); changed() }
     else if (selectedWater >= 0) { const doc = snapshot(); doc.waters!.splice(selectedWater, 1); await replace(doc); changed() }
   }
@@ -120,6 +125,7 @@ export async function createSandbox(engine: AsciiEngine, options: AreaOptions = 
     toolbar.querySelector<HTMLButtonElement>('[data-k="redo"]')!.disabled = !history.canRedo
   }
   function refreshHint() {
+    if (cameraEditor?.viewed) { ui?.hint('Vendo pela câmera · ajuste o enquadramento no inspetor · Voltar à navegação libera a edição da cena'); return }
     if (preview) { ui?.hint('Prévia do visual · clique em Voltar à edição para continuar'); return }
     if (tool.kind === 'water') ui?.hint('Água · arraste para desenhar · Shift apaga água · ajuste o raio para criar lagos ou canais', true)
     else if (tool.kind === 'place') ui?.hint(`Colocar ${library[tool.prefab]?.title ?? 'objeto'} · clique para colocar · W/E/R ajustam · Enter confirma · Esc cancela`, true)
@@ -127,6 +133,7 @@ export async function createSandbox(engine: AsciiEngine, options: AreaOptions = 
     else ui?.hint(selected ? 'Arraste os eixos para transformar · W mover · E girar · R escalar · F focar' : 'Arraste um objeto da biblioteca para a cena · Alt + arraste gira a câmera · botão direito desloca')
   }
   function setMode(mode: typeof transformMode, cancelPlacement = false) {
+    if (cameraEditor?.selected && mode === 'scale') mode = 'translate'
     const placing = tool.kind === 'place' && mode !== 'hand' && !cancelPlacement
     if (placing) placement.lock(); else placement.clear()
     transformMode = mode; if (!placing) tool.kind = 'select'; gizmos?.cursor()
@@ -137,6 +144,7 @@ export async function createSandbox(engine: AsciiEngine, options: AreaOptions = 
   }
   function beginPlacement(prefab: string) {
     if (busy || preview) return
+    cameraEditor?.view(null)
     tool.prefab = prefab; tool.kind = 'place'; gizmos?.attach(); ui?.selectPane('object')
     placement.show(prefab, focus.clone().setY(scene.terrain?.heightAt(focus.x, focus.z) ?? 0))
     if (transformMode === 'hand') transformMode = 'translate'
@@ -226,7 +234,7 @@ export async function createSandbox(engine: AsciiEngine, options: AreaOptions = 
     const list = hierarchy.querySelector('[data-k="objects"]')!
     list.replaceChildren()
     ui!.get('[data-k="scene-name"]').textContent = name
-    ui!.get('[data-k="count"]').textContent = String(scene.placed.length + scene.waters.length + (scene.terrain ? 1 : 0))
+    ui!.get('[data-k="count"]').textContent = String(scene.placed.length + scene.waters.length + (scene.terrain ? 1 : 0) + (cameraEditor?.entries().length ?? 0))
     if (scene.terrain && normalized('Terreno').includes(normalized(hierarchyQuery))) {
       const button = document.createElement('button'); button.innerHTML = icon('terrain') + '<span>Terreno</span>'; button.className = 'hierarchy-object terrain-row'
       button.onclick = () => { choose(); ui!.selectPane('terrain') }; list.append(button)
@@ -238,6 +246,11 @@ export async function createSandbox(engine: AsciiEngine, options: AreaOptions = 
       const label = document.createElement('span'); label.textContent = title.replace(' (com fogo e luz)', ''); button.append(label)
       button.className = `hierarchy-object${object === selected ? ' active' : ''}${!object.visible ? ' muted' : ''}`; button.dataset.objectId = doc.id
       button.onclick = () => choose(object); button.ondblclick = () => { focus.copy(object.position); focus.y += .8 }; list.append(button)
+    }
+    for (const { id, object, active } of cameraEditor?.entries() ?? []) {
+      if (!normalized(object.name).includes(normalized(hierarchyQuery))) continue
+      const button = document.createElement('button'); button.className = `hierarchy-object${object === selected ? ' active' : ''}`; button.dataset.cameraId = id; button.innerHTML = icon('camera')
+      const label = document.createElement('span'); label.textContent = object.name + (active ? ' · inicial' : ''); button.append(label); button.onclick = () => choose(object); list.append(button)
     }
     scene.waters.forEach((water, i) => {
       const title = `${water.shape.kind === 'paint' ? 'Água' : water.shape.kind === 'pond' ? 'Lago' : 'Riacho'} ${i + 1}`
@@ -253,7 +266,8 @@ export async function createSandbox(engine: AsciiEngine, options: AreaOptions = 
     }
     const actions = document.createElement('div'); actions.className = 'object-actions'
     const button = (label: string, action: () => void | Promise<void>) => { if (!actions.parentNode) inspector.append(actions); const b = document.createElement('button'); b.textContent = label; b.onclick = () => run(action); actions.append(b) }
-    if (selected) {
+    if (cameraEditor?.selected) cameraEditor.inspector(inspector)
+    else if (selected) {
       const object = selected
       field('Nome', object.name, value => { object.name = value; changed() }, 'text')
       const row = document.createElement('label'), visible = document.createElement('input'); row.textContent = 'Visível'; visible.type = 'checkbox'; visible.checked = object.visible
@@ -329,7 +343,8 @@ export async function createSandbox(engine: AsciiEngine, options: AreaOptions = 
       async save(key, definition) { const doc = snapshot(); doc.effects = { ...doc.effects, [key]: definition }; await replace(doc); selectAssetCategory('Efeitos'); changed() },
       place(key) { ui!.showProject('assets'); assetCategory = 'Efeitos'; beginPlacement(key) },
     })
-    gizmos = createGizmos(engine, { change: () => { if (tool.kind === 'place') placement.lock(); else syncTransformFields() }, commit: () => { if (tool.kind !== 'place') changed() }, allowed: () => !busy && !preview && !document.body.classList.contains('studio-mode') && (tool.kind === 'select' || tool.kind === 'place') && transformMode !== 'hand' })
+    cameraEditor = createSceneCameras(engine, { viewChanged: () => { refreshHierarchy(); refreshHint() }, changed, select: choose, focus: () => focus.clone() }); cameraEditor.load(scene.toJSON())
+    gizmos = createGizmos(engine, { change: () => { if (tool.kind === 'place') placement.lock(); else { cameraEditor?.syncSelected(); syncTransformFields() } }, commit: () => { if (tool.kind !== 'place') changed() }, allowed: () => !busy && !preview && !cameraEditor?.viewed && !document.body.classList.contains('studio-mode') && (tool.kind === 'select' || tool.kind === 'place') && transformMode !== 'hand' })
     const el = <T extends HTMLElement>(key: string) => ui!.get<T>(`[data-k="${key}"]`)
     el<HTMLInputElement>('name').value = name
     el<HTMLInputElement>('name').onchange = e => { name = (e.target as HTMLInputElement).value || 'Sem título'; changed() }
@@ -343,6 +358,7 @@ export async function createSandbox(engine: AsciiEngine, options: AreaOptions = 
     const opener = el<HTMLInputElement>('open')
     opener.onchange = () => { const file = opener.files?.[0]; opener.value = ''; if (file) run(async () => { await replace(JSON.parse(await file.text())); setMode('translate'); changed() }) }
     el('library').onclick = () => { ui!.showProject('assets'); assetCategory = 'Todos'; assetQuery = ''; el<HTMLInputElement>('asset-search').value = ''; refreshLibrary(); el('asset-search').focus() }
+    el('create-camera').onclick = () => { cameraEditor!.view(null); setMode('translate', true); cameraEditor!.add() }
     el('create-effect').onclick = () => { ui!.showProject('effects'); effectEditor!.newEffect() }
     el<HTMLInputElement>('search').oninput = e => { hierarchyQuery = (e.target as HTMLInputElement).value; refreshHierarchy() }
     el<HTMLInputElement>('asset-search').oninput = e => { assetQuery = (e.target as HTMLInputElement).value; refreshLibrary() }
@@ -380,6 +396,7 @@ export async function createSandbox(engine: AsciiEngine, options: AreaOptions = 
       for (const [key, asset] of Object.entries(item.assets ?? {})) { doc.assets ??= {}; doc.assets[remap.get(key)!] = asset }
       for (const [key, definition] of Object.entries(item.effects ?? {})) { const id = `fx:custom-${crypto.randomUUID()}`; remap.set(key, id); doc.effects ??= {}; doc.effects[id] = definition }
       for (const asset of Object.values(item.atmospheres ?? {})) { doc.atmospheres ??= {}; doc.atmospheres[`atmosphere-${crypto.randomUUID()}`] = asset }
+      for (const camera of Object.values(item.cameras ?? {})) { doc.cameras ??= {}; doc.cameras[`camera-${crypto.randomUUID()}`] = { ...camera, position: [camera.position[0] + focus.x, camera.position[1], camera.position[2] + focus.z] } }
       for (const object of item.objects) {
         const type = object.options?.type ?? object.prefab, typeStyle = item.style?.types?.[type]
         doc.objects.push({ ...object, id: crypto.randomUUID(), prefab: remap.get(object.prefab) ?? object.prefab,
@@ -455,7 +472,7 @@ export async function createSandbox(engine: AsciiEngine, options: AreaOptions = 
         scene.terrain.apply({ brush: kind as Brush, x: p.x, z: p.z, radius: tool.radius, strength: kind === 'paint' ? tool.strength * 4 : tool.strength, layer: tool.layer, height: flattenHeight }); strokeChanged = true
       }
     }
-    addEventListener('pointerdown', e => { if (busy || preview || document.body.classList.contains('studio-mode') || e.altKey || (tool.kind === 'place' && gizmos!.hovered) || tool.kind === 'select' || e.target !== canvas || e.button !== 0) return; e.stopPropagation(); painting = true; strokeChanged = false; act(e, true) }, { capture: true, signal: signal.signal })
+    addEventListener('pointerdown', e => { if (busy || preview || cameraEditor?.viewed || document.body.classList.contains('studio-mode') || e.altKey || (tool.kind === 'place' && gizmos!.hovered) || tool.kind === 'select' || e.target !== canvas || e.button !== 0) return; e.stopPropagation(); painting = true; strokeChanged = false; act(e, true) }, { capture: true, signal: signal.signal })
     addEventListener('pointermove', e => { if (painting) { e.stopPropagation(); act(e, false) } }, { capture: true, signal: signal.signal })
     function syncWaterSlopes() {
       const terrain = scene.terrain; if (!terrain) return
@@ -471,7 +488,14 @@ export async function createSandbox(engine: AsciiEngine, options: AreaOptions = 
     }
     const endStroke = (e: Event) => { if (painting) { e.stopPropagation(); painting = false; if (strokeChanged) { syncWaterSlopes(); scene.regrow(); changed() } } }
     addEventListener('pointerup', endStroke, { capture: true, signal: signal.signal }); addEventListener('pointercancel', endStroke, { capture: true, signal: signal.signal })
+    canvas.addEventListener('pointerup', e => {
+      if (busy || preview || cameraEditor?.viewed || document.body.classList.contains('studio-mode') || gizmos?.consumed || tool.kind !== 'select' || e.button !== 0) return
+      const hit = cameraEditor?.pick(e); if (hit) { e.stopImmediatePropagation(); choose(hit) }
+    }, { capture: true, signal: signal.signal })
     addEventListener('keydown', e => {
+      if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 's' && document.body.classList.contains('studio-mode')) {
+        e.preventDefault(); if (!ui!.effectRoot.hidden) void effectEditor!.save(); else void atmosphereStudio!.save(); return
+      }
       if (e.target instanceof HTMLElement && (e.target.matches('input,select,textarea') || e.target.isContentEditable)) return
       if (e.key === 'Escape') { if (gizmos?.dragging) gizmos.cancel(); else setMode('translate', true); return }
       if (preview || busy) return
@@ -491,9 +515,10 @@ export async function createSandbox(engine: AsciiEngine, options: AreaOptions = 
     get state() { return `${scene.placed.length} objetos · ${scene.waters.length} águas${busy ? ' · abrindo…' : ''}${automationLocked ? ' · edição pela IA' : note ? ` · ${note}` : ''}` },
     focus: (_angle, target) => target.copy(focus), pan(x, z) { focus.x += x; focus.z += z },
     select: object => choose(object, true), changed, document: snapshot,
-    navigation(e) { if (player) return e.button !== 0 || e.shiftKey ? 'pan' : 'orbit'; if (busy || gizmos?.consumed) return false; if (e.altKey && e.button === 0) return 'orbit'; if (e.button !== 0 || e.shiftKey && tool.kind === 'select' || transformMode === 'hand') return 'pan'; return false },
-    blocksSelection: () => busy || automationLocked || preview || document.body.classList.contains('studio-mode') || !!gizmos?.consumed || tool.kind !== 'select' || transformMode === 'hand',
-    renderOverlay() { if (!player) gizmos?.render() },
+    navigation(e) { if (player) return e.button !== 0 || e.shiftKey ? 'pan' : 'orbit'; if (busy || cameraEditor?.viewed || gizmos?.consumed) return false; if (e.altKey && e.button === 0) return 'orbit'; if (e.button !== 0 || e.shiftKey && tool.kind === 'select' || transformMode === 'hand') return 'pan'; return false },
+    blocksSelection: () => busy || automationLocked || preview || !!cameraEditor?.viewed || document.body.classList.contains('studio-mode') || !!gizmos?.consumed || tool.kind !== 'select' || transformMode === 'hand',
+    renderOverlay() { if (!player) { cameraEditor?.render(); if (!cameraEditor?.viewed) gizmos?.render() } },
+    cameraView: () => player ? initialCamera : cameraEditor?.current(),
     renderPreview: dt => effectEditor?.frame(dt) ?? false,
     capturePreview: () => effectEditor?.capture(),
     async openDocument(doc) { await replace(doc); changed() },
@@ -504,13 +529,14 @@ export async function createSandbox(engine: AsciiEngine, options: AreaOptions = 
       lock(value) { automationLocked = value; placement.clear(); gizmos?.attach(); if (ui) ui.root.inert = value },
       catalog: () => [...Object.entries(library).map(([id, prefab]) => ({ id, title: prefab.title, kind: Object.hasOwn(builtins, id) ? 'builtin' as const : Object.hasOwn(assets.library, id) ? 'asset' as const : 'effect' as const })), ...Object.entries(snapshot().atmospheres ?? {}).map(([id, asset]) => ({ id, title: asset.name, kind: 'atmosphere' as const }))],
       inspect(id) {
+        if (snapshot().cameras?.[id]) return { camera: snapshot().cameras![id] }
         const placed = scene.placed.find(p => p.doc.id === id)
         if (!placed) throw new Error('Objeto inexistente: ' + id)
         const parts: { name: string; glyph: unknown; surface: unknown }[] = []
         placed.object.traverse(node => { if (node instanceof THREE.Mesh) parts.push({ name: node.name, glyph: node.userData.glyph, surface: node.userData.surface }) })
         return { object: snapshot().objects.find(o => o.id === id), parts, options: engine.instanceStyle(placed.object), animationClips: placed.object.userData.animationClips ?? [] }
       },
-      view(point, studio) { if (point) focus.set(...point); if (studio === 'scene') ui?.showProject('assets'); else if (studio) ui?.showStudio(studio) },
+      view(point, studio, cameraId) { if (cameraId !== undefined) cameraEditor?.view(cameraId); if (point) focus.set(...point); if (studio === 'scene') ui?.showProject('assets'); else if (studio) ui?.showStudio(studio) },
     },
     async importFiles(files) {
       if (busy) throw new Error('Aguarde a abertura atual.')
@@ -522,7 +548,7 @@ export async function createSandbox(engine: AsciiEngine, options: AreaOptions = 
     },
     update(time) { scene.update(time); placement.update(time) },
     dispose() {
-      placement.clear(); signal.abort(); effectEditor?.dispose(); gizmos?.dispose(); scene.dispose(); assets.dispose()
+      placement.clear(); signal.abort(); cameraEditor?.dispose(); effectEditor?.dispose(); gizmos?.dispose(); scene.dispose(); assets.dispose()
       ui?.dispose()
     },
   }

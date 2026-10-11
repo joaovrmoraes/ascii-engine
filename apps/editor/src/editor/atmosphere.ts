@@ -91,5 +91,5 @@ export function createAtmosphereStudio(root: HTMLElement, engine: AsciiEngine, c
     try { const content = JSON.parse(await file.text()); if (content.version !== 1 || !content.atmosphere || typeof content.atmosphere !== 'object') throw new Error('Arquivo de atmosfera inválido.'); const style = parseScene({ version: 1, objects: [], style: content.atmosphere }).style!; selectedKey = undefined; get<HTMLInputElement>('name').value = typeof content.name === 'string' ? content.name : file.name.replace(/\.atmosphere\.json$/, ''); apply(atmosphereStyle(style)); refresh(); status.textContent = 'Atmosfera aberta. Clique em Salvar nos Assets para adicioná-la à biblioteca.' } catch (error) { status.textContent = String(error) }
   }
   refresh()
-  return { refresh, setPreset, applyAsset }
+  return { refresh, setPreset, applyAsset, save }
 }

@@ -70,6 +70,21 @@ export function parseScene(input: unknown, library?: PrefabLibrary): SceneDoc {
     if (typeof asset.name !== 'string' || typeof asset.source !== 'string' || !asset.source.startsWith('data:')) fail(`assets.${id}`, 'precisa conter nome e fonte incorporada (data URI)')
   }
   const ids = new Set<string>()
+  if (root.cameras !== undefined) {
+    const cameras = record(root.cameras, 'cameras')
+    if (Object.keys(cameras).length > 128) fail('cameras', 'excede 128 câmeras')
+    for (const [id, raw] of Object.entries(cameras)) {
+      const camera = record(raw, `cameras.${id}`), path = `cameras.${id}`
+      if (!id || typeof camera.name !== 'string' || !camera.name.trim()) fail(path, 'precisa de identificador e nome')
+      if (camera.projection !== 'orthographic') fail(path, 'projeção não suportada')
+      vector(camera.position, `${path}.position`, 3); vector(camera.rotation, `${path}.rotation`, 3)
+      number(camera.span, `${path}.span`, .01, 10000); number(camera.aspect, `${path}.aspect`, .1, 10)
+      if (camera.near !== undefined) number(camera.near, `${path}.near`, .001, 10000)
+      if (camera.far !== undefined) number(camera.far, `${path}.far`, .002, 100000)
+      if (Number(camera.near ?? .1) >= Number(camera.far ?? 1000)) fail(path, 'plano distante precisa ser maior que o próximo')
+    }
+  }
+  if (root.activeCamera !== undefined && (typeof root.activeCamera !== 'string' || !Object.hasOwn(root.cameras ?? {}, root.activeCamera))) fail('activeCamera', 'câmera inexistente')
   if (root.atmospheres !== undefined) {
     const atmospheres = record(root.atmospheres, 'atmospheres')
     if (Object.keys(atmospheres).length > 256) fail('atmospheres', 'excede 256 atmosferas')

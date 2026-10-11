@@ -36,6 +36,7 @@ export interface Area {
   navigation?(event: PointerEvent): 'pan' | 'orbit' | false
   blocksSelection?(): boolean
   renderOverlay?(): void
+  cameraView?(): import('@ascii-engine/core').SceneCamera | undefined
   renderPreview?(dt: number): boolean
   capturePreview?(): string | undefined
 }

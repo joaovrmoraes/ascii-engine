@@ -15,6 +15,7 @@
     "compare": "node scripts/compare.mjs",
     "verify:visual": "node scripts/verify-visual.mjs",
     "verify:api": "node scripts/verify-api.mjs",
+    "verify:composition": "node scripts/verify-composition.mjs",
     "verify:authoring": "node scripts/verify-authoring.mjs",
     "export": "node scripts/export.mjs"
   },
