@@ -325,3 +325,43 @@ conferência no Orca Browser com o painel visível.
   material, rampas, vento) ainda está em constantes do shader. Hoje só ficam
   ao vivo a célula do passe de tela, o brilho, o zoom, o giro e o estilo por
   parte.
+
+## 11/10/2026 — Fase 5: cenários, prefabs, chunks e terreno com pincéis (§3.4)
+
+- Núcleo:
+  - `world/terrain.ts`: terreno por mapa de alturas (malha de 32 m, 129²) com
+    pincéis `raise`, `lower`, `smooth`, `flatten`, `dig` e `paint` (até 4
+    camadas de chão com cor e densidade de grama: musgo, terra, pedra, neve);
+    `heightAt`, `layerAt` e `grassAt`. É declarado como `surface`/terra, e a
+    grade de letras segue o relevo.
+  - `world/scene.ts`: formato `SceneDoc` em JSON (estilo, terreno, águas,
+    tapete, objetos de prefab com posição, giro, escala e estilo por
+    instância/parte). Funções `buildScene`, `place`, `remove`, `addWater`,
+    `regrow` (refaz o tapete pelas camadas pintadas) e `toJSON`. O prefab
+    vira tipo de objeto: mudar o estilo do tipo muda todas as cópias.
+  - Geração por regras: `generateChunkGrid` encaixa chunks numa grade de modo
+    que os conectores de borda casem (trilha, riacho, mato), com pesos,
+    filtro de bioma, chunks fixos, borda exigida e semente determinística
+    (com retrocesso). `rotateConnectors` gira os conectores. O carregamento
+    por distância já existia (`createChunkStreamer`).
+- Editor: área **Cenário** (`?area=sandbox`) com painel de ferramentas:
+  - pincéis: esculpir ±, suavizar, aplainar, pintar chão, cavar lago (cava,
+    pinta a margem e põe água), pôr objeto, apagar objeto;
+  - controles de raio e força, regerar grama, salvar e abrir cenário .json,
+    novo cenário;
+  - o documento fica guardado no navegador (localStorage, quando disponível);
+  - os prefabs (`scene/prefabs.ts`): árvore, pedregulho, caixa, ponte, ruína,
+    pedras em pé, tronco caído e fogueira com fogo e luz.
+- Testes: 21 (novos: chunks casando bordas e borda externa, determinismo e
+  chunks fixos, bioma, rotação de conectores, pincéis de terreno).
+- Captura: `cenario-pincel-lago-ponte-morro.png`, montada só com eventos de
+  ponteiro (morro esculpido e suavizado, pedra pintada, lago cavado, ponte,
+  ruína e árvores postas, grama regerada).
+- Pendências:
+  - em encostas muito íngremes as lâminas do tapete afundam na rampa
+    (falta inclinar a lâmina pela normal);
+  - costura automática entre chunks vizinhos e editor visual de chunks com
+    conectores;
+  - o editor de cenário ainda não monta mapas a partir do gerador de chunks
+    (só os testes usam);
+  - desfazer e refazer ainda não existem.

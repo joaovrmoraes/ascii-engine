@@ -5,6 +5,7 @@ import { createMarsh, marshHooks } from './areas/marsh'
 import { createSnow } from './areas/snow'
 import { createCathedral, createMine } from './areas/interiors'
 import { createGltfDemo, importFile } from './areas/gltfDemo'
+import { createSandbox } from './areas/sandbox'
 import type { GlyphModel } from '@ascii-engine/core'
 import type { Area, AreaOptions } from './areas/types'
 import { buildReferenceScene } from './scene/reference'
@@ -30,6 +31,7 @@ export const AREAS: Record<string, AreaEntry> = {
   snow_pines: { title: 'Pinheiros Nevados', create: createSnow },
   old_mine: { title: 'Mina Antiga', create: createMine },
   sunken_cathedral: { title: 'Catedral Submersa', create: createCathedral },
+  sandbox: { title: 'Cenário: terreno e prefabs', create: createSandbox },
   gltf: { title: 'Importação GLTF (teste)', create: createGltfDemo },
   reference: { title: 'Cena de referência', create: (engine, options) => buildReferenceScene(engine, options.screen) },
   terrain: { title: 'Relevo (teste)', create: (engine) => buildTerrainScene(engine) },

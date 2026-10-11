@@ -30,3 +30,5 @@ export { createMarshWater, marshShoreGLSL, legacyReflectionGLSL, type MarshFrame
 export { createSnowField, snowAccumulation, snowMeltRadius, snowflake, pomorogSnow, SNOW_TRACK_LIFE, type SnowBoot, type SnowField, type SnowOptions } from './presets/snow'
 export { createCombatEffects, IMPACT_DELAY, FIRE_TRAVEL_TIME, type CombatEffects, type CombatFrame, type Entry, type Spell } from './presets/combat'
 export { applyDefaultGlyphs, defaultGlyphStyle, loadGlyphModel, normalizeGlyphData, prepareGlyphModel, type GlyphModel } from './import/gltf'
+export { createTerrain, createTerrainData, DEFAULT_LAYERS, type Brush, type BrushStroke, type GroundLayer, type Terrain, type TerrainData } from './world/terrain'
+export { buildScene, emptyScene, generateChunkGrid, rotateConnectors, terrainCover, type BuiltScene, type ChunkCell, type ChunkDef, type Connectors, type PlacedObject, type Prefab, type PrefabLibrary, type SceneDoc, type SceneWater } from './world/scene'
