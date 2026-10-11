@@ -1,18 +1,27 @@
 import * as THREE from 'three'
 import { createAsciiEngine, ENGINE_VERSION, pomorogSpan } from '@ascii-engine/core'
 import { createForest } from './areas/forest'
+import { createMarsh, marshHooks } from './areas/marsh'
 import type { Area, AreaOptions } from './areas/types'
 import { buildReferenceScene } from './scene/reference'
 import { buildTerrainScene } from './scene/terrain'
-import type { AsciiEngine } from '@ascii-engine/core'
+import type { AsciiEngine, AsciiPassHook } from '@ascii-engine/core'
+
+export interface AreaEntry {
+  title: string
+  create: (engine: AsciiEngine, options: AreaOptions) => Area
+  /** Screen-pass hooks the area needs (the engine builds the pass with them). */
+  hooks?: AsciiPassHook[]
+}
 import { createPanel } from './panel'
 
 /**
  * ASCII Engine editor. URL: ?area=<id>, ?ascii=screen|raw, ?angle=<rad>,
  * ?zoom=<.75–1.5>, ?pause=<seconds>, ?camp=1, ?hunt=<seconds>, ?at=<metres>, ?cell=<px>, ?light=<.65–1.4>.
  */
-export const AREAS: Record<string, { title: string; create: (engine: AsciiEngine, options: AreaOptions) => Area }> = {
+export const AREAS: Record<string, AreaEntry> = {
   dark_forest: { title: 'Floresta Sombria', create: createForest },
+  rain_marsh: { title: 'Pântano da Chuva', create: createMarsh, hooks: marshHooks },
   reference: { title: 'Cena de referência', create: (engine, options) => buildReferenceScene(engine, options.screen) },
   terrain: { title: 'Relevo (teste)', create: (engine) => buildTerrainScene(engine) },
 }
@@ -23,11 +32,12 @@ const canvas = document.createElement('canvas')
 canvas.style.width = canvas.style.height = '100%'; canvas.style.display = 'block'
 host.appendChild(canvas)
 
-const engine = createAsciiEngine(canvas)
+const areaId = params.get('area') ?? params.get('scene') ?? 'dark_forest'
+const entry = AREAS[areaId] ?? AREAS.dark_forest
+const engine = createAsciiEngine(canvas, { hooks: entry.hooks })
 const mode = params.get('ascii') ?? 'letters'
 engine.debug.raw = mode === 'raw'
-const areaId = params.get('area') ?? params.get('scene') ?? 'dark_forest'
-const area = (AREAS[areaId] ?? AREAS.dark_forest).create(engine, { screen: mode === 'screen', camp: params.has('camp'), hunt: params.has('hunt') ? Number(params.get('hunt')) : undefined, at: params.has('at') ? Number(params.get('at')) : undefined })
+const area = entry.create(engine, { screen: mode === 'screen', camp: params.has('camp'), hunt: params.has('hunt') ? Number(params.get('hunt')) : undefined, at: params.has('at') ? Number(params.get('at')) : undefined })
 const view = {
   angle: Number(params.get('angle') ?? 0), zoom: Number(params.get('zoom') ?? .9),
   paused: false, pauseAt: params.has('pause') ? Number(params.get('pause')) : Infinity,

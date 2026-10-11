@@ -156,3 +156,50 @@ ponto mais próximo; chunks −1..+2 com volta; forma da água).
   modelos já estão copiados em `src/pomorog/`.
 - Recorte de oclusores entre câmera e herói (raycast) não portado.
 - Sem rótulos HTML (nome, vida).
+
+## 11/10/2026 — Fatia 2: Pântano da Chuva
+
+**Estado:** área montada (`?area=rain_marsh`). A água e a chuva mantêm o
+visual antigo aprovado, no passe de tela. Árvores de várzea, pedras, juncos,
+plantas aquáticas, margens, passarela e cabana são letras nos objetos.
+
+### Núcleo
+
+- `weather/storm.ts` (`stormAt`), `weather/rain.ts` (traços de 1 px ao longo
+  da queda, raio em `| / \`, gotas determinísticas por índice) e
+  `world/rippleField.ts` (ondas amortecidas em passo fixo).
+- `presets/marshWater.ts`: preset de água "pântano antigo" (§3.2). Ilhas como
+  dados, nível que sobe com a enchente, IDs antigos (água .8, grama submersa .3,
+  reflexo 0), traços de onda, anéis ASCII `- _ | / \` pela tangente na tela
+  (passos, chuva, corpos, golpes), espirros, ondas de arrasto das botas e
+  gotas escorrendo dos ombros.
+- O passe de tela recebe o tom azulado de quem está dentro d'água por um
+  **gancho** (`marshHooks` no editor), não por import: era o acoplamento
+  `swampShoreGLSL` que a fase 1 removeu.
+- `engine.addWater` (qualquer água com espelho), `engine.createRainStreaks`,
+  `engine.setGain` (o relâmpago clareia chuva e raio) e `engine.setFlash`.
+- Materiais `ShaderMaterial` (água, piso antigo) passam intactos pelas
+  técnicas `screen`/`surface`: já escrevem o próprio ID.
+- Correção: `engine.add` ignorava `LineSegments`, e por isso a chuva não aparecia.
+
+### Editor
+
+- `src/areas/common.ts`: acampamento, fogueira (com vapor quando a chuva
+  apaga o fogo), viajante numa rota de pontos, lanterna e o piso antigo do
+  passe de tela, compartilhados pelas áreas fixas.
+- `src/areas/marsh.ts` e `src/scene/shoreDetails.ts`: porte de
+  `swampEnvironment.ts` e das margens. A técnica fica declarada em cada nó com
+  a mesma regra do catálogo §19 (folhagem e rochas facetadas viram nuvem de
+  letras; o resto, letras na face).
+
+### Capturas
+
+`pantano.png`, `pantano-perto-chuva-aneis.png` e `pantano-relampago.png`.
+Comparar com o painel do pântano em `all-areas-ground-cover.png`.
+
+### Pendências
+
+- O pântano roda a ~40–49 fps no headless, contra 60 da floresta. O custo
+  está no campo de ondas, recalculado na CPU a cada quadro, e no espelho
+  sempre ativo. Otimizar depois.
+- Sem som de trovão (áudio fica fora da engine por enquanto).

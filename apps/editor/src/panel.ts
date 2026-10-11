@@ -1,10 +1,9 @@
 import type { AsciiEngine } from '@ascii-engine/core'
-import type { Area, AreaOptions } from './areas/types'
 
 interface PanelOptions {
   engine: AsciiEngine
   view: { angle: number; zoom: number; paused: boolean }
-  areas: Record<string, { title: string; create: (engine: AsciiEngine, options: AreaOptions) => Area }>
+  areas: Record<string, { title: string }>
   areaId: string
   mode: string
   capture: () => void

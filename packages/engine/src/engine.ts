@@ -10,7 +10,8 @@ import { createCarpet, type Carpet, type GroundCover } from './techniques/carpet
 import { createGlyphCloud, type GlyphCloud } from './techniques/particle'
 import { markScreen } from './techniques/screen'
 import { surfaceMaterial } from './techniques/surface'
-import { createWater, type Water, type WaterOptions, type WaterShape } from './techniques/water'
+import { createWater, type WaterOptions, type WaterShape } from './techniques/water'
+import { createRainStreaks, type RainStreaks } from './weather/rain'
 
 export interface AsciiEngineOptions {
   style?: Partial<AsciiStyle>
@@ -30,6 +31,17 @@ export interface AddOptions extends GlyphStyle {
 }
 
 interface Entry { object: THREE.Object3D; options: AddOptions }
+
+/** Anything with a mirror the engine renders when it is the nearest water. */
+export interface WaterSource {
+  mesh: THREE.Mesh
+  reflection: { render(renderer: THREE.WebGLRenderer, scene: THREE.Scene, camera: THREE.OrthographicCamera): void; dispose(): void }
+  /** Distance (m) from a point to the water, 0 inside. */
+  distance(x: number, z: number): number
+  look: { reflection: { enabled: boolean } }
+  uniforms: { time: { value: number } }
+  dispose(): void
+}
 
 const BODY_RAMPS: Partial<Record<SurfaceKind, BodyRamp>> = { actor: 'actor', foliage: 'foliage', stone: 'stone', snow: 'snow', bark: 'bark', wood: 'bark' }
 
@@ -62,7 +74,10 @@ export function createAsciiEngine(canvas: HTMLCanvasElement, options: AsciiEngin
 
   let illumination = createIllumination({ interior: style.interior, obstacles: options.obstacles })
   const bodies = bodyUniforms()
-  const carpets: Carpet[] = [], clouds: GlyphCloud[] = [], waters: Water[] = []
+  const carpets: Carpet[] = [], clouds: GlyphCloud[] = [], waters: WaterSource[] = []
+  const streaks: RainStreaks[] = []
+  /** Extra ink per particle layer (lightning brightens rain and bolts). */
+  const gains = new Map<object, number>()
   /** Only the nearest water renders its mirror, within this distance (Pomorog: 11 m). */
   let reflectionRange = 11
   const entries = new Map<THREE.Object3D, Entry>()
@@ -104,6 +119,7 @@ export function createAsciiEngine(canvas: HTMLCanvasElement, options: AsciiEngin
     renderer.setSize(width, height, false)
     const size = renderer.getDrawingBufferSize(new THREE.Vector2()); target.setSize(size.x, size.y)
     for (const cloud of clouds) cloud.occludeWith(depth, size.x, size.y)
+    for (const layer of streaks) layer.occludeWith(depth, size.x, size.y)
     ascii.material.uniforms.resolution.value.set(width, height)
   }
 
@@ -142,7 +158,7 @@ export function createAsciiEngine(canvas: HTMLCanvasElement, options: AsciiEngin
       if (node.name && partNames.has(node.name)) part = node.name
       const own = nodeGlyphStyle(node.userData)
       if (own && node !== object) nodeStyle = { ...nodeStyle, ...own }
-      if (node instanceof THREE.Mesh || node instanceof THREE.Points) {
+      if (node instanceof THREE.Mesh || node instanceof THREE.Points || node instanceof THREE.LineSegments) {
         const style_ = resolveGlyphStyle({ global: style.glyphs, type, part, node: node === object ? own : nodeStyle, instance, instanceParts: instance.parts })
         if (!style_.glyph) missing.push(node.name || node.type)
         else {
@@ -160,18 +176,20 @@ export function createAsciiEngine(canvas: HTMLCanvasElement, options: AsciiEngin
     for (const { style: s, meshes } of groups.values()) applyTechnique(s, meshes)
   }
 
+  /** Shader materials write their own ID (water, legacy floors): leave them alone. */
+  const standardLike = (mesh: THREE.Mesh) => ![mesh.material].flat().some((m) => m instanceof THREE.ShaderMaterial)
   function applyTechnique(s: GlyphStyle, nodes: THREE.Object3D[]) {
     const meshes = nodes.filter((n): n is THREE.Mesh => n instanceof THREE.Mesh)
     switch (s.glyph) {
       case 'surface':
-        for (const mesh of meshes) swapMaterials(mesh, `surface:${s.surface ?? ''}`, (copy) => {
+        for (const mesh of meshes.filter(standardLike)) swapMaterials(mesh, `surface:${s.surface ?? ''}`, (copy) => {
           if (!(copy instanceof THREE.MeshStandardMaterial)) return copy
           if (s.surface) copy.userData.asciiSurface = s.surface
           return surfaceMaterial(copy)
         })
         return
       case 'screen':
-        for (const mesh of meshes) swapMaterials(mesh, `screen:${s.surface ?? 'actor'}`, (copy) => markScreen(copy, s.surface ?? 'actor'))
+        for (const mesh of meshes.filter(standardLike)) swapMaterials(mesh, `screen:${s.surface ?? 'actor'}`, (copy) => markScreen(copy, s.surface ?? 'actor'))
         return
       case 'body': {
         const ramp = s.surface ? BODY_RAMPS[s.surface] : undefined
@@ -187,7 +205,7 @@ export function createAsciiEngine(canvas: HTMLCanvasElement, options: AsciiEngin
         return
       case 'particle':
         for (const mesh of nodes) {
-          if (!clouds.some((c) => c.mesh === mesh)) throw new Error('ascii-engine: particle precisa vir de engine.createParticles()')
+          if (!clouds.some((c) => c.mesh === mesh) && !streaks.some((r) => r.mesh === mesh)) throw new Error('ascii-engine: particle precisa vir de engine.createParticles() ou createRainStreaks()')
           particleScene.add(mesh)
         }
         return
@@ -336,7 +354,22 @@ export function createAsciiEngine(canvas: HTMLCanvasElement, options: AsciiEngin
       waters.push(water)
       return water
     },
-    get waters() { return waters as readonly Water[] },
+    /** Registers another water (e.g. the old marsh preset); add its mesh with `{ glyph: 'water' }`. */
+    addWater<T extends WaterSource>(water: T): T { water.mesh.userData.glyph = 'water'; waters.push(water); return water },
+    get waters() { return waters as readonly WaterSource[] },
+    /** 1 px rain strokes, occluded by the world; add `rain.mesh` with `{ glyph: 'particle' }`. */
+    createRainStreaks(capacity = 800) {
+      const layer = createRainStreaks(capacity)
+      layer.mesh.userData.glyph = 'particle'
+      streaks.push(layer)
+      const size = renderer.getDrawingBufferSize(new THREE.Vector2())
+      layer.occludeWith(depth, size.x, size.y)
+      return layer
+    },
+    /** Extra ink for one particle layer (cloud or rain), multiplied by the style brightness. */
+    setGain(layer: GlyphCloud | RainStreaks, gain: number) { gains.set(layer, gain) },
+    /** Lightning flash 0–1: lights every ink (Pomorog `stormFlash`). */
+    setFlash(flash: number) { illumination.uniforms.stormFlash.value = flash },
     set reflectionRange(metres: number) { reflectionRange = metres },
     get size() { return { width, height } },
     resize,
@@ -360,12 +393,13 @@ export function createAsciiEngine(canvas: HTMLCanvasElement, options: AsciiEngin
       updateGlyphBodies(bodies, camera, height, lantern.position, lantern.on ? style.bodyLantern : 0, hearth.position, hearth.on ? hearth.power : 0, style.bodyAmbient)
       const hero = actors.hero ?? new THREE.Vector3(100, 0, 100)
       for (const carpet of carpets) carpet.update(time, hero, actors.foe, camera, focus, style.atmosphere, style.brightness)
-      for (const cloud of clouds) cloud.commit(height, camera, style.brightness)
+      for (const cloud of clouds) cloud.commit(height, camera, style.brightness * (gains.get(cloud) ?? 1))
+      for (const layer of streaks) layer.commit(style.brightness * (gains.get(layer) ?? 1))
 
       // Draw order (visual-pipeline §2, recreate-from-zero step 10).
       // The nearest water renders its mirror (the most expensive pass).
       const near = actors.hero ?? focus
-      let mirror: Water | undefined, best = Infinity
+      let mirror: WaterSource | undefined, best = Infinity
       for (const water of waters) {
         water.uniforms.time.value = time
         if (!water.mesh.parent || !water.look.reflection.enabled) continue
@@ -387,6 +421,7 @@ export function createAsciiEngine(canvas: HTMLCanvasElement, options: AsciiEngin
       for (const carpet of carpets) carpet.dispose()
       for (const cloud of clouds) cloud.dispose()
       for (const water of waters) water.dispose()
+      for (const layer of streaks) layer.dispose()
       for (const byKey of materialCache.values()) for (const m of byKey.values()) m.dispose()
       illumination.dispose(); moon.shadow.dispose(); depth.dispose(); target.dispose(); ascii.dispose(); renderer.dispose()
     },

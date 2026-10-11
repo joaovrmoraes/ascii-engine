@@ -22,3 +22,8 @@ export { createWater, createWaterReflection, updateReflectionCamera, waterEdge, 
 export { createCircuit, circuitGLSL, type Circuit } from './world/circuit'
 export { createChunkStreamer, type ChunkStreamerOptions } from './world/chunks'
 export { pushFireflies, pushLanternMotes, createDustTrail } from './presets/ambient'
+export type { WaterSource } from './engine'
+export { stormAt, type Storm } from './weather/storm'
+export { createRain, createRainStreaks, rainDrop, type RainOptions, type RainStreaks } from './weather/rain'
+export { createRippleField } from './world/rippleField'
+export { createMarshWater, marshShoreGLSL, legacyReflectionGLSL, type MarshFrame, type MarshIsland, type MarshSurface, type MarshWater, type MarshWaterOptions, type FootPose } from './presets/marshWater'
