@@ -9,7 +9,8 @@
     "test": "pnpm -r test",
     "typecheck": "pnpm -r typecheck",
     "check": "pnpm typecheck && pnpm test && pnpm build",
-    "tauri": "pnpm --filter @ascii-engine/editor tauri"
+    "tauri": "pnpm --filter @ascii-engine/editor tauri",
+    "compare": "node scripts/compare.mjs"
   },
   "packageManager": "pnpm@11.9.0"
 }

@@ -1,0 +1,80 @@
+import * as THREE from 'three'
+import type { AsciiEngine, GlyphKind, GlyphStyle, SurfaceKind } from '@ascii-engine/core'
+
+/**
+ * Part selection (§3.1, phase 4): a click selects the part under the cursor,
+ * a second click (or Esc) climbs to the whole object. The panel shows the
+ * resolved style and saves a change where the user chooses: this instance
+ * only, this part in every object of the type, or the global style.
+ */
+const KINDS: GlyphKind[] = ['surface', 'body', 'screen']
+const FAMILIES: SurfaceKind[] = ['earth', 'stone', 'wood', 'bark', 'foliage', 'snow', 'wetgrass', 'actor']
+
+export function createSelection(engine: AsciiEngine, canvas: HTMLCanvasElement, root: HTMLElement) {
+  let selected: ReturnType<AsciiEngine['pick']> & { level: 'part' | 'object' } | undefined
+  const box = new THREE.Box3Helper(new THREE.Box3(), 0xd3b27c)
+  box.visible = false; engine.particleScene.add(box)
+  root.innerHTML = `
+    <div data-k="what">clique numa parte da cena</div>
+    <label>técnica <select data-k="glyph">${KINDS.map((k) => `<option>${k}</option>`).join('')}</select></label>
+    <label>letras <select data-k="surface"><option value="">(herdar)</option>${FAMILIES.map((k) => `<option>${k}</option>`).join('')}</select></label>
+    <label>tamanho <input data-k="size" type="number" min=".08" max=".5" step=".01" placeholder="(herdar)"></label>
+    <label>salvar em <select data-k="scope">
+      <option value="instance">só esta</option>
+      <option value="type">todas desta parte neste tipo</option>
+      <option value="global">estilo global</option>
+    </select></label>
+    <button data-k="apply">[ aplicar ]</button>`
+  const el = <T extends HTMLElement>(k: string) => root.querySelector<T>(`[data-k="${k}"]`)!
+  const what = el<HTMLDivElement>('what')
+  root.hidden = true
+
+  function show() {
+    if (!selected) { box.visible = false; root.hidden = true; return }
+    root.hidden = false
+    const target = selected.level === 'part' ? selected.node : selected.object
+    box.box.setFromObject(target); box.visible = true
+    const style = selected.style ?? {}
+    what.textContent = `${selected.type ? `tipo ${selected.type} · ` : ''}${selected.level === 'part' && selected.part ? `parte "${selected.part}"` : `objeto "${selected.object.name || selected.object.type}"`}`
+    el<HTMLSelectElement>('glyph').value = style.glyph ?? 'surface'
+    el<HTMLSelectElement>('surface').value = style.surface ?? ''
+    el<HTMLInputElement>('size').value = style.size ? String(style.size) : ''
+    el<HTMLSelectElement>('scope').querySelector<HTMLOptionElement>('[value="type"]')!.disabled = !selected.type
+  }
+
+  let downX = 0, downY = 0
+  canvas.addEventListener('pointerdown', (e) => { downX = e.clientX; downY = e.clientY })
+  canvas.addEventListener('pointerup', (e) => {
+    if (Math.hypot(e.clientX - downX, e.clientY - downY) > 5) return
+    const rect = canvas.getBoundingClientRect()
+    const hit = engine.pick((e.clientX - rect.left) / rect.width * 2 - 1, -((e.clientY - rect.top) / rect.height) * 2 + 1)
+    if (!hit) { selected = undefined; show(); return }
+    // Second click on the same part climbs to the whole object.
+    const same = selected && selected.object === hit.object && (selected.part === hit.part)
+    selected = { ...hit, level: same && selected!.level === 'part' || !hit.part ? 'object' : 'part' }
+    show()
+  })
+  addEventListener('keydown', (e) => {
+    if (e.key !== 'Escape' || !selected) return
+    if (selected.level === 'part') selected.level = 'object'; else selected = undefined
+    show()
+  })
+  el<HTMLButtonElement>('apply').onclick = () => {
+    if (!selected) return
+    const size = Number(el<HTMLInputElement>('size').value)
+    const style: GlyphStyle = {
+      glyph: el<HTMLSelectElement>('glyph').value as GlyphKind,
+      surface: (el<HTMLSelectElement>('surface').value || undefined) as SurfaceKind | undefined,
+      size: size > 0 ? size : undefined,
+    }
+    const part = selected.level === 'part' ? selected.part : undefined
+    const scope = el<HTMLSelectElement>('scope').value
+    if (scope === 'instance') part ? engine.setPartStyle(selected.object, part, style) : engine.setInstanceStyle(selected.object, style)
+    else if (scope === 'type' && selected.type) engine.setTypeStyle(selected.type, part ? { parts: { [part]: style } } : { style })
+    else engine.setStyle({ glyphs: { ...engine.style.glyphs, ...style } })
+    // Re-read what the part resolves to now.
+    selected.style = (selected.node.userData.glyphResolved as GlyphStyle | undefined) ?? style
+    show()
+  }
+  return { get selected() { return selected }, refresh: () => { if (selected) box.box.setFromObject(selected.level === 'part' ? selected.node : selected.object) } }
+}

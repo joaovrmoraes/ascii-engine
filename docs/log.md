@@ -289,3 +289,39 @@ conferência no Orca Browser com o painel visível.
 - Captura: `gltf-serpente-arvore.png` (dois quadros da serpente nadando).
 - Pendência: sem um .glb real do Blender no repositório; o teste usa o
   exportador do Three.
+
+## 11/10/2026 — Fase 4: editor de ajustes
+
+- **Seleção por parte (§3.1):**
+  - um clique seleciona a parte sob o cursor, destacada com uma caixa dourada;
+  - um segundo clique ou o Esc sobe para o objeto inteiro;
+  - o painel à esquerda mostra a técnica, a família de letras e o tamanho
+    resolvidos;
+  - a mudança é salva onde o usuário escolhe: **só esta**
+    (`setPartStyle`/`setInstanceStyle`), **todas desta parte neste tipo**
+    (`setTypeStyle`) ou **estilo global** (`setStyle({ glyphs })`).
+- Núcleo:
+  - `engine.pick(ndc)` devolve objeto, nó, parte, tipo e estilo resolvido;
+  - `engine.setInstanceStyle`, `engine.exportStyle` e `engine.types`;
+  - cada nó guarda o estilo resolvido (`userData.glyphResolved`);
+  - mudar a camada global ou os tipos re-resolve todos os objetos;
+  - objetos adicionados à parte (a árvore dentro do chunk) mantêm seus
+    estilos quando o pai é reaplicado;
+  - a camada da instância não vaza mais `type`/`parts` para o estilo resolvido.
+- **Presets em JSON:** "salvar preset .json" e "carregar preset .json" (camada
+  global, tipos de objeto, luzes, tamanho da célula, brilho).
+- **Comparação de imagens automática:** `pnpm compare` (`scripts/compare.mjs`)
+  captura vistas congeladas de cada área no Chromium sem janela e compara com
+  `docs/captures/baseline/` (ImageMagick, RMSE). Diferenças em
+  `docs/captures/diff/` (fora do git). `--update` grava uma nova base.
+  Repetibilidade medida:
+  - referência, floresta, neve, mina e catedral: RMSE ≤ 0,014 entre execuções;
+  - pântano: até 0,15, porque os anéis da chuva dependem do ritmo dos
+    quadros; tem limite próprio.
+- Captura: `estilo-por-parte-uma-copa.png`. Só a copa desta árvore foi
+  trocada para `surface` (o visual rejeitado "bola cheia de letras",
+  reproduzido de propósito); as outras copas seguem em nuvem de letras.
+- Pendência: a tabela completa de ajustes do §16 (célula e tinta por
+  material, rampas, vento) ainda está em constantes do shader. Hoje só ficam
+  ao vivo a célula do passe de tela, o brilho, o zoom, o giro e o estilo por
+  parte.

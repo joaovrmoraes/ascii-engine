@@ -163,6 +163,8 @@ export function createAsciiEngine(canvas: HTMLCanvasElement, options: AsciiEngin
     const partNames = new Set([...Object.keys(type?.parts ?? {}), ...Object.keys(instance.parts ?? {})])
     const groups = new Map<string, { style: GlyphStyle; meshes: THREE.Object3D[] }>()
     const missing: string[] = []
+    // The instance layer is the style fields only (not `type` and `parts`).
+    const { type: _type, parts: _parts, ...instanceStyle } = instance
     const visit = (node: THREE.Object3D, part: string | undefined, nodeStyle: GlyphStyle | undefined) => {
       if (node.userData.glyphBodyOf) return
       // An object added on its own keeps its own styles (a tree inside a chunk).
@@ -171,9 +173,10 @@ export function createAsciiEngine(canvas: HTMLCanvasElement, options: AsciiEngin
       const own = nodeGlyphStyle(node.userData)
       if (own && node !== object) nodeStyle = { ...nodeStyle, ...own }
       if (node instanceof THREE.Mesh || node instanceof THREE.Points || node instanceof THREE.LineSegments) {
-        const style_ = resolveGlyphStyle({ global: style.glyphs, type, part, node: node === object ? own : nodeStyle, instance, instanceParts: instance.parts })
+        const style_ = resolveGlyphStyle({ global: style.glyphs, type, part, node: node === object ? own : nodeStyle, instance: instanceStyle, instanceParts: instance.parts })
         if (!style_.glyph) missing.push(node.name || node.type)
         else {
+          node.userData.glyphResolved = style_; node.userData.glyphPart = part
           // A body is the whole part (or whole object): one spacing hash.
           const key = `${part ?? ''}|${JSON.stringify(style_)}`
           let group = groups.get(key)
@@ -232,7 +235,13 @@ export function createAsciiEngine(canvas: HTMLCanvasElement, options: AsciiEngin
 
   function unapply(entry: Entry) {
     const meshes: THREE.Mesh[] = []
-    entry.object.traverse((node) => { if (node instanceof THREE.Mesh) meshes.push(node) })
+    // Stop at objects added on their own: they keep their styles.
+    const visit = (node: THREE.Object3D) => {
+      if (node !== entry.object && entries.has(node)) return
+      if (node instanceof THREE.Mesh) meshes.push(node)
+      for (const child of node.children) visit(child)
+    }
+    visit(entry.object)
     for (const mesh of meshes) {
       if (mesh.userData.glyphBodyMaterial) removeGlyphBody(mesh)
       if (mesh.userData.asciiOriginal) { mesh.material = mesh.userData.asciiOriginal; delete mesh.userData.asciiOriginal }
@@ -240,6 +249,7 @@ export function createAsciiEngine(canvas: HTMLCanvasElement, options: AsciiEngin
   }
 
   const debug = { raw: false }
+  const raycaster = new THREE.Raycaster()
   const engine = {
     /** `raw`: draw the 3D scene without letters, to separate geometry from shader. */
     debug,
@@ -295,6 +305,13 @@ export function createAsciiEngine(canvas: HTMLCanvasElement, options: AsciiEngin
       entry.options.parts = { ...entry.options.parts, [part]: { ...entry.options.parts?.[part], ...partStyle } }
       unapply(entry); apply(entry)
     },
+    /** Changes the instance layer of one added object (all its parts unless they override). */
+    setInstanceStyle(object: THREE.Object3D, instanceStyle: GlyphStyle) {
+      const entry = entries.get(object)
+      if (!entry) throw new Error('ascii-engine: objeto não foi adicionado com engine.add')
+      entry.options = { ...entry.options, ...instanceStyle }
+      unapply(entry); apply(entry)
+    },
     /** Registers or changes an object type; `part` changes that part in every instance. */
     setTypeStyle(typeName: string, typeStyle: ObjectTypeStyle) {
       const previous = types[typeName]
@@ -303,6 +320,35 @@ export function createAsciiEngine(canvas: HTMLCanvasElement, options: AsciiEngin
       for (const entry of entries.values()) if (entry.options.type === typeName) { unapply(entry); apply(entry) }
     },
     getTypeStyle(typeName: string): ObjectTypeStyle | undefined { return types[typeName] },
+    /** Object types known to the engine (preset types plus registered ones). */
+    get types() { return types as Readonly<Record<string, ObjectTypeStyle>> },
+
+    /**
+     * What is under a screen point (NDC −1..1): the added object, the node hit,
+     * the part it belongs to (nearest named node below the object) and the
+     * style resolved for it. Letter clouds are skipped; their mesh is hit.
+     */
+    pick(ndcX: number, ndcY: number) {
+      raycaster.setFromCamera(new THREE.Vector2(ndcX, ndcY), camera)
+      for (const hit of raycaster.intersectObjects(scene.children, true)) {
+        if (!(hit.object instanceof THREE.Mesh) || !hit.object.visible) continue
+        let node: THREE.Object3D | null = hit.object, part: string | undefined
+        while (node && !entries.has(node)) { if (!part && node.name) part = node.name; node = node.parent }
+        if (!node) continue
+        const entry = entries.get(node)!
+        if (part === node.name) part = undefined
+        return {
+          object: node, node: hit.object, part: (hit.object.userData.glyphPart as string | undefined) ?? part,
+          type: entry.options.type, style: hit.object.userData.glyphResolved as GlyphStyle | undefined,
+          instance: entry.options as AddOptions, point: hit.point,
+        }
+      }
+      return undefined
+    },
+    /** Style data (global layer and object types) as JSON-ready data. */
+    exportStyle(): Partial<AsciiStyle> { return JSON.parse(JSON.stringify({ ...style, types })) },
+    /** Instance options of an added object (its own layer and its parts). */
+    instanceStyle(object: THREE.Object3D) { return entries.get(object)?.options },
 
     /** A carpet of standing letters; add `carpet.mesh` with `{ glyph: 'carpet' }`. */
     createCarpet(cover: GroundCover, seed = 48017) {
@@ -332,6 +378,8 @@ export function createAsciiEngine(canvas: HTMLCanvasElement, options: AsciiEngin
       style = { ...style, ...next }
       if (next.types) Object.assign(types, next.types)
       applyStyle()
+      // The global letter layer or object types changed: re-resolve every object.
+      if (next.glyphs || next.types) for (const entry of entries.values()) { unapply(entry); apply(entry) }
       if (style.interior !== interior) rebuildIllumination()
     },
     /** Footprints that block the lantern's sight in interiors (discovery map). */

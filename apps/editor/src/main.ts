@@ -18,6 +18,7 @@ export interface AreaEntry {
   hooks?: AsciiPassHook[]
 }
 import { createPanel } from './panel'
+import { createSelection } from './selection'
 
 /**
  * ASCII Engine editor. URL: ?area=<id>, ?ascii=screen|raw, ?angle=<rad>,
@@ -66,6 +67,7 @@ const importAt = (file: File) => importFile(engine, file, area.focus(angle, new 
 addEventListener('dragover', (e) => e.preventDefault())
 addEventListener('drop', (e) => { e.preventDefault(); for (const file of e.dataTransfer?.files ?? []) void importAt(file) })
 const panel = createPanel({ engine, view, areas: AREAS, areaId, mode, capture: () => captureNext = true, importFile: (file) => void importAt(file) })
+const selection = createSelection(engine, canvas, document.getElementById('selection')!)
 const status = document.getElementById('status')!
 const focus = new THREE.Vector3()
 let last = 0, frames = 0, sample = 0, fps = 0, captureNext = false
@@ -80,6 +82,7 @@ function frame(now: number) {
   angle += (Math.PI / 7 + view.angle + drag - angle) * (1 - Math.exp(-6 * Math.min(real, .1)))
   if (dt > 0) { area.update(engine.time + dt, dt); for (const model of imported) model.update(dt) }
   engine.frame(area.focus(angle, focus), pomorogSpan(height, width / height, view.zoom), angle)
+  selection.refresh()
   engine.render(dt)
   if (captureNext) { captureNext = false; download(canvas.toDataURL('image/png')) }
   frames++

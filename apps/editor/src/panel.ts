@@ -26,7 +26,9 @@ export function createPanel({ engine, view, areas, areaId, mode, capture, import
     <label>zoom <input data-k="zoom" type="range" min=".75" max="1.5" step=".05"><output></output></label>
     <label>giro <input data-k="angle" type="range" min="-3.14" max="3.14" step=".05"><output></output></label>
     <button data-k="pause">[ pausar ]</button> <button data-k="shot">[ captura ]</button>
-    <label class="file">[ importar .glb/.gltf ]<input data-k="import" type="file" accept=".glb,.gltf" hidden></label>`
+    <label class="file">[ importar .glb/.gltf ]<input data-k="import" type="file" accept=".glb,.gltf" hidden></label>
+    <button data-k="save">[ salvar preset .json ]</button>
+    <label class="file">[ carregar preset .json ]<input data-k="load" type="file" accept=".json" hidden></label>`
   const input = (k: string) => root.querySelector<HTMLInputElement>(`[data-k="${k}"]`)!
   root.querySelector<HTMLSelectElement>('[data-k="area"]')!.onchange = (e) => go('area', (e.target as HTMLSelectElement).value)
   root.querySelector<HTMLSelectElement>('[data-k="mode"]')!.onchange = (e) => go('ascii', (e.target as HTMLSelectElement).value)
@@ -47,6 +49,18 @@ export function createPanel({ engine, view, areas, areaId, mode, capture, import
   root.querySelector<HTMLButtonElement>('[data-k="shot"]')!.onclick = capture
   const picker = input('import')
   picker.onchange = () => { for (const file of picker.files ?? []) importFile(file); picker.value = '' }
+  // Presets: the global letter layer, object types, lights and screen settings as JSON.
+  root.querySelector<HTMLButtonElement>('[data-k="save"]')!.onclick = () => {
+    const blob = new Blob([JSON.stringify(engine.exportStyle(), null, 2)], { type: 'application/json' })
+    const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'preset-ascii.json'; a.click()
+    setTimeout(() => URL.revokeObjectURL(a.href), 1000)
+  }
+  const loader = input('load')
+  loader.onchange = async () => {
+    const file = loader.files?.[0]; loader.value = ''
+    if (!file) return
+    try { engine.setStyle(JSON.parse(await file.text())); refresh() } catch (error) { alert(`preset inválido: ${error}`) }
+  }
   const refresh = () => shows.forEach((show) => show())
   refresh()
   return { refresh }
