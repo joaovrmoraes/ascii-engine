@@ -1,0 +1,24 @@
+{
+  "name": "@ascii-engine/editor",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc -p tsconfig.json --noEmit && vite build",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "test": "echo 'editor: sem testes ainda'",
+    "tauri": "tauri"
+  },
+  "dependencies": {
+    "@ascii-engine/core": "workspace:*",
+    "three": "^0.186.1"
+  },
+  "devDependencies": {
+    "@tauri-apps/api": "^2.1.1",
+    "@tauri-apps/cli": "^2.1.0",
+    "@types/three": "^0.186.0",
+    "typescript": "^5.7.2",
+    "vite": "^6.0.5"
+  }
+}

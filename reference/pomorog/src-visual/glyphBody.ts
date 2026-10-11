@@ -1,0 +1,211 @@
+import * as THREE from 'three'
+import { MeshSurfaceSampler } from 'three/examples/jsm/math/MeshSurfaceSampler.js'
+import { SURFACE_ALPHA } from './surface'
+
+/**
+ * Bodies made of letters: characters scattered over each part's surface,
+ * facing the camera, riding along with the limb, bough or rock they belong
+ * to. Nothing is filtered by a screen-locked grid. Solid bodies keep a dark
+ * occluder between letters; leaf crowns stay open and ragged.
+ */
+const RAMPS = {
+  actor: ' .:-=+*x%#@',
+  foliage: ' .,:;vYv%&#',
+  stone: ' .:-=coO0#@',
+  snow: ' .,:;+*oO@',
+  bark: ' :|!/\\lI#',
+}
+type Ramp = keyof typeof RAMPS
+let glyphs = ''
+const START: Record<string, number> = {}
+for (const [k, v] of Object.entries(RAMPS)) { START[k] = glyphs.length; glyphs += v }
+const GLYPH_ALPHA = SURFACE_ALPHA.glyph
+
+export const glyphBodyUniforms = {
+  pixelScale: { value: 60 },
+  moon: { value: new THREE.Vector3(-5, 12, 7).normalize() },
+  lantern: { value: new THREE.Vector4(0, 0, 0, 0) },
+  hearth: { value: new THREE.Vector4(0, 0, 0, 0) },
+  ambient: { value: .32 },
+}
+
+let atlas: THREE.CanvasTexture | null = null
+function glyphAtlas() {
+  if (atlas) return atlas
+  // Sized near the on-screen letter (9–14 px) and without mipmaps: point
+  // sprites have no UV derivatives, so mip selection blurred letters into squares.
+  const per = 24, canvas = document.createElement('canvas')
+  canvas.width = glyphs.length * per; canvas.height = 32
+  const ctx = canvas.getContext('2d')!
+  ctx.fillStyle = '#000'; ctx.fillRect(0, 0, canvas.width, canvas.height)
+  ctx.fillStyle = '#fff'; ctx.font = '25px "Courier New", monospace'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle'
+  Array.from(glyphs).forEach((g, i) => ctx.fillText(g, i * per + per / 2, 17))
+  atlas = new THREE.CanvasTexture(canvas)
+  atlas.generateMipmaps = false; atlas.minFilter = THREE.LinearFilter; atlas.magFilter = THREE.LinearFilter
+  return atlas
+}
+
+function lettersMaterial(color: THREE.Color, glow: THREE.Color, size: number, ramp: Ramp, open: boolean) {
+  const count = RAMPS[ramp].length
+  return new THREE.ShaderMaterial({
+    uniforms: { ...glyphBodyUniforms, atlas: { value: glyphAtlas() }, tint: { value: color }, glow: { value: glow } },
+    vertexShader: `
+      attribute vec3 glyphColor; attribute float seed;
+      uniform float pixelScale, ambient; uniform vec3 moon, tint, glow; uniform vec4 lantern, hearth;
+      varying vec3 vColor; varying float vIndex;
+      void main() {
+        vec4 world = modelMatrix * vec4(position, 1.);
+        vec3 n = normalize(mat3(modelMatrix) * normal);
+        vec4 view = viewMatrix * world;
+        float facing = dot(normalize(mat3(viewMatrix) * n), vec3(0., 0., 1.));
+        float diffuse = max(dot(n, moon), 0.);
+        float lamp = lantern.w * pow(max(0., 1. - distance(world.xyz, lantern.xyz) / 6.), 1.5);
+        float fire = hearth.w * pow(max(0., 1. - distance(world.xyz, hearth.xyz) / 5.5), 1.7);
+        float light = ambient + diffuse * .7 + lamp * .9 + fire * .8;
+        // Letter shape carries the shading; colour stays the material's own hue.
+        float level = clamp(light * .62 + (seed - .5) * .3 + length(glow) * .5, .08, .999);
+        vIndex = ${START[ramp]}.0 + 1.0 + floor(level * ${count - 1}.0);
+        vColor = (glyphColor * tint * (.35 + light * .8) + vec3(.95, .6, .28) * (lamp * .25 + fire * .35) * tint + glow) * ${ramp === 'stone' ? '1.45' : '1.'};
+        gl_Position = projectionMatrix * view;
+        gl_Position.z -= .002 * gl_Position.w;
+        gl_PointSize = facing < ${ramp === 'stone' ? '.05' : open ? '-.2' : '-.05'} ? 0. : ${size.toFixed(3)} * pixelScale;
+      }`,
+    fragmentShader: `
+      uniform sampler2D atlas;
+      varying vec3 vColor; varying float vIndex;
+      void main() {
+        vec2 uv = vec2((gl_PointCoord.x - .5) * 1.25 + .5, 1. - gl_PointCoord.y);
+        if (uv.x < 0. || uv.x > 1.) discard;
+        float ink = texture2D(atlas, vec2((vIndex + .08 + uv.x * .84) / ${glyphs.length}.0, .06 + uv.y * .88)).r;
+        if (ink < .38) discard;
+        gl_FragColor = vec4(vColor, ${GLYPH_ALPHA.toFixed(2)});
+      }`,
+  })
+}
+
+function triangleArea(geometry: THREE.BufferGeometry) {
+  const pos = geometry.attributes.position, index = geometry.index
+  const a = new THREE.Vector3(), b = new THREE.Vector3(), c = new THREE.Vector3()
+  const count = index ? index.count : pos.count
+  let total = 0
+  for (let i = 0; i < count; i += 3) {
+    a.fromBufferAttribute(pos, index ? index.getX(i) : i)
+    b.fromBufferAttribute(pos, index ? index.getX(i + 1) : i + 1)
+    c.fromBufferAttribute(pos, index ? index.getX(i + 2) : i + 2)
+    total += b.sub(a).cross(c.sub(a)).length() / 2
+  }
+  return total
+}
+
+/** Letters over a geometry; `matrices` place instances and `scale` sets world density. */
+function scatter(geometry: THREE.BufferGeometry, spacing: number, matrices: THREE.Matrix4[], colors: THREE.Color[], worldScale: THREE.Vector3, seedBase: number, toWorld: THREE.Matrix4, taken: Set<string>) {
+  const sampler = new MeshSurfaceSampler(new THREE.Mesh(geometry)).build()
+  const area = triangleArea(geometry)
+  const positions: number[] = [], normals: number[] = [], tints: number[] = [], seeds: number[] = []
+  const p = new THREE.Vector3(), n = new THREE.Vector3(), nm = new THREE.Matrix3(), s = new THREE.Vector3()
+  let seed = seedBase
+  const random = () => { seed = (Math.imul(seed, 1664525) + 1013904223) >>> 0; return seed / 4294967296 }
+  ;(sampler as unknown as { randomFunction: () => number }).randomFunction = random
+  // Even spacing (dart throwing on a world-scale hash) keeps every letter
+  // readable: no clumps of overlapping glyphs that read as noise.
+  const w = new THREE.Vector3()
+  const key = (v: THREE.Vector3) => `${Math.floor(v.x / spacing)},${Math.floor(v.y / spacing)},${Math.floor(v.z / spacing)}`
+  matrices.forEach((matrix, m) => {
+    s.setFromMatrixScale(matrix).multiply(worldScale)
+    const scaledArea = area * (s.x * s.y + s.y * s.z + s.x * s.z) / 3
+    const count = Math.min(3000, Math.max(2, Math.round(scaledArea / (spacing * spacing))))
+    nm.getNormalMatrix(matrix)
+    for (let i = 0, tries = 0; i < count && tries < count * 6; tries++) {
+      sampler.sample(p, n)
+      p.applyMatrix4(matrix); n.applyMatrix3(nm).normalize()
+      w.copy(p).applyMatrix4(toWorld)
+      const k = key(w); if (taken.has(k)) continue
+      taken.add(k); i++
+      positions.push(p.x, p.y, p.z); normals.push(n.x, n.y, n.z)
+      tints.push(colors[m].r, colors[m].g, colors[m].b); seeds.push(random())
+    }
+  })
+  const out = new THREE.BufferGeometry()
+  out.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3))
+  out.setAttribute('normal', new THREE.Float32BufferAttribute(normals, 3))
+  out.setAttribute('glyphColor', new THREE.Float32BufferAttribute(tints, 3))
+  out.setAttribute('seed', new THREE.Float32BufferAttribute(seeds, 1))
+  return out
+}
+
+const white = new THREE.Color(1, 1, 1), noGlow = new THREE.Color(0, 0, 0)
+const darkCache = new Map<THREE.Material, THREE.MeshBasicMaterial>()
+/** Opaque near-black stand-in: hides what is behind, shows as the gap between letters. */
+function darkOccluder(material: THREE.MeshStandardMaterial, tint = .035) {
+  let dark = darkCache.get(material)
+  if (!dark) {
+    // A deep shade of the object's own colour: a silhouette on bright snow,
+    // practically black on night ground.
+    dark = new THREE.MeshBasicMaterial({ color: material.color.clone().multiplyScalar(tint) })
+    dark.onBeforeCompile = (shader) => {
+      shader.fragmentShader = shader.fragmentShader.replace('#include <dithering_fragment>', `#include <dithering_fragment>\ngl_FragColor.a = ${GLYPH_ALPHA.toFixed(2)};`)
+    }
+    dark.customProgramCacheKey = () => 'glyph-occluder'
+    darkCache.set(material, dark)
+  }
+  return dark
+}
+
+function rampOf(material: THREE.MeshStandardMaterial, fallback: Ramp): Ramp {
+  const kind = material.userData.asciiSurface as string | undefined
+  if (kind === 'foliage') return 'foliage'
+  if (kind === 'snow') return 'snow'
+  if (kind === 'stone') return 'stone'
+  if (kind === 'bark' || kind === 'wood') return 'bark'
+  return fallback
+}
+
+const world = new THREE.Vector3()
+/**
+ * Turns a mesh hierarchy into letters. `open` meshes (foliage, snow caps)
+ * lose their surface entirely; the rest keep a dark occluder.
+ */
+export function glyphBody(root: THREE.Object3D, size = .1, fallback: Ramp = 'actor') {
+  root.updateMatrixWorld(true)
+  const meshes: THREE.Mesh[] = []
+  root.traverse((o) => { if (o instanceof THREE.Mesh && !o.userData.glyphDone) meshes.push(o) })
+  let seed = 9173
+  // One spacing hash per body: overlapping parts must not stack letters.
+  const taken = new Set<string>()
+  for (const mesh of meshes) {
+    mesh.userData.glyphDone = true
+    const material = mesh.material as THREE.MeshStandardMaterial
+    if (!(material instanceof THREE.MeshStandardMaterial)) continue
+    const ramp = rampOf(material, fallback)
+    // Stones are an open shell of letters too: a dark body read as a hole.
+    const open = ramp === 'foliage' || ramp === 'snow' || ramp === 'stone'
+    const letter = ramp === 'stone' ? size * .95 : open ? size * 1.25 : size
+    world.setFromMatrixScale(mesh.matrixWorld)
+    const instanced = mesh instanceof THREE.InstancedMesh
+    const matrices: THREE.Matrix4[] = [], colors: THREE.Color[] = []
+    if (instanced) {
+      for (let i = 0; i < mesh.count; i++) {
+        const m = new THREE.Matrix4(); mesh.getMatrixAt(i, m); matrices.push(m)
+        const c = new THREE.Color(1, 1, 1); if (mesh.instanceColor) mesh.getColorAt(i, c); colors.push(c)
+      }
+    } else { matrices.push(new THREE.Matrix4()); colors.push(white) }
+    const geometry = scatter(mesh.geometry, letter * (ramp === 'stone' ? .72 : open ? .9 : .82), matrices, colors, world, seed += 7919, mesh.matrixWorld, taken)
+    const points = new THREE.Points(geometry, lettersMaterial(material.color, material.emissive ?? noGlow, letter, ramp, open))
+    points.userData.glyphDone = true; points.frustumCulled = false
+    mesh.add(points)
+    if (open) {
+      // Crowns become an open cloud of leaf letters; the clusters still cast shade.
+      const hidden = material.clone(); hidden.colorWrite = false; hidden.depthWrite = false
+      mesh.material = hidden; mesh.castShadow = true
+    // Creatures keep a faint silhouette of their own colour (readable on snow).
+    } else mesh.material = darkOccluder(material)
+  }
+}
+
+/** Per-frame: point size in pixels, moon and the warm lights that pick letters. */
+export function updateGlyphBodies(camera: THREE.OrthographicCamera, height: number, lantern: THREE.Vector3, lanternPower: number, hearth: THREE.Vector3, hearthPower: number, ambient: number) {
+  glyphBodyUniforms.pixelScale.value = height / (camera.top - camera.bottom)
+  glyphBodyUniforms.lantern.value.set(lantern.x, lantern.y, lantern.z, lanternPower)
+  glyphBodyUniforms.hearth.value.set(hearth.x, hearth.y, hearth.z, hearthPower)
+  glyphBodyUniforms.ambient.value = ambient
+}

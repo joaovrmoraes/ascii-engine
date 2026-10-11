@@ -1,0 +1,12 @@
+# ASCII Engine
+
+Engine que desenha cenas 3D (Three.js) **feitas de letras presas às coisas**,
+nascida do visual do Pomorog.
+
+- Comece por [`START.md`](START.md).
+- Agentes: [`AGENTS.md`](AGENTS.md) (Codex e outros) e [`CLAUDE.md`](CLAUDE.md).
+- Referência copiada do Pomorog: [`reference/pomorog/`](reference/pomorog/README.md).
+
+```bash
+pnpm install && pnpm dev   # http://localhost:1440
+```

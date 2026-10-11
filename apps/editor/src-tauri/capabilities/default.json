@@ -1,0 +1,7 @@
+{
+  "$schema": "../gen/schemas/desktop-schema.json",
+  "identifier": "default",
+  "description": "Janela principal do editor.",
+  "windows": ["main"],
+  "permissions": ["core:default"]
+}
