@@ -219,3 +219,29 @@ Comparar com o painel do pântano em `all-areas-ground-cover.png`.
   letras e prateleiras de neve (rampa `snow`) que engrossam com o tempo,
   pedregulhos, cerca quebrada, capim seco e tapete de crosta de neve.
 - Capturas: `neve.png` e `neve-perto-pegadas.png`.
+
+## 11/10/2026 — Fatias 4 e 5: Mina Antiga e Catedral Submersa
+
+**Estado:** as duas áreas montadas (`?area=old_mine`, `?area=sunken_cathedral`),
+equivalentes aos painéis de `all-areas-ground-cover.png`. 60 fps.
+
+- Núcleo: `engine.setObstacles` refaz o mapa de descoberta com os obstáculos
+  da cena já montada (a lanterna só revela o que enxerga). A água ganhou
+  contorno livre (`edgeGLSL`, `crestGLSL`, `flow`, `distance`), usado nos
+  corredores alagados da catedral (era `channelWater.ts`).
+- Editor: `src/areas/interiors.ts` com o código de montagem do Pomorog quase
+  literal: trilhos, escoras, rochas e cristais, lampiões pendurados com luz,
+  cascalho, carrinho; lajes, colunas com nervuras, bancos, arcos, altar,
+  vitral com brilho, fragmentos com musgo. Piso iluminado com textura
+  (`createLitFloor`), lanterna 19, estilo `pomorogInterior`, tapetes de
+  cascalho e de musgo.
+- Correção nas áreas fixas: o abrigo de tábuas só existe no acampamento da
+  floresta procedural (no Pomorog, `if (procedural)`); ele tinha entrado por
+  engano no pântano e na neve. Capturas refeitas.
+- Capturas: `mina.png`, `catedral.png` (e `neve.png`, `pantano.png` refeitas).
+
+### Critério de sucesso (§1.1)
+
+As 5 áreas do Pomorog podem ser montadas na engine e escolhidas no editor
+(painel → área). Falta a comparação lado a lado aprovada pelo dono e a
+conferência no Orca Browser com o painel visível.

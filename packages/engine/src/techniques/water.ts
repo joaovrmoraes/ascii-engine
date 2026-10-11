@@ -208,10 +208,16 @@ export interface WaterOptions {
   /** Height of the surface (Pomorog: .018). */
   level?: number
   /**
-   * Custom outline instead of `shape`: GLSL body returning `float inside` (> 0
-   * in the water) from `vec3 p`; used by canals and flooded aisles.
+   * Custom outline instead of `shape`: GLSL statements that set `float inside`
+   * (> 0 in the water) from `vec3 p`; used by canals and flooded aisles.
+   * Give `distance` too, so the engine picks the nearest mirror.
    */
   edgeGLSL?: string
+  /** GLSL expression for the foam/crest strength (default `edge * .75`). */
+  crestGLSL?: string
+  /** Flow on the plane (m/s); default: along a stream, slow drift on a pond. */
+  flow?: [number, number]
+  distance?: (x: number, z: number) => number
   /** Plane size (m); by default it covers the shape. */
   size?: number
 }
@@ -224,7 +230,7 @@ export function createWater(shape: WaterShape, options: WaterOptions = {}) {
     reflection: { value: null as THREE.Texture | null }, reflectionMatrix: { value: new THREE.Matrix4() },
     reflectionOn: { value: look.reflection.enabled ? 1 : 0 }, glyphAtlas: { value: surfaceAtlas() },
   }
-  const flow = shape.kind === 'stream'
+  const flow = options.flow ? `vec2(${f(options.flow[0])}, ${f(options.flow[1])})` : shape.kind === 'stream'
     ? `vec2(cos(centre.z), sin(centre.z)) * ${f(look.flow)}`
     : `vec2(${f(look.pondDrift[0])}, ${f(look.pondDrift[1])})`
   const material = new THREE.ShaderMaterial({
@@ -238,7 +244,7 @@ export function createWater(shape: WaterShape, options: WaterOptions = {}) {
         ${options.edgeGLSL ?? 'float inside=waterEdge(p.xz,centre);'}
         if(inside<0.)discard;
         float edge=1.-smoothstep(0.,${f(look.bank)},inside);
-        gl_FragColor=vec4(waterLetters(p,time,edge*.75,${flow},0.,vec3(0.)),${surfaceAlpha('glyph')});
+        gl_FragColor=vec4(waterLetters(p,time,${options.crestGLSL ?? 'edge*.75'},${flow},0.,vec3(0.)),${surfaceAlpha('glyph')});
       }`,
   })
   const size = options.size ?? (shape.kind === 'stream' ? 38 : shape.size * 2.8 + 2)
@@ -249,7 +255,7 @@ export function createWater(shape: WaterShape, options: WaterOptions = {}) {
   return {
     mesh, material, shape, look, reflection, uniforms,
     /** Distance (m) from a point to this water, 0 inside. */
-    distance(x: number, z: number) { return Math.max(0, -waterEdge(shape, x, z)) },
+    distance(x: number, z: number) { return options.distance ? options.distance(x, z) : Math.max(0, -waterEdge(shape, x, z)) },
     dispose() { reflection.dispose(); material.dispose(); mesh.geometry.dispose() },
   }
 }

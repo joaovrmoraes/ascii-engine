@@ -72,7 +72,17 @@ export function createAsciiEngine(canvas: HTMLCanvasElement, options: AsciiEngin
   ascii.material.uniforms.sceneTexture.value = target.texture
   ascii.material.uniforms.sceneDepth.value = target.depthTexture
 
-  let illumination = createIllumination({ interior: style.interior, obstacles: options.obstacles })
+  let obstacles = options.obstacles ?? []
+  let illumination = createIllumination({ interior: style.interior, obstacles })
+  function rebuildIllumination() {
+    const flash = illumination.uniforms.stormFlash.value
+    illumination.dispose()
+    illumination = createIllumination({ interior: style.interior, obstacles })
+    illumination.uniforms.stormFlash.value = flash
+    shareIllumination(ascii.material.uniforms)
+    for (const carpet of carpets) shareIllumination(carpet.uniforms)
+    for (const cloud of clouds) shareIllumination(cloud.uniforms)
+  }
   const bodies = bodyUniforms()
   const carpets: Carpet[] = [], clouds: GlyphCloud[] = [], waters: WaterSource[] = []
   const streaks: RainStreaks[] = []
@@ -320,14 +330,10 @@ export function createAsciiEngine(canvas: HTMLCanvasElement, options: AsciiEngin
       style = { ...style, ...next }
       if (next.types) Object.assign(types, next.types)
       applyStyle()
-      if (style.interior !== interior) {
-        illumination.dispose()
-        illumination = createIllumination({ interior: style.interior, obstacles: options.obstacles })
-        shareIllumination(ascii.material.uniforms)
-        for (const carpet of carpets) shareIllumination(carpet.uniforms)
-        for (const cloud of clouds) shareIllumination(cloud.uniforms)
-      }
+      if (style.interior !== interior) rebuildIllumination()
     },
+    /** Footprints that block the lantern's sight in interiors (discovery map). */
+    setObstacles(list: LightObstacle[]) { obstacles = list; rebuildIllumination() },
     /** Warm local lights that pick letters: the hero's lantern and the hearth. */
     setLights(next: { lantern?: THREE.Vector3 | null; hearth?: THREE.Vector3 | null; hearthPower?: number }) {
       if (next.lantern !== undefined) { lantern.on = !!next.lantern; lantern.position.copy(next.lantern ?? ABSENT) }

@@ -48,14 +48,14 @@ export interface RouteOptions {
   wadingAt?: (x: number, z: number) => boolean
   /** Lantern strength: 7 outdoors, 19 indoors. */
   lantern?: number
-  /** Leave out the lean-to (interiors). */
+  /** The lean-to only travels with the procedural forest camp (Pomorog). */
   leanTo?: boolean
 }
 
 /** Camp, bonfire, traveller and lantern for a fixed map. */
 export function createFixedMapActors(engine: AsciiEngine, options: AreaOptions, route: RouteOptions) {
   const kit: Kit = createKit()
-  const campGroup = createCamp(kit, route.leanTo ?? true)
+  const campGroup = createCamp(kit, route.leanTo ?? false)
   campGroup.position.copy(CAMP)
   engine.add(campGroup, options.screen ? { glyph: 'screen' } : {})
   const fireLetters = engine.createParticles(1600)
