@@ -1,5 +1,37 @@
 # Registro de trabalho
 
+## 11/10/2026 — Auditoria do estado real e retomada
+
+- Relatório: [`relatorio-engine-2026-10-11.md`](relatorio-engine-2026-10-11.md).
+  Código conferido no commit `ed2d4f3`, árvore inicialmente limpa.
+- Diagnóstico: núcleo gráfico funcional e cinco áreas demonstráveis;
+  autoria de um jogo pelo editor ainda incompleta. Corrigido o resumo de
+  `START.md`, que tratava fases parciais como implementadas e sugeria que
+  faltava somente aprovação visual. `README.md` aponta para a auditoria.
+- Problemas reproduzidos em Chromium isolado: ajustes de instância/global
+  ausentes no JSON; tipo sobrescrito pelo padrão do prefab ao reconstruir;
+  árvore com geometria diferente para o mesmo documento; tapete removido
+  ainda atualizado; sandbox falha com cenário sem terreno.
+- Revisão de código: GLBs importados ficam fora do documento; recarga
+  descarta a cena atual antes de validar/construir a nova; faltam ferramentas
+  de autoria, integração dos chunks e projeto com assets persistentes.
+- Testes: `pnpm check` passou (25 testes, TypeScript e build); `pnpm compare`
+  passou nas seis vistas, sem atualizar baselines. Editor sem testes próprios.
+- Capturas e reprodução em
+  [`captures/auditoria-2026-10-11/`](captures/auditoria-2026-10-11/README.md):
+  referência, cinco áreas, sandbox, GLTF, efeitos, exportação web e sandbox
+  no **Orca Browser**. A captura no Orca funcionou nesta sessão.
+- Exportação web refeita para pasta temporária, servida por HTTP e
+  conferida em modo jogador; sem novo build/execução desktop ou mobile.
+- Próximo marco recomendado: criar uma cena, ajustar partes, importar um
+  modelo, salvar, reabrir igual e exportar. Começar por persistência,
+  sementes, validação e descarte; depois completar as ferramentas previstas.
+- Esta etapa altera apenas documentação e evidências. Os bugs encontrados
+  continuam abertos; nenhuma alteração em `reference/`, push ou publicação.
+
+As entradas abaixo registram o histórico de implementação e suas pendências
+naquele momento; para o estado consolidado, consulte a auditoria acima.
+
 ## 11/10/2026 — Fase 1: núcleo extraído
 
 **Estado:** fase 1 concluída no navegador headless; falta conferir no Orca

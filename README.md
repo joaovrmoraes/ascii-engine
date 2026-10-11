@@ -4,6 +4,7 @@ Engine que desenha cenas 3D (Three.js) **feitas de letras presas às coisas**,
 nascida do visual do Pomorog.
 
 - Comece por [`START.md`](START.md).
+- Estado conferido e prioridades: [relatório de 11/10/2026](docs/relatorio-engine-2026-10-11.md).
 - Agentes: [`AGENTS.md`](AGENTS.md) (Codex e outros) e [`CLAUDE.md`](CLAUDE.md).
 - Referência copiada do Pomorog: [`reference/pomorog/`](reference/pomorog/README.md).
 

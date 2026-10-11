@@ -271,9 +271,24 @@ aprovadas e nenhum módulo do núcleo importa nada específico do jogo.
 
 ### Estado em 11/10/2026
 
-Fases 1 a 6 e 8 (web e desktop) implementadas, e as 5 áreas montadas no
-editor; detalhes e pendências em `docs/log.md`. Falta a aprovação do dono,
-lado a lado com as capturas do Pomorog. A Fase 7 espera autorização.
+Existe uma implementação inicial das fases 1 a 6 e 8, com as 5 áreas
+montadas **em código** e selecionáveis no editor. Isso ainda não cumpre o
+critério de montá-las pelas ferramentas do editor. A autoria de cenários,
+a persistência de estilos/assets e a integração entre sistemas estão
+incompletas; não falta apenas aprovação visual.
+
+Estado conferido, problemas reproduzidos e prioridades estão no
+[`relatório de auditoria de 11/10`](docs/relatorio-engine-2026-10-11.md).
+O próximo marco recomendado é criar uma cena, personalizar partes,
+importar um modelo, salvar, reabrir igual e exportar. Primeiro, corrigir
+persistência, sementes dos prefabs, validação de documentos e descarte de
+camadas; depois completar as ferramentas de autoria já previstas abaixo.
+
+`pnpm check` e as seis comparações com a base da engine passaram. O
+sandbox foi capturado no Orca Browser. A equivalência final com o Pomorog
+continua pendente. Desktop tem compilação histórica, sem execução
+validada; a Fase 7 espera autorização no repositório do jogo. O histórico
+de implementação permanece em `docs/log.md`.
 
 ### Ordem real de trabalho (marcos por área)
 
