@@ -298,7 +298,12 @@ do editor, fora do pipeline ASCII e do documento exportado.
 **Estúdio visual:** tela dedicada de Efeitos e Atmosfera, com prévia grande
 à esquerda e controles à direita. Efeitos incluem emissores e luz pontual;
 atmosferas incluem exposição, cor das letras, luzes, direção, sombra e
-névoa. `SceneDoc.effects` incorpora receitas e `SceneDoc.style` a atmosfera.
+névoa. Efeitos usam uma engine de prévia vazia e descartável; a renderização
+do mapa pausa durante essa edição. Controles essenciais e modelos iniciais
+simplificam a criação. `SceneDoc.effects` incorpora receitas,
+`SceneDoc.atmospheres` guarda presets nomeados nos Assets e `SceneDoc.style`
+contém a iluminação aplicada. Ambos os estúdios salvam na biblioteca;
+atmosferas são aplicadas por clique e reabertas por duplo clique.
 Curvas complexas, calor e flipbooks continuam disponíveis pelo JSON avançado.
 Linha do tempo e curvas gráficas ficam pendentes.
 

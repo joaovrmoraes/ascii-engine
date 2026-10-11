@@ -1,4 +1,4 @@
-import { createTerrain, createTerrainData, createWaterPaint, paintWater, waterEdge, parseScene, seededRandom, pomorog, FOREST_WATER, type SceneDoc, type SceneWater, type PlacedObject, type EffectDef } from '@ascii-engine/core'
+import { createTerrain, createTerrainData, createWaterPaint, paintWater, waterEdge, parseScene, seededRandom, pomorog, atmosphereStyle, FOREST_WATER, type SceneDoc, type SceneWater, type PlacedObject, type EffectDef } from '@ascii-engine/core'
 import { assertSafeJson, batchSchema } from './schema'
 
 /** Merge plain JSON only, protecting object prototypes before any assignment. */
@@ -15,7 +15,7 @@ export function mergeJson(base: unknown, patch: unknown): unknown {
 export function summarizeScene(doc: SceneDoc) {
   return { name: doc.name, objects: doc.objects, terrain: doc.terrain ? { size: doc.terrain.size, resolution: doc.terrain.resolution, layers: doc.terrain.layers, minHeight: doc.terrain.heights.reduce((a,b)=>Math.min(a,b), Infinity), maxHeight: doc.terrain.heights.reduce((a,b)=>Math.max(a,b), -Infinity) } : null,
     waters: doc.waters?.map((w,index)=>({ index, ...w, shape: { ...w.shape, mask: w.shape.mask ? { resolution: w.shape.mask.resolution, followsTerrain: !!w.shape.mask.heights } : undefined } })),
-    assets: Object.entries(doc.assets ?? {}).map(([id, asset])=>({ id, name: asset.name })), effects: doc.effects, environment: doc.environment, style: doc.style }
+    assets: Object.entries(doc.assets ?? {}).map(([id, asset])=>({ id, name: asset.name })), effects: doc.effects, atmospheres: doc.atmospheres, environment: doc.environment, style: doc.style }
 }
 
 /** Re-sample only water explicitly authored to follow terrain. */
@@ -106,8 +106,14 @@ export function applyCommands(source: SceneDoc, input: unknown): SceneDoc {
       case 'asset.define': (doc.assets ??= {})[cmd.id] = { name: cmd.name, source: cmd.source }; break
       case 'resource.remove':
         if (!doc[cmd.kind]?.[cmd.id]) throw new Error('Recurso inexistente: ' + cmd.id)
-        if (doc.objects.some(o => o.prefab === cmd.id)) throw new Error('Remova primeiro as instâncias deste recurso: ' + cmd.id)
+        if (cmd.kind !== 'atmospheres' && doc.objects.some(o => o.prefab === cmd.id)) throw new Error('Remova primeiro as instâncias deste recurso: ' + cmd.id)
         delete doc[cmd.kind]![cmd.id]; break
+      case 'atmosphere.define': (doc.atmospheres ??= {})[cmd.id] = { name: cmd.name, style: atmosphereStyle(mergeJson(mergeJson(pomorog, doc.style ?? {}), { ...cmd.style, bodySceneLighting: true, inkFog: true }) as NonNullable<SceneDoc['style']>) }; break
+      case 'atmosphere.apply': {
+        const asset = doc.atmospheres?.[cmd.id]
+        if (!asset) throw new Error('Atmosfera inexistente: ' + cmd.id)
+        doc.style = mergeJson(doc.style ?? {}, asset.style) as SceneDoc['style']; break
+      }
       case 'atmosphere.set': doc.style = mergeJson(mergeJson(pomorog, doc.style ?? {}), { ...cmd.style, bodySceneLighting: true, inkFog: true }) as SceneDoc['style']; break
       case 'environment.set': doc.environment = { weather: cmd.weather, intensity: cmd.intensity }; break
     }

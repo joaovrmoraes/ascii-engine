@@ -26,6 +26,14 @@ describe('portable scene validation', () => {
     expect(doc.objects[0].options?.parts?.crown.size).toBe(.22)
     expect(parseScene(JSON.parse(JSON.stringify(doc)))).toEqual(doc)
   })
+  it('round-trips named atmosphere assets without applying them to the scene', () => {
+    const input = { ...legacy, atmospheres: { sunset: { name: 'Pôr do sol', style: { background: 0x221100, fog: null, inkTint: [1,.7,.5] } } } }
+    const doc = parseScene(input, library)
+    expect(parseScene(JSON.parse(JSON.stringify(doc)))).toEqual(doc)
+    expect(doc.style).toBeUndefined()
+    doc.atmospheres!.sunset.style.inkTint![0] = .4
+    expect(input.atmospheres.sunset.style.inkTint[0]).toBe(1)
+  })
   it.each([
     { ...legacy, version: 2 },
     { ...legacy, objects: [{ prefab: 'missing', position: [0, 0, 0] }] },
@@ -35,6 +43,9 @@ describe('portable scene validation', () => {
     { ...legacy, waters: [{ shape: { kind: 'pond', x: 0, z: 0, angle: 0, size: 1 }, look: { cell: [0, 1] } }] },
     { ...legacy, style: { moon: { position: 'invalid' } } },
     { ...legacy, environment: { weather: 'rain', intensity: 2 } },
+    { ...legacy, atmospheres: { dusk: { name: '', style: {} } } },
+    { ...legacy, atmospheres: { dusk: { name: 'Dusk', style: { brightness: -1 } } } },
+    { ...legacy, atmospheres: { dusk: { name: 'Dusk', style: { types: {} } } } },
     JSON.parse('{"version":1,"objects":[],"__proto__":{"polluted":true}}'),
   ])('rejects invalid data before it can reach scene allocation (%#)', input => expect(() => parseScene(input, library)).toThrow('Cenário inválido'))
 })

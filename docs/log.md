@@ -1,5 +1,26 @@
 # Registro de trabalho
 
+## 11/10/2026 — Prévia vazia de efeitos e Assets de atmosfera
+
+- Efeitos têm uma engine de prévia separada, sem terreno, com órbita,
+  deslocamento, zoom, enquadrar, pausar, parar, reiniciar e velocidade.
+  O mapa pausa durante a edição; ao sair, o contexto da prévia é liberado.
+- Modelos Fogo, Fumaça, Faíscas, Magia, Explosão e Raio; controles Essencial
+  e Avançado, camadas e salvamento fixo no rodapé.
+- **Salvar nos Assets** e **Ver nos Assets** em ambos os estúdios.
+  Atmosferas nomeadas usam `SceneDoc.atmospheres`, categoria própria,
+  aplicar por clique, editar por duplo clique e salvar cópia. Efeitos
+  também reabrem por duplo clique real e atualizam o mesmo asset.
+- Recursos acompanham rascunho local, arquivo, exportação, desfazer e refazer.
+  API/MCP expõe `atmosphere.define/apply`, catálogo e captura do Studio.
+- Validação: `pnpm check` (61 testes, tipos e build), `pnpm verify:authoring`
+  e `pnpm verify:api`; capturas reais por `cdpshot.mjs` e Orca Browser.
+  A prévia foi vista no Orca; a animação nesse host pode ficar suspensa.
+- Capturas: [Studio e Assets](captures/studio-assets-2026-10-11/README.md).
+- Biblioteca ainda pertence ao documento; não é global entre projetos.
+  Curvas gráficas e linha do tempo continuam pendentes. Pedido seguinte do
+  dono: posicionamento de camadas por gizmo e câmeras de composição salvas.
+
 ## 11/10/2026 — Estúdio dedicado, água no relevo e autoria completa por API/MCP
 
 - Escopo confirmado pelo dono: Estúdio como tela dedicada de Efeitos e

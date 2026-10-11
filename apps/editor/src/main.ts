@@ -126,6 +126,10 @@ function frame(now: number) {
   requestAnimationFrame(frame)
   if (document.hidden) { last = now; return }
   const real = last ? (now - last) / 1000 : 0; last = now
+  if (area.renderPreview?.(Math.max(0, real))) {
+    status.textContent = 'Estúdio de efeitos · prévia isolada · o mapa está pausado'
+    return
+  }
   let dt = view.paused ? 0 : THREE.MathUtils.clamp(real, 0, .08)
   if (engine.time + dt > view.pauseAt) dt = Math.max(0, view.pauseAt - engine.time)
   const { width, height } = engine.size
@@ -149,6 +153,8 @@ Object.assign(window, { engine, area, view, core })
 if (!player) {
   const { connectAuthoring } = await import('./api/client')
   connectAuthoring(engine, area, view, () => {
+    const preview = area.capturePreview?.()
+    if (preview) return preview
     // A tool capture must work even when the host suspends animation frames.
     const captureAngle = Math.PI / 7 + view.angle + drag, { width, height } = engine.size
     area.update(engine.time, 0)

@@ -6,7 +6,7 @@ export interface AuthoringEditor {
   commit(): Promise<void>
   undo(redo?: boolean): Promise<void>
   lock(value: boolean): void
-  catalog(): { id: string; title: string; kind: 'builtin' | 'asset' | 'effect' }[]
+  catalog(): { id: string; title: string; kind: 'builtin' | 'asset' | 'effect' | 'atmosphere' }[]
   inspect(id: string): unknown
   view(focus?: [number, number, number], studio?: 'scene' | 'effects' | 'atmosphere'): void
 }

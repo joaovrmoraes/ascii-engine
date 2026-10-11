@@ -43,3 +43,4 @@ export { seededRandom } from './world/scene'
 export { loadSceneAssets } from './import/assets'
 
 export { createWaterPaint, paintWater, waterMaskEdge, waterHeightAt, type WaterMask } from './world/waterPaint'
+export { ATMOSPHERE_KEYS, atmosphereStyle, type AtmosphereStyle, type AtmosphereAsset } from './world/atmosphere'

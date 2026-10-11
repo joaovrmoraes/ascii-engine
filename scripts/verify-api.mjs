@@ -80,6 +80,8 @@ try {
     {op:'effect.define',id:'fx:custom-blue',effect:{name:'Luz azul',duration:2,loop:true,emitters:[{rate:12,life:2,shape:{kind:'sphere',radius:.25},velocity:[0,.5,0],glyphs:'.+*',color:[.2,.6,1],size:.16,glow:2}],light:{color:0x3388ff,intensity:8,distance:7,offset:[0,.7,0]}}},
     {op:'object.add',object:{id:'blue',prefab:'fx:custom-blue',position:[-2,0,3]}},
     {op:'atmosphere.set',style:{moon:{intensity:1.9,color:0xaabbff},inkTint:[.85,.95,1],fog:{color:0x0a1020,density:.018}}},
+    {op:'atmosphere.define',id:'blue-night',name:'Noite azul',style:{moon:{intensity:2.2}}},
+    {op:'atmosphere.apply',id:'blue-night'},
     {op:'environment.set',weather:'rain',intensity:.2},
   ]
   assert((await invoke('scene_validate',{commands})).valid,'complete batch validates without mutation')
@@ -118,10 +120,17 @@ try {
   const capture=await invoke('editor_capture')
   await writeFile(join(output,'mcp-cena.png'),Buffer.from(capture.content[0].data,'base64'))
   assert(capture.content[0].mimeType==='image/png'&&capture.content[0].data.length>10000,'MCP returns actual rendered scene as image content')
+  assert((await invoke('engine_reference',{topic:'catalog'})).some(asset=>asset.id==='blue-night'&&asset.kind==='atmosphere'),'MCP atmosphere appears in asset catalog')
+  await invoke('editor_view',{studio:'effects'})
+  const effectCapture=await invoke('editor_capture')
+  await writeFile(join(output,'mcp-efeito-void.png'),Buffer.from(effectCapture.content[0].data,'base64'))
+  assert(effectCapture.content[0].data.length>1000,'MCP captures the isolated effect stage')
+  await check('API stage switch isolates preview', 'document.body.classList.contains("effect-studio-active") && !document.querySelector("#effect-preview").hidden')
+  await invoke('editor_view',{studio:'scene'})
   const exported=join(output,'mcp-cenario.pomorog.json')
   await invoke('scene_export',{path:exported,overwrite:true})
   const data=JSON.parse(await readFile(exported,'utf8'))
-  assert(data.effects['fx:custom-blue']&&data.assets[imported.id].source.startsWith('data:')&&data.waters[0].shape.mask.heights.length===65*65,'export embeds models, effects, atmosphere, terrain and slope water')
+  assert(data.atmospheres['blue-night'].style.moon.intensity===2.2&&data.effects['fx:custom-blue']&&data.assets[imported.id].source.startsWith('data:')&&data.waters[0].shape.mask.heights.length===65*65,'export embeds models, effects, atmosphere, terrain and slope water')
   await invoke('scene_export',{path:exported},true)
   assert(JSON.parse(await readFile(exported,'utf8')).name===data.name,'export refuses accidental file overwrite')
   state=await invoke('scene_open',{revision:state.revision,path:exported,preview:false})

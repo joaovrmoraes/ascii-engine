@@ -13,7 +13,7 @@ O espaço de trabalho segue a organização de editores como a Unity:
 - **Inspetor**, à direita: nome, transformação e aparência do objeto;
   abas separadas para **Terreno** e **Ambiente**.
 - **Projeto / Biblioteca**, embaixo: objetos disponíveis, separados em
-  Natureza, Construções, Formas, Efeitos e Importados, com busca.
+  Natureza, Construções, Formas, Efeitos, Atmosferas e Importados, com busca.
 - **Arquivo**, no topo: novo mapa/item, abrir, salvar e exportar.
   **Exibição**, acima da cena, guarda câmera e ajustes globais.
 
@@ -123,46 +123,55 @@ não foram validados; prefira GLB incorporado ou GLTF com acompanhantes.
 ## Criar efeitos
 
 1. Clique em **Estúdio → Efeitos**, ou em **Criar efeito** na barra superior.
-   Abre uma tela dedicada, com cena grande à esquerda e controles à direita.
-   **Voltar à cena** restaura os painéis do editor.
-2. Comece com **Novo efeito**, uma base do Pomorog ou um efeito já salvo no
-   documento. Escolher uma base cria uma cópia para editar.
-3. Ajuste duração e repetição; adicione, duplique ou exclua emissores.
-   Os campos controlam tipo, emissão por segundo, rajada inicial, início,
-   vida, forma de nascimento, velocidade XYZ, gravidade, arrasto, variação,
-   giro, letras, tamanho inicial/final, cores e brilho. **Emitir luz** abre
-   cor, intensidade, alcance e altura da luz; ela ilumina também as letras
-   dos objetos e da grama.
-4. **Prévia** toca no centro da vista. **Parar** remove apenas a prévia.
-   Trocar para Projeto também a interrompe. Alterar os campos atualiza a
-   prévia; ainda é preciso salvar para incorporar as alterações ao mapa.
-5. **Salvar na biblioteca** guarda a receita no documento. **Salvar e
-   colocar** também ativa a colocação: clique no chão para criar a instância.
-   O efeito passa a aparecer na categoria **Efeitos** da biblioteca.
-6. **Baixar efeito** exporta a receita como `.effect.json`; **Abrir efeito**
-   importa uma receita. **Avançado — definição JSON** permite ajustar os
-   parâmetros que ainda não têm campos, incluindo curvas e grade de
-   fogo e flipbook. Dados inválidos mostram uma mensagem e preservam a cena.
+   A tela dedicada mostra somente o efeito num espaço vazio. O mapa fica
+   pausado; **Voltar à cena** restaura a vista e os painéis.
+2. Escolha **Fogo, Fumaça, Faíscas, Magia, Explosão ou Raio**, ou use
+   **Começar do zero**. O seletor também lista bases do Pomorog e efeitos
+   salvos. As bases são copiadas, preservando as receitas originais.
+3. Dê um nome e use **Essencial** para ajustar a camada selecionada:
+   quantidade, tamanho das letras, tempo de vida, subida/queda, espalhamento
+   e cor, conforme o tipo. As camadas podem ser adicionadas, duplicadas ou
+   excluídas. **Avançado** abre forma, velocidade XYZ, gravidade, aparência
+   e JSON (curvas, calor e flipbooks).
+4. A prévia atualiza ao editar. **Reiniciar, Pausar, Parar, Enquadrar** e
+   velocidade ficam abaixo da prévia. Arrastar gira; botão direito move;
+   roda aproxima. Efeitos de disparo repetem automaticamente só na prévia.
+5. **Salvar nos Assets** adiciona o efeito à categoria **Efeitos**.
+   **Ver nos Assets** abre essa categoria. **Salvar e colocar na cena**
+   ativa a colocação: clique no chão para criar uma instância.
+   Duplo clique no asset salvo reabre a receita; salvar atualiza esse asset.
+6. **Importar ou baixar arquivo** contém **Baixar efeito** (`.effect.json`)
+   e **Abrir efeito**. Depois de importar, salve para adicionar aos Assets.
+
+**Emitir luz** configura a luz pontual que ilumina objetos e grama ao
+colocar o efeito no mapa. O espaço vazio não contém superfícies para
+mostrar essa iluminação.
 
 Os efeitos salvos acompanham salvar, reabrir, desfazer/refazer, exportar o
-mapa e exportar/inserir um item. A composição usa o campo opcional
-`SceneDoc.effects`; `buildScene` cria os prefabs a partir dessas receitas,
-sem depender do editor. Uma instância segue a posição do objeto; orientação
-e escala do objeto ainda não transformam toda a simulação de partículas.
-As receitas originais do Pomorog continuam intactas. Efeitos sem repetição
-tocam uma vez ao abrir a cena; a prévia pode ser reiniciada pelo botão.
+mapa e exportar/inserir um item, no campo `SceneDoc.effects`. Uma instância
+segue a posição do objeto; orientação e escala ainda não transformam toda
+a simulação de partículas. Efeitos sem repetição tocam uma vez na cena;
+a repetição automática do estúdio não altera essa configuração.
 
 ## Criar atmosferas
 
 No **Estúdio → Atmosfera**, comece com luar, entardecer ou brasas e ajuste
 exposição, cor das letras, fundo, luz principal (direção/cor/intensidade),
-sombra, luz ambiente, preenchimento e névoa. A prévia aparece na cena.
-Ctrl Z desfaz; **Baixar atmosfera** e **Abrir atmosfera** transportam o
-preset em `.atmosphere.json`. A cena salva todos esses campos.
+sombra, luz ambiente, preenchimento e névoa. A prévia usa o mapa aberto.
+Ctrl Z desfaz as alterações da cena.
 
-A tela é um espaço dedicado dentro do editor, não uma janela nativa extra.
-Os dois estúdios compartilham a cena como prévia; o efeito temporário para
-ao mudar para Atmosfera ou voltar à cena.
+Dê um nome e clique em **Salvar nos Assets**. O preset aparece em
+**Assets → Atmosferas**; **Ver nos Assets** abre essa categoria.
+Um clique no asset aplica a iluminação; duplo clique aplica e abre o
+estúdio para editar. Salvar atualiza o mesmo preset; **Salvar cópia** cria
+outro. Os presets ficam em `SceneDoc.atmospheres` e acompanham o arquivo
+do projeto, rascunho local, desfazer/refazer e exportação. A iluminação
+atual continua em `SceneDoc.style`.
+
+**Baixar atmosfera** e **Abrir atmosfera**, dentro de **Importar ou baixar
+arquivo**, transportam o preset em `.atmosphere.json`. Depois de importar,
+use **Salvar nos Assets**. A biblioteca pertence ao documento aberto;
+não é uma biblioteca global compartilhada entre projetos.
 
 ## Criar com IA
 

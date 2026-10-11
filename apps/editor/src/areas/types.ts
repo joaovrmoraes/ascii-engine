@@ -36,4 +36,6 @@ export interface Area {
   navigation?(event: PointerEvent): 'pan' | 'orbit' | false
   blocksSelection?(): boolean
   renderOverlay?(): void
+  renderPreview?(dt: number): boolean
+  capturePreview?(): string | undefined
 }

@@ -10,6 +10,7 @@ import { parseScene } from './validation'
 import { createSceneWeather, type SceneEnvironment } from '../weather/sceneWeather'
 import { createEffectPrefabs } from '../fx/prefabs'
 import type { EffectDef } from '../fx/effects'
+import type { AtmosphereAsset } from './atmosphere'
 
 /**
  * Scenes as JSON (phase 5): terrain, waters, a carpet and objects placed from
@@ -49,6 +50,8 @@ export interface SceneDoc {
   assets?: Record<string, { name: string; source: string }>
   /** User-authored visual effects; keys are portable prefab ids (fx:custom-*). */
   effects?: Record<string, EffectDef>
+  /** Saved lighting presets in the document's resource library. */
+  atmospheres?: Record<string, AtmosphereAsset>
   environment?: SceneEnvironment
 }
 

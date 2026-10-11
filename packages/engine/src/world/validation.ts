@@ -3,6 +3,7 @@ import { pomorog } from '../presets/pomorog'
 import { SURFACE_ALPHA } from '../surface'
 import { FOREST_WATER } from '../techniques/water'
 import { parseEffect } from '../fx/validation'
+import { ATMOSPHERE_KEYS } from './atmosphere'
 
 const glyphs = ['screen', 'surface', 'body', 'water', 'particle', 'carpet']
 function fail(path: string, detail: string): never { throw new Error(`Cenário inválido: ${path} ${detail}`) }
@@ -69,6 +70,17 @@ export function parseScene(input: unknown, library?: PrefabLibrary): SceneDoc {
     if (typeof asset.name !== 'string' || typeof asset.source !== 'string' || !asset.source.startsWith('data:')) fail(`assets.${id}`, 'precisa conter nome e fonte incorporada (data URI)')
   }
   const ids = new Set<string>()
+  if (root.atmospheres !== undefined) {
+    const atmospheres = record(root.atmospheres, 'atmospheres')
+    if (Object.keys(atmospheres).length > 256) fail('atmospheres', 'excede 256 atmosferas')
+    for (const [id, raw] of Object.entries(atmospheres)) {
+      const asset = record(raw, `atmospheres.${id}`)
+      if (!id || typeof asset.name !== 'string' || !asset.name.trim()) fail(`atmospheres.${id}`, 'precisa de identificador e nome')
+      const lighting = record(asset.style, `atmospheres.${id}.style`)
+      for (const key of Object.keys(lighting)) if (!(ATMOSPHERE_KEYS as readonly string[]).includes(key)) fail(`atmospheres.${id}.style.${key}`, 'não é um campo de iluminação')
+      parseScene({ version: 1, objects: [], style: lighting })
+    }
+  }
   if (root.effects !== undefined) {
     const effects = record(root.effects, 'effects')
     if (Object.keys(effects).length > 256) fail('effects', 'excede 256 efeitos')

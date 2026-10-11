@@ -140,6 +140,15 @@ uma receita de `engine_reference(topic: "effects")`, altere seus emissores
 e luz, e use `effect.define` com id `fx:custom-NOME`; depois posicione esse
 id com `object.add`.
 
+Para salvar iluminação nos Assets, use `atmosphere.define` com `id`, `name`
+e `style`; campos omitidos herdam a iluminação atual. Isso adiciona
+`SceneDoc.atmospheres[id]`, sem aplicar o preset. `atmosphere.apply` com
+esse `id` aplica a iluminação, preservando o restante do documento.
+`resource.remove` aceita `kind: "atmospheres"`. Catálogo, exportação,
+prévia e histórico incluem esses recursos, como os criados pelo estúdio.
+`atmosphere.set` continua ajustando a iluminação atual diretamente.
+`editor_capture` captura a prévia isolada quando o estúdio de efeitos está aberto.
+
 ## API HTTP e JavaScript
 
 ```sh
@@ -172,7 +181,7 @@ decodificação de modelos são verificados pelo editor ao materializar a cena.
 
 ## Limites e validação
 
-- 20000 objetos, 256 receitas de efeito; terreno/máscara até 513 × 513.
+- 20000 objetos, 256 receitas de efeito e 256 atmosferas salvas; terreno/máscara até 513 × 513.
 - Até 2000 comandos por lote, 1000 amostras por pincel e 2000 cópias por dispersão.
 - 32 MB por modelo no importador; 45 MB totais de arquivos no MCP, 64 MB no transporte.
 - Histórico do editor: até 30 ações/64 MB, podendo reduzir ações com modelos grandes.
