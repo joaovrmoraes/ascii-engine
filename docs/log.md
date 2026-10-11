@@ -203,3 +203,19 @@ Comparar com o painel do pântano em `all-areas-ground-cover.png`.
   está no campo de ondas, recalculado na CPU a cada quadro, e no espelho
   sempre ativo. Otimizar depois.
 - Sem som de trovão (áudio fica fora da engine por enquanto).
+
+## 11/10/2026 — Fatia 3: Pinheiros Nevados
+
+**Estado:** área montada (`?area=snow_pines`), equivalente ao painel da neve em
+`all-areas-ground-cover.png`. Roda a 60 fps.
+
+- Núcleo: `presets/snow.ts` com o chão de neve (cor por máscara de
+  cobertura, clareira derretida que cresce de 1,48 a 1,83 m, mapa de pegadas
+  512² com dedos e calcanhar que somem em 110 s), flocos `. + *` lentos que
+  não caem sob as copas e derretem sobre a clareira, acúmulo
+  (`snowAccumulation`), e o estilo `pomorogSnow` (luzes da neve, ambiente .42
+  nos corpos de letras).
+- Editor: `src/areas/snow.ts`. Pinheiros com galhos de folhas em nuvem de
+  letras e prateleiras de neve (rampa `snow`) que engrossam com o tempo,
+  pedregulhos, cerca quebrada, capim seco e tapete de crosta de neve.
+- Capturas: `neve.png` e `neve-perto-pegadas.png`.

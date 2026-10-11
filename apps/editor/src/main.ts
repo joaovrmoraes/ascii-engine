@@ -2,6 +2,7 @@ import * as THREE from 'three'
 import { createAsciiEngine, ENGINE_VERSION, pomorogSpan } from '@ascii-engine/core'
 import { createForest } from './areas/forest'
 import { createMarsh, marshHooks } from './areas/marsh'
+import { createSnow } from './areas/snow'
 import type { Area, AreaOptions } from './areas/types'
 import { buildReferenceScene } from './scene/reference'
 import { buildTerrainScene } from './scene/terrain'
@@ -22,6 +23,7 @@ import { createPanel } from './panel'
 export const AREAS: Record<string, AreaEntry> = {
   dark_forest: { title: 'Floresta Sombria', create: createForest },
   rain_marsh: { title: 'Pântano da Chuva', create: createMarsh, hooks: marshHooks },
+  snow_pines: { title: 'Pinheiros Nevados', create: createSnow },
   reference: { title: 'Cena de referência', create: (engine, options) => buildReferenceScene(engine, options.screen) },
   terrain: { title: 'Relevo (teste)', create: (engine) => buildTerrainScene(engine) },
 }
