@@ -15,6 +15,28 @@ Meta de uso, na voz do dono: *"jogar um 3D e converter pra ASCII"*. Um objeto
 entra na cena com uma marcação de técnica e sai com o mesmo acabamento do
 Pomorog. Nada de ajuste à mão em shader para cada caso.
 
+## 1.1 Critério de sucesso (definido pelo dono em 11/10/2026)
+
+> *"Se eu conseguir fazer meu game eu acho que já tá bom, todos os mapas que
+> tem lá… pântano e afins, isso aí pra mim é sucesso."*
+
+A engine está pronta quando as **5 áreas do Pomorog** podem ser montadas
+nela, pelo editor, com o mesmo nível das capturas aprovadas:
+
+| Área (id no jogo) | O que exige da engine |
+| --- | --- |
+| Floresta Sombria (`dark_forest`) | chunks em circuito, terreno, lago e riacho com reflexo, ponte, copas `body`, grama `carpet`, fogueira |
+| Pântano da Chuva (`rain_marsh`) | água do pântano antigo, chuva com anéis `\|_____\|`, árvores de várzea, margens |
+| Pinheiros Nevados (`snow_pines`) | chão de neve, neve caindo, neve nos galhos, pinheiros |
+| Mina Antiga (`old_mine`) | interior escuro com descoberta pela luz, trilhos, vigas, veios de cobre, pedras |
+| Catedral Submersa (`sunken_cathedral`) | construção em `surface`, água com reflexo, luz interna |
+
+Ordem de ataque: **Floresta → Pântano → Neve → Mina → Catedral**. Cada área
+é um marco: só puxa as funções que ela precisa e termina com capturas lado a
+lado (Pomorog × engine) aprovadas pelo dono. Recursos dos §3.1–3.4 que
+nenhuma área exige (mar, cachoeira, erosão, importar vídeo…) ficam para
+depois desse critério estar cumprido.
+
 ## 2. Princípio visual (não negociável)
 
 - **O mundo é feito de letras presas às coisas.** Quando a câmera gira, a letra
@@ -221,6 +243,15 @@ Porte de `reference/pomorog/src-visual/` para `packages/engine/src/`:
 
 Pronto quando: a cena do editor fica visualmente equivalente às capturas
 aprovadas e nenhum módulo do núcleo importa nada específico do jogo.
+
+### Ordem real de trabalho (marcos por área)
+
+As fases abaixo descrevem **sistemas**. A ordem de execução segue as áreas
+do §1.1: depois da Fase 1, cada área é uma **fatia vertical**, construída de
+ponta a ponta com o mínimo de cada sistema que ela usa (terreno e pincel,
+água, chunks, efeitos, ajustes por parte, salvar e carregar), e os sistemas
+crescem a cada área. A Floresta Sombria é a primeira fatia e a prova do
+caminho; se algo travar, descobre-se ali e não depois de editores grandes.
 
 ### Fase 2 — Água, reflexo, clima e fogo (porte do Pomorog)
 
