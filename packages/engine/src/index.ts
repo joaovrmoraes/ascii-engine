@@ -32,3 +32,6 @@ export { createCombatEffects, IMPACT_DELAY, FIRE_TRAVEL_TIME, type CombatEffects
 export { applyDefaultGlyphs, defaultGlyphStyle, loadGlyphModel, normalizeGlyphData, prepareGlyphModel, type GlyphModel } from './import/gltf'
 export { createTerrain, createTerrainData, DEFAULT_LAYERS, type Brush, type BrushStroke, type GroundLayer, type Terrain, type TerrainData } from './world/terrain'
 export { buildScene, emptyScene, generateChunkGrid, rotateConnectors, terrainCover, type BuiltScene, type ChunkCell, type ChunkDef, type Connectors, type PlacedObject, type Prefab, type PrefabLibrary, type SceneDoc, type SceneWater } from './world/scene'
+export { createEffectSystem, drawableGlyphs, type Curve, type EffectDef, type EffectInstance, type EffectSystem, type EmitterDef, type Gradient, type ShapeDef } from './fx/effects'
+export { imageToGlyphFrame, spriteSheetToFlipbook, gifToFlipbook, videoToFlipbook, type FlipbookData, type GlyphConversion, type PixelSource } from './fx/flipbook'
+export { POMOROG_EFFECTS } from './fx/presets'

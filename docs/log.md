@@ -365,3 +365,56 @@ conferência no Orca Browser com o painel visível.
   - o editor de cenário ainda não monta mapas a partir do gerador de chunks
     (só os testes usam);
   - desfazer e refazer ainda não existem.
+
+## 11/10/2026 — Fase 6: sistema de efeitos (§3.3)
+
+- Núcleo `fx/effects.ts`: um efeito é um dado (`EffectDef`) com linha do
+  tempo (duração, loop) e emissores.
+  - **Emissão:** contínua (`rate`) ou em rajadas (`bursts`), dentro de uma
+    janela da linha do tempo.
+  - **Formas de nascimento:** ponto, esfera (volume ou casca), cone, anel,
+    caixa e linha.
+  - **Movimento:** velocidade e rapidez, gravidade, arrasto, ruído, atração,
+    giro, pousar no chão.
+  - **Ao longo da vida:** tamanho, cor e alfa por curva ou gradiente, brilho
+    e **sequência de letras**.
+  - **Tipos de render, todos em letras:** partícula, anel/onda de choque (com
+    letra pela tangente na tela), feixe em zigue-zague, fita/rastro, grade de
+    calor (a fogueira `HeatGridSpec`), decal no chão e **flipbook ASCII**.
+  - **Luz própria** com cintilação e curva de esmaecimento.
+  - **Fixação:** o efeito pode seguir um objeto, uma parte ou um osso
+    (`instance.attach(obj)`).
+  - **Orçamento:** letras por emissor (`max`) e por cena (`budget`).
+- `engine.fx.play('fogueira', alvo)`: o sistema nasce no primeiro uso, com os
+  efeitos do Pomorog já registrados.
+- `fx/presets.ts`: efeitos do Pomorog refeitos como dados (fogueira, poeira,
+  vagalumes, morte, aura, raio, explosão de fogo, gelo, anel de chuva,
+  rastro).
+- `fx/flipbook.ts`: imagem → letras por célula (o brilho escolhe a densidade
+  da letra, a imagem dá a cor), em **sprite sheet**, **GIF/WebP animado**
+  (`ImageDecoder` do navegador) ou **vídeo** amostrado em N quadros por
+  segundo.
+- Editor, área **Efeitos** (`?area=effects`):
+  - lista de efeitos, tocar em loop ou uma vez, parar;
+  - "preso ao alvo" (um poste andando em círculo);
+  - JSON do efeito editável ao vivo, salvar efeito .json;
+  - importar imagem, GIF ou vídeo como flipbook;
+  - orçamento visível (letras, efeitos e emissores ativos).
+- Testes: 25 (novos: rajada, envelhecimento e fim; loop com orçamento e grade
+  de calor; letras fora do alfabeto; conversão de imagem em letras).
+- Captura: `efeitos-presets.png` (fogueira, raio, explosão, gelo / aura,
+  morte, rastro, flipbook de uma sprite sheet gerada).
+- **Achado de fidelidade:**
+  - o alfabeto das partículas do Pomorog (`glyphCloud.ts`) não tem `@` nem
+    `x`;
+  - a fogueira e os efeitos pedem `@ # % x …`, mas o jogo desenha `.` no lugar
+    (`indexOf` = −1 → 0), e `ascii-fire-grid.png` de fato não mostra `@`;
+  - a engine mantém o mesmo comportamento por fidelidade;
+  - incluir `@`, `x` e `&` no alfabeto é uma melhoria a decidir com
+    antes/depois.
+- Pendências:
+  - o editor ainda não tem curvas e gradientes gráficos, só o JSON;
+  - forma "superfície de uma parte" e fixação em ossos por nome;
+  - gatilhos por evento (ao bater, ao morrer, ao entrar na água) ainda são
+    chamados pelo código;
+  - som.

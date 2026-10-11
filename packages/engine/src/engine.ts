@@ -12,6 +12,8 @@ import { markScreen } from './techniques/screen'
 import { surfaceMaterial } from './techniques/surface'
 import { createWater, type WaterOptions, type WaterShape } from './techniques/water'
 import { createRainStreaks, type RainStreaks } from './weather/rain'
+import { createEffectSystem, type EffectSystem } from './fx/effects'
+import { POMOROG_EFFECTS } from './fx/presets'
 
 export interface AsciiEngineOptions {
   style?: Partial<AsciiStyle>
@@ -248,6 +250,9 @@ export function createAsciiEngine(canvas: HTMLCanvasElement, options: AsciiEngin
     }
   }
 
+  // The effect system is created on first use (`engine.fx`).
+  let effects: EffectSystem | undefined, effectLetters: GlyphCloud | undefined
+  let lastDt = 0
   const debug = { raw: false }
   const raycaster = new THREE.Raycaster()
   const engine = {
@@ -257,6 +262,8 @@ export function createAsciiEngine(canvas: HTMLCanvasElement, options: AsciiEngin
     lights: { hemisphere, moon, fill },
     get style() { return style },
     get time() { return time },
+    /** Last frame step (clamped). */
+    get dt() { return lastDt },
 
     /**
      * Adds an object with a declared technique. Style layers, most specific
@@ -424,6 +431,16 @@ export function createAsciiEngine(canvas: HTMLCanvasElement, options: AsciiEngin
     },
     /** Extra ink for one particle layer (cloud or rain), multiplied by the style brightness. */
     setGain(layer: GlyphCloud | RainStreaks, gain: number) { gains.set(layer, gain) },
+    /** Effect system (§3.3): `engine.fx.play('fogueira', alvo)`; Pomorog effects pre-registered. */
+    get fx(): EffectSystem {
+      if (!effects) {
+        effectLetters = engine.createParticles(8000)
+        engine.add(effectLetters.mesh, { glyph: 'particle' })
+        effects = createEffectSystem(effectLetters, scene)
+        effects.register(...POMOROG_EFFECTS)
+      }
+      return effects
+    },
     /** Lightning flash 0–1: lights every ink (Pomorog `stormFlash`). */
     setFlash(flash: number) { illumination.uniforms.stormFlash.value = flash },
     set reflectionRange(metres: number) { reflectionRange = metres },
@@ -455,6 +472,8 @@ export function createAsciiEngine(canvas: HTMLCanvasElement, options: AsciiEngin
       updateGlyphBodies(bodies, camera, height, lantern.position, lantern.on ? style.bodyLantern : 0, hearth.position, hearth.on ? hearth.power : 0, style.bodyAmbient)
       const hero = actors.hero ?? new THREE.Vector3(100, 0, 100)
       for (const carpet of carpets) carpet.update(time, hero, actors.foe, camera, focus, style.atmosphere, style.brightness)
+      if (effects && effectLetters) { effectLetters.clear(); effects.update(dt, time, camera) }
+      lastDt = dt
       for (const cloud of clouds) cloud.commit(height, camera, style.brightness * (gains.get(cloud) ?? 1))
       for (const layer of streaks) layer.commit(style.brightness * (gains.get(layer) ?? 1))
 
