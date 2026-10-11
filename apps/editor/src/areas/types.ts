@@ -11,6 +11,8 @@ export interface AreaOptions {
   at?: number
   /** No encounters. */
   peaceful?: boolean
+  /** A scene document to open (sandbox / exported games). */
+  scene?: import('@ascii-engine/core').SceneDoc
 }
 
 /** One map of the game, built on the engine. */

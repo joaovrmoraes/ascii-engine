@@ -22,16 +22,17 @@ function loadStored(): SceneDoc | undefined {
   try { const raw = localStorage.getItem(STORAGE); return raw ? JSON.parse(raw) as SceneDoc : undefined } catch { return undefined }
 }
 
-export function createSandbox(engine: AsciiEngine, _options: AreaOptions = {}): Area {
+export function createSandbox(engine: AsciiEngine, options: AreaOptions = {}): Area {
   const library = createPrefabs(engine)
-  let scene: BuiltScene = buildScene(engine, loadStored() ?? defaultScene(), library)
+  let scene: BuiltScene = buildScene(engine, options.scene ?? loadStored() ?? defaultScene(), library)
   const tool = { kind: 'select' as Tool, radius: 2, strength: .08, layer: 1, prefab: 'arvore' }
   const focus = new THREE.Vector3(0, .8, 0)
   let note = ''
-  const save = () => { try { localStorage.setItem(STORAGE, JSON.stringify(scene.toJSON())) } catch { /* private mode */ } }
+  const save = () => { if (options.scene) return; try { localStorage.setItem(STORAGE, JSON.stringify(scene.toJSON())) } catch { /* private mode */ } }
 
   // Tool panel.
   const box = document.createElement('div'); box.id = 'tools'; document.body.appendChild(box)
+  if (document.body.classList.contains('player')) box.hidden = true
   const brushes: [Tool, string][] = [['select', 'selecionar parte'], ['raise', 'esculpir +'], ['lower', 'esculpir −'], ['smooth', 'suavizar'], ['flatten', 'aplainar'], ['paint', 'pintar chão'], ['lake', 'cavar lago'], ['place', 'pôr objeto'], ['erase', 'apagar objeto']]
   box.innerHTML = `
     <div class="title">cenário</div>

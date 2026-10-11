@@ -418,3 +418,33 @@ conferência no Orca Browser com o painel visível.
   - gatilhos por evento (ao bater, ao morrer, ao entrar na água) ainda são
     chamados pelo código;
   - som.
+
+## 11/10/2026 — Fase 8: exportação (web e desktop)
+
+- **Modo jogador:** se houver um `game.json` ao lado do `index.html` (título,
+  área ou cenário de partida, estilo, zoom), o editor vira jogador, sem painéis
+  nem seleção. `?player=1` mostra esse modo no editor. O Vite usa
+  `base: './'`, então a pasta exportada funciona em qualquer caminho.
+- **`pnpm export`** (`scripts/export.mjs`):
+  `--title … --area <id> | --scene cenario.json [--zoom] [--desktop] [--bundle deb,appimage]`.
+  Compila o editor, copia para `exports/<jogo>/web` (fora do git) e grava o
+  `game.json` (e o `scene.json`). Com `--desktop`, gera uma configuração do
+  Tauri com nome e identificador do jogo e compila o app.
+- Verificado:
+  - web: a pasta exportada da Floresta servida estaticamente abre como jogo
+    (`exportacao-web-floresta.png`, título "Floresta Sombria", sem painéis);
+  - desktop: o binário release compilou em 2m33s
+    (`apps/editor/src-tauri/target/release/ascii-engine-editor`, sem
+    instalador; `--bundle` gera .deb/AppImage).
+- Não verificado:
+  - a janela do app desktop não foi aberta (evitei abrir janelas no desktop
+    do dono);
+  - Android e iOS: os SDKs não estão instalados (só `adb`); o caminho é
+    `tauri android init/build` e `tauri ios init/build` com a mesma pasta web.
+
+## Conferências gerais pendentes
+
+- **Orca Browser:** a aba existe, mas o painel do navegador está oculto e não
+  desenha quadros (o screenshot expira). Tudo foi validado no Chromium sem
+  janela com GPU (`cdpshot.mjs`, `pnpm compare`).
+- **Fase 7** (o Pomorog usando a engine) espera autorização do dono.

@@ -209,15 +209,33 @@ ascii-engine/
 ```
 
 - O **núcleo** não conhece jogo, UI nem Tauri. Ele roda em qualquer navegador.
-  Módulos (fase 1): `surface.ts` (IDs no alpha), `illumination.ts` +
-  `exploration.ts` (luz local), `ascii.ts` (passe de tela, com ganchos
-  `AsciiPassHook` para bioma), `style.ts` (estilo por parte em camadas),
-  `techniques/` (`screen`, `surface`, `body`, `carpet`, `particle`),
-  `presets/` (`pomorog`, fogueira `HeatGridSpec`) e `engine.ts`
-  (`createAsciiEngine`, `add` com `type`/`parts`, `setPartStyle`,
-  `setTypeStyle`, `render`).
-- O **editor** é a vitrine e a ferramenta: cena de teste, ajustes ao vivo e,
-  depois, importação e exportação.
+  Módulos de `packages/engine/src/`:
+  - `engine.ts`: `createAsciiEngine`; `add(obj, { glyph, type, parts })`,
+    `remove`, `setPartStyle`, `setInstanceStyle`, `setTypeStyle`, `setStyle`,
+    `pick`, `render(dt)`; `createCarpet`, `createParticles`, `createWater`,
+    `addWater`, `createRainStreaks`, `fx`.
+  - `surface.ts` (IDs no alpha), `style.ts` (estilo por parte em camadas),
+    `ascii.ts` (passe de tela com ganchos `AsciiPassHook`), `illumination.ts`
+    e `exploration.ts` (luz local e descoberta).
+  - `techniques/`: `screen`, `surface`, `body` (com malhas de esqueleto),
+    `carpet`, `particle` e `water` (componente com reflexo em letras).
+  - `presets/`: `pomorog` (estilo e tipos), `campfire` (`HeatGridSpec`),
+    `ambient` (vagalumes, motas, poeira), `combat`, `marshWater` (pântano
+    antigo) e `snow`.
+  - `weather/`: `rain` e `storm`.
+  - `world/`: `circuit`, `chunks` (carregamento por distância),
+    `rippleField`, `terrain` (pincéis) e `scene` (cenário em JSON, prefabs,
+    gerador de chunks por conectores).
+  - `fx/`: sistema de efeitos em dados, presets do Pomorog e flipbook ASCII.
+  - `import/gltf.ts`: GLTF/GLB com `userData.glyph`.
+- O **editor** é a vitrine e a ferramenta: as 5 áreas do Pomorog
+  (`src/areas/`), a cena de referência, o cenário com pincéis, os efeitos, a
+  importação GLTF, o painel de ajustes, a seleção por parte e os presets. O
+  conteúdo do jogo (modelos, prefabs, ritmo da caçada) fica em
+  `src/pomorog/` e `src/scene/`, nunca no núcleo. Com um `game.json` ao lado
+  do `index.html`, o editor vira o jogador de um jogo exportado.
+- Scripts: `pnpm compare` (comparação de imagens com a base) e
+  `pnpm export -- --title … --area …|--scene … [--desktop]` (web e Tauri).
 - O **Tauri** só entra para o que o navegador não faz: arquivos e empacotamento.
   Desenvolva e valide primeiro no navegador (`pnpm dev`). No Linux, o WebKitGTK
   do Tauri tem WebGL mais lento que o Chromium.
@@ -250,6 +268,12 @@ Porte de `reference/pomorog/src-visual/` para `packages/engine/src/`:
 
 Pronto quando: a cena do editor fica visualmente equivalente às capturas
 aprovadas e nenhum módulo do núcleo importa nada específico do jogo.
+
+### Estado em 11/10/2026
+
+Fases 1 a 6 e 8 (web e desktop) implementadas, e as 5 áreas montadas no
+editor; detalhes e pendências em `docs/log.md`. Falta a aprovação do dono,
+lado a lado com as capturas do Pomorog. A Fase 7 espera autorização.
 
 ### Ordem real de trabalho (marcos por área)
 
