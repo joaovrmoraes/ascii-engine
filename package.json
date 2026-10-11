@@ -5,12 +5,16 @@
   "type": "module",
   "scripts": {
     "dev": "pnpm --filter @ascii-engine/editor dev",
+    "api": "pnpm --filter @ascii-engine/automation api",
+    "mcp": "pnpm --silent --filter @ascii-engine/automation mcp",
     "build": "pnpm -r build",
     "test": "pnpm -r test",
     "typecheck": "pnpm -r typecheck",
     "check": "pnpm typecheck && pnpm test && pnpm build",
     "tauri": "pnpm --filter @ascii-engine/editor tauri",
     "compare": "node scripts/compare.mjs",
+    "verify:visual": "node scripts/verify-visual.mjs",
+    "verify:api": "node scripts/verify-api.mjs",
     "verify:authoring": "node scripts/verify-authoring.mjs",
     "export": "node scripts/export.mjs"
   },

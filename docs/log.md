@@ -1,5 +1,62 @@
 # Registro de trabalho
 
+## 11/10/2026 — Estúdio dedicado, água no relevo e autoria completa por API/MCP
+
+- Escopo confirmado pelo dono: Estúdio como tela dedicada de Efeitos e
+  Atmosfera; água seguindo a montanha; IA cria todo o conteúdo visual e
+  pode editar a cena aberta com prévia e desfazer.
+- Estúdio com cena grande e controles à direita; voltar restaura o layout.
+  Atmosfera controla exposição, tinta, fundo, luz principal/ambiente,
+  sombra e névoa; presets portáteis `.atmosphere.json`. Efeitos têm campos
+  de luz além de seus emissores. Objetos pendentes mostram modelo real e
+  permitem W/E/R, gizmo, Enter e Esc antes de gravar no mapa.
+- Um pincel Água, com máscara contínua, Shift para apagar, modo plano e
+  Seguir relevo. Malha e ondulação seguem a encosta, sem achatar o terreno.
+  A conversão de águas antigas é explícita no inspetor. Máscaras/alturas
+  são serializadas e restauradas por desfazer/reabrir.
+- Reflexos: todas as águas visíveis são atualizadas; planos iguais
+  compartilham textura. Materiais iluminados no passe auxiliar evitam
+  dupla perda de letras. O resultado final continua em letras. Nas encostas
+  há aproximação planar local; não há simulação física de água nem reflexo
+  de partículas do passe separado.
+- Até 8 PointLights chegam às letras de corpos, grama e partículas.
+  Estúdio habilita `bodySceneLighting`/`inkFog`; cenas antigas conservam
+  iluminação aprovada. Não foram alteradas as bases da comparação.
+- `packages/authoring`: comandos atômicos/validados para o documento todo,
+  objetos, dispersão, terreno, água, efeitos, assets, atmosfera e clima.
+  Nenhuma dependência de editor ou renderer. `scene.replace/patch` permitem
+  todo campo do contrato visual, além dos comandos de conveniência.
+- `apps/editor/src/api`: sessão por aba, revisão, prévia sem autosave,
+  aceitar/descartar, histórico integrado, inspeção, câmera, PNG e importação.
+  A IA pode aceitar diretamente; botões humanos são opcionais. Edição manual
+  invalida a revisão antiga. Erros de materialização preservam cena/recursos.
+- `apps/automation`: API HTTP/WebSocket loopback:1442 e 13 ferramentas MCP
+  stdio usando SDK oficial v2. Vite inicia a ponte; `pnpm api` é independente.
+  MCP importa caminhos explícitos e exporta JSON portátil por gravação
+  temporária; sobrescrita exige parâmetro explícito. Configuração de cliente
+  em `.mcp.example.json`, sem alterar configuração global do dono.
+- Arquitetura em START e `docs/decisions/0001-authoring-api.md`; uso em
+  [API/MCP](api-mcp.md) e [guia visual](guia-editor-visual.md).
+- Verificação: `pnpm check` passou (56 testes, tipos e build),
+  `pnpm verify:api`, `pnpm verify:visual`, `pnpm verify:authoring` e as seis
+  vistas de `pnpm compare` passaram. Build mantém aviso de chunk grande
+  e avisos de comentários PURE no Zod; sem falha de compilação.
+- Capturas: [MCP](captures/api-mcp-2026-10-11/README.md),
+  [Estúdio/água/luz](captures/studio-agua-2026-10-11/README.md).
+  [Mapa de exemplo](examples/mapa-mcp.pomorog.json) criado/importado/exportado
+  pelo cliente MCP no teste. Perfis isolados; nenhum comando de teste foi
+  enviado à sessão do dono.
+- Orca Browser: aba consultada, API carregada e sessão registrada.
+  A aba continua sem quadros de animação; screenshot do viewport expira.
+  A captura da API força enquadramento/render sem avançar tempo e retornou
+  PNG válido no Orca, revisão 0 preservada (`orca-api-canvas.png`).
+  Capturas da interface vêm do Chromium GPU e cdpshot. Vite com a ponte
+  já ativa também iniciou corretamente em uma porta temporária.
+- Pendentes: execução da conexão no binário Tauri, configuração do MCP no
+  cliente de IA do dono e importador dentro do Pomorog. A API cobre autoria
+  visual implementada; não introduz regras do jogo, edição de layout por
+  API, hierarquia de prefabs nem sistemas visuais ausentes no renderer.
+
 ## 11/10/2026 — Câmera corrigida, painéis móveis e aba de efeitos
 
 - Pedidos do dono: corrigir navegação da câmera, mover/redimensionar a UI

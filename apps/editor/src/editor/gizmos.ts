@@ -26,6 +26,7 @@ export function createGizmos(engine: AsciiEngine, callbacks: { change(): void; c
     setTimeout(() => { consumed = false }, 0)
   })
   return {
+    get hovered() { return control.enabled && !!control.axis && !!control.object },
     get dragging() { return control.dragging },
     get consumed() { return consumed || control.dragging },
     attach(object?: THREE.Object3D) { if (object && object.visible) control.attach(object); else control.detach() },
@@ -35,6 +36,7 @@ export function createGizmos(engine: AsciiEngine, callbacks: { change(): void; c
     cancel() { if (control.dragging) control.reset() },
     cursor(point?: THREE.Vector3, radius = .44) { ring.visible = !!point; if (point) { ring.position.copy(point).y += .04; ring.scale.setScalar(radius / .44) } },
     render() {
+      if (control.object && !control.object.parent) control.detach()
       canvas.dataset.transformAxis = control.axis ?? ''
       canvas.dataset.transformMode = control.mode
       const allowed = callbacks.allowed()

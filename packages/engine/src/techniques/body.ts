@@ -1,5 +1,6 @@
 import * as THREE from 'three'
 import { MeshSurfaceSampler } from 'three/examples/jsm/math/MeshSurfaceSampler.js'
+import { inkLightsGLSL, inkLightUniforms } from '../illumination'
 import { SURFACE_ALPHA } from '../surface'
 
 /**
@@ -25,11 +26,12 @@ const GLYPH_ALPHA = SURFACE_ALPHA.glyph
 /** Shared by every body of one engine: point size, moon and the warm lights. */
 export function bodyUniforms() {
   return {
+    ...inkLightUniforms(),
     pixelScale: { value: 60 },
     moon: { value: new THREE.Vector3(-5, 12, 7).normalize() },
     lantern: { value: new THREE.Vector4(0, 0, 0, 0) },
     hearth: { value: new THREE.Vector4(0, 0, 0, 0) },
-    ambient: { value: .32 },
+    ambient: { value: .32 }, sunPower: { value: 1 }, sunColor: { value: new THREE.Color(1,1,1) },
   }
 }
 export type BodyUniforms = ReturnType<typeof bodyUniforms>
@@ -55,8 +57,9 @@ function lettersMaterial(shared: BodyUniforms, color: THREE.Color, glow: THREE.C
   return new THREE.ShaderMaterial({
     uniforms: { ...shared, atlas: { value: glyphAtlas() }, tint: { value: color }, glow: { value: glow } },
     vertexShader: `
+      ${inkLightsGLSL}
       attribute vec3 glyphColor; attribute float seed;
-      uniform float pixelScale, ambient; uniform vec3 moon, tint, glow; uniform vec4 lantern, hearth;
+      uniform float pixelScale, ambient, sunPower; uniform vec3 sunColor; uniform vec3 moon, tint, glow; uniform vec4 lantern, hearth;
       varying vec3 vColor; varying float vIndex;
       void main() {
         vec4 world = modelMatrix * vec4(position, 1.);
@@ -66,11 +69,13 @@ function lettersMaterial(shared: BodyUniforms, color: THREE.Color, glow: THREE.C
         float diffuse = max(dot(n, moon), 0.);
         float lamp = lantern.w * pow(max(0., 1. - distance(world.xyz, lantern.xyz) / 6.), 1.5);
         float fire = hearth.w * pow(max(0., 1. - distance(world.xyz, hearth.xyz) / 5.5), 1.7);
-        float light = ambient + diffuse * .7 + lamp * .9 + fire * .8;
+        vec3 point = pointInk(world.xyz);
+        float light = ambient + diffuse * .7 * sunPower + lamp * .9 + fire * .8 + dot(point, vec3(.2126,.7152,.0722)) * .5;
         // Letter shape carries the shading; colour stays the material's own hue.
         float level = clamp(light * .62 + (seed - .5) * .3 + length(glow) * .5, .08, .999);
         vIndex = ${START[ramp]}.0 + 1.0 + floor(level * ${count - 1}.0);
         vColor = (glyphColor * tint * (.35 + light * .8) + vec3(.95, .6, .28) * (lamp * .25 + fire * .35) * tint + glow) * ${ramp === 'stone' ? '1.45' : '1.'};
+        vColor = vColor * mix(vec3(1.), sunColor, diffuse * .6) + glyphColor * tint * point * .35;
         gl_Position = projectionMatrix * view;
         gl_Position.z -= .002 * gl_Position.w;
         gl_PointSize = facing < ${ramp === 'stone' ? '.05' : open ? '-.2' : '-.05'} ? 0. : ${size.toFixed(3)} * pixelScale;

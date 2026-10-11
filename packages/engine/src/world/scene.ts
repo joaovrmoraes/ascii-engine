@@ -3,6 +3,7 @@ import type { AddOptions, AsciiEngine } from '../engine'
 import type { AsciiStyle } from '../presets/pomorog'
 import type { ObjectTypeStyle } from '../style'
 import type { GroundCover } from '../techniques/carpet'
+import { waterHeightAt } from './waterPaint'
 import { waterEdge, type Water, type WaterLook, type WaterShape } from '../techniques/water'
 import { createTerrain, type Terrain, type TerrainData } from './terrain'
 import { parseScene } from './validation'
@@ -73,7 +74,7 @@ const pickOf = (list: number[], random: () => number) => list[Math.floor(random(
 export function terrainCover(terrain: Terrain, count: number, waterLevel: number | SceneWater[] = -Infinity): GroundCover {
   return {
     count, extent: terrain.data.size, y: (x, z) => terrain.heightAt(x, z) - .06,
-    density: (x, z) => terrain.grassAt(x, z, typeof waterLevel === 'number' ? waterLevel : Math.max(-Infinity, ...waterLevel.filter(w => waterEdge(w.shape, x, z) > 0).map(w => w.level ?? 0))),
+    density: (x, z) => terrain.grassAt(x, z, typeof waterLevel === 'number' ? waterLevel : Math.max(-Infinity, ...waterLevel.filter(w => waterEdge(w.shape, x, z) > 0).map(w => waterHeightAt(w.shape, x, z, w.level ?? 0)))),
     pick(random) {
       const flower = random() < .012, shade = .55 + random() * .6, warm = random()
       return flower

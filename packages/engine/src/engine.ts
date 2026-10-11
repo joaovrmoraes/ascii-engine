@@ -1,6 +1,6 @@
 import * as THREE from 'three'
 import { createAsciiPass, type AsciiPassHook } from './ascii'
-import { ABSENT, createIllumination } from './illumination'
+import { ABSENT, createIllumination, MAX_INK_LIGHTS } from './illumination'
 import type { LightObstacle } from './exploration'
 import { pomorog, type AsciiStyle } from './presets/pomorog'
 import { nodeGlyphStyle, resolveGlyphStyle, type GlyphStyle, type ObjectTypeStyle } from './style'
@@ -40,8 +40,9 @@ export interface WaterSource {
   reflection: { render(renderer: THREE.WebGLRenderer, scene: THREE.Scene, camera: THREE.OrthographicCamera): void; dispose(): void }
   /** Distance (m) from a point to the water, 0 inside. */
   distance(x: number, z: number): number
+  reflectionLevel?(x: number, z: number): number
   look: { reflection: { enabled: boolean } }
-  uniforms: { time: { value: number } }
+  uniforms: { time: { value: number }; reflection?: THREE.IUniform<THREE.Texture | null>; reflectionMatrix?: THREE.IUniform<THREE.Matrix4>; reflectionOn?: THREE.IUniform<number> }
   dispose(): void
 }
 
@@ -82,6 +83,7 @@ export function createAsciiEngine(canvas: HTMLCanvasElement, options: AsciiEngin
     illumination = createIllumination({ interior: style.interior, obstacles })
     illumination.uniforms.stormFlash.value = flash
     shareIllumination(ascii.material.uniforms)
+    shareIllumination(bodies)
     for (const carpet of carpets) shareIllumination(carpet.uniforms)
     for (const cloud of clouds) shareIllumination(cloud.uniforms)
   }
@@ -93,7 +95,7 @@ export function createAsciiEngine(canvas: HTMLCanvasElement, options: AsciiEngin
   /** Extra ink per particle layer (lightning brightens rain and bolts). */
   const gains = new Map<object, number>()
   const detachedLayers = new WeakMap<THREE.Object3D, () => void>()
-  /** Only the nearest water renders its mirror, within this distance (Pomorog: 11 m). */
+  /** Cull mirrors beyond the view plus this margin (Pomorog: 11 m). */
   let reflectionRange = 11
   const entries = new Map<THREE.Object3D, Entry>()
   const types: Record<string, ObjectTypeStyle> = { ...style.types }
@@ -128,6 +130,8 @@ export function createAsciiEngine(canvas: HTMLCanvasElement, options: AsciiEngin
   /** Same uniform objects in every pass that lights ink (Pomorog `Object.assign`). */
   function shareIllumination(uniforms: Record<string, THREE.IUniform>) { Object.assign(uniforms, illumination.uniforms) }
   shareIllumination(ascii.material.uniforms)
+  shareIllumination(bodies)
+  const lightPosition = new THREE.Vector3(), originalMoonColor = new THREE.Color(pomorog.moon.color)
 
   function resize() {
     width = Math.max(canvas.clientWidth, 1); height = Math.max(canvas.clientHeight, 1)
@@ -497,24 +501,62 @@ export function createAsciiEngine(canvas: HTMLCanvasElement, options: AsciiEngin
       }
       updateGlyphBodies(bodies, camera, height, lantern.position, lantern.on ? style.bodyLantern : 0, hearth.position, hearth.on ? hearth.power : 0, style.bodyAmbient)
       const hero = actors.hero ?? new THREE.Vector3(100, 0, 100)
-      for (const carpet of carpets) carpet.update(time, hero, actors.foe, camera, focus, style.atmosphere, style.brightness)
+      for (const carpet of carpets) carpet.update(time, hero, actors.foe, camera, focus, style.inkTint ? 'moon' : style.atmosphere, style.brightness)
       if (effects && effectLetters) { effectLetters.clear(); effects.update(dt, time, camera) }
+      // Effects update their PointLights first. Sharing these uniforms makes
+      // their colour/reach work on bodies, carpets, surfaces and particles.
+      const ink = illumination.uniforms
+      const tint = style.inkTint ?? (style.atmosphere === 'dusk' ? [1.25, .8, .65] : style.atmosphere === 'ember' ? [1.5, .65, .36] : [1, 1, 1])
+      ink.atmosphereTint.value.setRGB(tint[0], tint[1], tint[2])
+      bodies.sunPower.value = style.bodySceneLighting ? style.moon.intensity / pomorog.moon.intensity : 1
+      if (style.bodySceneLighting) {
+        bodies.sunColor.value.setHex(style.moon.color)
+        bodies.sunColor.value.r /= originalMoonColor.r; bodies.sunColor.value.g /= originalMoonColor.g; bodies.sunColor.value.b /= originalMoonColor.b
+      } else bodies.sunColor.value.setRGB(1,1,1)
+      bodies.moon.value.set(...(style.bodySceneLighting ? style.moon.position : pomorog.moon.position)).normalize()
+      ink.inkFogDensity.value = style.inkFog ? style.fog?.density ?? 0 : 0
+      ink.inkFogColor.value.setHex(style.fog?.color ?? style.background).convertLinearToSRGB()
+      let count = 0
+      scene.updateMatrixWorld()
+      scene.traverseVisible(object => {
+        if (!(object instanceof THREE.PointLight) || object.intensity <= 0 || count >= MAX_INK_LIGHTS) return
+        object.getWorldPosition(lightPosition)
+        // The original Pomorog lantern/hearth already have dedicated ink terms.
+        if (lantern.on && lightPosition.distanceTo(lantern.position) < 1.5 || hearth.on && lightPosition.distanceTo(hearth.position) < 1.5) return
+        ink.inkLightPosition.value[count].set(lightPosition.x, lightPosition.y, lightPosition.z, object.distance || 20)
+        ink.inkLightColor.value[count].set(object.color.r, object.color.g, object.color.b, Math.min(8, object.intensity * .25))
+        count++
+      })
+      ink.inkLightCount.value = count
       lastDt = dt
       for (const cloud of clouds) cloud.commit(height, camera, style.brightness * (gains.get(cloud) ?? 1))
       for (const layer of streaks) layer.commit(style.brightness * (gains.get(layer) ?? 1))
 
       // Draw order (visual-pipeline §2, recreate-from-zero step 10).
-      // The nearest water renders its mirror (the most expensive pass).
+      // Visible waters share a mirror at equal levels (the most expensive pass).
       const near = actors.hero ?? focus
-      let mirror: WaterSource | undefined, best = Infinity
+      const mirrors = new Map<number, WaterSource>()
+      const frustum = new THREE.Frustum().setFromProjectionMatrix(new THREE.Matrix4().multiplyMatrices(camera.projectionMatrix, camera.matrixWorldInverse))
+      renderer.autoClear = true
       for (const water of waters) {
         water.uniforms.time.value = time
-        if (!water.mesh.parent || !water.look.reflection.enabled) continue
-        const d = water.distance(near.x, near.z)
-        if (d < best) { best = d; mirror = water }
+        if (water.uniforms.reflectionOn) water.uniforms.reflectionOn.value = 0
+        if (!water.mesh.parent || !water.mesh.visible || !water.look.reflection.enabled) continue
+        water.mesh.updateWorldMatrix(true, false)
+        if (!frustum.intersectsObject(water.mesh)) continue
+        if (water.distance(near.x, near.z) > reflectionRange + (camera.right - camera.left) / camera.zoom) continue
+        const level = water.reflectionLevel?.(near.x, near.z) ?? water.mesh.getWorldPosition(lightPosition).y
+        water.mesh.userData.waterReflectionLevel = level
+        const previous = mirrors.get(level)
+        if (previous?.uniforms.reflection && previous.uniforms.reflectionMatrix && water.uniforms.reflection && water.uniforms.reflectionMatrix) {
+          water.uniforms.reflection.value = previous.uniforms.reflection.value
+          water.uniforms.reflectionMatrix.value.copy(previous.uniforms.reflectionMatrix.value)
+        } else {
+          water.reflection.render(renderer, scene, camera)
+          mirrors.set(level, water)
+        }
+        if (water.uniforms.reflectionOn) water.uniforms.reflectionOn.value = 1
       }
-      renderer.autoClear = true
-      if (mirror && best < reflectionRange) mirror.reflection.render(renderer, scene, camera)
       if (debug.raw) { renderer.setRenderTarget(null); renderer.render(scene, camera); return }
       renderer.setRenderTarget(target); renderer.render(scene, camera)
       renderer.setRenderTarget(null); renderer.render(ascii.scene, ascii.camera)

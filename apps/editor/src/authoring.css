@@ -161,3 +161,31 @@ body.previewing #scene-toolbar .scene-tools { opacity: .35; }
 .fx-advanced { margin-top: 12px; }
 #editor-workspace .fx-advanced textarea { width: 100%; min-height: 200px; background: #23262c; color: #d2dbe8; font: 12px monospace; border: 1px solid #59616e; resize: vertical; }
 [data-dock="left"] .fx-body, [data-dock="right"] .fx-body { grid-template-columns: 1fr; }
+
+#atmosphere-studio { overflow: auto; min-height: 0; padding: 10px 14px; }
+.studio-fields { padding-top: 6px; }
+#asset-browser .project-tabs { margin-right: auto; }
+
+#studio-workspace { display: flex; flex-direction: column; flex: 1; min-height: 0; }
+.studio-tabs { display: flex; gap: 6px; padding: 6px 10px; background: #282c33; border-bottom: 1px solid #464b53; }
+#editor-workspace .studio-tabs .active { background: #46596e; color: #eef6ff; }
+#atmosphere-studio { flex: 1; }
+
+#studio-toolbar { position: fixed; inset: 0 0 auto; height: 66px; z-index: 8; background: #292d35; border-bottom: 1px solid #50555e; align-items: center; gap: 20px; padding: 12px 16px; }
+body.studio-mode #studio-toolbar { display: flex; }
+#studio-toolbar nav { display: flex; gap: 6px; }
+#studio-toolbar span { margin-left: auto; color: #aab4c3; font-size: 11px; }
+#studio-toolbar .active { background: #46596e; }
+body.studio-mode #authoring-toolbar, body.studio-mode #hierarchy, body.studio-mode #authoring-sidebar, body.studio-mode #scene-toolbar, body.studio-mode #scene-hint { display: none !important; }
+body.studio-mode #app { top: 66px; left: 0; right: min(560px, 43vw); bottom: 24px; }
+body.studio-mode #asset-browser { position: fixed !important; left: auto !important; right: 0 !important; top: 66px !important; bottom: 24px !important; width: min(560px, 43vw) !important; height: auto !important; border-left: 1px solid #50555e; border-top: 0; }
+body.studio-mode #asset-browser > .dock-heading, body.studio-mode #asset-browser > .panel-resize, body.studio-mode .studio-tabs { display: none; }
+body.studio-mode .fx-body { display: block; }
+body.studio-mode .fx-emitter-list { flex-direction: row; flex-wrap: wrap; margin-bottom: 12px; }
+body.studio-mode .fx-fields { grid-template-columns: repeat(auto-fit, minmax(215px, 1fr)); }
+body.studio-mode .fx-toolbar { padding: 8px 0 12px; }
+body.studio-mode .fx-general { gap: 12px; }
+#ai-preview { position: fixed; z-index: 10000; left: 50%; top: 90px; transform: translateX(-50%); display: flex; gap: 12px; align-items: center; padding: 12px 18px; border: 1px solid #7daebc; border-radius: 6px; background: #17232b; color: #eef6f7; box-shadow: 0 8px 28px #0009; font: 13px system-ui; }
+#ai-preview[hidden] { display: none; }
+.ai-preview .save-note { visibility: hidden; }
+#ai-preview button { padding: 7px 12px; cursor: pointer; }

@@ -1,5 +1,5 @@
 import * as THREE from 'three'
-import { buildScene, createTerrainData, createHistory, createEffectPrefabs, emptyScene, loadSceneAssets, parseScene, pomorog, waterEdge, type AsciiEngine, type Brush, type BuiltScene, type SceneDoc } from '@ascii-engine/core'
+import { buildScene, createTerrainData, createHistory, createEffectPrefabs, emptyScene, createWaterPaint, paintWater, loadSceneAssets, parseScene, pomorog, waterEdge, type AsciiEngine, type Brush, type BuiltScene, type SceneDoc } from '@ascii-engine/core'
 import { createPrefabs } from '../scene/prefabs'
 import { downloadDocument, importModelFiles } from '../scene/files'
 import { readDraft, saveDraft } from '../scene/storage'
@@ -8,9 +8,11 @@ import '../authoring.css'
 import { createWorkspace, type Workspace } from '../editor/workspace'
 import { createGizmos, type Gizmos } from '../editor/gizmos'
 import { assetInfo, icon } from '../editor/icons'
+import { createAtmosphereStudio } from '../editor/atmosphere'
+import { createPlacementPreview } from '../editor/placement'
 import { createEffectEditor } from '../editor/effects'
 
-type Tool = 'select' | Brush | 'lake' | 'stream' | 'place' | 'erase'
+type Tool = 'select' | Brush | 'water' | 'place' | 'erase'
 export function defaultScene(): SceneDoc {
   return { ...emptyScene('Meu mapa'), terrain: createTerrainData(32, 129), carpet: { count: 60000, seed: 48017 }, objects: [
     { prefab: 'fogueira', position: [0, 0, 0] }, { prefab: 'arvore', position: [-4, 0, -3] }, { prefab: 'pedregulho', position: [3, 0, -2] },
@@ -32,14 +34,16 @@ export async function createSandbox(engine: AsciiEngine, options: AreaOptions = 
     note = `Não foi possível abrir o rascunho: ${error}. Novo mapa aberto; o rascunho só será substituído ao editar.`
     initial = defaultScene(); library = builtins; assets = { library: {}, dispose() {} }; scene = buildScene(engine, initial, library)
   }
-  let name = initial?.name ?? 'Meu mapa', selected: THREE.Object3D | undefined, selectedWater = -1, busy = false
+  const placement = createPlacementPreview(engine, () => library)
+  let name = initial?.name ?? 'Meu mapa', selected: THREE.Object3D | undefined, selectedWater = -1, busy = false, automationLocked = false
   const snapshot = (): SceneDoc => ({ ...scene.toJSON(), name })
   const history = createHistory(snapshot(), 30)
   const focus = new THREE.Vector3(0, 1.6, -1.5), canvas = engine.renderer.domElement
   const signal = new AbortController()
-  const tool = { kind: 'select' as Tool, radius: 2, strength: .08, layer: 1, prefab: 'arvore' }
+  const tool = { kind: 'select' as Tool, radius: 2, strength: .08, layer: 1, prefab: 'arvore', waterMode: 'terrain' as 'terrain' | 'level' }
   let toolbar: HTMLElement, hierarchy: HTMLElement, sidebar: HTMLElement, box: HTMLElement
   let ui: Workspace | undefined, gizmos: Gizmos | undefined
+  let atmosphereStudio: ReturnType<typeof createAtmosphereStudio> | undefined
   let effectEditor: ReturnType<typeof createEffectEditor> | undefined
   let transformMode: 'hand' | 'translate' | 'rotate' | 'scale' = 'translate', preview = false, assetCategory = 'Todos', assetQuery = '', hierarchyQuery = ''
   const run = (action: () => void | Promise<void>) => { if (busy) return; void Promise.resolve().then(action).catch(error => message(String(error))) }
@@ -50,7 +54,7 @@ export async function createSandbox(engine: AsciiEngine, options: AreaOptions = 
     try { await saveDraft(snapshot()); if (revision === saveRevision) message('Rascunho salvo neste navegador') }
     catch (error) { message(`Falha no rascunho; use Salvar arquivo. ${error}`) }
   }
-  function changed() { if (player || busy) return; history.commit(snapshot()); refreshHierarchy(); refreshHistory(); void persist() }
+  function changed() { if (player || busy) return; history.commit(snapshot()); refreshHierarchy(); refreshHistory(); canvas.dispatchEvent(new Event('scene-document-changed')); void persist() }
   function choose(object?: THREE.Object3D, fromCanvas = false) {
     selected = scene.placed.find(p => p.object === object)?.object; selectedWater = -1
     if (object && (object === scene.terrain?.mesh || scene.waters.some(water => water.mesh === object))) {
@@ -65,6 +69,7 @@ export async function createSandbox(engine: AsciiEngine, options: AreaOptions = 
   }
   async function replace(input: unknown) {
     if (busy) throw new Error('Aguarde a abertura atual.')
+    placement.clear()
     busy = true
     for (const panel of [toolbar, hierarchy, sidebar, ui?.assets]) if (panel) panel.inert = true
     let nextAssets: Awaited<ReturnType<typeof loadSceneAssets>> | undefined
@@ -83,7 +88,7 @@ export async function createSandbox(engine: AsciiEngine, options: AreaOptions = 
       engine.setStyle(nextStyle, { replace: true })
       selected = undefined; selectedWater = -1; gizmos?.attach(); gizmos?.cursor()
       canvas.dispatchEvent(new Event('scene-replaced'))
-      refreshTools(); refreshHierarchy(); effectEditor?.refresh()
+      refreshTools(); refreshHierarchy(); effectEditor?.refresh(); atmosphereStudio?.refresh()
       if (toolbar) toolbar.querySelector<HTMLInputElement>('[data-k="name"]')!.value = name
     } catch (error) { nextAssets?.dispose(); engine.setStyle(previousStyle, { replace: true }); throw error }
     finally { busy = false; for (const panel of [toolbar, hierarchy, sidebar, ui?.assets]) if (panel) panel.inert = false }
@@ -116,25 +121,37 @@ export async function createSandbox(engine: AsciiEngine, options: AreaOptions = 
   }
   function refreshHint() {
     if (preview) { ui?.hint('Prévia do visual · clique em Voltar à edição para continuar'); return }
-    if (tool.kind === 'place') ui?.hint(`Colocar ${library[tool.prefab]?.title ?? 'objeto'} · clique no chão · Shift mantém a ferramenta`, true)
+    if (tool.kind === 'water') ui?.hint('Água · arraste para desenhar · Shift apaga água · ajuste o raio para criar lagos ou canais', true)
+    else if (tool.kind === 'place') ui?.hint(`Colocar ${library[tool.prefab]?.title ?? 'objeto'} · clique para colocar · W/E/R ajustam · Enter confirma · Esc cancela`, true)
     else if (tool.kind !== 'select') ui?.hint('Arraste no terreno para pintar · Shift inverte a altura · Esc volta à seleção', true)
     else ui?.hint(selected ? 'Arraste os eixos para transformar · W mover · E girar · R escalar · F focar' : 'Arraste um objeto da biblioteca para a cena · Alt + arraste gira a câmera · botão direito desloca')
   }
-  function setMode(mode: typeof transformMode) {
-    transformMode = mode; tool.kind = 'select'; gizmos?.cursor()
+  function setMode(mode: typeof transformMode, cancelPlacement = false) {
+    const placing = tool.kind === 'place' && mode !== 'hand' && !cancelPlacement
+    if (placing) placement.lock(); else placement.clear()
+    transformMode = mode; if (!placing) tool.kind = 'select'; gizmos?.cursor()
     if (mode !== 'hand') gizmos?.mode(mode)
-    gizmos?.attach(mode !== 'hand' ? selected : undefined)
+    gizmos?.attach(mode !== 'hand' ? (placing ? placement.object : selected) : undefined)
     ui?.root.querySelectorAll<HTMLButtonElement>('[data-mode]').forEach(button => { const active = button.dataset.mode === mode; button.classList.toggle('active', active); button.setAttribute('aria-pressed', String(active)) })
     refreshTools(); refreshHint()
   }
   function beginPlacement(prefab: string) {
     if (busy || preview) return
     tool.prefab = prefab; tool.kind = 'place'; gizmos?.attach(); ui?.selectPane('object')
-    refreshLibrary(); refreshHint()
+    placement.show(prefab, focus.clone().setY(scene.terrain?.heightAt(focus.x, focus.z) ?? 0))
+    if (transformMode === 'hand') transformMode = 'translate'
+    gizmos?.mode(transformMode); gizmos?.attach(placement.object)
+    gizmos?.cursor(); refreshLibrary(); refreshHint()
   }
   function placeAt(prefab: string, point: THREE.Vector3, repeat = false) {
     if (busy || preview) return
-    const object = scene.place({ prefab, position: [point.x, scene.terrain?.heightAt(point.x, point.z) ?? 0, point.z] })
+    const ghost = placement.object, seed = placement.seed(prefab)
+    const rotation3: [number, number, number] | undefined = ghost ? [ghost.rotation.x, ghost.rotation.y, ghost.rotation.z] : undefined
+    const scale3 = ghost?.scale.toArray() as [number, number, number] | undefined
+    if (placement.locked && ghost) point = ghost.position.clone()
+    const y = placement.locked ? point.y : scene.terrain?.heightAt(point.x, point.z) ?? 0
+    placement.clear(); gizmos?.attach()
+    const object = scene.place({ prefab, seed, rotation3, scale3, position: [point.x, y, point.z] })
     choose(object); changed()
     if (repeat) beginPlacement(prefab)
     else { setMode('translate'); gizmos?.cursor() }
@@ -162,7 +179,7 @@ export async function createSandbox(engine: AsciiEngine, options: AreaOptions = 
       card.classList.toggle('active', key === tool.prefab && tool.kind === 'place')
       card.onclick = () => beginPlacement(key)
       card.ondragstart = event => { if (!event.dataTransfer) return; tool.prefab = key; event.dataTransfer.setData('application/x-ascii-prefab', key); event.dataTransfer.effectAllowed = 'copy'; gizmos?.attach(); refreshHint() }
-      card.ondragend = () => { gizmos?.cursor(); ui!.get('#placement-label').hidden = true; if (tool.kind === 'select' && transformMode !== 'hand') gizmos?.attach(selected) }
+      card.ondragend = () => { placement.clear(); gizmos?.cursor(); ui!.get('#placement-label').hidden = true; if (tool.kind === 'select' && transformMode !== 'hand') gizmos?.attach(selected) }
       grid.append(card)
     }
     if (!grid.childElementCount) { const hint = document.createElement('p'); hint.className = 'empty-library'; hint.textContent = assetCategory === 'Importados' ? 'Use Importar modelo para adicionar seus GLB e GLTF.' : 'Nenhum objeto encontrado.'; grid.append(hint) }
@@ -205,7 +222,7 @@ export async function createSandbox(engine: AsciiEngine, options: AreaOptions = 
       button.onclick = () => choose(object); button.ondblclick = () => { focus.copy(object.position); focus.y += .8 }; list.append(button)
     }
     scene.waters.forEach((water, i) => {
-      const title = `${water.shape.kind === 'pond' ? 'Lago' : 'Riacho'} ${i + 1}`
+      const title = `${water.shape.kind === 'paint' ? 'Água' : water.shape.kind === 'pond' ? 'Lago' : 'Riacho'} ${i + 1}`
       if (!normalized(title).includes(normalized(hierarchyQuery))) return
       const button = document.createElement('button'); button.innerHTML = icon('water') + `<span>${title}</span>`
       button.className = `hierarchy-object${selectedWater === i ? ' active' : ''}`; button.onclick = () => { choose(); selectedWater = i; ui!.selectPane('object'); refreshHierarchy() }; list.append(button)
@@ -253,14 +270,24 @@ export async function createSandbox(engine: AsciiEngine, options: AreaOptions = 
       button('Duplicar [Ctrl D]', duplicate); button('Exportar este item', exportItem)
     } else if (selectedWater >= 0) {
       const index = selectedWater, entry = snapshot().waters![index]
-      for (const [key, label, value] of [['x', 'Posição x', entry.shape.x], ['z', 'Posição z', entry.shape.z], ['size', 'Tamanho', entry.shape.size], ['angle', 'Direção (graus)', entry.shape.angle * 180 / Math.PI], ['level', 'Nível', entry.level ?? 0], ['flow', 'Fluxo', entry.look?.flow ?? .35]] as const) {
+      for (const [key, label, value] of [['x', 'Posição x', entry.shape.x], ['z', 'Posição z', entry.shape.z], ['size', 'Tamanho', entry.shape.size], ['angle', 'Direção (graus)', entry.shape.angle * 180 / Math.PI], ['level', 'Nível', entry.level ?? 0], ['flow', 'Fluxo', entry.look?.flow ?? (entry.shape.kind === 'stream' ? .35 : .025)]] as const) {
         field(label, String(value), value => { void waterChange(key, Number(value)) })
       }
+      const row = document.createElement('label'), reflect = document.createElement('input'); row.textContent = 'Reflexo'; reflect.type = 'checkbox'; reflect.checked = scene.waters[index].look.reflection.enabled
+      reflect.onchange = () => run(async () => { const doc = snapshot(); doc.waters![index].look = { ...doc.waters![index].look, reflection: { ...scene.waters[index].look.reflection, enabled: reflect.checked } }; await replace(doc); selectedWater = index; changed() }); row.append(reflect); inspector.append(row)
+      if (!entry.shape.mask?.heights && scene.terrain) button('Adaptar ao relevo', async () => {
+        const doc = snapshot(), terrain = scene.terrain!, { size, resolution } = terrain.data
+        const shape = createWaterPaint(size, resolution)
+        for (let z = 0; z < resolution; z++) for (let x = 0; x < resolution; x++) shape.mask!.values[z * resolution + x] = waterEdge(entry.shape, x / (resolution - 1) * size - size / 2, z / (resolution - 1) * size - size / 2)
+        shape.mask!.heights = terrain.data.heights.map(height => height + .045)
+        doc.waters![index] = { ...entry, shape, level: 0 }; await replace(doc); selectedWater = index; changed()
+      })
+      if (entry.shape.kind === 'paint') button('Continuar pintando água', () => { tool.kind = 'water'; gizmos?.attach(); ui?.selectPane('terrain'); refreshTools(); refreshHint() })
       async function waterChange(key: string, value: number) {
         try {
           const doc = snapshot(), water = doc.waters![index]
           if (key === 'level') water.level = value
-          else if (key === 'flow') water.look = { ...water.look, flow: value }
+          else if (key === 'flow') water.look = { ...water.look, flow: value, pondDrift: [Math.cos(water.shape.angle) * value, Math.sin(water.shape.angle) * value] }
           else Object.assign(water.shape, { [key]: key === 'angle' ? value * Math.PI / 180 : value })
           await replace(doc); selectedWater = index; changed()
         } catch (error) { message(String(error)) }
@@ -271,13 +298,14 @@ export async function createSandbox(engine: AsciiEngine, options: AreaOptions = 
 
   if (!player) {
     ui = createWorkspace(); toolbar = ui.toolbar; hierarchy = ui.hierarchy; sidebar = ui.sidebar; box = ui.tools
+    atmosphereStudio = createAtmosphereStudio(ui.studioRoot, engine, changed)
     effectEditor = createEffectEditor(ui.effectRoot, engine, {
       definitions: () => snapshot().effects ?? {},
       position: () => focus.clone().setY(scene.terrain?.heightAt(focus.x, focus.z) ?? 0),
       async save(key, definition) { const doc = snapshot(); doc.effects = { ...doc.effects, [key]: definition }; await replace(doc); changed() },
       place(key) { ui!.showProject('assets'); assetCategory = 'Efeitos'; beginPlacement(key) },
     })
-    gizmos = createGizmos(engine, { change: syncTransformFields, commit: changed, allowed: () => !busy && !preview && tool.kind === 'select' && transformMode !== 'hand' })
+    gizmos = createGizmos(engine, { change: () => { if (tool.kind === 'place') placement.lock(); else syncTransformFields() }, commit: () => { if (tool.kind !== 'place') changed() }, allowed: () => !busy && !preview && !document.body.classList.contains('studio-mode') && (tool.kind === 'select' || tool.kind === 'place') && transformMode !== 'hand' })
     const el = <T extends HTMLElement>(key: string) => ui!.get<T>(`[data-k="${key}"]`)
     el<HTMLInputElement>('name').value = name
     el<HTMLInputElement>('name').onchange = e => { name = (e.target as HTMLInputElement).value || 'Sem título'; changed() }
@@ -298,23 +326,26 @@ export async function createSandbox(engine: AsciiEngine, options: AreaOptions = 
     el<HTMLSelectElement>('space').onchange = e => gizmos!.space((e.target as HTMLSelectElement).value as 'world' | 'local')
     el('snap').onclick = () => { const on = el('snap').getAttribute('aria-pressed') !== 'true'; el('snap').setAttribute('aria-pressed', String(on)); el('snap').classList.toggle('active', on); gizmos!.snap(on) }
     el('frame').onclick = () => { focus.copy(selected?.position ?? new THREE.Vector3()); focus.y += .8 }
-    el('cancel').onclick = () => setMode('translate')
+    el('cancel').onclick = () => setMode('translate', true)
     el('preview').onclick = () => {
-      preview = !preview; document.body.classList.toggle('previewing', preview)
+      placement.clear(); preview = !preview; document.body.classList.toggle('previewing', preview)
       el('preview').innerHTML = icon(preview ? 'cursor' : 'play') + (preview ? ' Voltar à edição' : ' Prévia')
       for (const panel of [hierarchy, sidebar, ui!.assets, ui!.get('.scene-tools')]) panel.inert = preview
       gizmos!.cursor(); canvas.dispatchEvent(new CustomEvent('editor-preview', { detail: preview })); refreshHint()
     }
     el('pause').onclick = () => { document.querySelector<HTMLButtonElement>('#panel [data-k="pause"]')?.click(); el('pause').classList.toggle('active') }
-    const brushes: [Tool, string, string][] = [['raise', 'Elevar', 'terrain'], ['lower', 'Baixar', 'terrain'], ['smooth', 'Suavizar', 'rock'], ['flatten', 'Aplainar', 'grid'], ['paint', 'Pintar', 'cursor'], ['lake', 'Lago', 'water'], ['stream', 'Riacho', 'water'], ['erase', 'Apagar objeto', 'cube']]
-    box.innerHTML = `<div class="component-title">${icon('terrain')} Ferramentas de terreno</div><p data-k="no-terrain" class="empty-note" hidden>Este item não tem terreno. Use Arquivo → Novo mapa.</p><div class="brush-grid">${brushes.map(([key, title, symbol]) => `<button data-brush="${key}">${icon(symbol)}${title}</button>`).join('')}</div><label>Raio<input data-k="radius" type="range" min=".5" max="8" step=".25"></label><label>Força<input data-k="strength" type="range" min=".01" max=".4" step=".01"></label><label>Camada<select data-k="layer"></select></label><button data-k="grow">Regerar grama</button><p class="empty-note">Arraste sobre o terreno. Cada traço pode ser desfeito com Ctrl Z.</p>`
-    box.querySelectorAll<HTMLButtonElement>('[data-brush]').forEach(button => { button.onclick = () => { tool.kind = button.dataset.brush as Tool; gizmos!.attach(); refreshTools(); refreshHint() } })
+    const brushes: [Tool, string, string][] = [['raise', 'Elevar', 'terrain'], ['lower', 'Baixar', 'terrain'], ['smooth', 'Suavizar', 'rock'], ['flatten', 'Aplainar', 'grid'], ['paint', 'Pintar', 'cursor'], ['water', 'Água', 'water'], ['erase', 'Apagar objeto', 'cube']]
+    box.innerHTML = `<div class="component-title">${icon('terrain')} Ferramentas de terreno</div><p data-k="no-terrain" class="empty-note" hidden>Este item não tem terreno. Use Arquivo → Novo mapa.</p><div class="brush-grid">${brushes.map(([key, title, symbol]) => `<button data-brush="${key}">${icon(symbol)}${title}</button>`).join('')}</div><label>Raio<input data-k="radius" type="range" min=".5" max="8" step=".25"></label><label>Água<select data-k="water-mode"><option value="terrain">Seguir relevo</option><option value="level">Nível plano (lago)</option></select></label><label>Força<input data-k="strength" type="range" min=".01" max=".4" step=".01"></label><label>Camada<select data-k="layer"></select></label><button data-k="grow">Regerar grama</button><p class="empty-note">Arraste sobre o terreno. Cada traço pode ser desfeito com Ctrl Z.</p>`
+    box.querySelectorAll<HTMLButtonElement>('[data-brush]').forEach(button => { button.onclick = () => { placement.clear(); tool.kind = button.dataset.brush as Tool; gizmos!.attach(); refreshTools(); refreshHint() } })
     for (const key of ['radius', 'strength'] as const) { const input = el<HTMLInputElement>(key); input.value = String(tool[key]); input.oninput = () => { tool[key] = Number(input.value) } }
+    el<HTMLSelectElement>('water-mode').onchange = e => { tool.waterMode = (e.target as HTMLSelectElement).value as 'terrain' | 'level'; selectedWater = -1 }
     el<HTMLSelectElement>('layer').onchange = e => { tool.layer = Number((e.target as HTMLSelectElement).value) }
     el('grow').onclick = () => run(() => { scene.regrow(); changed() })
-    ui.environment.innerHTML = `<div class="component-title">${icon('spark')} Ambiente da cena</div><label>Clima<select data-k="weather"><option value="none">Sem precipitação</option><option value="rain">Chuva</option><option value="snow">Neve</option></select></label><label>Atmosfera<select data-k="atmosphere"><option value="moon">Luar</option><option value="dusk">Entardecer</option><option value="ember">Brasa</option></select></label><p class="empty-note">Configurações salvas junto com o mapa.</p>`
+    ui.environment.innerHTML = `<div class="component-title">${icon('spark')} Ambiente da cena</div><label>Clima<select data-k="weather"><option value="none">Sem precipitação</option><option value="rain">Chuva</option><option value="snow">Neve</option></select></label><label>Atmosfera<select data-k="atmosphere"><option value="moon">Luar</option><option value="dusk">Entardecer</option><option value="ember">Brasa</option></select></label><button data-k="open-studio">Abrir estúdio de atmosfera</button><p class="empty-note">Configurações salvas junto com o mapa.</p>`
     el<HTMLSelectElement>('weather').onchange = e => run(async () => { const doc = snapshot(); doc.environment = { weather: (e.target as HTMLSelectElement).value as 'none' | 'rain' | 'snow' }; await replace(doc); changed() })
-    el<HTMLSelectElement>('atmosphere').onchange = e => { engine.setStyle({ atmosphere: (e.target as HTMLSelectElement).value as 'moon' | 'dusk' | 'ember' }); changed() }
+    el<HTMLSelectElement>('atmosphere').onchange = e => { atmosphereStudio!.setPreset((e.target as HTMLSelectElement).value as 'moon' | 'dusk' | 'ember') }
+    el('open-studio').onclick = () => { atmosphereStudio!.refresh(); ui!.showStudio('atmosphere') }
+    ui.root.addEventListener('project-tab', event => { const pane = (event as CustomEvent).detail; if (pane !== 'assets') { placement.clear(); gizmos?.attach(); gizmos?.cursor() } else gizmos?.attach(selected); if (pane === 'atmosphere') atmosphereStudio!.refresh() }, { signal: signal.signal })
     const modelImport = el<HTMLInputElement>('model-import')
     modelImport.onchange = () => { const files = Array.from(modelImport.files ?? []); modelImport.value = ''; if (files.length) canvas.dispatchEvent(new CustomEvent('editor-import-files', { detail: files })) }
     const insert = el<HTMLInputElement>('insert')
@@ -337,6 +368,8 @@ export async function createSandbox(engine: AsciiEngine, options: AreaOptions = 
 
     const raycaster = new THREE.Raycaster(), ndc = new THREE.Vector2(), plane = new THREE.Plane(new THREE.Vector3(0, 1, 0), 0)
     let painting = false, strokeChanged = false, flattenHeight = 0
+    let previousWaterPoint: THREE.Vector3 | undefined, lastRegrow = 0
+    let strokeWater: BuiltScene['waters'][number] | undefined
     function groundAt(e: { clientX: number; clientY: number }) {
       const rect = canvas.getBoundingClientRect(); ndc.set((e.clientX - rect.left) / rect.width * 2 - 1, -(e.clientY - rect.top) / rect.height * 2 + 1)
       raycaster.setFromCamera(ndc, engine.camera)
@@ -345,10 +378,10 @@ export async function createSandbox(engine: AsciiEngine, options: AreaOptions = 
     canvas.addEventListener('dragover', e => {
       if (!e.dataTransfer?.types.includes('application/x-ascii-prefab') || busy || preview) return
       e.preventDefault(); e.dataTransfer.dropEffect = 'copy'
-      const point = groundAt(e); gizmos!.cursor(point ?? undefined)
+      const point = groundAt(e); gizmos!.cursor(); placement.show(tool.prefab, point ?? undefined)
       const label = ui!.get('#placement-label'); label.hidden = !point; label.textContent = `+ ${library[tool.prefab]?.title ?? 'Objeto'}`; label.style.left = `${e.clientX + 18}px`; label.style.top = `${e.clientY + 18}px`
     }, { signal: signal.signal })
-    canvas.addEventListener('dragleave', () => { gizmos!.cursor(); ui!.get('#placement-label').hidden = true }, { signal: signal.signal })
+    canvas.addEventListener('dragleave', () => { placement.clear(); gizmos!.cursor(); ui!.get('#placement-label').hidden = true }, { signal: signal.signal })
     canvas.addEventListener('drop', e => {
       const key = e.dataTransfer?.getData('application/x-ascii-prefab')
       if (!key || !library[key]) return
@@ -356,37 +389,68 @@ export async function createSandbox(engine: AsciiEngine, options: AreaOptions = 
       gizmos!.cursor(); ui!.get('#placement-label').hidden = true
       if (point) run(() => placeAt(key, point))
     }, { signal: signal.signal })
-    canvas.addEventListener('pointermove', e => { if (!preview && tool.kind !== 'select' && !e.altKey && e.buttons === 0) { const point = groundAt(e); gizmos!.cursor(point ?? undefined, tool.kind === 'place' ? .44 : tool.radius) } }, { signal: signal.signal })
-    canvas.addEventListener('pointerleave', () => gizmos!.cursor(), { signal: signal.signal })
+    canvas.addEventListener('pointermove', e => { if (!preview && !document.body.classList.contains('studio-mode') && tool.kind !== 'select' && !e.altKey && e.buttons === 0) { const point = groundAt(e); if (tool.kind === 'place') { if (!gizmos!.hovered && !gizmos!.consumed) placement.show(tool.prefab, point ?? undefined); gizmos!.attach(placement.object); gizmos!.cursor() } else gizmos!.cursor(point ?? undefined, tool.radius) } }, { signal: signal.signal })
+    canvas.addEventListener('pointerleave', () => { if (!placement.locked) placement.clear(); gizmos!.cursor() }, { signal: signal.signal })
     function act(e: PointerEvent, first: boolean) {
-      const p = groundAt(e)
-      if (!p) return
+      let p = groundAt(e)
+      if (painting && !first && tool.kind === 'water' && !strokeWater?.shape.mask?.heights) p = raycaster.ray.intersectPlane(new THREE.Plane(new THREE.Vector3(0, 1, 0), -flattenHeight), new THREE.Vector3())
+      if (!p) { previousWaterPoint = undefined; return }
       if (first) flattenHeight = p.y
       let kind = tool.kind
       if (e.shiftKey && (kind === 'raise' || kind === 'lower')) kind = kind === 'raise' ? 'lower' : 'raise'
       if (kind === 'place' && first) { placeAt(tool.prefab, p, e.shiftKey); strokeChanged = false }
       else if (kind === 'erase' && first) { const hit = engine.pick(ndc.x, ndc.y); if (hit && scene.placed.some(v => v.object === hit.object)) { scene.remove(hit.object); choose(); strokeChanged = true } }
-      else if ((kind === 'lake' || kind === 'stream') && first && scene.terrain) {
-        const shape = { kind: kind === 'lake' ? 'pond' as const : 'stream' as const, x: p.x, z: p.z, angle: 0, size: tool.radius }
-        const level = scene.terrain.heightAt(p.x, p.z) - .05, data = scene.terrain.toJSON(), { size, resolution } = data
-        for (let z = 0; z < resolution; z++) for (let x = 0; x < resolution; x++) {
-          const edge = waterEdge(shape, x / (resolution - 1) * size - size / 2, z / (resolution - 1) * size - size / 2)
-          if (edge > -.4) data.heights[z * resolution + x] = Math.min(data.heights[z * resolution + x], level - Math.max(0, Math.min(.6, edge * .6 + .1)))
+      else if (kind === 'water' && scene.terrain) {
+        const terrain = scene.terrain
+        if (first) {
+          previousWaterPoint = undefined
+          strokeWater = scene.waters[selectedWater]?.shape.kind === 'paint' ? scene.waters[selectedWater] : scene.waters.find(w => w.shape.kind === 'paint' && !!w.shape.mask?.heights === (tool.waterMode === 'terrain'))
+          if (!strokeWater && !e.shiftKey) {
+            const shape = createWaterPaint(terrain.data.size, terrain.data.resolution)
+            if (tool.waterMode === 'terrain') shape.mask!.heights = terrain.data.heights.map(height => height + .045)
+            strokeWater = scene.addWater({ shape, level: tool.waterMode === 'terrain' ? 0 : p.y - .05 })
+          }
         }
-        const doc = snapshot(); doc.terrain = data; doc.waters = [...doc.waters ?? [], { shape, level }]
-        run(async () => { await replace(doc); changed() })
-      } else if (scene.terrain && !['select', 'place', 'erase', 'lake', 'stream'].includes(kind)) {
+        if (!strokeWater) return
+        if (paintWater(strokeWater.shape, previousWaterPoint ?? p, p, tool.radius, e.shiftKey)) {
+          strokeWater.refresh()
+          if (!e.shiftKey && !strokeWater.shape.mask?.heights) {
+            const { size, resolution, heights } = terrain.data, level = strokeWater.mesh.position.y
+            for (let z = 0; z < resolution; z++) for (let x = 0; x < resolution; x++) {
+              const edge = waterEdge(strokeWater.shape, x / (resolution - 1) * size - size / 2, z / (resolution - 1) * size - size / 2)
+              if (edge > -.2) heights[z * resolution + x] = Math.min(heights[z * resolution + x], level - Math.max(-.05, Math.min(.65, edge * .8 + .08)))
+            }
+            terrain.refresh()
+          }
+          strokeChanged = true
+          if (performance.now() - lastRegrow > 150) { scene.regrow(); lastRegrow = performance.now() }
+        }
+        previousWaterPoint = p.clone(); gizmos!.cursor(p, tool.radius)
+      } else if (scene.terrain && !['select', 'place', 'erase', 'water'].includes(kind)) {
         scene.terrain.apply({ brush: kind as Brush, x: p.x, z: p.z, radius: tool.radius, strength: kind === 'paint' ? tool.strength * 4 : tool.strength, layer: tool.layer, height: flattenHeight }); strokeChanged = true
       }
     }
-    addEventListener('pointerdown', e => { if (busy || preview || e.altKey || tool.kind === 'select' || e.target !== canvas || e.button !== 0) return; e.stopPropagation(); painting = true; strokeChanged = false; act(e, true) }, { capture: true, signal: signal.signal })
+    addEventListener('pointerdown', e => { if (busy || preview || document.body.classList.contains('studio-mode') || e.altKey || (tool.kind === 'place' && gizmos!.hovered) || tool.kind === 'select' || e.target !== canvas || e.button !== 0) return; e.stopPropagation(); painting = true; strokeChanged = false; act(e, true) }, { capture: true, signal: signal.signal })
     addEventListener('pointermove', e => { if (painting) { e.stopPropagation(); act(e, false) } }, { capture: true, signal: signal.signal })
-    const endStroke = (e: Event) => { if (painting) { e.stopPropagation(); painting = false; if (strokeChanged) { scene.regrow(); changed() } } }
+    function syncWaterSlopes() {
+      const terrain = scene.terrain; if (!terrain) return
+      for (const water of scene.waters) {
+        const { shape } = water, mask = shape.mask; if (!mask?.heights) continue
+        const n = mask.resolution, c = Math.cos(shape.angle), s = Math.sin(shape.angle)
+        for (let z = 0; z < n; z++) for (let x = 0; x < n; x++) {
+          const lx = (x / (n - 1) - .5) * shape.size * 2, lz = (z / (n - 1) - .5) * shape.size * 2
+          mask.heights[z * n + x] = terrain.heightAt(shape.x + c * lx - s * lz, shape.z + s * lx + c * lz) + .045 - water.mesh.position.y
+        }
+        water.refresh()
+      }
+    }
+    const endStroke = (e: Event) => { if (painting) { e.stopPropagation(); painting = false; if (strokeChanged) { syncWaterSlopes(); scene.regrow(); changed() } } }
     addEventListener('pointerup', endStroke, { capture: true, signal: signal.signal }); addEventListener('pointercancel', endStroke, { capture: true, signal: signal.signal })
     addEventListener('keydown', e => {
       if (e.target instanceof HTMLElement && (e.target.matches('input,select,textarea') || e.target.isContentEditable)) return
-      if (e.key === 'Escape') { if (gizmos?.dragging) gizmos.cancel(); else setMode('translate'); return }
+      if (e.key === 'Escape') { if (gizmos?.dragging) gizmos.cancel(); else setMode('translate', true); return }
       if (preview || busy) return
+      if (e.key === 'Enter' && tool.kind === 'place' && placement.object) { e.preventDefault(); placeAt(tool.prefab, placement.object.position.clone(), e.shiftKey); return }
       const modifier = e.ctrlKey || e.metaKey
       if (modifier && e.key.toLowerCase() === 'z') { e.preventDefault(); run(() => undo(e.shiftKey)) }
       else if (modifier && e.key.toLowerCase() === 's') { e.preventDefault(); downloadDocument(snapshot()) }
@@ -398,13 +462,28 @@ export async function createSandbox(engine: AsciiEngine, options: AreaOptions = 
   }
   return {
     id: 'sandbox', title: 'Editor visual', hero: new THREE.Vector3(100, 0, 100),
-    get state() { return `${scene.placed.length} objetos · ${scene.waters.length} águas${busy ? ' · abrindo…' : ''}${note ? ` · ${note}` : ''}` },
+    get state() { return `${scene.placed.length} objetos · ${scene.waters.length} águas${busy ? ' · abrindo…' : ''}${automationLocked ? ' · edição pela IA' : note ? ` · ${note}` : ''}` },
     focus: (_angle, target) => target.copy(focus), pan(x, z) { focus.x += x; focus.z += z },
     select: object => choose(object, true), changed, document: snapshot,
     navigation(e) { if (player) return e.button !== 0 || e.shiftKey ? 'pan' : 'orbit'; if (busy || gizmos?.consumed) return false; if (e.altKey && e.button === 0) return 'orbit'; if (e.button !== 0 || e.shiftKey && tool.kind === 'select' || transformMode === 'hand') return 'pan'; return false },
-    blocksSelection: () => busy || preview || !!gizmos?.consumed || tool.kind !== 'select' || transformMode === 'hand',
+    blocksSelection: () => busy || automationLocked || preview || document.body.classList.contains('studio-mode') || !!gizmos?.consumed || tool.kind !== 'select' || transformMode === 'hand',
     renderOverlay() { if (!player) gizmos?.render() },
     async openDocument(doc) { await replace(doc); changed() },
+    authoring: player ? undefined : {
+      replace,
+      async commit() { history.commit(snapshot()); refreshHierarchy(); refreshHistory(); canvas.dispatchEvent(new Event('scene-document-changed')); await persist() },
+      undo,
+      lock(value) { automationLocked = value; placement.clear(); gizmos?.attach(); if (ui) ui.root.inert = value },
+      catalog: () => Object.entries(library).map(([id, prefab]) => ({ id, title: prefab.title, kind: Object.hasOwn(builtins, id) ? 'builtin' as const : Object.hasOwn(assets.library, id) ? 'asset' as const : 'effect' as const })),
+      inspect(id) {
+        const placed = scene.placed.find(p => p.doc.id === id)
+        if (!placed) throw new Error('Objeto inexistente: ' + id)
+        const parts: { name: string; glyph: unknown; surface: unknown }[] = []
+        placed.object.traverse(node => { if (node instanceof THREE.Mesh) parts.push({ name: node.name, glyph: node.userData.glyph, surface: node.userData.surface }) })
+        return { object: snapshot().objects.find(o => o.id === id), parts, options: engine.instanceStyle(placed.object), animationClips: placed.object.userData.animationClips ?? [] }
+      },
+      view(point, studio) { if (point) focus.set(...point); if (studio === 'scene') ui?.showProject('assets'); else if (studio) ui?.showStudio(studio) },
+    },
     async importFiles(files) {
       if (busy) throw new Error('Aguarde a abertura atual.')
       message('Importando modelos…')
@@ -413,9 +492,9 @@ export async function createSandbox(engine: AsciiEngine, options: AreaOptions = 
       for (const [prefab, asset] of Object.entries(imported)) doc.objects.push({ prefab, name: asset.name, position: [focus.x, scene.terrain?.heightAt(focus.x, focus.z) ?? 0, focus.z] })
       await replace(doc); choose(scene.placed.at(-1)?.object); changed()
     },
-    update(time) { scene.update(time) },
+    update(time) { scene.update(time); placement.update(time) },
     dispose() {
-      signal.abort(); effectEditor?.dispose(); gizmos?.dispose(); scene.dispose(); assets.dispose()
+      placement.clear(); signal.abort(); effectEditor?.dispose(); gizmos?.dispose(); scene.dispose(); assets.dispose()
       ui?.dispose()
     },
   }

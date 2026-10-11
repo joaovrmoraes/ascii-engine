@@ -23,6 +23,12 @@ export interface AsciiStyle {
   /** `body`: lantern strength (interior 1.2, exterior .7). */
   bodyLantern: number
   atmosphere: 'moon' | 'dusk' | 'ember'
+  /** Optional studio tint, applied to ink in world space. */
+  inkTint?: [number, number, number]
+  /** Body letters follow the scene directional light; omitted keeps legacy shading. */
+  bodySceneLighting?: boolean
+  /** Fog reaches body/carpet/particle ink, in addition to mesh materials. */
+  inkFog?: boolean
   /** Global layer of the per-part letter style. */
   glyphs: GlyphStyle
   /** Object types known to the preset ("tree" → crown/trunk…). */

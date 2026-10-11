@@ -1,0 +1,10 @@
+{
+  "name": "@ascii-engine/authoring",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "exports": { ".": "./src/index.ts" },
+  "scripts": { "build": "tsc --noEmit", "typecheck": "tsc --noEmit", "test": "vitest run" },
+  "dependencies": { "@ascii-engine/core": "workspace:*", "zod": "^4.3.6", "three": "^0.186.1" },
+  "devDependencies": { "typescript": "^5.7.2", "vitest": "^3.2.4", "@types/three": "^0.186.0" }
+}

@@ -11,6 +11,7 @@
     "tauri": "tauri"
   },
   "dependencies": {
+    "@ascii-engine/authoring": "workspace:*",
     "@ascii-engine/core": "workspace:*",
     "three": "^0.186.1"
   },

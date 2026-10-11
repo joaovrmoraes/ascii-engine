@@ -41,3 +41,5 @@ export { parseScene } from './world/validation'
 export { createHistory } from './world/history'
 export { seededRandom } from './world/scene'
 export { loadSceneAssets } from './import/assets'
+
+export { createWaterPaint, paintWater, waterMaskEdge, waterHeightAt, type WaterMask } from './world/waterPaint'

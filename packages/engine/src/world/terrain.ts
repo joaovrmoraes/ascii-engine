@@ -152,7 +152,7 @@ export function createTerrain(data: TerrainData = createTerrainData()) {
   }
 
   return {
-    mesh, data, heightAt, layerAt, apply,
+    mesh, data, heightAt, layerAt, apply, refresh,
     /** Re-reads `data.layers` (colours changed). */
     setLayers(layers: GroundLayer[]) { data.layers = layers.map((l) => ({ ...l })); palette = layerColors(); refresh() },
     /** Carpet density for a recipe: the painted layer's `grass`, zero under water. */

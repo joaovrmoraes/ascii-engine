@@ -106,6 +106,8 @@ export function parseScene(input: unknown, library?: PrefabLibrary): SceneDoc {
         if (t.parts) style({ parts: t.parts }, `style.types.${name}`)
       }
       else if (k === 'fog' && v === null) continue
+      else if (k === 'bodySceneLighting' || k === 'inkFog') { if (typeof v !== 'boolean') fail(`style.${k}`, 'deve ser booleano') }
+      else if (k === 'inkTint') vector(v, 'style.inkTint', 3, 0)
       else if (k === 'atmosphere') { if (!['moon', 'dusk', 'ember'].includes(String(v))) fail('style.atmosphere', 'desconhecida') }
       else if (k in pomorog) sameShape(v, pomorog[k as keyof typeof pomorog], `style.${k}`)
     }
@@ -130,9 +132,18 @@ export function parseScene(input: unknown, library?: PrefabLibrary): SceneDoc {
   }
   if (root.waters !== undefined) array(root.waters, 'waters').forEach((raw, i) => {
     const w = record(raw, `waters[${i}]`), s = record(w.shape, `waters[${i}].shape`)
-    if (!['pond', 'stream'].includes(String(s.kind))) fail(`waters[${i}].shape.kind`, 'desconhecido')
+    if (!['pond', 'stream', 'paint'].includes(String(s.kind))) fail(`waters[${i}].shape.kind`, 'desconhecido')
     for (const k of ['x', 'z', 'angle']) number(s[k], `waters[${i}].${k}`)
     number(s.size, `waters[${i}].size`, .01, 4096)
+    if (s.kind === 'paint') {
+      const mask = record(s.mask, `waters[${i}].shape.mask`)
+      number(mask.resolution, `waters[${i}].shape.mask.resolution`, 2, 513)
+      if (!Number.isInteger(mask.resolution)) fail(`waters[${i}].shape.mask.resolution`, 'deve ser inteiro')
+      const values = array(mask.values, `waters[${i}].shape.mask.values`)
+      if (values.length !== Number(mask.resolution) ** 2) fail(`waters[${i}].shape.mask.values`, 'tamanho incompatível')
+      if (mask.heights !== undefined) { const heights = array(mask.heights, `waters[${i}].shape.mask.heights`); if (heights.length !== values.length) fail(`waters[${i}].shape.mask.heights`, 'tamanho incompatível'); heights.forEach(value => number(value, `waters[${i}].shape.mask.heights`, -1e4, 1e4)) }
+      values.forEach((value, j) => number(value, `waters[${i}].shape.mask.values[${j}]`, -1e6, 1e6))
+    }
     if (w.level !== undefined) number(w.level, `waters[${i}].level`)
     if (w.look !== undefined) {
       const look = record(w.look, `waters[${i}].look`)

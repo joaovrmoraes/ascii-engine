@@ -67,6 +67,13 @@ export function createEffectEditor(root: HTMLElement, engine: AsciiEngine, callb
     const general = root.querySelector<HTMLElement>('.fx-general')!; general.replaceChildren()
     field(general, 'Duração (s)', draft.duration, v => draft.duration = Number(v), 'number', .01, 3600)
     field(general, 'Repetir', !!draft.loop, v => draft.loop = v === 'true', 'checkbox')
+    field(general, 'Emitir luz', !!draft.light, v => { draft.light = v === 'true' ? { color: 0xffac55, intensity: 14, distance: 7, offset: [0,1,0], flicker: .12 } : undefined; render() }, 'checkbox')
+    if (draft.light) {
+      field(general, 'Cor da luz', '#' + draft.light.color.toString(16).padStart(6, '0'), v => draft.light!.color = parseInt(v.slice(1), 16), 'color')
+      field(general, 'Intensidade', draft.light.intensity, v => draft.light!.intensity = Number(v), 'number', 0, 100)
+      field(general, 'Alcance (m)', draft.light.distance ?? 6, v => draft.light!.distance = Number(v), 'number', .1, 100)
+      field(general, 'Altura da luz', draft.light.offset?.[1] ?? 1, v => { draft.light!.offset ??= [0,1,0]; draft.light!.offset[1] = Number(v) }, 'number', -100, 100)
+    }
     const e = draft.emitters[emitter]; if (!e) return
     const emission = group('Emissão')
     select(emission, 'Tipo', e.render ?? 'particle', [['particle','Partículas'],['ring','Anel'],['beam','Feixe'],['ribbon','Rastro'],['heat','Fogo'],['decal','Marca no chão'],['flipbook','Flipbook (JSON)']], v => { e.render = v as EmitterDef['render']; if(v==='ring') {e.ring ??= {from:0,to:2,count:32}; e.rate=0; e.bursts=[{at:0,count:1}]} })

@@ -55,12 +55,15 @@ separadas. A barra superior e a cena permanecem na estrutura principal.
 2. Na aba **Terreno** do inspetor, escolha elevar, baixar, suavizar, aplainar ou pintar.
    Arraste sobre o chão; cada traço é uma ação de desfazer. Shift inverte
    elevar/baixar. Aplainar mantém a altura do início do traço.
-3. **Lago** e **Riacho** escavam o leito e colocam água. O riacho
-   usa o contorno procedural do Pomorog, com extensão de 34 m; ainda não é
-   uma curva desenhada ponto a ponto. Selecione a água na lista para ajustar
-   posição, tamanho, direção, nível e fluxo. Mover a água depois não escava
-   automaticamente o novo local: ajuste o relevo com os pincéis.
-4. Arraste um objeto da biblioteca para o chão. A biblioteca inclui árvore,
+3. **Água** é um pincel contínuo: arraste para desenhar canais ou lagos;
+   Shift apaga só água. **Seguir relevo** acompanha a encosta sem achatá-la,
+   com ondulação descendo. **Nível plano (lago)** escava o leito. Selecione
+   a água na hierarquia para ajustar contorno, nível, fluxo e reflexo.
+   Para água antiga, **Adaptar ao relevo** converte seu contorno em máscara
+   sobre o terreno; a conversão é explícita e pode ser desfeita.
+4. Clique no objeto da biblioteca para ver o modelo real na mão, ou
+   arraste-o para o chão. W/E/R fixam a prévia para ajustar o gizmo; Enter
+   coloca a transformação inteira, Esc cancela. A biblioteca inclui árvore,
    pedras, caixa, ponte, ruína, tronco, formas básicas, fogueira e efeitos.
 5. A lista à esquerda seleciona o objeto inteiro. O inspetor permite
    renomear, ocultar, mover, girar, escalar, duplicar e excluir.
@@ -68,8 +71,9 @@ separadas. A barra superior e a cena permanecem na estrutura principal.
    parte, ou escolha-a na lista **parte** em **Aparência ASCII**, para ajustar
    técnica, família de letras e tamanho. O escopo pode ser instância, tipo
    ou global; todas essas camadas entram no arquivo.
-7. Na aba **Ambiente**, **Clima** seleciona chuva/neve; **Atmosfera** muda o parâmetro de atmosfera
-   existente da engine. Não converte o terreno nem os objetos em um bioma.
+7. **Ambiente → Clima** seleciona chuva/neve. **Estúdio → Atmosfera**
+   abre a tela dedicada de iluminação, cor e névoa. Os ajustes ficam no mapa;
+   não convertem seus objetos ou terreno automaticamente em outro bioma.
 
 **Alt + arraste esquerdo** gira a câmera; botão direito/meio, ferramenta
 **Q** ou Shift + arraste em modo de seleção deslocam o centro; roda
@@ -118,14 +122,17 @@ não foram validados; prefira GLB incorporado ou GLTF com acompanhantes.
 
 ## Criar efeitos
 
-1. Abra a aba **Efeitos**, ao lado de Projeto, ou clique em **Criar efeito**
-   na barra superior. Aumente a altura do painel se quiser ver mais campos.
+1. Clique em **Estúdio → Efeitos**, ou em **Criar efeito** na barra superior.
+   Abre uma tela dedicada, com cena grande à esquerda e controles à direita.
+   **Voltar à cena** restaura os painéis do editor.
 2. Comece com **Novo efeito**, uma base do Pomorog ou um efeito já salvo no
    documento. Escolher uma base cria uma cópia para editar.
 3. Ajuste duração e repetição; adicione, duplique ou exclua emissores.
    Os campos controlam tipo, emissão por segundo, rajada inicial, início,
    vida, forma de nascimento, velocidade XYZ, gravidade, arrasto, variação,
-   giro, letras, tamanho inicial/final, cores e brilho.
+   giro, letras, tamanho inicial/final, cores e brilho. **Emitir luz** abre
+   cor, intensidade, alcance e altura da luz; ela ilumina também as letras
+   dos objetos e da grama.
 4. **Prévia** toca no centro da vista. **Parar** remove apenas a prévia.
    Trocar para Projeto também a interrompe. Alterar os campos atualiza a
    prévia; ainda é preciso salvar para incorporar as alterações ao mapa.
@@ -134,7 +141,7 @@ não foram validados; prefira GLB incorporado ou GLTF com acompanhantes.
    O efeito passa a aparecer na categoria **Efeitos** da biblioteca.
 6. **Baixar efeito** exporta a receita como `.effect.json`; **Abrir efeito**
    importa uma receita. **Avançado — definição JSON** permite ajustar os
-   parâmetros que ainda não têm campos, incluindo curvas, luz, grade de
+   parâmetros que ainda não têm campos, incluindo curvas e grade de
    fogo e flipbook. Dados inválidos mostram uma mensagem e preservam a cena.
 
 Os efeitos salvos acompanham salvar, reabrir, desfazer/refazer, exportar o
@@ -144,6 +151,27 @@ sem depender do editor. Uma instância segue a posição do objeto; orientação
 e escala do objeto ainda não transformam toda a simulação de partículas.
 As receitas originais do Pomorog continuam intactas. Efeitos sem repetição
 tocam uma vez ao abrir a cena; a prévia pode ser reiniciada pelo botão.
+
+## Criar atmosferas
+
+No **Estúdio → Atmosfera**, comece com luar, entardecer ou brasas e ajuste
+exposição, cor das letras, fundo, luz principal (direção/cor/intensidade),
+sombra, luz ambiente, preenchimento e névoa. A prévia aparece na cena.
+Ctrl Z desfaz; **Baixar atmosfera** e **Abrir atmosfera** transportam o
+preset em `.atmosphere.json`. A cena salva todos esses campos.
+
+A tela é um espaço dedicado dentro do editor, não uma janela nativa extra.
+Os dois estúdios compartilham a cena como prévia; o efeito temporário para
+ao mudar para Atmosfera ou voltar à cena.
+
+## Criar com IA
+
+A API e o MCP permitem ler e editar todo o documento visual, importar
+modelos, criar efeitos, esculpir/pintar, controlar atmosfera e exportar.
+Uma prévia da IA mostra **Aplicar/Descartar**; um lote aceito é uma ação
+de desfazer. A IA também pode aplicar diretamente. Cada aba tem uma sessão
+e cada edição tem uma revisão para impedir sobrescrita de alterações novas.
+Veja [conexão, ferramentas e exemplos](api-mcp.md).
 
 ## Salvar e exportar para o Pomorog
 

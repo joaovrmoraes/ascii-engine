@@ -146,3 +146,14 @@ function download(url: string) {
   const a = document.createElement('a'); a.href = url; a.download = `${area.id}-${Date.now()}.png`; a.click()
 }
 Object.assign(window, { engine, area, view, core })
+if (!player) {
+  const { connectAuthoring } = await import('./api/client')
+  connectAuthoring(engine, area, view, () => {
+    // A tool capture must work even when the host suspends animation frames.
+    const captureAngle = Math.PI / 7 + view.angle + drag, { width, height } = engine.size
+    area.update(engine.time, 0)
+    engine.frame(area.focus(captureAngle, focus), pomorogSpan(height, width / height, view.zoom), captureAngle)
+    engine.render(0); area.renderOverlay?.()
+    return canvas.toDataURL('image/png').split(',')[1]
+  })
+}

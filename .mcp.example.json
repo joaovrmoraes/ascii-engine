@@ -1,0 +1,11 @@
+{
+  "mcpServers": {
+    "ascii-engine": {
+      "command": "node",
+      "args": [
+        "/home/jonny/Documents/ascii-engine/apps/automation/node_modules/tsx/dist/cli.mjs",
+        "/home/jonny/Documents/ascii-engine/apps/automation/src/mcp.ts"
+      ]
+    }
+  }
+}

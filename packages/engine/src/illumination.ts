@@ -1,6 +1,32 @@
 import * as THREE from 'three'
 import { createExploration, type LightObstacle } from './exploration'
 
+/** Portable point lights reach every letter technique, not just Three's meshes. */
+export const MAX_INK_LIGHTS = 8
+export const inkLightsGLSL = `
+  uniform int inkLightCount;
+  uniform vec4 inkLightPosition[8], inkLightColor[8];
+  uniform vec3 atmosphereTint;
+  vec3 pointInk(vec3 p) {
+    vec3 light = vec3(0.);
+    for (int i = 0; i < 8; i++) {
+      if (i >= inkLightCount) break;
+      float d = distance(p, inkLightPosition[i].xyz);
+      float range = inkLightPosition[i].w;
+      float falloff = pow(max(0., 1. - d / range), 2.);
+      light += inkLightColor[i].rgb * inkLightColor[i].w * falloff / (1. + d * d * .2);
+    }
+    return light;
+  }
+`
+export function inkLightUniforms() {
+  return {
+    inkLightCount: { value: 0 }, atmosphereTint: { value: new THREE.Color(1, 1, 1) },
+    inkLightPosition: { value: Array.from({ length: MAX_INK_LIGHTS }, () => new THREE.Vector4()) },
+    inkLightColor: { value: Array.from({ length: MAX_INK_LIGHTS }, () => new THREE.Vector4()) },
+  }
+}
+
 /**
  * Local light shared by the screen pass, carpets and particles (Pomorog
  * `illumination.ts`). Darkness never leaves an overlay exposed.
@@ -8,9 +34,15 @@ import { createExploration, type LightObstacle } from './exploration'
  * Interior (`discoveryEnabled`): what the lantern sees, plus a faint memory.
  */
 export const illuminationGLSL = `
+  ${inkLightsGLSL}
   uniform sampler2D explorationMap;
   uniform float illuminationEnabled, discoveryEnabled, explorationExtent, lanternPulse, stormFlash;
-  uniform vec3 lanternPosition, hearthPosition;
+  uniform vec3 lanternPosition, hearthPosition, inkFogColor;
+  uniform float inkFogDensity;
+  vec3 inkFog(vec3 ink, vec3 p) {
+    float distanceToEye = distance(cameraPosition, p);
+    return mix(ink, inkFogColor, 1. - exp(-inkFogDensity * inkFogDensity * distanceToEye * distanceToEye));
+  }
   vec2 discovered(vec3 p) {
     if (illuminationEnabled < .5 || discoveryEnabled < .5) return vec2(1.);
     vec2 uv = p.xz / explorationExtent + .5;
@@ -24,16 +56,18 @@ export const illuminationGLSL = `
   }
   vec3 illuminateInk(vec3 ink, vec3 p) {
     if (illuminationEnabled < .5) return ink;
+    ink *= atmosphereTint;
+    vec3 point = pointInk(p);
     vec2 discovery = discovered(p), lights = localLights(p);
     if (discoveryEnabled < .5) {
       // Open sky: cool moonlight keeps the whole landscape readable. Lantern
       // and hearth add local warmth, never a circular visibility restriction.
-      return ink * (vec3(.96,1.02,1.02) + vec3(.22,.16,.07) * lights.x + vec3(.32,.17,.04) * lights.y
-        + vec3(2.1,2.35,2.65) * stormFlash);
+      return inkFog(ink * (vec3(.96,1.02,1.02) + vec3(.22,.16,.07) * lights.x + vec3(.32,.17,.04) * lights.y
+        + vec3(2.1,2.35,2.65) * stormFlash + point), p);
     }
     vec3 memory = vec3(.24,.29,.32) * discovery.y * .30;
     vec3 lit = vec3(.64,.69,.76) + vec3(.64,.52,.30) * lights.x + vec3(.75,.42,.16) * lights.y;
-    return ink * (memory + lit * sqrt(discovery.x));
+    return inkFog(ink * (memory + (lit + point) * sqrt(discovery.x)), p);
   }
 `
 
@@ -44,6 +78,8 @@ export const ABSENT = new THREE.Vector3(1e4, 0, 1e4)
 
 export function illuminationUniforms() {
   return {
+    ...inkLightUniforms(),
+    inkFogColor: { value: new THREE.Color() }, inkFogDensity: { value: 0 },
     explorationMap: { value: null as THREE.Texture | null }, illuminationEnabled: { value: 0 },
     discoveryEnabled: { value: 0 }, stormFlash: { value: 0 },
     explorationExtent: { value: 42 }, lanternPulse: { value: 1 },

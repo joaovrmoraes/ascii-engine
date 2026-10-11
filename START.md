@@ -295,13 +295,29 @@ fica em localStorage, separada do documento, e pode ser restaurada.
 `TransformControls`: estes desenham numa cena de sobreposição exclusiva
 do editor, fora do pipeline ASCII e do documento exportado.
 
-**Autoria de efeitos:** aba Efeitos junto de Projeto, com campos para
-emissores, prévia, bases existentes e salvar/colocar no mapa. O campo
-opcional `SceneDoc.effects` incorpora as receitas; `fx/validation.ts`
-valida e `fx/prefabs.ts` as materializa no `buildScene`. O runtime aceita
-definições diretamente, sem substituir presets globais de mesmo nome.
-Curvas complexas, luz, grade de calor e flipbooks continuam disponíveis
-pelo JSON avançado; linha do tempo e curvas gráficas ficam pendentes.
+**Estúdio visual:** tela dedicada de Efeitos e Atmosfera, com prévia grande
+à esquerda e controles à direita. Efeitos incluem emissores e luz pontual;
+atmosferas incluem exposição, cor das letras, luzes, direção, sombra e
+névoa. `SceneDoc.effects` incorpora receitas e `SceneDoc.style` a atmosfera.
+Curvas complexas, calor e flipbooks continuam disponíveis pelo JSON avançado.
+Linha do tempo e curvas gráficas ficam pendentes.
+
+**Água e colocação:** um pincel de água desenha máscaras contínuas, com
+modo plano ou seguindo relevo. Malha e ondulação seguem a encosta; não é
+simulação física de fluidos. Reflexos visíveis são atualizados por nível,
+compartilhados em águas coplanares; encostas usam aproximação planar local.
+A colocação mostra o prefab real e permite usar gizmo antes de confirmar.
+
+**API/MCP de autoria:** `packages/authoring` aplica comandos atômicos em
+`SceneDoc`, sem editor ou renderer. `apps/editor/src/api` adapta operações
+à cena aberta, com revisão, prévia/aceitar/descartar e histórico único.
+`apps/automation` serve a ponte HTTP/WebSocket local (1442) e o MCP stdio.
+O Vite inicia a ponte em desenvolvimento; `pnpm api` a inicia separadamente.
+A IA acessa o catálogo, objetos/partes, terreno, água, assets, efeitos,
+atmosfera, clima, câmera, captura, importação/exportação e o documento
+completo. O núcleo não depende desses adaptadores. Contrato e configuração
+em [`docs/api-mcp.md`](docs/api-mcp.md); decisão em
+[`docs/decisions/0001-authoring-api.md`](docs/decisions/0001-authoring-api.md).
 
 No núcleo, `world/validation.ts` valida documentos, `world/history.ts`
 guarda snapshots limitados, `import/assets.ts` resolve fontes incorporadas

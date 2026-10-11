@@ -1,4 +1,5 @@
 import * as THREE from 'three'
+import { waterMaskEdge, type WaterMask } from '../world/waterPaint'
 import { surfaceAlpha } from '../surface'
 import { surfaceAtlas, SURFACE_RANGES } from './surface'
 
@@ -11,7 +12,9 @@ import { surfaceAtlas, SURFACE_RANGES } from './surface'
 
 /** Outline of a water body. `stream`: meandering band; `pond`: organic lake. */
 export interface WaterShape {
-  kind: 'stream' | 'pond'
+  kind: 'stream' | 'pond' | 'paint'
+  /** Freehand water: signed distance samples, square width = 2 × size. */
+  mask?: WaterMask
   x: number
   z: number
   /** Stream direction / pond outline phase, radians. */
@@ -27,6 +30,7 @@ export function waterVec4(shape: WaterShape, out = new THREE.Vector4()) {
 
 /** > 0 inside the water (metres to the edge, roughly). Mirrors `waterEdgeGLSL`. */
 export function waterEdge(shape: WaterShape, x: number, z: number) {
+  if (shape.kind === 'paint') return waterMaskEdge(shape, x, z)
   const dx = x - shape.x, dz = z - shape.z, a0 = shape.angle
   if (shape.kind === 'stream') {
     const along = Math.cos(a0) * dx + Math.sin(a0) * dz
@@ -97,7 +101,7 @@ const f = (v: number) => v.toFixed(4)
 const v3 = (c: RGB) => `vec3(${f(c[0])}, ${f(c[1])}, ${f(c[2])})`
 
 /** `waterLetters(p, time, crest, flow, vegetation, weed)` for a look. */
-export function waterLettersGLSL(look: WaterLook = FOREST_WATER) {
+export function waterLettersGLSL(look: WaterLook = FOREST_WATER, followSlope = false) {
   const texture = surfaceAtlas(), slot = (texture.userData.slot as number).toFixed(6)
   const [ws, wc] = SURFACE_RANGES.water, [cs, cc] = SURFACE_RANGES.crest, [rs, rc] = SURFACE_RANGES.actor, [gs, gc] = SURFACE_RANGES.wetgrass
   const r = look.reflection
@@ -114,10 +118,10 @@ export function waterLettersGLSL(look: WaterLook = FOREST_WATER) {
     // a letter, so reflections are characters, never a continuous image.
     vec3 waterLetters(vec3 p, float time, float crest, vec2 flow, float vegetation, vec3 weed) {
       vec2 cell = vec2(${f(look.cell[0])}, ${f(look.cell[1])});
-      vec2 plane = p.xz - flow * time;
+      vec2 plane = p.xz ${followSlope ? '' : '- flow * time'};
       vec2 grid = floor(plane / cell), inside = fract(plane / cell);
       float grain = waterHash(grid);
-      vec3 centre = vec3((grid + .5) * cell + flow * time, p.y).xzy;
+      vec3 centre = vec3((grid + .5) * cell ${followSlope ? '' : '+ flow * time'}, p.y).xzy;
       centre.x += sin(grid.y * .7 + time * 1.2) * .05;
       vec4 mirror = reflectionMatrix * vec4(centre, 1.);
       vec2 uv = mirror.xy / mirror.w;
@@ -146,7 +150,7 @@ export function waterLettersGLSL(look: WaterLook = FOREST_WATER) {
         return mix(gap, weed, waterGlyph(${gs}.0 + 1. + floor(grain * ${gc - 1}.0), inside) * .8);
       }
       // Open water: sparse rows of ~ - = drifting with the current.
-      float swell = .5 + .5 * sin(grid.y * .9 + grid.x * .15 - time * 1.4 + grain * 2.);
+      float swell = .5 + .5 * sin(${followSlope ? 'dot(grid, normalize(flow + vec2(.00001))) * .9 - time * (1.4 + length(flow) * 2.)' : 'grid.y * .9 + grid.x * .15 - time * 1.4'} + grain * 2.);
       if (grain < ${f(look.sparse)} + swell * ${f(look.sparse)}) return gap;
       float level = clamp(swell * .75 + grain * .3, 0., .999);
       // Moon sheen drifts across the surface in slow bands.
@@ -177,12 +181,29 @@ export function updateReflectionCamera(camera: THREE.OrthographicCamera, mirror:
 export function createWaterReflection(surface: THREE.Mesh, uniforms: { reflection: THREE.IUniform; reflectionMatrix: THREE.IUniform }, size = 640) {
   const target = new THREE.WebGLRenderTarget(size, size, { minFilter: THREE.LinearFilter, magFilter: THREE.LinearFilter })
   const mirror = new THREE.OrthographicCamera()
+  const materials = new Map<THREE.Material, THREE.Material>()
+  function mirrorMaterial(original: THREE.Material) {
+    let material = materials.get(original)
+    if (!material) {
+      material = original.clone()
+      const compile = original.onBeforeCompile
+      material.onBeforeCompile = function(shader, renderer) {
+        compile.call(this, shader, renderer)
+        shader.fragmentShader = shader.fragmentShader.replace('#include <dithering_fragment>', '#include <dithering_fragment>\ngl_FragColor.a = .85;')
+      }
+      material.customProgramCacheKey = () => `water-source-${original.customProgramCacheKey()}`
+      material.colorWrite = true; material.depthWrite = true
+      materials.set(original, material)
+    }
+    return material
+  }
   const clip = new THREE.Plane(new THREE.Vector3(0, 1, 0), 0)
   uniforms.reflection.value = target.texture
   return {
     render(renderer: THREE.WebGLRenderer, scene: THREE.Scene, camera: THREE.OrthographicCamera) {
+      uniforms.reflection.value = target.texture
       surface.updateWorldMatrix(true, false)
-      const level = surface.getWorldPosition(eye).y
+      const level = surface.userData.waterReflectionLevel ?? surface.getWorldPosition(eye).y
       updateReflectionCamera(camera, mirror, level, uniforms.reflectionMatrix.value)
       const previous = renderer.getRenderTarget(), clipping = renderer.clippingPlanes, shadow = renderer.shadowMap.autoUpdate
       const visible = surface.visible
@@ -192,14 +213,28 @@ export function createWaterReflection(surface: THREE.Mesh, uniforms: { reflectio
       const saved = standing?.clone()
       if (standing) standing.set(clip.normal, -level); else { clip.constant = -level; renderer.clippingPlanes = [clip] }
       surface.visible = false; renderer.shadowMap.autoUpdate = false
+      // Capture the lit shapes before glyph conversion. Sampling sparse glyphs
+      // and converting them again erased almost the entire reflected object.
+      // Only this offscreen source is solid; water still emits broken glyph rows.
+      const swapped: [THREE.Mesh, THREE.Material | THREE.Material[]][] = [], hidden: THREE.Object3D[] = []
+      scene.traverseVisible(node => {
+        if (node.userData.glyphBodyOf || node.userData.glyph === 'water') { hidden.push(node); node.visible = false; return }
+        if (!(node instanceof THREE.Mesh)) return
+        const original = node.userData.glyphBodyMaterial ?? node.userData.asciiOriginal
+        if (!original) return
+        swapped.push([node, node.material])
+        node.material = Array.isArray(original) ? original.map(mirrorMaterial) : mirrorMaterial(original)
+      })
       try { renderer.setRenderTarget(target); renderer.render(scene, mirror) }
       finally {
+        for (const [mesh, material] of swapped) mesh.material = material
+        for (const node of hidden) node.visible = true
         renderer.setRenderTarget(previous)
         if (standing && saved) standing.copy(saved); else renderer.clippingPlanes = clipping
         renderer.shadowMap.autoUpdate = shadow; surface.visible = visible
       }
     },
-    dispose() { target.dispose() },
+    dispose() { materials.forEach(material => material.dispose()); materials.clear(); target.dispose() },
   }
 }
 
@@ -225,7 +260,11 @@ export interface WaterOptions {
 /** One water body: add `water.mesh` with `{ glyph: 'water' }`. */
 export function createWater(shape: WaterShape, options: WaterOptions = {}) {
   const look: WaterLook = { ...FOREST_WATER, ...options.look, reflection: { ...FOREST_WATER.reflection, ...options.look?.reflection } }
+  const mask = shape.kind === 'paint' ? shape.mask : undefined
+  const maskTexture = mask ? new THREE.DataTexture(new Float32Array(mask.values), mask.resolution, mask.resolution, THREE.RedFormat, THREE.FloatType) : undefined
+  if (maskTexture) { maskTexture.minFilter = maskTexture.magFilter = THREE.NearestFilter; maskTexture.needsUpdate = true }
   const uniforms = {
+    waterMask: { value: maskTexture ?? null }, maskResolution: { value: mask?.resolution ?? 1 },
     time: { value: 0 }, centre: { value: waterVec4(shape) },
     reflection: { value: null as THREE.Texture | null }, reflectionMatrix: { value: new THREE.Matrix4() },
     reflectionOn: { value: look.reflection.enabled ? 1 : 0 }, glyphAtlas: { value: surfaceAtlas() },
@@ -235,28 +274,69 @@ export function createWater(shape: WaterShape, options: WaterOptions = {}) {
     : `vec2(${f(look.pondDrift[0])}, ${f(look.pondDrift[1])})`
   const material = new THREE.ShaderMaterial({
     uniforms,
-    vertexShader: `varying vec3 p;
-      void main(){vec4 w=modelMatrix*vec4(position,1.);p=w.xyz;gl_Position=projectionMatrix*viewMatrix*w;}`,
-    fragmentShader: `varying vec3 p; uniform float time; uniform vec4 centre;
+    vertexShader: `varying vec3 p; varying vec3 waterNormalWorld;
+      void main(){vec4 w=modelMatrix*vec4(position,1.);p=w.xyz;waterNormalWorld=normalize(mat3(modelMatrix)*normal);gl_Position=projectionMatrix*viewMatrix*w;}`,
+    fragmentShader: `varying vec3 p; varying vec3 waterNormalWorld; uniform float time; uniform vec4 centre;
       ${waterEdgeGLSL}
-      ${waterLettersGLSL(look)}
+      ${mask ? `
+      uniform sampler2D waterMask; uniform float maskResolution;
+      float paintedEdge(vec2 point) {
+        vec2 d = point - centre.xy;
+        vec2 uv = vec2(cos(centre.z)*d.x + sin(centre.z)*d.y, -sin(centre.z)*d.x + cos(centre.z)*d.y) / (-centre.w * 2.) + .5;
+        if (min(uv.x,uv.y)<0. || max(uv.x,uv.y)>1.) return -1.;
+        vec2 grid = uv * (maskResolution - 1.), base = min(floor(grid), vec2(maskResolution - 2.)), t = grid - base;
+        vec2 texel = (base + .5) / maskResolution; float step = 1. / maskResolution;
+        float a = texture2D(waterMask, texel).r, b = texture2D(waterMask, texel + vec2(step,0.)).r;
+        float c = texture2D(waterMask, texel + vec2(0.,step)).r, d1 = texture2D(waterMask, texel + vec2(step)).r;
+        return mix(mix(a,b,t.x),mix(c,d1,t.x),t.y);
+      }` : ''}
+      ${waterLettersGLSL(look, !!mask?.heights)}
       void main(){
-        ${options.edgeGLSL ?? 'float inside=waterEdge(p.xz,centre);'}
+        ${options.edgeGLSL ?? (mask ? 'float inside=paintedEdge(p.xz);' : 'float inside=waterEdge(p.xz,centre);')}
         if(inside<0.)discard;
         float edge=1.-smoothstep(0.,${f(look.bank)},inside);
-        gl_FragColor=vec4(waterLetters(p,time,${options.crestGLSL ?? 'edge*.75'},${flow},0.,vec3(0.)),${surfaceAlpha('glyph')});
+        vec2 current = ${flow};
+        ${mask?.heights ? `float slope=length(waterNormalWorld.xz); if(slope>.02) current=normalize(waterNormalWorld.xz)*(${f(look.flow)} + slope*.8);` : ''}
+        gl_FragColor=vec4(waterLetters(p,time,${options.crestGLSL ?? 'edge*.75'},current,0.,vec3(0.)),${surfaceAlpha('glyph')});
       }`,
   })
-  const size = options.size ?? (shape.kind === 'stream' ? 38 : shape.size * 2.8 + 2)
-  const mesh = new THREE.Mesh(new THREE.PlaneGeometry(size, size), material)
-  mesh.rotation.x = -Math.PI / 2; mesh.position.set(shape.x, options.level ?? .018, shape.z)
+  const size = options.size ?? (shape.kind === 'stream' ? 38 : shape.size * (mask ? 3 : 2.8) + 2)
+  const geometry = mask?.heights ? new THREE.PlaneGeometry(shape.size * 2, shape.size * 2, mask.resolution - 1, mask.resolution - 1) : new THREE.PlaneGeometry(size, size)
+  geometry.rotateX(-Math.PI / 2)
+  const mesh = new THREE.Mesh(geometry, material)
+  if (mask?.heights) mesh.rotation.y = -shape.angle
+  mesh.position.set(shape.x, options.level ?? .018, shape.z)
   mesh.userData.glyph = 'water'
+  function refresh() {
+    if (mask && maskTexture) { (maskTexture.image.data as Float32Array).set(mask.values); maskTexture.needsUpdate = true }
+    if (mask?.heights) {
+      const position = geometry.attributes.position as THREE.BufferAttribute
+      mask.heights.forEach((height, i) => position.setY(i, height))
+      position.needsUpdate = true; geometry.computeVertexNormals(); geometry.computeBoundingSphere(); geometry.computeBoundingBox()
+    }
+  }
+  refresh()
   const reflection = createWaterReflection(mesh, uniforms)
   return {
     mesh, material, shape, look, reflection, uniforms,
+    /** A slope uses the nearest wet sample as its local mirror plane. */
+    reflectionLevel(x: number, z: number) {
+      if (!mask?.heights) return mesh.position.y
+      const n = mask.resolution, c = Math.cos(shape.angle), s = Math.sin(shape.angle)
+      let best = Infinity, level = mesh.position.y
+      for (let iz = 0; iz < n; iz++) for (let ix = 0; ix < n; ix++) {
+        const i = iz * n + ix; if (mask.values[i] <= 0) continue
+        const lx = (ix / (n - 1) - .5) * shape.size * 2, lz = (iz / (n - 1) - .5) * shape.size * 2
+        const d = (shape.x + c * lx - s * lz - x) ** 2 + (shape.z + s * lx + c * lz - z) ** 2
+        if (d < best) { best = d; level = mask.heights[i] + mesh.position.y }
+      }
+      return level
+    },
+    /** Upload a changed paint mask without rebuilding the scene. */
+    refresh,
     /** Distance (m) from a point to this water, 0 inside. */
     distance(x: number, z: number) { return options.distance ? options.distance(x, z) : Math.max(0, -waterEdge(shape, x, z)) },
-    dispose() { reflection.dispose(); material.dispose(); mesh.geometry.dispose() },
+    dispose() { maskTexture?.dispose(); reflection.dispose(); material.dispose(); mesh.geometry.dispose() },
   }
 }
 
