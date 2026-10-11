@@ -3,8 +3,10 @@ import type { AddOptions, AsciiEngine } from '../engine'
 import type { AsciiStyle } from '../presets/pomorog'
 import type { ObjectTypeStyle } from '../style'
 import type { GroundCover } from '../techniques/carpet'
-import type { Water, WaterLook, WaterShape } from '../techniques/water'
+import { waterEdge, type Water, type WaterLook, type WaterShape } from '../techniques/water'
 import { createTerrain, type Terrain, type TerrainData } from './terrain'
+import { parseScene } from './validation'
+import { createSceneWeather, type SceneEnvironment } from '../weather/sceneWeather'
 
 /**
  * Scenes as JSON (phase 5): terrain, waters, a carpet and objects placed from
@@ -13,11 +15,18 @@ import { createTerrain, type Terrain, type TerrainData } from './terrain'
  * changes every copy, a copy can override parts (§3.1).
  */
 export interface PlacedObject {
+  id?: string
+  name?: string
+  seed?: number
+  visible?: boolean
   prefab: string
   position: [number, number, number]
   /** Turn around y (radians) and uniform scale. */
   rotation?: number
   scale?: number
+  rotation3?: [number, number, number]
+  scale3?: [number, number, number]
+  animation?: string | null
   /** Instance layer and parts of this copy. */
   options?: AddOptions
 }
@@ -33,26 +42,34 @@ export interface SceneDoc {
   /** Standing letters over painted grass layers. */
   carpet?: { count: number; seed?: number }
   objects: PlacedObject[]
+  /** Portable model sources; keys are prefab ids. No machine-specific paths. */
+  assets?: Record<string, { name: string; source: string }>
+  environment?: SceneEnvironment
 }
 
 export interface Prefab {
   title: string
-  create(): THREE.Object3D
+  create(context: { seed: number; random: () => number; item: PlacedObject }): THREE.Object3D
   /** Type style shared by every copy (registered as object type = prefab name). */
   style?: ObjectTypeStyle
   /** Per-frame animation of one copy. */
   update?(object: THREE.Object3D, time: number): void
+  dispose?(object: THREE.Object3D): void
 }
 export type PrefabLibrary = Record<string, Prefab>
 
 export function emptyScene(name = 'cenário'): SceneDoc { return { version: 1, name, objects: [] } }
 
+export function seededRandom(seed: number) {
+  return () => { seed = (Math.imul(seed, 1664525) + 1013904223) >>> 0; return seed / 4294967296 }
+}
+
 const pickOf = (list: number[], random: () => number) => list[Math.floor(random() * list.length)]
 /** Meadow blades over a terrain: density from the painted layer, height from the relief. */
-export function terrainCover(terrain: Terrain, count: number, waterLevel = -Infinity): GroundCover {
+export function terrainCover(terrain: Terrain, count: number, waterLevel: number | SceneWater[] = -Infinity): GroundCover {
   return {
     count, extent: terrain.data.size, y: (x, z) => terrain.heightAt(x, z) - .06,
-    density: (x, z) => terrain.grassAt(x, z, waterLevel),
+    density: (x, z) => terrain.grassAt(x, z, typeof waterLevel === 'number' ? waterLevel : Math.max(-Infinity, ...waterLevel.filter(w => waterEdge(w.shape, x, z) > 0).map(w => w.level ?? 0))),
     pick(random) {
       const flower = random() < .012, shade = .55 + random() * .6, warm = random()
       return flower
@@ -63,50 +80,78 @@ export function terrainCover(terrain: Terrain, count: number, waterLevel = -Infi
 }
 
 /** Builds a scene document into the engine. */
-export function buildScene(engine: AsciiEngine, doc: SceneDoc, library: PrefabLibrary) {
-  if (doc.style) engine.setStyle(doc.style)
-  for (const [name, prefab] of Object.entries(library)) if (prefab.style) engine.setTypeStyle(name, prefab.style)
-  const terrain = doc.terrain ? createTerrain(doc.terrain) : undefined
-  if (terrain) engine.add(terrain.mesh)
+export function buildScene(engine: AsciiEngine, source: SceneDoc, library: PrefabLibrary) {
+  const doc = parseScene(source, library)
+  const previousStyle = engine.exportStyle()
+  let terrain: Terrain | undefined
+  let carpet: ReturnType<AsciiEngine['createCarpet']> | undefined
+  let weather: ReturnType<typeof createSceneWeather> | undefined
   const waters: Water[] = []
-  for (const entry of doc.waters ?? []) {
-    const water = engine.createWater(entry.shape, { look: entry.look, level: entry.level })
-    engine.add(water.mesh, { glyph: 'water' })
-    waters.push(water)
-  }
   const placed: { doc: PlacedObject; object: THREE.Object3D }[] = []
+  function dispose() {
+    weather?.dispose()
+    for (const p of placed) { library[p.doc.prefab]?.dispose?.(p.object); engine.remove(p.object, { dispose: true }) }
+    if (terrain) engine.remove(terrain.mesh, { dispose: true })
+    for (const w of waters) engine.remove(w.mesh, { dispose: true })
+    if (carpet) engine.remove(carpet.mesh, { dispose: true })
+  }
+  try {
+    for (const [name, prefab] of Object.entries(library)) if (prefab.style) engine.setTypeStyle(name, prefab.style)
+    if (doc.style) engine.setStyle(doc.style)
+    terrain = doc.terrain ? createTerrain(doc.terrain) : undefined
+    if (terrain) engine.add(terrain.mesh)
+    for (const entry of doc.waters ?? []) {
+      const water = engine.createWater(entry.shape, { look: entry.look, level: entry.level })
+      waters.push(water)
+      engine.add(water.mesh, { glyph: 'water' })
+    }
+    doc.objects.forEach(place)
+    carpet = doc.carpet && terrain ? engine.createCarpet(terrainCover(terrain, doc.carpet.count, doc.waters ?? []), doc.carpet.seed) : undefined
+    if (carpet) engine.add(carpet.mesh, { glyph: 'carpet' })
+    weather = createSceneWeather(engine, doc.environment, doc.terrain?.size)
+  } catch (error) { dispose(); engine.setStyle(previousStyle, { replace: true }); throw error }
   function place(item: PlacedObject) {
     const prefab = library[item.prefab]
     if (!prefab) throw new Error(`ascii-engine: prefab desconhecido "${item.prefab}"`)
-    const object = prefab.create()
+    const seed = item.seed ?? 48017
+    const object = prefab.create({ seed, random: seededRandom(seed), item })
     object.position.set(...item.position); object.rotation.y = item.rotation ?? 0; object.scale.setScalar(item.scale ?? 1)
+    if (item.rotation3) object.rotation.set(...item.rotation3)
+    if (item.scale3) object.scale.set(...item.scale3)
+    object.visible = item.visible ?? true
+    object.name = item.name ?? prefab.title
+    object.userData.sceneId = item.id
     object.userData.prefab = item.prefab
-    engine.add(object, { type: prefab.style ? item.prefab : undefined, ...item.options })
+    try { engine.add(object, { type: prefab.style ? item.prefab : undefined, ...item.options }) }
+    catch (error) { prefab.dispose?.(object); engine.remove(object, { dispose: true }); throw error }
     placed.push({ doc: item, object })
     return object
   }
-  doc.objects.forEach(place)
-  let carpet = doc.carpet && terrain ? engine.createCarpet(terrainCover(terrain, doc.carpet.count, lowestWater()), doc.carpet.seed) : undefined
-  if (carpet) engine.add(carpet.mesh, { glyph: 'carpet' })
-  function lowestWater() { return waters.length ? Math.max(...waters.map((w) => w.mesh.position.y)) : -Infinity }
 
   return {
     terrain, waters, placed,
     /** Adds one object to the scene (and to the document). */
-    place(item: PlacedObject) { doc.objects.push(item); return place(item) },
+    place(item: PlacedObject) {
+      const next = parseScene({ version: 1, objects: [{ ...item, id: item.id ?? crypto.randomUUID(), seed: item.seed ?? Math.floor(Math.random() * 4294967296) }] }, library).objects[0]
+      const object = place(next)
+      doc.objects.push(next)
+      return object
+    },
     /** Removes one placed object. */
     remove(object: THREE.Object3D) {
       const i = placed.findIndex((p) => p.object === object)
       if (i < 0) return
       doc.objects.splice(doc.objects.indexOf(placed[i].doc), 1)
+      library[placed[i].doc.prefab]?.dispose?.(object)
       placed.splice(i, 1)
       engine.remove(object, { dispose: true })
     },
     /** Adds a water body (e.g. dug by the lake brush). */
     addWater(entry: SceneWater) {
-      doc.waters = [...doc.waters ?? [], entry]
+      parseScene({ version: 1, objects: [], waters: [entry] })
       const water = engine.createWater(entry.shape, { look: entry.look, level: entry.level })
       engine.add(water.mesh, { glyph: 'water' }); waters.push(water)
+      doc.waters = [...doc.waters ?? [], entry]
       return water
     },
     /** Rebuilds the carpet after painting (blades are generated once). */
@@ -114,18 +159,22 @@ export function buildScene(engine: AsciiEngine, doc: SceneDoc, library: PrefabLi
       if (!terrain) return
       if (carpet) engine.remove(carpet.mesh, { dispose: true })
       doc.carpet = { count, seed: doc.carpet?.seed }
-      carpet = engine.createCarpet(terrainCover(terrain, count, lowestWater()), doc.carpet.seed)
+      carpet = engine.createCarpet(terrainCover(terrain, count, doc.waters ?? []), doc.carpet.seed)
       engine.add(carpet.mesh, { glyph: 'carpet' })
     },
-    update(time: number) { for (const p of placed) library[p.doc.prefab]?.update?.(p.object, time) },
+    update(time: number) { weather?.update(time); for (const p of placed) library[p.doc.prefab]?.update?.(p.object, time) },
     /** The document, with the terrain as edited. */
-    toJSON(): SceneDoc { return { ...doc, terrain: terrain?.toJSON() ?? doc.terrain } },
-    dispose() {
-      for (const p of placed) engine.remove(p.object, { dispose: true })
-      if (terrain) { engine.remove(terrain.mesh); terrain.dispose() }
-      for (const w of waters) engine.remove(w.mesh, { dispose: true })
-      if (carpet) engine.remove(carpet.mesh, { dispose: true })
+    toJSON(): SceneDoc {
+      return JSON.parse(JSON.stringify({
+        ...doc, style: engine.exportStyle(), terrain: terrain?.toJSON() ?? doc.terrain,
+        objects: placed.map(({ doc: item, object }) => ({
+          ...item, name: object.name, visible: object.visible,
+          position: object.position.toArray(), rotation3: [object.rotation.x, object.rotation.y, object.rotation.z], scale3: object.scale.toArray(),
+          options: engine.instanceStyle(object),
+        })),
+      }))
     },
+    dispose,
   }
 }
 export type BuiltScene = ReturnType<typeof buildScene>

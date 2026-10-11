@@ -37,6 +37,21 @@ describe('effect system', () => {
   it('keeps only drawable glyphs (the Pomorog particle atlas has no @ or x)', () => {
     expect(drawableGlyphs('@#a%x+')).toBe('#%+')
   })
+  it('deleting a scene effect releases its letters, budget and light immediately', () => {
+    const { cloud } = fakeCloud(), scene = new THREE.Scene()
+    const fx = createEffectSystem(cloud as never, scene)
+    fx.register(...POMOROG_EFFECTS)
+    const effect = fx.play('aura', new THREE.Vector3())
+    fx.update(.02, .02, new THREE.PerspectiveCamera())
+    expect(scene.children.length).toBe(1)
+    expect(fx.stats.letters).toBeGreaterThan(0)
+    effect.cancel(); effect.cancel()
+    expect(fx.stats.letters).toBe(0)
+    expect(fx.playing).toHaveLength(0)
+    expect(scene.children).toHaveLength(0)
+    fx.play('fogueira', new THREE.Vector3()); fx.dispose()
+    expect(scene.children).toHaveLength(0)
+  })
 })
 
 describe('flipbook conversion', () => {

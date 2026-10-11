@@ -125,6 +125,8 @@ export interface EffectInstance {
   attach(object: THREE.Object3D | null): void
   position: THREE.Vector3
   stop(): void
+  /** Remove all letters and its light immediately (scene deletion). */
+  cancel(): void
   readonly done: boolean
 }
 
@@ -162,6 +164,13 @@ export function createEffectSystem(cloud: GlyphCloud, scene: THREE.Object3D, opt
       get done() { return stopped && emitters.every((e) => e.letters.length === 0) },
       attach(object: THREE.Object3D | null) { target = object },
       stop() { stopped = true },
+      cancel() {
+        stopped = true
+        const index = playing.indexOf(instance)
+        if (index >= 0) { live -= instance.letters; playing.splice(index, 1) }
+        for (const emitter of emitters) { emitter.letters.length = 0; emitter.trail.length = 0 }
+        instance.dispose()
+      },
       dispose() { if (light) { light.removeFromParent(); light.dispose() } },
       tick(dt: number, time: number, camera: THREE.Camera) {
         t += dt
@@ -355,6 +364,7 @@ export function createEffectSystem(cloud: GlyphCloud, scene: THREE.Object3D, opt
       }
     },
     stopAll() { for (const p of playing) p.stop() },
+    dispose() { for (const p of playing) p.dispose(); playing.length = 0; live = 0 },
   }
 }
 export type EffectSystem = ReturnType<typeof createEffectSystem>

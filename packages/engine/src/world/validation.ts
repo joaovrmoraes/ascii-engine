@@ -1,0 +1,141 @@
+import type { SceneDoc, PrefabLibrary } from './scene'
+import { pomorog } from '../presets/pomorog'
+import { SURFACE_ALPHA } from '../surface'
+import { FOREST_WATER } from '../techniques/water'
+
+const glyphs = ['screen', 'surface', 'body', 'water', 'particle', 'carpet']
+function fail(path: string, detail: string): never { throw new Error(`Cenário inválido: ${path} ${detail}`) }
+function record(value: unknown, path: string): Record<string, unknown> {
+  if (!value || typeof value !== 'object' || Array.isArray(value)) fail(path, 'deve ser um objeto')
+  return value as Record<string, unknown>
+}
+function number(value: unknown, path: string, min = -1e8, max = 1e8): number {
+  if (typeof value !== 'number' || !Number.isFinite(value) || value < min || value > max) fail(path, `deve ser um número entre ${min} e ${max}`)
+  return value
+}
+function vector(value: unknown, path: string, count: number, min = -1e8) {
+  if (!Array.isArray(value) || value.length !== count) fail(path, `deve ter ${count} números`)
+  value.forEach((n, i) => number(n, `${path}[${i}]`, min))
+}
+function array(value: unknown, path: string): unknown[] {
+  if (!Array.isArray(value)) fail(path, 'deve ser uma lista')
+  return value
+}
+function style(value: unknown, path: string) {
+  const s = record(value, path)
+  if (s.glyph !== undefined && !glyphs.includes(String(s.glyph))) fail(path, 'contém uma técnica desconhecida')
+  if (s.surface !== undefined && !Object.hasOwn(SURFACE_ALPHA, String(s.surface))) fail(path, 'contém uma família desconhecida')
+  if (s.size !== undefined) number(s.size, `${path}.size`, .01, 10)
+  if (s.type !== undefined && typeof s.type !== 'string') fail(`${path}.type`, 'deve ser texto')
+  if (s.body !== undefined) {
+    const body = record(s.body, `${path}.body`)
+    if (body.occlude !== undefined && typeof body.occlude !== 'boolean') fail(`${path}.body.occlude`, 'deve ser booleano')
+  }
+  if (s.parts) for (const [k, v] of Object.entries(record(s.parts, `${path}.parts`))) style(v, `${path}.parts.${k}`)
+}
+function jsonData(value: unknown, path: string) {
+  if (typeof value === 'number') number(value, path, -Number.MAX_VALUE, Number.MAX_VALUE)
+  if (value && typeof value === 'object') for (const [key, child] of Object.entries(value)) {
+    if (['__proto__', 'constructor', 'prototype'].includes(key)) fail(path, 'contém uma chave reservada')
+    jsonData(child, `${path}.${key}`)
+  }
+}
+function sameShape(value: unknown, template: unknown, path: string) {
+  if (typeof template === 'number') { number(value, path); return }
+  if (typeof template === 'boolean') { if (typeof value !== 'boolean') fail(path, 'deve ser booleano'); return }
+  if (Array.isArray(template)) { vector(value, path, template.length); return }
+  if (template && typeof template === 'object') {
+    const r = record(value, path)
+    for (const [k, v] of Object.entries(template)) sameShape(r[k], v, `${path}.${k}`)
+  }
+}
+
+/** Validate before allocating GPU resources or replacing the open document. */
+export function parseScene(input: unknown, library?: PrefabLibrary): SceneDoc {
+  const root = record(input, 'documento')
+  if (root.version !== 1) fail('version', 'não é suportada (esperado: 1)')
+  if (root.name !== undefined && typeof root.name !== 'string') fail('name', 'deve ser texto')
+  if (root.environment !== undefined) {
+    const environment = record(root.environment, 'environment')
+    if (!['none', 'rain', 'snow'].includes(String(environment.weather))) fail('environment.weather', 'desconhecido')
+    if (environment.intensity !== undefined) number(environment.intensity, 'environment.intensity', 0, 1)
+  }
+  jsonData(root, 'documento')
+  const objects = array(root.objects, 'objects')
+  if (objects.length > 20000) fail('objects', 'excede 20000 objetos')
+  if (root.assets !== undefined) for (const [id, raw] of Object.entries(record(root.assets, 'assets'))) {
+    const asset = record(raw, `assets.${id}`)
+    if (typeof asset.name !== 'string' || typeof asset.source !== 'string' || !asset.source.startsWith('data:')) fail(`assets.${id}`, 'precisa conter nome e fonte incorporada (data URI)')
+  }
+  const ids = new Set<string>()
+  objects.forEach((raw, i) => {
+    const item = record(raw, `objects[${i}]`), path = `objects[${i}]`
+    if (typeof item.prefab !== 'string' || !item.prefab) fail(`${path}.prefab`, 'é obrigatório')
+    if (library && !Object.hasOwn(library, item.prefab)) fail(`${path}.prefab`, `não existe: ${item.prefab}`)
+    vector(item.position, `${path}.position`, 3)
+    if (item.rotation !== undefined) number(item.rotation, `${path}.rotation`)
+    if (item.scale !== undefined) number(item.scale, `${path}.scale`, .001, 1000)
+    if (item.rotation3 !== undefined) vector(item.rotation3, `${path}.rotation3`, 3)
+    if (item.scale3 !== undefined) vector(item.scale3, `${path}.scale3`, 3, .001)
+    if (item.seed !== undefined) number(item.seed, `${path}.seed`, 0, 4294967295)
+    if (item.options !== undefined) style(item.options, `${path}.options`)
+    if (item.visible !== undefined && typeof item.visible !== 'boolean') fail(`${path}.visible`, 'deve ser booleano')
+    if (item.animation !== undefined && item.animation !== null && typeof item.animation !== 'string') fail(`${path}.animation`, 'deve ser nome de clipe ou null')
+    if (item.name !== undefined && typeof item.name !== 'string') fail(`${path}.name`, 'deve ser texto')
+    const id = item.id ?? `object-${i + 1}`
+    if (typeof id !== 'string' || !id || ids.has(id)) fail(`${path}.id`, 'deve ser único e não vazio')
+    ids.add(id)
+  })
+  if (root.style !== undefined) {
+    const s = record(root.style, 'style')
+    for (const [k, v] of Object.entries(s)) {
+      if (v === undefined) continue
+      if (k === 'glyphs') style(v, 'style.glyphs')
+      else if (k === 'types') for (const [name, raw] of Object.entries(record(v, 'style.types'))) {
+        const t = record(raw, `style.types.${name}`)
+        if (t.style) style(t.style, `style.types.${name}.style`)
+        if (t.parts) style({ parts: t.parts }, `style.types.${name}`)
+      }
+      else if (k === 'fog' && v === null) continue
+      else if (k === 'atmosphere') { if (!['moon', 'dusk', 'ember'].includes(String(v))) fail('style.atmosphere', 'desconhecida') }
+      else if (k in pomorog) sameShape(v, pomorog[k as keyof typeof pomorog], `style.${k}`)
+    }
+    if (s.cellSize !== undefined) number(s.cellSize, 'style.cellSize', 1, 100)
+    if (s.brightness !== undefined) number(s.brightness, 'style.brightness', 0, 10)
+  }
+  if (root.terrain !== undefined) {
+    const t = record(root.terrain, 'terrain')
+    const r = number(t.resolution, 'terrain.resolution', 2, 513)
+    if (!Number.isInteger(r)) fail('terrain.resolution', 'deve ser inteiro')
+    number(t.size, 'terrain.size', 1, 4096)
+    const heights = array(t.heights, 'terrain.heights'), paint = array(t.paint, 'terrain.paint'), layers = array(t.layers, 'terrain.layers')
+    if (heights.length !== r * r || paint.length !== r * r * 4) fail('terrain', 'tem dimensões incompatíveis')
+    heights.forEach((h) => number(h, 'terrain.heights', -4096, 4096))
+    paint.forEach((p) => number(p, 'terrain.paint', 0, 255))
+    if (!layers.length || layers.length > 4) fail('terrain.layers', 'precisa de 1 a 4 camadas')
+    layers.forEach((raw) => { const l = record(raw, 'terrain.layers'); number(l.color, 'layer.color', 0, 0xffffff); number(l.grass, 'layer.grass', 0, 1); if (typeof l.name !== 'string') fail('layer.name', 'deve ser texto') })
+  }
+  if (root.carpet !== undefined) {
+    const c = record(root.carpet, 'carpet'); number(c.count, 'carpet.count', 0, 300000)
+    if (c.seed !== undefined) number(c.seed, 'carpet.seed', 0, 4294967295)
+  }
+  if (root.waters !== undefined) array(root.waters, 'waters').forEach((raw, i) => {
+    const w = record(raw, `waters[${i}]`), s = record(w.shape, `waters[${i}].shape`)
+    if (!['pond', 'stream'].includes(String(s.kind))) fail(`waters[${i}].shape.kind`, 'desconhecido')
+    for (const k of ['x', 'z', 'angle']) number(s[k], `waters[${i}].${k}`)
+    number(s.size, `waters[${i}].size`, .01, 4096)
+    if (w.level !== undefined) number(w.level, `waters[${i}].level`)
+    if (w.look !== undefined) {
+      const look = record(w.look, `waters[${i}].look`)
+      for (const [k, value] of Object.entries(look)) {
+        if (k in FOREST_WATER) sameShape(value, FOREST_WATER[k as keyof typeof FOREST_WATER], `waters[${i}].look.${k}`)
+      }
+      if (look.cell) vector(look.cell, `waters[${i}].look.cell`, 2, .001)
+      if (look.reflection) number(record(look.reflection, 'reflection').rows, 'reflection.rows', 1, 10000)
+    }
+  })
+  // Independent snapshot. Legacy documents receive deterministic identities/seeds.
+  const doc = JSON.parse(JSON.stringify(root)) as SceneDoc
+  doc.objects.forEach((item, i) => { item.id ??= `object-${i + 1}`; item.seed ??= (Math.imul(i + 1, 2654435761) + 48017) >>> 0 })
+  return doc
+}

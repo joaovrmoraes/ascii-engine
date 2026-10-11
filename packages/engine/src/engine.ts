@@ -92,6 +92,7 @@ export function createAsciiEngine(canvas: HTMLCanvasElement, options: AsciiEngin
   let skinnedLetters: THREE.Points[] = []
   /** Extra ink per particle layer (lightning brightens rain and bolts). */
   const gains = new Map<object, number>()
+  const detachedLayers = new WeakMap<THREE.Object3D, () => void>()
   /** Only the nearest water renders its mirror, within this distance (Pomorog: 11 m). */
   let reflectionRange = 11
   const entries = new Map<THREE.Object3D, Entry>()
@@ -271,24 +272,43 @@ export function createAsciiEngine(canvas: HTMLCanvasElement, options: AsciiEngin
      * `parts[name]`. Parts are matched by node name and cover the subtree.
      */
     add<T extends THREE.Object3D>(object: T, options: AddOptions = {}): T {
+      object.traverse(node => { detachedLayers.get(node)?.(); detachedLayers.delete(node) })
       const entry: Entry = { object, options: { ...options, parts: { ...options.parts } } }
       const isLayer = object.userData.glyph === 'carpet' || object.userData.glyph === 'particle'
       if (!isLayer && !object.parent) scene.add(object)
-      apply(entry)
-      entries.set(object, entry)
+      try { apply(entry); entries.set(object, entry) }
+      catch (error) { unapply(entry); object.removeFromParent(); throw error }
       return object
     },
     /** Takes an object out. `dispose`: free its geometry, materials and letters too. */
     remove(object: THREE.Object3D, options: { dispose?: boolean } = {}) {
+      if (options.dispose) object.traverse(node => { detachedLayers.get(node)?.(); detachedLayers.delete(node) })
+      const removed = new Set<THREE.Object3D>()
+      object.traverse((node) => removed.add(node))
       // Every object added below this one leaves too (a chunk and its trees).
       object.traverse((node) => {
         const entry = entries.get(node)
         if (entry) { unapply(entry); entries.delete(node) }
       })
       object.removeFromParent()
+      // Detached layers must stop receiving updates, even when kept for reuse.
+      const releasedLayers = new Set<THREE.Object3D>()
+      const removeLayers = <T extends { mesh: THREE.Object3D; dispose(): void }>(list: T[]) => {
+        for (let i = list.length - 1; i >= 0; i--) if (removed.has(list[i].mesh)) {
+          const layer = list[i]
+          const gain = gains.get(layer)
+          gains.delete(layer)
+          list.splice(i, 1)
+          if (options.dispose) { layer.dispose(); releasedLayers.add(layer.mesh) }
+          else detachedLayers.set(layer.mesh, () => { list.push(layer); if (gain !== undefined) gains.set(layer, gain) })
+        }
+      }
+      removeLayers(carpets); removeLayers(clouds); removeLayers(streaks)
+      skinnedLetters = skinnedLetters.filter((points) => points.parent && !removed.has(points.parent))
       if (!options.dispose) return
       const geometries = new Set<THREE.BufferGeometry>(), materials = new Set<THREE.Material>()
       object.traverse((node) => {
+        if (releasedLayers.has(node)) return
         if (node instanceof THREE.InstancedMesh) node.dispose()
         if (node instanceof THREE.Mesh || node instanceof THREE.Points) {
           if (!node.userData.sharedGeometry) geometries.add(node.geometry)
@@ -339,6 +359,9 @@ export function createAsciiEngine(canvas: HTMLCanvasElement, options: AsciiEngin
       raycaster.setFromCamera(new THREE.Vector2(ndcX, ndcY), camera)
       for (const hit of raycaster.intersectObjects(scene.children, true)) {
         if (!(hit.object instanceof THREE.Mesh) || !hit.object.visible) continue
+        let ancestor: THREE.Object3D | null = hit.object.parent, hidden = false
+        while (ancestor) { if (!ancestor.visible) { hidden = true; break }; ancestor = ancestor.parent }
+        if (hidden) continue
         let node: THREE.Object3D | null = hit.object, part: string | undefined
         while (node && !entries.has(node)) { if (!part && node.name) part = node.name; node = node.parent }
         if (!node) continue
@@ -380,13 +403,15 @@ export function createAsciiEngine(canvas: HTMLCanvasElement, options: AsciiEngin
       return cloud
     },
 
-    setStyle(next: Partial<AsciiStyle>) {
+    setStyle(next: Partial<AsciiStyle>, options: { replace?: boolean } = {}) {
       const interior = style.interior
-      style = { ...style, ...next }
+      if (options.replace) for (const name of Object.keys(types)) delete types[name]
+      style = { ...(options.replace ? structuredClone(pomorog) : style), ...next }
+      if (options.replace) Object.assign(types, style.types)
       if (next.types) Object.assign(types, next.types)
       applyStyle()
       // The global letter layer or object types changed: re-resolve every object.
-      if (next.glyphs || next.types) for (const entry of entries.values()) { unapply(entry); apply(entry) }
+      if (options.replace || next.glyphs || next.types) for (const entry of entries.values()) { unapply(entry); apply(entry) }
       if (style.interior !== interior) rebuildIllumination()
     },
     /** Footprints that block the lantern's sight in interiors (discovery map). */
@@ -445,6 +470,7 @@ export function createAsciiEngine(canvas: HTMLCanvasElement, options: AsciiEngin
     setFlash(flash: number) { illumination.uniforms.stormFlash.value = flash },
     set reflectionRange(metres: number) { reflectionRange = metres },
     get size() { return { width, height } },
+    get resources() { return { objects: entries.size, carpets: carpets.length, particles: clouds.length, rain: streaks.length, waters: waters.length } },
     resize,
 
     /** One frame. `dt` is clamped to [0, .08] (a negative step once blew up poses). */
@@ -498,6 +524,7 @@ export function createAsciiEngine(canvas: HTMLCanvasElement, options: AsciiEngin
     },
 
     dispose() {
+      effects?.dispose()
       for (const entry of entries.values()) unapply(entry)
       for (const carpet of carpets) carpet.dispose()
       for (const cloud of clouds) cloud.dispose()
