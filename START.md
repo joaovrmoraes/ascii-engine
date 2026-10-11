@@ -132,6 +132,49 @@ do Niagara da Unreal, em que tudo vira **letras**.
 - **Desempenho:** um limite de letras por efeito e por cena, menos detalhe com a
   distância e reaproveitamento de partículas.
 
+### 3.4 Terreno com pincéis, como na Unity (requisito do dono)
+
+O terreno é esculpido e pintado com **pincéis**, no espírito do Terrain da
+Unity, e o resultado sai em letras.
+
+- **Base:** um mapa de alturas por chunk (grade de vértices) com costura
+  automática entre vizinhos, e camadas pintadas de tipo de chão (grama, terra,
+  pedra, areia, neve, lama, folhas). Cada tipo tem seu estilo de letras
+  (`surface`) e seu tapete (`carpet`).
+- **Pincel:** tamanho, força, suavidade da borda e formato (redondo,
+  quadrado ou uma imagem em tons de cinza importada como carimbo). Tem espelho
+  e ajuste para encaixar na grade. `Shift` inverte (subir/descer) e o
+  desfazer funciona traço a traço.
+- **Pincéis de forma:**
+  - **subir/descer** (montanhas, morros, buracos);
+  - **suavizar**;
+  - **achatar** numa altura escolhida ou na altura do clique (platôs, bases de construção);
+  - **ruído** (rugosidade natural);
+  - **terraço** (degraus, encostas em camadas);
+  - **erosão** simples (sulcos de chuva, encostas mais naturais);
+  - **rampa** (de um ponto a outro, para caminhos e estradas).
+- **Pincéis de pintura:**
+  - **tipo de chão**, com mistura nas bordas;
+  - **regra automática por inclinação e altura:** pedra em encosta íngreme,
+    neve no alto, areia na beira da água. Ela pode ser desligada por área.
+- **Pincéis de detalhe:**
+  - **espalhar objetos** (árvores, pedras, arbustos), com densidade,
+    variação de escala e giro, alinhamento ao chão e borracha;
+  - **grama e flores** (densidade do `carpet`).
+- **Pincel de água** (§3.2):
+  - **lago:** pinta a área, que é cavada e enchida até um nível escolhido;
+  - **rio e riacho:** desenha o traçado, que cava o leito, define largura e
+    direção do fluxo e se ajusta ao relevo;
+  - **mar:** nível da água para o mundo todo.
+  O terreno e a água ficam ligados: mexer no relevo atualiza a margem.
+- **Pincel de caminho:** traça a trilha, que achata e pinta o chão por baixo e
+  serve de conector entre chunks.
+- **Montanhas e paredões em letras:** encosta íngreme vira pedra com letras
+  mais densas e degraus de sombra mais marcados. Paredões verticais usam
+  `surface` com a grade alinhada à face, para as letras não esticarem.
+- **Gerar e depois esculpir:** o gerador procedural (§ Fase 5) produz o
+  relevo e a água iniciais, e os pincéis refinam à mão.
+
 ## 4. Arquitetura
 
 ```text
@@ -222,10 +265,10 @@ como o circuito da floresta do Pomorog (`forestWorld.ts`, `trailLoop.ts`).
 4. **Carregamento por distância:** só os chunks perto da câmera existem;
    o resto é descarregado. O Pomorog já faz isso no circuito.
 5. **Editor de chunk e de cenário:** posicionar, girar, escalar, duplicar,
-   agrupar, desfazer e refazer; pincel para espalhar árvores, pedras e grama
-   com variação; pintar o tipo de chão (que define o tapete `carpet`);
-   desenhar lagos, riachos e caminhos; costuras automáticas entre chunks
-   vizinhos (chão, água e trilha contínuos).
+   agrupar, desfazer e refazer, com o **terreno por pincéis** (§3.4):
+   esculpir montanhas e vales, pintar o chão, espalhar objetos e grama,
+   cavar lagos e rios, traçar caminhos. Costuras automáticas entre chunks
+   vizinhos (relevo, chão, água e trilha contínuos).
 6. **Ambiente por cenário:** chuva, neve, noite e luar, neblina e luzes locais.
 
 Tudo salvo em JSON (prefab, chunk e cenário), carregável pela engine sem o editor.
