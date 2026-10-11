@@ -32,4 +32,7 @@ export interface Area {
   pan?(x: number, z: number): void
   document?(): import('@ascii-engine/core').SceneDoc
   openDocument?(doc: unknown): Promise<void>
+  navigation?(event: PointerEvent): 'pan' | 'orbit' | false
+  blocksSelection?(): boolean
+  renderOverlay?(): void
 }

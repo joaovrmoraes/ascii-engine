@@ -9,23 +9,24 @@ import type { AsciiEngine, GlyphKind, GlyphStyle, SurfaceKind } from '@ascii-eng
  */
 const KINDS: GlyphKind[] = ['surface', 'body', 'screen']
 const FAMILIES: SurfaceKind[] = ['earth', 'stone', 'wood', 'bark', 'foliage', 'snow', 'wetgrass', 'actor']
+const LABELS: Record<string, string> = { surface: 'Letras na superfície', body: 'Volume de letras', screen: 'Personagem (tela)', earth: 'Terra', stone: 'Pedra', wood: 'Madeira', bark: 'Casca', foliage: 'Folhagem', snow: 'Neve', wetgrass: 'Grama úmida', actor: 'Personagem', crown: 'Copa', trunk: 'Tronco' }
 
-export function createSelection(engine: AsciiEngine, canvas: HTMLCanvasElement, root: HTMLElement, callbacks: { select?: (object?: THREE.Object3D) => void; changed?: () => void } = {}) {
+export function createSelection(engine: AsciiEngine, canvas: HTMLCanvasElement, root: HTMLElement, callbacks: { select?: (object?: THREE.Object3D) => void; changed?: () => void; blocked?: () => boolean; objectFirst?: boolean } = {}) {
   let selected: Omit<NonNullable<ReturnType<AsciiEngine['pick']>>, 'node'> & { node: THREE.Object3D; level: 'part' | 'object' } | undefined
   const box = new THREE.Box3Helper(new THREE.Box3(), 0xd3b27c)
   box.visible = false; engine.particleScene.add(box)
   root.innerHTML = `
-    <div data-k="what">clique numa parte da cena</div>
+    <strong>Aparência ASCII</strong><div data-k="what">clique numa parte da cena</div>
     <label>parte <select data-k="part"></select></label>
-    <label>técnica <select data-k="glyph">${KINDS.map((k) => `<option>${k}</option>`).join('')}</select></label>
-    <label>letras <select data-k="surface"><option value="">(herdar)</option>${FAMILIES.map((k) => `<option>${k}</option>`).join('')}</select></label>
+    <label>Técnica <select data-k="glyph">${KINDS.map((k) => `<option value="${k}">${LABELS[k]}</option>`).join('')}</select></label>
+    <label>Material <select data-k="surface"><option value="">Padrão do objeto</option>${FAMILIES.map((k) => `<option value="${k}">${LABELS[k]}</option>`).join('')}</select></label>
     <label>tamanho <input data-k="size" type="number" min=".08" max=".5" step=".01" placeholder="(herdar)"></label>
     <label>salvar em <select data-k="scope">
       <option value="instance">só esta</option>
       <option value="type">todas desta parte neste tipo</option>
       <option value="global">estilo global</option>
     </select></label>
-    <button data-k="apply">[ aplicar ]</button>`
+    <button data-k="apply">Aplicar aparência</button>`
   const el = <T extends HTMLElement>(k: string) => root.querySelector<T>(`[data-k="${k}"]`)!
   const what = el<HTMLDivElement>('what')
   root.hidden = true
@@ -40,7 +41,7 @@ export function createSelection(engine: AsciiEngine, canvas: HTMLCanvasElement, 
     parts.replaceChildren(new Option('Objeto inteiro', ''))
     const names = new Set<string>()
     selected.object.traverse(node => { if (node !== selected!.object && node.name && !node.userData.glyphBodyLetters && !(node instanceof THREE.Points)) names.add(node.name) })
-    names.forEach(name => parts.append(new Option(name, name)))
+    names.forEach(name => parts.append(new Option(LABELS[name] ?? name, name)))
     parts.value = selected.level === 'part' ? selected.part ?? '' : ''
     what.textContent = `${selected.type ? `tipo ${selected.type} · ` : ''}${selected.level === 'part' && selected.part ? `parte "${selected.part}"` : `objeto "${selected.object.name || selected.object.type}"`}`
     el<HTMLSelectElement>('glyph').value = style.glyph ?? 'surface'
@@ -58,20 +59,21 @@ export function createSelection(engine: AsciiEngine, canvas: HTMLCanvasElement, 
     show()
   }
 
-  let downX = 0, downY = 0
+  let downX = 0, downY = 0, preview = false
   canvas.addEventListener('pointerdown', (e) => { downX = e.clientX; downY = e.clientY })
   canvas.addEventListener('pointerup', (e) => {
-    if (e.button !== 0 || e.shiftKey) return
+    if (e.button !== 0 || e.shiftKey || e.altKey || callbacks.blocked?.()) return
     if (Math.hypot(e.clientX - downX, e.clientY - downY) > 5) return
     const rect = canvas.getBoundingClientRect()
     const hit = engine.pick((e.clientX - rect.left) / rect.width * 2 - 1, -((e.clientY - rect.top) / rect.height) * 2 + 1)
     if (!hit) { selected = undefined; show(); callbacks.select?.(); return }
     // Second click on the same part climbs to the whole object.
     const same = selected && selected.object === hit.object && (selected.part === hit.part)
-    selected = { ...hit, level: same && selected!.level === 'part' || !hit.part ? 'object' : 'part' }
+    selected = { ...hit, level: callbacks.objectFirst ? (same && selected!.level === 'object' && hit.part ? 'part' : 'object') : (same && selected!.level === 'part' || !hit.part ? 'object' : 'part') }
     show(); callbacks.select?.(hit.object)
   })
   canvas.addEventListener('scene-replaced', () => { selected = undefined; show() })
+  canvas.addEventListener('editor-preview', event => { preview = (event as CustomEvent<boolean>).detail; box.visible = !preview && !!selected })
   canvas.addEventListener('select-scene-object', (event) => {
     const object = (event as CustomEvent<THREE.Object3D>).detail
     if (!object) { selected = undefined; show(); return }
@@ -81,9 +83,9 @@ export function createSelection(engine: AsciiEngine, canvas: HTMLCanvasElement, 
     show()
   })
   addEventListener('keydown', (e) => {
-    if (e.key !== 'Escape' || !selected) return
+    if (e.key !== 'Escape' || !selected || callbacks.blocked?.()) return
     if (selected.level === 'part') selected.level = 'object'; else selected = undefined
-    show()
+    show(); if (!selected) callbacks.select?.()
   })
   el<HTMLButtonElement>('apply').onclick = () => {
     if (!selected) return
@@ -103,5 +105,5 @@ export function createSelection(engine: AsciiEngine, canvas: HTMLCanvasElement, 
     show()
     callbacks.changed?.()
   }
-  return { get selected() { return selected }, refresh: () => { if (selected) box.box.setFromObject(selected.level === 'part' ? selected.node : selected.object) } }
+  return { get selected() { return selected }, refresh: () => { box.visible = !preview && !!selected; if (selected) box.box.setFromObject(selected.level === 'part' ? selected.node : selected.object) } }
 }

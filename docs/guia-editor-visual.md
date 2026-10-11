@@ -4,30 +4,60 @@ O editor agora abre diretamente em **http://localhost:1440** (`pnpm dev`).
 Esta entrega fecha o fluxo de criar → editar → salvar → reabrir → exportar
 conteúdo visual. Regras e interface do jogo continuam no Pomorog.
 
+## Onde fica cada coisa
+
+O espaço de trabalho segue a organização de editores como a Unity:
+
+- **Hierarquia**, à esquerda: objetos que já estão no mapa, com busca.
+- **Cena**, no centro: selecionar, posicionar e transformar com o mouse.
+- **Inspetor**, à direita: nome, transformação e aparência do objeto;
+  abas separadas para **Terreno** e **Ambiente**.
+- **Projeto / Biblioteca**, embaixo: objetos disponíveis, separados em
+  Natureza, Construções, Formas, Efeitos e Importados, com busca.
+- **Arquivo**, no topo: novo mapa/item, abrir, salvar e exportar.
+  **Exibição**, acima da cena, guarda câmera e ajustes globais.
+
+Para colocar algo, **arraste um objeto da biblioteca até o chão e solte**.
+Ele entra selecionado, com as setas para mover. Também é possível clicar
+no objeto da biblioteca e depois no chão; Shift permite colocar várias
+cópias e Esc cancela a ferramenta.
+
+Com o objeto selecionado, use **W** para mover, **E** para girar e **R**
+para escalar; arraste os eixos ou anéis coloridos. Os valores XYZ também
+podem ser digitados no inspetor. **Global/Local** escolhe a orientação dos
+eixos; **Encaixar** usa passos de 0,5 m, 15° e 0,1 na escala. Um arraste
+inteiro conta como uma ação de desfazer. Os controles de transformação
+valem para objetos; água continua sendo ajustada pelos campos do inspetor.
+
+**Prévia** oculta os controles de seleção na cena e desativa os painéis
+de edição até clicar em **Voltar à edição**. O botão ao lado pausa as
+animações. Esta prévia é visual, sem regras de jogo.
+
 ## Criar um mapa
 
-1. **Novo mapa** abre um terreno de 32 × 32 m com árvore, pedra e fogueira.
-2. Em **Construir**, escolha elevar, baixar, suavizar, aplainar ou pintar.
+1. **Arquivo → Novo mapa** abre um terreno de 32 × 32 m com árvore, pedra e fogueira.
+2. Na aba **Terreno** do inspetor, escolha elevar, baixar, suavizar, aplainar ou pintar.
    Arraste sobre o chão; cada traço é uma ação de desfazer. Shift inverte
    elevar/baixar. Aplainar mantém a altura do início do traço.
-3. **Cavar lago** e **Cavar riacho** escavam o leito e colocam água. O riacho
+3. **Lago** e **Riacho** escavam o leito e colocam água. O riacho
    usa o contorno procedural do Pomorog, com extensão de 34 m; ainda não é
    uma curva desenhada ponto a ponto. Selecione a água na lista para ajustar
    posição, tamanho, direção, nível e fluxo. Mover a água depois não escava
    automaticamente o novo local: ajuste o relevo com os pincéis.
-4. Escolha um objeto e clique **Adicionar no centro da vista**, ou use
-   **Colocar objeto** para posicioná-lo no chão. A biblioteca inclui árvore,
+4. Arraste um objeto da biblioteca para o chão. A biblioteca inclui árvore,
    pedras, caixa, ponte, ruína, tronco, formas básicas, fogueira e efeitos.
 5. A lista à esquerda seleciona o objeto inteiro. O inspetor permite
    renomear, ocultar, mover, girar, escalar, duplicar e excluir.
-6. Clique numa parte no mapa, ou escolha-a na lista **parte**, para ajustar
+6. O primeiro clique no mapa seleciona o objeto. Clique novamente na mesma
+   parte, ou escolha-a na lista **parte** em **Aparência ASCII**, para ajustar
    técnica, família de letras e tamanho. O escopo pode ser instância, tipo
    ou global; todas essas camadas entram no arquivo.
-7. **Clima** seleciona chuva/neve; **Atmosfera** muda o parâmetro de atmosfera
+7. Na aba **Ambiente**, **Clima** seleciona chuva/neve; **Atmosfera** muda o parâmetro de atmosfera
    existente da engine. Não converte o terreno nem os objetos em um bioma.
 
-Arraste para girar a câmera; botão direito ou Shift + arraste desloca o
-centro; roda aproxima/afasta. **F** foca o objeto. **Ctrl D** duplica,
+**Alt + arraste esquerdo** gira a câmera; botão direito/meio, ferramenta
+**Q** ou Shift + arraste em modo de seleção deslocam o centro; roda
+aproxima/afasta. **F** foca o objeto. **Ctrl D** duplica,
 **Delete** exclui, **Ctrl Z** desfaz e **Ctrl Shift Z** refaz. **Ctrl S**
 baixa o documento. Os atalhos não interceptam a edição de campos de texto.
 
@@ -37,7 +67,7 @@ um traço. A máscara de água é local ao seu contorno.
 
 ## Criar e reutilizar itens
 
-**Novo item** abre um documento sem terreno. Monte-o com formas, prefabs
+**Arquivo → Novo item** abre um documento sem terreno. Monte-o com formas, prefabs
 ou modelos importados, usando posição/rotação/escala. **Salvar arquivo**
 salva a composição toda. **Exportar este item** salva só o objeto
 selecionado, com origem reposicionada para `[0, 0, 0]`.
@@ -50,7 +80,7 @@ possibilidade de desfazer.
 
 ## Importar modelos
 
-Use **importar modelos e arquivos**, ou arraste arquivos sobre o editor:
+Use **Importar modelo** no topo da biblioteca, ou arraste arquivos sobre o editor:
 
 - GLB com recursos incorporados;
 - GLTF junto com seus `.bin` e imagens. Selecione todos de uma vez. Recursos
@@ -116,17 +146,19 @@ regras, inventário, missões ou interface.
   de interação; inclui uma copa personalizada.
 - [Item com modelos animados incorporados](examples/item-roundtrip.json):
   bloco e dois modelos mínimos de teste, GLTF e GLB. Não é arte final.
-- [Capturas](captures/autoria-2026-10-11/README.md).
+- [Capturas do espaço de trabalho atual](captures/editor-unity-2026-10-11/README.md).
+- [Validação de persistência e exportação](captures/autoria-2026-10-11/README.md).
 - `pnpm check`: tipos, testes unitários e build.
 - Com `pnpm dev` aberto, `pnpm verify:authoring`: teste do editor real no
-  Chromium isolado. Saídas em `/tmp/ascii-authoring-verification`; outro
+  Chromium isolado, incluindo arrastar da biblioteca e mover/girar/escalar
+  pelos eixos com eventos reais de mouse. Saídas em `/tmp/ascii-authoring-verification`; outro
   diretório pode ser passado como argumento. Requer Chromium instalado.
 - `pnpm compare`: seis vistas contra a base existente, sem atualizá-la.
 
 ## O que ainda não está completo
 
 Esta é uma base funcional de autoria visual, não a conclusão de todos os
-sistemas previstos em `START.md`. Permanecem: gizmos e agrupamento,
+sistemas previstos em `START.md`. Permanecem: seleção múltipla e agrupamento,
 biblioteca de prefabs compostos vinculados, editor de chunks com costuras e
 conectores, paleta completa dos cinco biomas, mar/cachoeira/rios por spline,
 pincéis avançados, edição visual de curvas/emissores, ajustes completos de
@@ -136,6 +168,8 @@ alfabeto/cor/espaçamento por parte e a integração real do jogo. As cinco
 A chuva/neve do editor reaproveita as receitas visuais, mas ainda não inclui
 as interações completas de pegadas, acumulação, derretimento e anéis do
 pântano. Objetos/efeitos e terreno podem se sobrepor; a autoria não aplica
-colisões nem regras de posicionamento. Desktop/mobile não foram validados
-nesta entrega. A aprovação de equivalência integral com o Pomorog continua
+colisões nem regras de posicionamento. Os painéis têm posições fixas;
+ainda não é possível arrastá-los ou redimensioná-los como na Unity.
+O app nativo Tauri e mobile não foram validados nesta entrega.
+A aprovação de equivalência integral com o Pomorog continua
 pendente.

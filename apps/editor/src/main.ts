@@ -67,7 +67,7 @@ const area = await Promise.resolve().then(() => entry.create(engine, { screen: m
   throw error
 })
 const view = {
-  angle: Number(params.get('angle') ?? 0), zoom: Number(params.get('zoom') ?? game?.zoom ?? .9),
+  angle: Number(params.get('angle') ?? 0), zoom: Number(params.get('zoom') ?? game?.zoom ?? (area.id === 'sandbox' && !player ? .8 : .9)),
   paused: false, pauseAt: params.has('pause') ? Number(params.get('pause')) : Infinity,
 }
 if (params.has('cell')) engine.setStyle({ cellSize: Number(params.get('cell')) })
@@ -75,7 +75,11 @@ if (params.has('light')) engine.setStyle({ brightness: Number(params.get('light'
 
 let drag = 0, dragX = 0, dragging = false, panning = false, lastX = 0, lastY = 0
 canvas.addEventListener('contextmenu', e => e.preventDefault())
-canvas.addEventListener('pointerdown', (e) => { dragging = true; panning = e.button !== 0 || e.shiftKey; lastX = e.clientX; lastY = e.clientY; dragX = e.clientX - drag / .006; canvas.setPointerCapture(e.pointerId) })
+canvas.addEventListener('pointerdown', (e) => {
+  const navigation = area.navigation ? area.navigation(e) : (e.button !== 0 || e.shiftKey ? 'pan' : 'orbit')
+  if (!navigation) return
+  dragging = true; panning = navigation === 'pan'; lastX = e.clientX; lastY = e.clientY; dragX = e.clientX - drag / .006; canvas.setPointerCapture(e.pointerId)
+})
 canvas.addEventListener('pointermove', (e) => {
   if (!dragging) return
   if (panning && area.pan) {
@@ -86,6 +90,7 @@ canvas.addEventListener('pointermove', (e) => {
   } else drag = (e.clientX - dragX) * .006
 })
 canvas.addEventListener('pointerup', () => { dragging = false })
+canvas.addEventListener('pointercancel', () => { dragging = false })
 canvas.addEventListener('wheel', (e) => { e.preventDefault(); view.zoom = THREE.MathUtils.clamp(view.zoom * Math.exp(-e.deltaY * .001), area.id === 'sandbox' ? .18 : .75, area.id === 'sandbox' ? 4 : 1.5) }, { passive: false })
 
 const imported: GlyphModel[] = []
@@ -98,9 +103,10 @@ const importFiles = (files: File[]) => {
   const action = area.importFiles ? area.importFiles(files) : Promise.all(files.map(importAt))
   void action.catch(error => { status.dataset.note = String(error) })
 }
-addEventListener('drop', (e) => { e.preventDefault(); importFiles(Array.from(e.dataTransfer?.files ?? [])) })
+addEventListener('drop', (e) => { e.preventDefault(); const files = Array.from(e.dataTransfer?.files ?? []); if (files.length) importFiles(files) })
+canvas.addEventListener('editor-import-files', e => importFiles((e as CustomEvent<File[]>).detail))
 const panel = createPanel({ engine, view, areas: AREAS, areaId, mode, capture: () => captureNext = true, importFiles, changed: area.changed })
-const selection = player ? { refresh() {} } : createSelection(engine, canvas, document.getElementById('selection')!, { select: area.select, changed: area.changed })
+const selection = player ? { refresh() {} } : createSelection(engine, canvas, document.getElementById('selection')!, { select: area.select, changed: area.changed, blocked: area.blocksSelection, objectFirst: area.id === 'sandbox' })
 const status = document.getElementById('status')!
 const focus = new THREE.Vector3()
 let last = 0, frames = 0, sample = 0, fps = 0, captureNext = false
@@ -117,6 +123,7 @@ function frame(now: number) {
   engine.frame(area.focus(angle, focus), pomorogSpan(height, width / height, view.zoom), angle)
   selection.refresh()
   engine.render(dt)
+  area.renderOverlay?.()
   if (captureNext) { captureNext = false; download(canvas.toDataURL('image/png')) }
   frames++
   if (now - sample > 1000) { fps = Math.round(frames * 1000 / (now - sample)); frames = 0; sample = now; panel.refresh() }

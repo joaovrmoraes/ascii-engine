@@ -1,5 +1,40 @@
 # Registro de trabalho
 
+## 11/10/2026 — Usabilidade: espaço de trabalho inspirado na Unity
+
+- Pedido do dono: a interface estava confusa, especialmente para colocar
+  itens. Reorganizado o editor em hierarquia à esquerda, cena central,
+  inspetor à direita e biblioteca embaixo. Ícones SVG, busca, categorias,
+  menu Arquivo e abas separadas para objeto, terreno e ambiente.
+- Colocação por arrastar e soltar da biblioteca, com indicação do ponto
+  no chão; alternativa de clicar no item e depois no chão. Shift repete,
+  Esc cancela. O objeto entra selecionado no modo mover.
+- Controles visuais W/E/R para mover/girar/escalar, espaço local/global,
+  encaixe e valores XYZ. Um arraste é uma ação de desfazer. Câmera:
+  Alt + arraste gira; botão direito/meio ou ferramenta Q deslocam.
+  Prévia desativa os painéis de edição e oculta os controles na cena.
+- `apps/editor/src/editor/`: espaço de trabalho, símbolos e
+  `TransformControls` em cena de sobreposição exclusiva do editor. Nenhuma
+  dependência nova nem mudança no núcleo, shaders, receitas ou documento.
+  Atualizados guia e `START.md` com a organização e os controles atuais.
+- `pnpm check`: **41 testes**, tipos e build passaram. Aviso de bundle
+  >500 kB permanece. `pnpm verify:authoring /tmp/unity-editor-final` passou
+  com arraste nativo da biblioteca e transformações pelos três controles,
+  inspetor, câmera estável ao transformar, histórico, prévia e os fluxos
+  anteriores de importar/salvar/reabrir/exportar. Sem exceções na página.
+- [Capturas antes/depois e métricas](captures/editor-unity-2026-10-11/README.md):
+  `cdpshot.mjs`, integração via CDP e página inteira no **Orca Browser**.
+  `pnpm compare` passou em cinco vistas e falhou na floresta durante a
+  execução concorrente. A floresta passou ao repetir isoladamente
+  (`pnpm compare floresta`), sem alterar código ou baseline; oscilação
+  temporal registrada, causa não isolada.
+- Limites: painéis fixos, seleção de um objeto, sem agrupamento. Água
+  usa campos no inspetor; os eixos transformam objetos. As pendências de
+  autoria das cinco áreas e do importador do Pomorog continuam no guia.
+  Sem validação nova de Tauri/mobile.
+- Branch local `feat/unity-editor-workspace`, sem push. Nenhuma alteração
+  no checkout do Pomorog ou em `reference/`.
+
 ## 11/10/2026 — Autoria visual e exportação portável
 
 - Escopo confirmado pelo dono: terrenos, mapas, itens e afins; regras e

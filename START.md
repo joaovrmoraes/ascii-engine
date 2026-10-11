@@ -90,8 +90,9 @@ Pomorog já faz isso: na árvore, a copa é `body` e o tronco é `surface`.
 - **API:** `engine.add(obj, { glyph, parts: { copa: { glyph: 'body', … }, tronco: { glyph: 'surface', … } } })`,
   `engine.setPartStyle(alvo, parte, estilo)` e `userData.glyph`/`userData.glyphStyle`
   por nó no GLTF.
-- **Editor:** clicar seleciona a **parte** sob o cursor, e um segundo clique ou
-  uma tecla sobe para o objeto. O painel mostra a técnica e os parâmetros
+- **Editor:** no espaço de autoria, clicar seleciona o objeto; outro clique
+  na mesma parte ou a lista do inspetor seleciona a parte. Nas demonstrações,
+  o primeiro clique seleciona a parte. O painel mostra a técnica e os parâmetros
   da parte com a escolha de onde salvar ("só esta", "todas desta parte
   neste tipo de objeto", "estilo global"). Destaque visual da parte selecionada.
 - Na fase 1, desenhe as estruturas de dados já pensando nisso (estilo como
@@ -280,6 +281,16 @@ dono se limita ao visual exportável, sem regras nem interface de jogo.
 Veja o [guia e limites da entrega](docs/guia-editor-visual.md) e os
 [exemplos](docs/examples/). Isso fecha o marco de persistência/autoria
 básica, mas não todos os recursos das fases abaixo.
+
+**Usabilidade:** a pedido do dono, o espaço de trabalho foi reorganizado
+com referência na Unity: hierarquia à esquerda, cena no centro, inspetor
+à direita e biblioteca embaixo. Objetos entram por arrastar e soltar ou
+clique seguido de posicionamento. W/E/R controlam mover/girar/escalar
+pelos eixos, com coordenadas locais/globais e encaixe; Alt + arraste gira
+a câmera. Terreno e ambiente possuem abas próprias. Os painéis são fixos.
+`apps/editor/src/editor/` contém o espaço de trabalho, ícones SVG e
+`TransformControls`: estes desenham numa cena de sobreposição exclusiva
+do editor, fora do pipeline ASCII e do documento exportado.
 
 No núcleo, `world/validation.ts` valida documentos, `world/history.ts`
 guarda snapshots limitados, `import/assets.ts` resolve fontes incorporadas

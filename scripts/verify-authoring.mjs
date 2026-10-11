@@ -16,9 +16,10 @@ try {
   socket = new WebSocket(targets.find(t => t.type === 'page').webSocketDebuggerUrl)
   await new Promise(resolve => { socket.onopen = resolve })
   let id = 0
-  const pending = new Map(), errors = []
+  const pending = new Map(), errors = []; let interceptedDrag
   socket.onmessage = event => {
     const data = JSON.parse(event.data)
+    if (data.method === 'Input.dragIntercepted') interceptedDrag = data.params.data
     if (data.method === 'Runtime.exceptionThrown') errors.push(data.params.exceptionDetails.text + ': ' + data.params.exceptionDetails.exception?.description)
     const request = pending.get(data.id)
     if (request) { clearTimeout(request.timer); pending.delete(data.id); data.error ? request.reject(new Error(data.error.message)) : request.resolve(data.result) }
@@ -42,7 +43,74 @@ try {
   await until('!!window.area && !!document.querySelector("canvas[data-ready]")')
   await evaluate(`window.ui = (selector, value) => { const el = document.querySelector(selector); if (!el) throw new Error(selector); if (value === undefined) el.click(); else { el.value = value; el.dispatchEvent(new Event('change')); } }`)
   await check('map starts with stable object identities', 'area.document().objects.every(o => o.id && Number.isInteger(o.seed))')
-  await action(`ui('#hierarchy [data-k="objects"] button:nth-child(2)'); ui('[data-field="Posição x"]', '-2.5')`)
+
+  // Real mouse drag from a library card into the viewport, using the browser's
+  // native DataTransfer payload (not a scene API call).
+  const mouse = (type, x, y, button = 'none', buttons = 0) => send('Input.dispatchMouseEvent', { type, x, y, button, buttons, clickCount: type === 'mousePressed' || type === 'mouseReleased' ? 1 : 0 })
+  await send('Input.setInterceptDrags', { enabled: true })
+  const dragPoints = await evaluate(`(() => { const card=document.querySelector('[data-prefab="caixa"]').getBoundingClientRect(), canvas=document.querySelector('canvas').getBoundingClientRect(); return {sx:card.x+card.width/2,sy:card.y+25,x:canvas.x+canvas.width*.6,y:canvas.y+canvas.height*.6} })()`)
+  await mouse('mouseMoved', dragPoints.sx, dragPoints.sy)
+  await mouse('mousePressed', dragPoints.sx, dragPoints.sy, 'left', 1)
+  await mouse('mouseMoved', dragPoints.sx+12, dragPoints.sy-18, 'left', 1)
+  for (let i=0; i<30 && !interceptedDrag; i++) await sleep(50)
+  if (!interceptedDrag) throw new Error('Native card drag did not start')
+  for (const type of ['dragEnter', 'dragOver', 'drop']) await send('Input.dispatchDragEvent', { type, x:dragPoints.x, y:dragPoints.y, data:interceptedDrag })
+  await mouse('mouseReleased', dragPoints.x, dragPoints.y, 'left')
+  await send('Input.setInterceptDrags', { enabled:false })
+  await until('area.document().objects.length === 4')
+  await check('native library drag creates a selected object at the drop point', 'area.document().objects[3].prefab === "caixa" && document.querySelector("#hierarchy .active")?.dataset.objectId === area.document().objects[3].id')
+  await evaluate(`window.draggedId=area.document().objects[3].id; window.beforeGizmo=area.document().objects[3].position.slice(); window.cameraBefore=engine.camera.position.toArray();
+    window.projectAxis = (offset) => { const object=engine.scene.children.find(o=>o.userData.sceneId===draggedId), point=object.position.clone(); point.x+=offset; point.project(engine.camera); const rect=document.querySelector('canvas').getBoundingClientRect(); return {x:rect.x+(point.x+1)/2*rect.width,y:rect.y+(1-point.y)/2*rect.height}; }`)
+  async function dragXAxis(mode) {
+    await action(`ui('[data-mode="${mode}"]'); ui('#hierarchy [data-object-id="'+draggedId+'"]')`)
+    let handle
+    for (let offset=.15; offset<4; offset+=.15) {
+      const point=await evaluate(`projectAxis(${offset})`)
+      await mouse('mouseMoved',point.x,point.y); await sleep(30)
+      if (await evaluate('document.querySelector("canvas").dataset.transformAxis === "X"')) { handle=point; break }
+    }
+    if (!handle) throw new Error(`No X handle found for ${mode}`)
+    const delta=await evaluate('(()=>{const a=projectAxis(0), b=projectAxis(1.2); return {x:b.x-a.x,y:b.y-a.y}})()')
+    await mouse('mousePressed',handle.x,handle.y,'left',1)
+    for(let i=1;i<=6;i++) { await mouse('mouseMoved',handle.x+delta.x*i/6,handle.y+delta.y*i/6,'left',1); await sleep(20) }
+    await mouse('mouseReleased',handle.x+delta.x,handle.y+delta.y,'left'); await sleep(250)
+  }
+  await dragXAxis('translate')
+  await check('dragging the X gizmo moves the object, updates inspector and leaves camera still', `area.document().objects[3].position[0] > beforeGizmo[0]+.5 && Math.abs(Number(document.querySelector('[data-field="Posição x"]').value)-area.document().objects[3].position[0])<.01 && JSON.stringify(engine.camera.position.toArray())===JSON.stringify(cameraBefore)`)
+  await action(`ui('#authoring-toolbar [data-k="undo"]')`)
+  await check('gizmo drag is one undo action', 'JSON.stringify(area.document().objects[3].position)===JSON.stringify(beforeGizmo)')
+  await dragXAxis('scale')
+  await check('scale gizmo changes the selected object', 'area.document().objects[3].scale3[0] > 1.2')
+  await action(`ui('#authoring-toolbar [data-k="undo"]')`)
+  await action(`ui('#hierarchy [data-object-id="'+draggedId+'"]'); ui('[data-mode="rotate"]')`)
+  await evaluate(`window.projectRing = angle => {
+    const object=engine.scene.children.find(o=>o.userData.sceneId===draggedId), point=object.position.clone();
+    const radius=(engine.camera.top-engine.camera.bottom)/engine.camera.zoom*.85/8;
+    point.x+=Math.cos(angle)*radius; point.z+=Math.sin(angle)*radius; point.project(engine.camera);
+    const rect=document.querySelector('canvas').getBoundingClientRect();
+    return {x:rect.x+(point.x+1)/2*rect.width,y:rect.y+(1-point.y)/2*rect.height};
+  }`)
+  let ringAngle
+  for (let angle=0; angle<Math.PI*2; angle+=Math.PI/12) {
+    const point=await evaluate(`projectRing(${angle})`)
+    await mouse('mouseMoved',point.x,point.y); await sleep(30)
+    if(await evaluate('document.querySelector("canvas").dataset.transformAxis === "Y"')) {ringAngle=angle; break}
+  }
+  if (ringAngle===undefined) throw new Error('No Y rotation ring found')
+  const ringStart=await evaluate(`projectRing(${ringAngle})`)
+  await mouse('mousePressed',ringStart.x,ringStart.y,'left',1)
+  let ringEnd=ringStart
+  for(let i=1;i<=6;i++) {ringEnd=await evaluate(`projectRing(${ringAngle+i*Math.PI/36})`); await mouse('mouseMoved',ringEnd.x,ringEnd.y,'left',1); await sleep(20)}
+  await mouse('mouseReleased',ringEnd.x,ringEnd.y,'left'); await sleep(250)
+  await check('dragging the rotation ring turns the object', 'Math.abs(area.document().objects[3].rotation3[1]) > .1')
+  await shot('workspace-gizmo')
+  await action(`ui('#authoring-toolbar [data-k="undo"]')`)
+  await action(`ui('#authoring-toolbar [data-k="preview"]')`)
+  await check('preview disables authoring without changing the document', 'document.body.classList.contains("previewing") && document.querySelector("#asset-browser").inert && area.document().objects.length===4')
+  await action(`ui('#authoring-toolbar [data-k="preview"]'); ui('[data-mode="translate"]'); ui('#authoring-toolbar [data-k="undo"]')`)
+  await check('undo also removes the dropped object', 'area.document().objects.length===3')
+
+  await action(`ui('#hierarchy [data-object-id="object-2"]'); ui('[data-field="Posição x"]', '-2.5')`)
   await check('transform edited in inspector is serialized', 'area.document().objects[1].position[0] === -2.5')
   await action(`ui('#selection [data-k="part"]', 'crown'); ui('#selection [data-k="size"]', '.24'); ui('#selection [data-k="apply"]')`)
   await check('part style is serialized', 'area.document().objects[1].options.parts.crown.size === .24')
@@ -51,7 +119,7 @@ try {
   await check('document roundtrip keeps geometry seeds, transforms and styles', 'JSON.stringify(area.document()) === JSON.stringify(expected)')
   await action(`ui('#authoring-toolbar [data-k="item"]')`)
   await check('terainless item opens', '!area.document().terrain && area.document().objects.length === 0')
-  await action(`ui('#tools [data-k="prefab"]', 'bloco'); ui('#tools [data-k="add"]')`)
+  await action(`ui('[data-prefab="bloco"]'); const canvas = document.querySelector('canvas'), r = canvas.getBoundingClientRect(); canvas.dispatchEvent(new PointerEvent('pointerdown', { bubbles:true, button:0, clientX:r.left+r.width/2, clientY:r.top+r.height/2 })); canvas.dispatchEvent(new PointerEvent('pointerup', { bubbles:true, button:0, clientX:r.left+r.width/2, clientY:r.top+r.height/2 }));`)
   await check('object added to item', 'area.document().objects[0].prefab === "bloco"')
   await action(`document.dispatchEvent(new KeyboardEvent('keydown', { key: 'd', ctrlKey: true, bubbles: true }))`)
   await check('duplicate has independent identity', 'area.document().objects.length === 2 && area.document().objects[0].id !== area.document().objects[1].id')
@@ -84,28 +152,28 @@ try {
   await shot('item-com-modelos')
   await action(`ui('#authoring-toolbar [data-k="export"]')`)
   await writeFile(join(output, 'item-roundtrip.json'), JSON.stringify(await evaluate('area.document()')))
-  await action(`(() => { const input = document.querySelector('#tools [data-k="insert"]'), transfer = new DataTransfer(); transfer.items.add(new File([JSON.stringify(withAssets)], 'item.json')); input.files = transfer.files; input.dispatchEvent(new Event('change')); })()`)
+  await action(`(() => { const input = document.querySelector('#asset-browser [data-k="insert"]'), transfer = new DataTransfer(); transfer.items.add(new File([JSON.stringify(withAssets)], 'item.json')); input.files = transfer.files; input.dispatchEvent(new Event('change')); })()`)
   await until('area.document().objects.length === 6')
   await check('saved composition can be inserted with independent assets and identities', 'Object.keys(area.document().assets).length === 4 && new Set(area.document().objects.map(o=>o.id)).size === 6')
   await action('await area.openDocument(expected)')
-  await action(`ui('#tools [data-k="weather"]', 'rain')`)
+  await action(`ui('#environment-settings [data-k="weather"]', 'rain')`)
   await check('rain is saved and registered', 'area.document().environment.weather === "rain" && engine.resources.rain === 1')
-  await action(`ui('#tools [data-k="weather"]', 'snow')`)
+  await action(`ui('#environment-settings [data-k="weather"]', 'snow')`)
   await check('weather replacement frees rain', 'area.document().environment.weather === "snow" && engine.resources.rain === 0')
-  await action(`ui('#tools [data-k="weather"]', 'none')`)
+  await action(`ui('#environment-settings [data-k="weather"]', 'none')`)
   await evaluate('window.resourcesBefore = JSON.stringify(engine.resources)')
   await evaluate('(async () => { for (let i=0;i<6;i++) await area.openDocument(area.document()) })()')
   await check('repeated reopen does not accumulate layers or lights', 'JSON.stringify(engine.resources) === resourcesBefore')
   // Brush through pointer events, then undo a whole stroke.
-  await action(`ui('#tools [data-k="tool"]', 'raise')`)
+  await action(`ui('[data-tab="terrain"]'); ui('[data-brush="raise"]')`)
   await evaluate(`(() => { const canvas = document.querySelector('canvas'), rect = canvas.getBoundingClientRect(); for(const type of ['pointerdown','pointermove','pointerup']) canvas.dispatchEvent(new PointerEvent(type,{bubbles:true,button:0,clientX:rect.left+rect.width*.6,clientY:rect.top+rect.height*.6})); })()`)
   await check('terrain brush changes heightmap', 'area.document().terrain.heights.some(h=>h>0)')
   await action(`ui('#authoring-toolbar [data-k="undo"]')`)
   await check('undo restores entire stroke', 'area.document().terrain.heights.every(h=>h===0)')
-  await action(`ui('#tools [data-k="tool"]', 'lake')`)
+  await action(`ui('[data-brush="lake"]')`)
   await action(`(() => { const canvas = document.querySelector('canvas'), rect = canvas.getBoundingClientRect(); canvas.dispatchEvent(new PointerEvent('pointerdown',{bubbles:true,button:0,clientX:rect.left+rect.width*.68,clientY:rect.top+rect.height*.57})); })()`)
   await check('lake brush carves and creates editable water', 'area.document().waters.length === 1 && area.document().terrain.heights.some(h=>h<0)')
-  await action(`ui('#tools [data-k="tool"]', 'select'); ui('#authoring-toolbar [data-k="name"]', 'Mapa de prova'); ui('#tools [data-k="weather"]', 'rain')`)
+  await action(`ui('[data-mode="translate"]'); ui('#authoring-toolbar [data-k="name"]', 'Mapa de prova'); ui('#environment-settings [data-k="weather"]', 'rain')`)
   await shot('mapa-com-lago')
   await evaluate('window.saved = JSON.stringify(area.document())')
   const saved = await evaluate('saved')
