@@ -3,6 +3,9 @@ import * as THREE from 'three'
 import { createEffectSystem, drawableGlyphs } from './effects'
 import { imageToGlyphFrame } from './flipbook'
 import { POMOROG_EFFECTS } from './presets'
+import { parseEffect } from './validation'
+import { parseScene } from '../world/validation'
+import { POMOROG_FIRE } from '../presets/campfire'
 
 /** A particle buffer stand-in that records pushes. */
 function fakeCloud() {
@@ -11,6 +14,18 @@ function fakeCloud() {
 }
 
 describe('effect system', () => {
+  it('plays portable definitions with the same name independently, without replacing a preset', () => {
+    const { pushed, cloud } = fakeCloud(), fx = createEffectSystem(cloud as never, new THREE.Scene())
+    const definition = { name: 'custom', duration: 1, emitters: [{ bursts: [{ at: 0, count: 1 }], glyphs: '+', life: 1 }] }
+    fx.register(definition)
+    const a = fx.play({ ...definition, emitters: [{ ...definition.emitters[0], glyphs: '*' }] }, new THREE.Vector3())
+    const b = fx.play('custom', new THREE.Vector3())
+    fx.update(.01, .01, new THREE.PerspectiveCamera())
+    expect(pushed.map(p => p.glyph).sort()).toEqual(['*','+'])
+    expect(fx.stats.emitters).toBe(2)
+    expect(fx.library.get('custom')).toBe(definition)
+    a.cancel(); b.cancel(); expect(fx.stats.effects).toBe(0)
+  })
   it('bursts, ages and finishes a one-shot effect', () => {
     const { pushed, cloud } = fakeCloud()
     const fx = createEffectSystem(cloud as never, new THREE.Scene())
@@ -51,6 +66,22 @@ describe('effect system', () => {
     expect(scene.children).toHaveLength(0)
     fx.play('fogueira', new THREE.Vector3()); fx.dispose()
     expect(scene.children).toHaveLength(0)
+  })
+})
+
+describe('portable effect authoring', () => {
+  it('preserves the Pomorog presets and custom effects through scene JSON without an editor library', () => {
+    for (const effect of POMOROG_EFFECTS) expect(parseEffect(effect)).toEqual(effect)
+    expect(parseEffect({ name:'calor',duration:3,emitters:[{render:'heat',heat:POMOROG_FIRE}] }).emitters[0].heat).toEqual(POMOROG_FIRE)
+    const effect = POMOROG_EFFECTS[1]
+    const doc = parseScene({ version:1, effects:{'fx:custom-dust':effect}, objects:[{prefab:'fx:custom-dust',position:[0,0,0]}] }, {})
+    expect(parseScene(JSON.parse(JSON.stringify(doc)), {})).toEqual(doc)
+    expect(doc.effects!['fx:custom-dust']).not.toBe(effect)
+  })
+  it('rejects malformed effect data before playback or scene replacement', () => {
+    const base = { name:'teste',duration:1,emitters:[] }
+    for (const value of [{...base,duration:0},{...base,emitters:[{life:[3,1]}]},{...base,emitters:[{render:'unknown'}]},{...base,emitters:[{ring:{from:0,to:1,count:Infinity}}]},{...base,emitters:[{shape:{kind:'box',size:[1]}}]},{...base,emitters:[{heat:{rows:1}}]}, JSON.parse('{"name":"teste","duration":1,"emitters":[],"__proto__":{}}')]) expect(()=>parseEffect(value)).toThrow('Efeito inválido')
+    expect(()=>parseScene({version:1,objects:[],effects:{'fx:custom-bad':{...base,emitters:[{rate:-1}]}}})).toThrow('Efeito inválido')
   })
 })
 

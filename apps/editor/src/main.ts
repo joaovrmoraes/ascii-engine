@@ -74,6 +74,7 @@ if (params.has('cell')) engine.setStyle({ cellSize: Number(params.get('cell')) }
 if (params.has('light')) engine.setStyle({ brightness: Number(params.get('light')) })
 
 let drag = 0, dragX = 0, dragging = false, panning = false, lastX = 0, lastY = 0
+const panDelta = new THREE.Vector3(), panUp = new THREE.Vector3(), panForward = new THREE.Vector3()
 canvas.addEventListener('contextmenu', e => e.preventDefault())
 canvas.addEventListener('pointerdown', (e) => {
   const navigation = area.navigation ? area.navigation(e) : (e.button !== 0 || e.shiftKey ? 'pan' : 'orbit')
@@ -83,9 +84,19 @@ canvas.addEventListener('pointerdown', (e) => {
 canvas.addEventListener('pointermove', (e) => {
   if (!dragging) return
   if (panning && area.pan) {
-    const s = (engine.camera.top - engine.camera.bottom) / engine.size.height
-    const dx = (e.clientX - lastX) * s, dy = (e.clientY - lastY) * s * 1.4
-    area.pan(-dx * Math.cos(angle) + dy * Math.sin(angle), dx * Math.sin(angle) + dy * Math.cos(angle))
+    const camera = engine.camera, rect = canvas.getBoundingClientRect()
+    const dx = (e.clientX - lastX) * (camera.right - camera.left) / (rect.width * camera.zoom)
+    const dy = (e.clientY - lastY) * (camera.top - camera.bottom) / (rect.height * camera.zoom)
+    panDelta.setFromMatrixColumn(camera.matrixWorld, 0).multiplyScalar(-dx)
+    panUp.setFromMatrixColumn(camera.matrixWorld, 1)
+    panDelta.addScaledVector(panUp, dy)
+    // Project screen movement onto the ground, keeping the grabbed point
+    // under the pointer regardless of the camera's angle or zoom.
+    camera.getWorldDirection(panForward)
+    if (Math.abs(panForward.y) > 1e-6) {
+      panDelta.addScaledVector(panForward, -panDelta.y / panForward.y)
+      area.pan(panDelta.x, panDelta.z)
+    }
     lastX = e.clientX; lastY = e.clientY
   } else drag = (e.clientX - dragX) * .006
 })

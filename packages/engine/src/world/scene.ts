@@ -7,6 +7,8 @@ import { waterEdge, type Water, type WaterLook, type WaterShape } from '../techn
 import { createTerrain, type Terrain, type TerrainData } from './terrain'
 import { parseScene } from './validation'
 import { createSceneWeather, type SceneEnvironment } from '../weather/sceneWeather'
+import { createEffectPrefabs } from '../fx/prefabs'
+import type { EffectDef } from '../fx/effects'
 
 /**
  * Scenes as JSON (phase 5): terrain, waters, a carpet and objects placed from
@@ -44,6 +46,8 @@ export interface SceneDoc {
   objects: PlacedObject[]
   /** Portable model sources; keys are prefab ids. No machine-specific paths. */
   assets?: Record<string, { name: string; source: string }>
+  /** User-authored visual effects; keys are portable prefab ids (fx:custom-*). */
+  effects?: Record<string, EffectDef>
   environment?: SceneEnvironment
 }
 
@@ -82,6 +86,7 @@ export function terrainCover(terrain: Terrain, count: number, waterLevel: number
 /** Builds a scene document into the engine. */
 export function buildScene(engine: AsciiEngine, source: SceneDoc, library: PrefabLibrary) {
   const doc = parseScene(source, library)
+  library = { ...library, ...createEffectPrefabs(engine, doc.effects) }
   const previousStyle = engine.exportStyle()
   let terrain: Terrain | undefined
   let carpet: ReturnType<AsciiEngine['createCarpet']> | undefined

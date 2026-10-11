@@ -139,15 +139,16 @@ const right = new THREE.Vector3(), up = new THREE.Vector3(), toward = new THREE.
  */
 export function createEffectSystem(cloud: GlyphCloud, scene: THREE.Object3D, options: { budget?: number } = {}) {
   const library = new Map<string, EffectDef>()
-  const playing: (EffectInstance & { tick(dt: number, time: number, camera: THREE.Camera): void; dispose(): void })[] = []
+  const playing: (EffectInstance & { emitterCount: number; tick(dt: number, time: number, camera: THREE.Camera): void; dispose(): void })[] = []
   const budget = options.budget ?? 6000
   let seed = 4242
   const random = () => { seed = (Math.imul(seed, 1664525) + 1013904223) >>> 0; return seed / 4294967296 }
   let live = 0
 
-  function play(name: string, at: THREE.Vector3 | THREE.Object3D, overrides: { loop?: boolean } = {}): EffectInstance {
-    const found = library.get(name)
-    if (!found) throw new Error(`ascii-engine: efeito desconhecido "${name}"`)
+  function play(source: string | EffectDef, at: THREE.Vector3 | THREE.Object3D, overrides: { loop?: boolean } = {}): EffectInstance {
+    const found = typeof source === 'string' ? library.get(source) : source
+    if (!found) throw new Error(`ascii-engine: efeito desconhecido "${source}"`)
+    const name = found.name
     const def: EffectDef = found
     const emitters: EmitterState[] = def.emitters.map((e) => ({ def: e, letters: [], carry: 0, burstsDone: 0, trail: [] }))
     const position = at instanceof THREE.Vector3 ? at.clone() : new THREE.Vector3()
@@ -158,7 +159,7 @@ export function createEffectSystem(cloud: GlyphCloud, scene: THREE.Object3D, opt
     if (light) scene.add(light)
     const origin = new THREE.Vector3()
     const instance = {
-      name, position,
+      name, position, emitterCount: emitters.length,
       get time() { return t },
       get letters() { return emitters.reduce((n, e) => n + e.letters.length, 0) },
       get done() { return stopped && emitters.every((e) => e.letters.length === 0) },
@@ -353,7 +354,7 @@ export function createEffectSystem(cloud: GlyphCloud, scene: THREE.Object3D, opt
     register(...defs: EffectDef[]) { for (const def of defs) library.set(def.name, def) },
     play,
     /** Letters and emitters alive (the budget shown by the editor). */
-    get stats() { return { letters: live, effects: playing.length, emitters: playing.reduce((n, p) => n + (library.get(p.name)?.emitters.length ?? 0), 0), budget } },
+    get stats() { return { letters: live, effects: playing.length, emitters: playing.reduce((n, p) => n + p.emitterCount, 0), budget } },
     get playing() { return playing as readonly EffectInstance[] },
     /** Advances every effect and pushes its letters; call between `cloud.clear()` and the render. */
     update(dt: number, time: number, camera: THREE.Camera) {

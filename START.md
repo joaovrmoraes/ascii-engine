@@ -287,10 +287,21 @@ com referência na Unity: hierarquia à esquerda, cena no centro, inspetor
 à direita e biblioteca embaixo. Objetos entram por arrastar e soltar ou
 clique seguido de posicionamento. W/E/R controlam mover/girar/escalar
 pelos eixos, com coordenadas locais/globais e encaixe; Alt + arraste gira
-a câmera. Terreno e ambiente possuem abas próprias. Os painéis são fixos.
+a câmera; botão direito desloca o mapa acompanhando o mouse. Terreno e
+ambiente possuem abas próprias. Hierarquia, Inspetor e Projeto podem ser
+movidos, redimensionados, destacados e encaixados nas bordas. A disposição
+fica em localStorage, separada do documento, e pode ser restaurada.
 `apps/editor/src/editor/` contém o espaço de trabalho, ícones SVG e
 `TransformControls`: estes desenham numa cena de sobreposição exclusiva
 do editor, fora do pipeline ASCII e do documento exportado.
+
+**Autoria de efeitos:** aba Efeitos junto de Projeto, com campos para
+emissores, prévia, bases existentes e salvar/colocar no mapa. O campo
+opcional `SceneDoc.effects` incorpora as receitas; `fx/validation.ts`
+valida e `fx/prefabs.ts` as materializa no `buildScene`. O runtime aceita
+definições diretamente, sem substituir presets globais de mesmo nome.
+Curvas complexas, luz, grade de calor e flipbooks continuam disponíveis
+pelo JSON avançado; linha do tempo e curvas gráficas ficam pendentes.
 
 No núcleo, `world/validation.ts` valida documentos, `world/history.ts`
 guarda snapshots limitados, `import/assets.ts` resolve fontes incorporadas

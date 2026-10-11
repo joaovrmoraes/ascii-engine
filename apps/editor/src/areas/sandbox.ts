@@ -1,5 +1,5 @@
 import * as THREE from 'three'
-import { buildScene, createTerrainData, createHistory, emptyScene, loadSceneAssets, parseScene, pomorog, waterEdge, type AsciiEngine, type Brush, type BuiltScene, type SceneDoc } from '@ascii-engine/core'
+import { buildScene, createTerrainData, createHistory, createEffectPrefabs, emptyScene, loadSceneAssets, parseScene, pomorog, waterEdge, type AsciiEngine, type Brush, type BuiltScene, type SceneDoc } from '@ascii-engine/core'
 import { createPrefabs } from '../scene/prefabs'
 import { downloadDocument, importModelFiles } from '../scene/files'
 import { readDraft, saveDraft } from '../scene/storage'
@@ -8,6 +8,7 @@ import '../authoring.css'
 import { createWorkspace, type Workspace } from '../editor/workspace'
 import { createGizmos, type Gizmos } from '../editor/gizmos'
 import { assetInfo, icon } from '../editor/icons'
+import { createEffectEditor } from '../editor/effects'
 
 type Tool = 'select' | Brush | 'lake' | 'stream' | 'place' | 'erase'
 export function defaultScene(): SceneDoc {
@@ -24,7 +25,7 @@ export async function createSandbox(engine: AsciiEngine, options: AreaOptions = 
   const builtins = createPrefabs(engine)
   let assets: Awaited<ReturnType<typeof loadSceneAssets>> = { library: {}, dispose() {} }
   let library = builtins, scene: BuiltScene
-  try { assets = await loadSceneAssets(initial ?? defaultScene()); library = { ...builtins, ...assets.library }; scene = buildScene(engine, initial ?? defaultScene(), library) }
+  try { assets = await loadSceneAssets(initial ?? defaultScene()); library = { ...builtins, ...assets.library, ...createEffectPrefabs(engine, initial?.effects) }; scene = buildScene(engine, initial ?? defaultScene(), library) }
   catch (error) {
     assets.dispose()
     if (options.scene) throw error
@@ -39,6 +40,7 @@ export async function createSandbox(engine: AsciiEngine, options: AreaOptions = 
   const tool = { kind: 'select' as Tool, radius: 2, strength: .08, layer: 1, prefab: 'arvore' }
   let toolbar: HTMLElement, hierarchy: HTMLElement, sidebar: HTMLElement, box: HTMLElement
   let ui: Workspace | undefined, gizmos: Gizmos | undefined
+  let effectEditor: ReturnType<typeof createEffectEditor> | undefined
   let transformMode: 'hand' | 'translate' | 'rotate' | 'scale' = 'translate', preview = false, assetCategory = 'Todos', assetQuery = '', hierarchyQuery = ''
   const run = (action: () => void | Promise<void>) => { if (busy) return; void Promise.resolve().then(action).catch(error => message(String(error))) }
   function message(text: string) { note = text; const el = toolbar?.querySelector('[data-k="note"]'); if (el) el.textContent = text }
@@ -70,18 +72,18 @@ export async function createSandbox(engine: AsciiEngine, options: AreaOptions = 
     try {
       const doc = parseScene(input)
       nextAssets = await loadSceneAssets(doc)
-      const nextLibrary = { ...builtins, ...nextAssets.library }
+      const nextLibrary = { ...builtins, ...nextAssets.library, ...createEffectPrefabs(engine, doc.effects) }
       parseScene(doc, nextLibrary)
       // Keep types used by the old scene valid until the candidate is built.
       const nextStyle = { ...structuredClone(pomorog), ...doc.style, types: { ...structuredClone(pomorog.types), ...Object.fromEntries(Object.entries(nextLibrary).filter(([, prefab]) => prefab.style).map(([key, prefab]) => [key, prefab.style!])), ...doc.style?.types } }
       engine.setStyle({ ...nextStyle, types: { ...previousStyle.types, ...nextStyle.types } }, { replace: true })
       const next = buildScene(engine, doc, nextLibrary)
-      scene.dispose(); assets.dispose()
+      effectEditor?.stop(); scene.dispose(); assets.dispose()
       scene = next; assets = nextAssets; library = nextLibrary; name = doc.name ?? 'Sem título'
       engine.setStyle(nextStyle, { replace: true })
       selected = undefined; selectedWater = -1; gizmos?.attach(); gizmos?.cursor()
       canvas.dispatchEvent(new Event('scene-replaced'))
-      refreshTools(); refreshHierarchy()
+      refreshTools(); refreshHierarchy(); effectEditor?.refresh()
       if (toolbar) toolbar.querySelector<HTMLInputElement>('[data-k="name"]')!.value = name
     } catch (error) { nextAssets?.dispose(); engine.setStyle(previousStyle, { replace: true }); throw error }
     finally { busy = false; for (const panel of [toolbar, hierarchy, sidebar, ui?.assets]) if (panel) panel.inert = false }
@@ -105,7 +107,7 @@ export async function createSandbox(engine: AsciiEngine, options: AreaOptions = 
   function exportItem() {
     if (!selected) return
     const doc = snapshot(), item = doc.objects[scene.placed.findIndex(p => p.object === selected)]
-    downloadDocument({ version: 1, name: item.name || item.prefab, style: doc.style, objects: [{ ...item, position: [0, 0, 0] }], assets: doc.assets?.[item.prefab] ? { [item.prefab]: doc.assets[item.prefab] } : undefined }, 'item.json')
+    downloadDocument({ version: 1, name: item.name || item.prefab, style: doc.style, objects: [{ ...item, position: [0, 0, 0] }], assets: doc.assets?.[item.prefab] ? { [item.prefab]: doc.assets[item.prefab] } : undefined, effects: doc.effects?.[item.prefab] ? { [item.prefab]: doc.effects[item.prefab] } : undefined }, 'item.json')
   }
   function refreshHistory() {
     if (!toolbar) return
@@ -167,6 +169,7 @@ export async function createSandbox(engine: AsciiEngine, options: AreaOptions = 
   }
   function refreshTools() {
     if (!ui) return
+    if (!library[tool.prefab]) { tool.prefab = 'arvore'; if (tool.kind === 'place') tool.kind = 'select' }
     const layers = box.querySelector<HTMLSelectElement>('[data-k="layer"]')!
     layers.replaceChildren(...(scene.terrain?.data.layers ?? []).map((l, i) => new Option(l.name, String(i))))
     layers.value = String(tool.layer); layers.disabled = !scene.terrain
@@ -268,6 +271,12 @@ export async function createSandbox(engine: AsciiEngine, options: AreaOptions = 
 
   if (!player) {
     ui = createWorkspace(); toolbar = ui.toolbar; hierarchy = ui.hierarchy; sidebar = ui.sidebar; box = ui.tools
+    effectEditor = createEffectEditor(ui.effectRoot, engine, {
+      definitions: () => snapshot().effects ?? {},
+      position: () => focus.clone().setY(scene.terrain?.heightAt(focus.x, focus.z) ?? 0),
+      async save(key, definition) { const doc = snapshot(); doc.effects = { ...doc.effects, [key]: definition }; await replace(doc); changed() },
+      place(key) { ui!.showProject('assets'); assetCategory = 'Efeitos'; beginPlacement(key) },
+    })
     gizmos = createGizmos(engine, { change: syncTransformFields, commit: changed, allowed: () => !busy && !preview && tool.kind === 'select' && transformMode !== 'hand' })
     const el = <T extends HTMLElement>(key: string) => ui!.get<T>(`[data-k="${key}"]`)
     el<HTMLInputElement>('name').value = name
@@ -281,7 +290,8 @@ export async function createSandbox(engine: AsciiEngine, options: AreaOptions = 
     el('undo').onclick = () => run(() => undo()); el('redo').onclick = () => run(() => undo(true))
     const opener = el<HTMLInputElement>('open')
     opener.onchange = () => { const file = opener.files?.[0]; opener.value = ''; if (file) run(async () => { await replace(JSON.parse(await file.text())); setMode('translate'); changed() }) }
-    el('library').onclick = () => { assetCategory = 'Todos'; assetQuery = ''; el<HTMLInputElement>('asset-search').value = ''; refreshLibrary(); el('asset-search').focus() }
+    el('library').onclick = () => { ui!.showProject('assets'); assetCategory = 'Todos'; assetQuery = ''; el<HTMLInputElement>('asset-search').value = ''; refreshLibrary(); el('asset-search').focus() }
+    el('create-effect').onclick = () => { ui!.showProject('effects'); effectEditor!.newEffect() }
     el<HTMLInputElement>('search').oninput = e => { hierarchyQuery = (e.target as HTMLInputElement).value; refreshHierarchy() }
     el<HTMLInputElement>('asset-search').oninput = e => { assetQuery = (e.target as HTMLInputElement).value; refreshLibrary() }
     ui.root.querySelectorAll<HTMLButtonElement>('[data-mode]').forEach(button => { button.onclick = () => setMode(button.dataset.mode as typeof transformMode) })
@@ -313,6 +323,7 @@ export async function createSandbox(engine: AsciiEngine, options: AreaOptions = 
       if (item.terrain || item.waters?.length) throw new Error('Para inserir como item, salve um documento sem terreno nem água. Use Abrir para mapas.')
       const remap = new Map(Object.keys(item.assets ?? {}).map(key => [key, `asset-${crypto.randomUUID()}`]))
       for (const [key, asset] of Object.entries(item.assets ?? {})) { doc.assets ??= {}; doc.assets[remap.get(key)!] = asset }
+      for (const [key, definition] of Object.entries(item.effects ?? {})) { const id = `fx:custom-${crypto.randomUUID()}`; remap.set(key, id); doc.effects ??= {}; doc.effects[id] = definition }
       for (const object of item.objects) {
         const type = object.options?.type ?? object.prefab, typeStyle = item.style?.types?.[type]
         doc.objects.push({ ...object, id: crypto.randomUUID(), prefab: remap.get(object.prefab) ?? object.prefab,
@@ -404,7 +415,7 @@ export async function createSandbox(engine: AsciiEngine, options: AreaOptions = 
     },
     update(time) { scene.update(time) },
     dispose() {
-      signal.abort(); gizmos?.dispose(); scene.dispose(); assets.dispose()
+      signal.abort(); effectEditor?.dispose(); gizmos?.dispose(); scene.dispose(); assets.dispose()
       ui?.dispose()
     },
   }

@@ -2,6 +2,7 @@ import type { SceneDoc, PrefabLibrary } from './scene'
 import { pomorog } from '../presets/pomorog'
 import { SURFACE_ALPHA } from '../surface'
 import { FOREST_WATER } from '../techniques/water'
+import { parseEffect } from '../fx/validation'
 
 const glyphs = ['screen', 'surface', 'body', 'water', 'particle', 'carpet']
 function fail(path: string, detail: string): never { throw new Error(`Cenário inválido: ${path} ${detail}`) }
@@ -68,10 +69,18 @@ export function parseScene(input: unknown, library?: PrefabLibrary): SceneDoc {
     if (typeof asset.name !== 'string' || typeof asset.source !== 'string' || !asset.source.startsWith('data:')) fail(`assets.${id}`, 'precisa conter nome e fonte incorporada (data URI)')
   }
   const ids = new Set<string>()
+  if (root.effects !== undefined) {
+    const effects = record(root.effects, 'effects')
+    if (Object.keys(effects).length > 256) fail('effects', 'excede 256 efeitos')
+    for (const [key, def] of Object.entries(effects)) {
+      if (!key.startsWith('fx:custom-')) fail(`effects.${key}`, 'precisa de identificador fx:custom-')
+      parseEffect(def)
+    }
+  }
   objects.forEach((raw, i) => {
     const item = record(raw, `objects[${i}]`), path = `objects[${i}]`
     if (typeof item.prefab !== 'string' || !item.prefab) fail(`${path}.prefab`, 'é obrigatório')
-    if (library && !Object.hasOwn(library, item.prefab)) fail(`${path}.prefab`, `não existe: ${item.prefab}`)
+    if (library && !Object.hasOwn(library, item.prefab) && !Object.hasOwn(root.effects ?? {}, item.prefab)) fail(`${path}.prefab`, `não existe: ${item.prefab}`)
     vector(item.position, `${path}.position`, 3)
     if (item.rotation !== undefined) number(item.rotation, `${path}.rotation`)
     if (item.scale !== undefined) number(item.scale, `${path}.scale`, .001, 1000)

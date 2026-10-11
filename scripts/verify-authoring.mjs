@@ -47,6 +47,28 @@ try {
   // Real mouse drag from a library card into the viewport, using the browser's
   // native DataTransfer payload (not a scene API call).
   const mouse = (type, x, y, button = 'none', buttons = 0) => send('Input.dispatchMouseEvent', { type, x, y, button, buttons, clickCount: type === 'mousePressed' || type === 'mouseReleased' ? 1 : 0 })
+  await evaluate(`window.projectPanTarget = () => {
+    const point=engine.scene.children.find(o=>o.userData.sceneId==='object-1').position.clone().project(engine.camera), rect=document.querySelector('canvas').getBoundingClientRect();
+    return {x:rect.x+(point.x+1)*rect.width/2,y:rect.y+(1-point.y)*rect.height/2};
+  }; window.beforePanDoc=JSON.stringify(area.document());`)
+  for (const [angle,zoom] of [[0,.8],[1.5,.45],[-1,1.5]]) {
+    await evaluate(`view.angle=${angle}; view.zoom=${zoom}`); await sleep(2000)
+    for (const [button,buttons,dx,dy] of [['right',2,80,40],['middle',4,-80,-40]]) {
+      const before=await evaluate('projectPanTarget()')
+      const origin=await evaluate(`(()=>{const r=document.querySelector('canvas').getBoundingClientRect(); return {x:r.x+r.width*.7,y:r.y+r.height*.6}})()`)
+      await mouse('mousePressed',origin.x,origin.y,button,buttons)
+      for(let i=1;i<=5;i++) {await mouse('mouseMoved',origin.x+dx*i/5,origin.y+dy*i/5,button,buttons); await sleep(30)}
+      await mouse('mouseReleased',origin.x+dx,origin.y+dy,button); await sleep(100)
+      const after=await evaluate('projectPanTarget()')
+      if (Math.abs(after.x-before.x-dx)>.5 || Math.abs(after.y-before.y-dy)>.5) throw new Error(`Pan does not follow pointer: ${JSON.stringify({angle,zoom,dx,dy,before,after})}`)
+    }
+  }
+  console.log('PASS right/middle pan follows mouse in both directions at three angles and zooms')
+  await check('camera navigation preserves the document', 'JSON.stringify(area.document())===beforePanDoc')
+  await evaluate('view.angle=0; view.zoom=.8'); await sleep(2000)
+  await shot('navegacao-corrigida')
+
+  // Native placement and object transforms must keep working after navigation.
   await send('Input.setInterceptDrags', { enabled: true })
   const dragPoints = await evaluate(`(() => { const card=document.querySelector('[data-prefab="caixa"]').getBoundingClientRect(), canvas=document.querySelector('canvas').getBoundingClientRect(); return {sx:card.x+card.width/2,sy:card.y+25,x:canvas.x+canvas.width*.6,y:canvas.y+canvas.height*.6} })()`)
   await mouse('mouseMoved', dragPoints.sx, dragPoints.sy)
@@ -76,7 +98,7 @@ try {
     await mouse('mouseReleased',handle.x+delta.x,handle.y+delta.y,'left'); await sleep(250)
   }
   await dragXAxis('translate')
-  await check('dragging the X gizmo moves the object, updates inspector and leaves camera still', `area.document().objects[3].position[0] > beforeGizmo[0]+.5 && Math.abs(Number(document.querySelector('[data-field="Posição x"]').value)-area.document().objects[3].position[0])<.01 && JSON.stringify(engine.camera.position.toArray())===JSON.stringify(cameraBefore)`)
+  await check('dragging the X gizmo moves the object, updates inspector and leaves camera still', `area.document().objects[3].position[0] > beforeGizmo[0]+.5 && Math.abs(Number(document.querySelector('[data-field="Posição x"]').value)-area.document().objects[3].position[0])<.01 && engine.camera.position.toArray().every((value,i)=>Math.abs(value-cameraBefore[i])<.001)`)
   await action(`ui('#authoring-toolbar [data-k="undo"]')`)
   await check('gizmo drag is one undo action', 'JSON.stringify(area.document().objects[3].position)===JSON.stringify(beforeGizmo)')
   await dragXAxis('scale')
@@ -183,6 +205,53 @@ try {
   await until('!window.__beforeReload && !!window.area && !!document.querySelector("canvas[data-ready]")')
   await check('browser reload restores IndexedDB draft with style, geometry and weather', `JSON.stringify(area.document()) === ${JSON.stringify(saved)}`)
   await shot('mapa-reaberto')
+  await evaluate(`window.ui = (selector, value) => { const el = document.querySelector(selector); if (!el) throw new Error(selector); if (value === undefined) el.click(); else { el.value = value; el.dispatchEvent(new Event('change')); } }`)
+  const bounds = selector => evaluate(`(()=>{const r=document.querySelector(${JSON.stringify(selector)}).getBoundingClientRect();return {x:r.x,y:r.y,width:r.width,height:r.height}})()`)
+  async function dragPointer(x,y,toX,toY) {
+    await mouse('mouseMoved',x,y); await mouse('mousePressed',x,y,'left',1)
+    for(let i=1;i<=8;i++) {await mouse('mouseMoved',x+(toX-x)*i/8,y+(toY-y)*i/8,'left',1);await sleep(30)}
+    await mouse('mouseReleased',toX,toY,'left'); await sleep(250)
+  }
+  const dockedLibrary=await bounds('#asset-browser'), libraryEdge=await bounds('#asset-browser > .panel-resize')
+  await dragPointer(libraryEdge.x+libraryEdge.width/2,libraryEdge.y+3,libraryEdge.x+libraryEdge.width/2,libraryEdge.y-97)
+  await check('docked library resizes and viewport follows', `document.querySelector('#asset-browser').getBoundingClientRect().height > ${dockedLibrary.height+80} && document.querySelector('canvas').getBoundingClientRect().bottom <= document.querySelector('#asset-browser').getBoundingClientRect().top+1`)
+  await action(`ui('[data-k="create-effect"]'); ui('[data-fx="name"]','Faíscas azuis'); ui('[data-effect-field="Letras / s"]','42'); ui('[data-effect-field="Cor inicial"]','#7799ff')`)
+  await sleep(700)
+  await check('effects tab previews a new effect without modifying the map', `!document.querySelector('#effect-editor').hidden && !area.document().effects && engine.fx.playing.some(e=>e.name==='Faíscas azuis' && e.letters>0)`)
+  await action(`ui('[data-fx="save"]')`)
+  await until('Object.keys(area.document().effects??{}).length===1')
+  await evaluate(`window.customEffectKey=Object.keys(area.document().effects)[0]`)
+  await check('effect form saves its recipe into the document and library', `area.document().effects[customEffectKey].emitters[0].rate===42 && !!document.querySelector('[data-prefab="'+customEffectKey+'"]')`)
+  await shot('aba-efeitos')
+  await action(`ui('[data-fx="place"]')`)
+  await action(`(()=>{const canvas=document.querySelector('canvas'),r=canvas.getBoundingClientRect(); for(const type of ['pointerdown','pointerup'])canvas.dispatchEvent(new PointerEvent(type,{bubbles:true,button:0,clientX:r.x+r.width*.55,clientY:r.y+r.height*.55}))})()`)
+  await check('saved effect is placed as an object with its portable recipe', `area.document().objects.some(o=>o.prefab===customEffectKey) && engine.fx.playing.some(e=>e.name==='Faíscas azuis')`)
+  await evaluate('window.effectDocument=area.document()')
+  await action('await area.openDocument(JSON.parse(JSON.stringify(effectDocument)))')
+  await check('custom effect survives rebuild without a global preset registration', `JSON.stringify(area.document())===JSON.stringify(effectDocument) && engine.fx.playing.some(e=>e.name==='Faíscas azuis') && !engine.fx.library.has('Faíscas azuis')`)
+  await action(`(()=>{const doc=area.document(), item={version:1,objects:[doc.objects.find(o=>o.prefab===customEffectKey)],effects:{[customEffectKey]:doc.effects[customEffectKey]}}, input=document.querySelector('#asset-browser [data-k="insert"]'), transfer=new DataTransfer();transfer.items.add(new File([JSON.stringify(item)],'efeito-item.json'));input.files=transfer.files;input.dispatchEvent(new Event('change'))})()`)
+  await check('inserting an effect item remaps both its recipe and instance', `Object.keys(area.document().effects).length===2 && new Set(area.document().objects.filter(o=>o.prefab.startsWith('fx:custom-')).map(o=>o.prefab)).size===2`)
+  await action('await area.openDocument(effectDocument)')
+  await check('replacing effects releases previous instances', `engine.fx.playing.filter(e=>e.name==='Faíscas azuis').length===1`)
+  await action(`ui('[data-project-tab="effects"]'); ui('[data-fx="json"]','{"name":"inválido","duration":0,"emitters":[]}'); ui('[data-fx="apply"]')`)
+  await check('invalid effect JSON preserves the saved scene', `document.querySelector('.fx-status').textContent.includes('Efeito inválido') && JSON.stringify(area.document())===JSON.stringify(effectDocument)`)
+  await action(`ui('[data-project-tab="assets"]')`)
+  const hierarchy=await bounds('#hierarchy'), heading=await bounds('#hierarchy > .dock-heading')
+  await dragPointer(heading.x+70,heading.y+14,heading.x+400,heading.y+114)
+  await check('dragging a panel title detaches it and frees viewport space', `document.querySelector('#hierarchy').dataset.dock==='floating' && document.querySelector('canvas').getBoundingClientRect().left===0`)
+  const floating=await bounds('#hierarchy'), corner=await bounds('#hierarchy > .panel-resize')
+  await dragPointer(corner.x+8,corner.y+8,corner.x+88,corner.y+48)
+  await check('floating panel can be resized', `document.querySelector('#hierarchy').getBoundingClientRect().width > ${floating.width+60}`)
+  await shot('painel-flutuante')
+  const floatingHeading=await bounds('#hierarchy > .dock-heading'), screen=await evaluate('({width:innerWidth,height:innerHeight})')
+  await dragPointer(floatingHeading.x+70,floatingHeading.y+14,screen.width/2,screen.height-40)
+  await check('panel docks to a different edge and displaces the previous occupant safely', `document.querySelector('#hierarchy').dataset.dock==='bottom' && document.querySelector('#asset-browser').dataset.dock==='floating'`)
+  const layout=await evaluate('localStorage.getItem("ascii-editor-layout-v1")'), finalDoc=await evaluate('JSON.stringify(area.document())')
+  await evaluate('window.__beforeReload=true'); await send('Page.reload')
+  await until('!window.__beforeReload && !!window.area && !!document.querySelector("canvas[data-ready]")')
+  await check('layout and custom effects restore after reloading the browser', `localStorage.getItem('ascii-editor-layout-v1')===${JSON.stringify(layout)} && document.querySelector('#hierarchy').dataset.dock==='bottom' && document.querySelector('#asset-browser').dataset.dock==='floating' && JSON.stringify(area.document())===${JSON.stringify(finalDoc)}`)
+  await evaluate(`document.querySelector('[data-k="reset-layout"]').click()`)
+  await check('restore panels brings every panel back', `document.querySelector('#hierarchy').dataset.dock==='left' && document.querySelector('#asset-browser').dataset.dock==='bottom' && document.querySelector('#authoring-sidebar').dataset.dock==='right'`)
   if (errors.length) throw new Error(errors.join('\n'))
   console.log('PASS no uncaught page exceptions')
 } finally {

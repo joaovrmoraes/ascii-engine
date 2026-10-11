@@ -1,4 +1,5 @@
 import { icon } from './icons'
+import { createPanelLayout } from './layout'
 
 /** Docked editor shell. All controls are wired by the scene controller/main. */
 export function createWorkspace() {
@@ -10,7 +11,7 @@ export function createWorkspace() {
         <details class="editor-menu"><summary>Arquivo</summary><div class="menu-items">
           <button data-k="new">Novo mapa <kbd>terreno</kbd></button><button data-k="item">Novo item <kbd>vazio</kbd></button>
           <label class="file">Abrir documento…<input data-k="open" type="file" accept=".json" hidden></label>
-          <button data-k="save">Salvar arquivo <kbd>Ctrl S</kbd></button><button data-k="export">Exportar para Pomorog…</button>
+          <button data-k="save">Salvar arquivo <kbd>Ctrl S</kbd></button><button data-k="export">Exportar para Pomorog…</button><button data-k="reset-layout">Restaurar painéis</button>
         </div></details>
         <button data-k="undo" title="Desfazer (Ctrl Z)" aria-label="Desfazer">↶</button><button data-k="redo" title="Refazer (Ctrl Shift Z)" aria-label="Refazer">↷</button>
         <span class="document-title"><input data-k="name" aria-label="Nome do documento"><span class="document-kind">Cena visual</span></span>
@@ -18,6 +19,7 @@ export function createWorkspace() {
       </div>
       <div class="main-toolbar">
         <button data-k="library">${icon('plus')} Adicionar objeto</button>
+        <button data-k="create-effect">${icon('spark')} Criar efeito</button>
         <button data-k="save-short">${icon('save')} Salvar</button>
         <div class="preview-controls"><button data-k="preview">${icon('play')} Prévia</button><button data-k="pause" title="Pausar animação" aria-label="Pausar animação">${icon('pause')}</button></div>
         <button data-k="export-short" class="export-action">Exportar ${icon('import')}</button>
@@ -55,13 +57,13 @@ export function createWorkspace() {
       <section data-pane="view" hidden><div class="component-title">Exibição da cena</div><div data-mount="panel"></div></section>
     </aside>
     <section id="asset-browser" aria-label="Biblioteca de objetos">
-      <div class="dock-heading"><span>${icon('folder')} Projeto <span class="subtle">/ Biblioteca</span></span>
+      <div class="dock-heading"><div class="project-tabs"><button data-project-tab="assets">${icon('folder')} Projeto</button><button data-project-tab="effects">${icon('spark')} Efeitos</button></div>
         <div class="asset-actions"><label class="file">${icon('import')} Importar modelo<input data-k="model-import" type="file" multiple accept=".glb,.gltf,.bin,.png,.jpg,.jpeg,.webp" hidden></label><label class="file">Inserir item salvo<input data-k="insert" type="file" accept=".json" hidden></label></div>
       </div>
       <div class="asset-body"><nav data-k="categories" aria-label="Categorias de objetos"></nav><div class="asset-content">
         <div class="asset-search-row"><label class="search-field">${icon('search')}<input data-k="asset-search" type="search" placeholder="Buscar objetos…" aria-label="Buscar objetos"></label><span>Arraste para a cena · ou clique e escolha um ponto</span></div>
         <div data-k="assets" role="list" aria-label="Objetos disponíveis"></div>
-      </div></div>
+      </div></div><section id="effect-editor" hidden></section>
     </section>`
   document.body.append(root)
   root.querySelector('[data-mount="panel"]')!.append(document.getElementById('panel')!)
@@ -76,12 +78,22 @@ export function createWorkspace() {
   }
   sidebar.querySelectorAll<HTMLButtonElement>('[data-tab]').forEach(el => { el.onclick = () => selectPane(el.dataset.tab!) })
   get('[data-k="view"]').onclick = () => selectPane(pane === 'view' ? 'object' : 'view')
+  function showProject(tab: 'assets' | 'effects') {
+    get('#asset-browser .asset-body').hidden = tab !== 'assets'
+    get('#effect-editor').hidden = tab !== 'effects'
+    get('.asset-actions').hidden = tab !== 'assets'
+    root.querySelectorAll<HTMLButtonElement>('[data-project-tab]').forEach(button => { button.classList.toggle('active', button.dataset.projectTab === tab); button.setAttribute('aria-pressed', String(button.dataset.projectTab === tab)) })
+    root.dispatchEvent(new CustomEvent('project-tab', { detail: tab }))
+  }
+  root.querySelectorAll<HTMLButtonElement>('[data-project-tab]').forEach(button => { button.onclick = () => showProject(button.dataset.projectTab as 'assets' | 'effects') })
+  const layout = createPanelLayout(root)
+  get('[data-k="reset-layout"]').onclick = () => layout.reset()
   root.querySelectorAll('.menu-items button, .menu-items label').forEach(el => el.addEventListener('click', () => root.querySelector('details')?.removeAttribute('open')))
-  selectPane('object')
+  selectPane('object'); showProject('assets')
   return {
-    root, toolbar, hierarchy, sidebar, tools: get('#tools'), inspector: get('#object-inspector'), environment: get('#environment-settings'), assets: get('#asset-browser'), get, selectPane,
+    root, toolbar, hierarchy, sidebar, tools: get('#tools'), inspector: get('#object-inspector'), environment: get('#environment-settings'), assets: get('#asset-browser'), effectRoot: get('#effect-editor'), get, selectPane, showProject,
     hint(text: string, cancel = false) { get('[data-k="instruction"]').textContent = text; get('[data-k="cancel"]').hidden = !cancel; get('#scene-hint').classList.toggle('placing', cancel) },
-    dispose() { document.body.append(document.getElementById('panel')!, document.getElementById('selection')!); root.remove(); document.body.classList.remove('authoring', 'previewing') },
+    dispose() { layout.dispose(); document.body.append(document.getElementById('panel')!, document.getElementById('selection')!); root.remove(); document.body.classList.remove('authoring', 'previewing') },
   }
 }
 export type Workspace = ReturnType<typeof createWorkspace>

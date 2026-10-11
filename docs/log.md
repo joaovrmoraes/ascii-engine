@@ -1,5 +1,30 @@
 # Registro de trabalho
 
+## 11/10/2026 — Câmera corrigida, painéis móveis e aba de efeitos
+
+- Pedidos do dono: corrigir navegação da câmera, mover/redimensionar a UI
+  e criar efeitos em uma aba própria. Câmera corrigida por projeção do
+  deslocamento da tela no chão: havia inversão vertical e ganho arbitrário
+  de 1,4. Botão direito/meio acompanha o mouse, sem Ctrl.
+- `editor/layout.ts`: painéis flutuantes, redimensionamento, encaixe nas
+  três bordas, alça de arraste, recuperação de painéis e persistência da
+  disposição em localStorage. Canvas ocupa o espaço liberado.
+- Aba Efeitos junto de Projeto, campos para emissores, cores, forma,
+  movimento, duração e repetição; prévia, bases, salvar/colocar na cena,
+  importar/baixar receita e JSON avançado.
+- `SceneDoc.effects` opcional: validação de receitas e criação de prefabs
+  no núcleo. Runtime aceita uma definição isolada sem sobrescrever presets.
+  Salvar/reabrir/exportar/duplicar e inserir composições preservam receitas.
+- `pnpm check`: 44 testes, tipos e build. `pnpm verify:authoring` passou
+  com os novos fluxos e os anteriores, sem exceções. `pnpm compare` passou
+  nas seis vistas, sem alterar baselines. [Evidências](captures/paineis-efeitos-2026-10-11/README.md).
+- Limites: encaixe de um painel por borda, sem janelas nativas separadas;
+  curvas/linha do tempo gráficas e transformação completa das partículas
+  por escala/rotação ainda pendentes. Nenhum push ou mudança em `reference/`.
+- Próxima correção, relatada pelo dono durante esta etapa: água/reflexos,
+  pincel contínuo de água, prévia do objeto ao colocar, luz dos efeitos e
+  atmosfera. Esses pontos não são considerados resolvidos por esta etapa.
+
 ## 11/10/2026 — Usabilidade: espaço de trabalho inspirado na Unity
 
 - Pedido do dono: a interface estava confusa, especialmente para colocar

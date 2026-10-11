@@ -35,6 +35,8 @@ export { buildScene, emptyScene, generateChunkGrid, rotateConnectors, terrainCov
 export { createEffectSystem, drawableGlyphs, type Curve, type EffectDef, type EffectInstance, type EffectSystem, type EmitterDef, type Gradient, type ShapeDef } from './fx/effects'
 export { imageToGlyphFrame, spriteSheetToFlipbook, gifToFlipbook, videoToFlipbook, type FlipbookData, type GlyphConversion, type PixelSource } from './fx/flipbook'
 export { POMOROG_EFFECTS } from './fx/presets'
+export { parseEffect } from './fx/validation'
+export { createEffectPrefabs } from './fx/prefabs'
 export { parseScene } from './world/validation'
 export { createHistory } from './world/history'
 export { seededRandom } from './world/scene'
