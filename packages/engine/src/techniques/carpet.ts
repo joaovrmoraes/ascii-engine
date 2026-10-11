@@ -31,7 +31,9 @@ export function createCarpet(random: () => number, cover: GroundCover) {
   const texture = new THREE.CanvasTexture(atlas)
   texture.minFilter = THREE.LinearMipmapLinearFilter; texture.magFilter = THREE.LinearFilter; texture.generateMipmaps = true
   const offsets: number[] = [], shapes: number[] = [], colors: number[] = []
-  const extent = cover.extent ?? 26, cx = cover.center?.x ?? 0, cz = cover.center?.z ?? 0
+  // An endless carpet must fill the whole wrap span: Pomorog scattered 26 m
+  // and wrapped 36 m, leaving a 10 m bare band that travelled with the hero.
+  const extent = cover.extent ?? cover.infinite?.span ?? 26, cx = cover.center?.x ?? 0, cz = cover.center?.z ?? 0
   for (let i = 0; i < cover.count; i++) {
     const x = cx + (random() - .5) * extent, z = cz + (random() - .5) * extent
     if (random() > cover.density(x, z)) continue

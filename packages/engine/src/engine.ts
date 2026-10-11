@@ -10,6 +10,7 @@ import { createCarpet, type Carpet, type GroundCover } from './techniques/carpet
 import { createGlyphCloud, type GlyphCloud } from './techniques/particle'
 import { markScreen } from './techniques/screen'
 import { surfaceMaterial } from './techniques/surface'
+import { createWater, type Water, type WaterOptions, type WaterShape } from './techniques/water'
 
 export interface AsciiEngineOptions {
   style?: Partial<AsciiStyle>
@@ -43,6 +44,9 @@ export function createAsciiEngine(canvas: HTMLCanvasElement, options: AsciiEngin
   // The screen pass applies gamma itself.
   renderer.outputColorSpace = THREE.LinearSRGBColorSpace
   renderer.shadowMap.enabled = true; renderer.shadowMap.type = THREE.PCFShadowMap
+  // One standing clip plane, far away except during the water mirror: the
+  // plane count never changes, so materials never switch programs per frame.
+  renderer.clippingPlanes = [new THREE.Plane(new THREE.Vector3(0, 1, 0), 1e9)]
 
   let style: AsciiStyle = { ...pomorog, ...options.style }
   const scene = new THREE.Scene()
@@ -58,7 +62,9 @@ export function createAsciiEngine(canvas: HTMLCanvasElement, options: AsciiEngin
 
   let illumination = createIllumination({ interior: style.interior, obstacles: options.obstacles })
   const bodies = bodyUniforms()
-  const carpets: Carpet[] = [], clouds: GlyphCloud[] = []
+  const carpets: Carpet[] = [], clouds: GlyphCloud[] = [], waters: Water[] = []
+  /** Only the nearest water renders its mirror, within this distance (Pomorog: 11 m). */
+  let reflectionRange = 11
   const entries = new Map<THREE.Object3D, Entry>()
   const types: Record<string, ObjectTypeStyle> = { ...style.types }
 
@@ -131,6 +137,8 @@ export function createAsciiEngine(canvas: HTMLCanvasElement, options: AsciiEngin
     const missing: string[] = []
     const visit = (node: THREE.Object3D, part: string | undefined, nodeStyle: GlyphStyle | undefined) => {
       if (node.userData.glyphBodyOf) return
+      // An object added on its own keeps its own styles (a tree inside a chunk).
+      if (node !== object && entries.has(node)) return
       if (node.name && partNames.has(node.name)) part = node.name
       const own = nodeGlyphStyle(node.userData)
       if (own && node !== object) nodeStyle = { ...nodeStyle, ...own }
@@ -184,7 +192,11 @@ export function createAsciiEngine(canvas: HTMLCanvasElement, options: AsciiEngin
         }
         return
       case 'water':
-        throw new Error('ascii-engine: a técnica water chega na fase 2')
+        for (const mesh of nodes) {
+          if (!waters.some((w) => w.mesh === mesh)) throw new Error('ascii-engine: water precisa vir de engine.createWater()')
+          if (!mesh.parent) scene.add(mesh)
+        }
+        return
     }
   }
 
@@ -219,10 +231,32 @@ export function createAsciiEngine(canvas: HTMLCanvasElement, options: AsciiEngin
       entries.set(object, entry)
       return object
     },
-    remove(object: THREE.Object3D) {
-      const entry = entries.get(object)
-      if (entry) { unapply(entry); entries.delete(object) }
+    /** Takes an object out. `dispose`: free its geometry, materials and letters too. */
+    remove(object: THREE.Object3D, options: { dispose?: boolean } = {}) {
+      // Every object added below this one leaves too (a chunk and its trees).
+      object.traverse((node) => {
+        const entry = entries.get(node)
+        if (entry) { unapply(entry); entries.delete(node) }
+      })
       object.removeFromParent()
+      if (!options.dispose) return
+      const geometries = new Set<THREE.BufferGeometry>(), materials = new Set<THREE.Material>()
+      object.traverse((node) => {
+        if (node instanceof THREE.InstancedMesh) node.dispose()
+        if (node instanceof THREE.Mesh || node instanceof THREE.Points) {
+          if (!node.userData.sharedGeometry) geometries.add(node.geometry)
+          for (const m of Array.isArray(node.material) ? node.material : [node.material]) materials.add(m)
+        }
+        const water = waters.findIndex((w) => w.mesh === node)
+        if (water >= 0) { waters[water].dispose(); waters.splice(water, 1) }
+      })
+      geometries.forEach((g) => g.dispose())
+      for (const m of materials) {
+        if (m.userData.shared) continue
+        const variants = materialCache.get(m)
+        if (variants) { variants.forEach((v) => v.dispose()); materialCache.delete(m) }
+        m.dispose()
+      }
     },
     /** Changes one part of one instance ("only this crown") and re-applies it. */
     setPartStyle(object: THREE.Object3D, part: string, partStyle: GlyphStyle) {
@@ -296,6 +330,14 @@ export function createAsciiEngine(canvas: HTMLCanvasElement, options: AsciiEngin
       camera.position.set(target.x + Math.sin(angle) * 15, target.y + 18, target.z + Math.cos(angle) * 15)
       camera.lookAt(target); camera.updateProjectionMatrix(); camera.updateMatrixWorld()
     },
+    /** A water body (§3.2); add `water.mesh` with `{ glyph: 'water' }`. */
+    createWater(shape: WaterShape, waterOptions?: WaterOptions) {
+      const water = createWater(shape, waterOptions)
+      waters.push(water)
+      return water
+    },
+    get waters() { return waters as readonly Water[] },
+    set reflectionRange(metres: number) { reflectionRange = metres },
     get size() { return { width, height } },
     resize,
 
@@ -321,7 +363,17 @@ export function createAsciiEngine(canvas: HTMLCanvasElement, options: AsciiEngin
       for (const cloud of clouds) cloud.commit(height, camera, style.brightness)
 
       // Draw order (visual-pipeline §2, recreate-from-zero step 10).
+      // The nearest water renders its mirror (the most expensive pass).
+      const near = actors.hero ?? focus
+      let mirror: Water | undefined, best = Infinity
+      for (const water of waters) {
+        water.uniforms.time.value = time
+        if (!water.mesh.parent || !water.look.reflection.enabled) continue
+        const d = water.distance(near.x, near.z)
+        if (d < best) { best = d; mirror = water }
+      }
       renderer.autoClear = true
+      if (mirror && best < reflectionRange) mirror.reflection.render(renderer, scene, camera)
       if (debug.raw) { renderer.setRenderTarget(null); renderer.render(scene, camera); return }
       renderer.setRenderTarget(target); renderer.render(scene, camera)
       renderer.setRenderTarget(null); renderer.render(ascii.scene, ascii.camera)
@@ -334,6 +386,7 @@ export function createAsciiEngine(canvas: HTMLCanvasElement, options: AsciiEngin
       for (const entry of entries.values()) unapply(entry)
       for (const carpet of carpets) carpet.dispose()
       for (const cloud of clouds) cloud.dispose()
+      for (const water of waters) water.dispose()
       for (const byKey of materialCache.values()) for (const m of byKey.values()) m.dispose()
       illumination.dispose(); moon.shadow.dispose(); depth.dispose(); target.dispose(); ascii.dispose(); renderer.dispose()
     },

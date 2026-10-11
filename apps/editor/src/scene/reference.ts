@@ -1,6 +1,7 @@
 import * as THREE from 'three'
 import { createCampfire, forestFloorMaterial, forestMeadowCover, type AsciiEngine, type GlyphStyle } from '@ascii-engine/core'
-import { box, createTraveller, createTree, piece, pomorogKind, rock } from './pomorogKit'
+import { box, createTree, piece, pomorogKind, rock } from './pomorogKit'
+import { createAdventurer } from '../pomorog/models'
 
 /**
  * Phase 1 reference scene (START.md §5): `surface` ground, a crate, a stone
@@ -61,7 +62,8 @@ export function buildReferenceScene(engine: AsciiEngine, screenMode = false, her
   })
 
   // The traveller stays in the approved screen pass.
-  const traveller = createTraveller()
+  const model = createAdventurer()
+  const traveller = { ...model, lantern: model.root.getObjectByName('traveller-lantern')! }
   traveller.root.position.set(-.8, 0, 2.7); traveller.root.rotation.y = heroYaw
   engine.add(traveller.root, { type: 'hero' })
   const lantern = new THREE.PointLight(0xffce83, 7, 9, 1.65); engine.scene.add(lantern)
@@ -79,8 +81,16 @@ export function buildReferenceScene(engine: AsciiEngine, screenMode = false, her
 
   return {
     camp, traveller, trees, carpet, crate, boulder, floor,
+    id: 'reference', title: 'Cena de referência (fase 1)', hero: traveller.root.position, state: 'static',
+    focus(angle: number, target: THREE.Vector3) {
+      target.copy(traveller.root.position); target.y = 1.05
+      target.x -= Math.sin(angle) * 2; target.z -= Math.cos(angle) * 2
+      return target
+    },
+    dispose() {},
     update(time: number) {
       for (const tree of trees) tree.animate(time)
+      traveller.animate({ time, dt: 1 / 60, speed: 0, distance: 0, attackAge: 9, hurtAge: 9 })
       traveller.root.updateMatrixWorld(true)
       traveller.lantern.getWorldPosition(lanternAt); lantern.position.copy(lanternAt); lantern.position.y += .5
       lantern.intensity = 7 + Math.sin(time * 3.7) * .7 + Math.sin(time * 7.3) * .35

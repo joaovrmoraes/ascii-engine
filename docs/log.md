@@ -88,3 +88,71 @@ objeto de cenário passa pela grade de tela.
 - Vagalumes/motas da lanterna (`effects.ts`) não portados.
 - `setPartStyle`/`setTypeStyle` reaplicam a parte inteira (recria a nuvem de
   letras); suficiente para o editor da fase 4, sem otimização.
+
+## 11/10/2026 — Fatia 1: Floresta Sombria
+
+**Estado:** área montada no editor (`?area=dark_forest`, padrão), no nível das
+capturas aprovadas (`procedural-forest-*.png`). Falta a aprovação do dono
+lado a lado.
+
+### Núcleo
+
+- `techniques/water.ts`: água como componente (§3.2). Forma `stream`/`pond`
+  (`waterEdge` em JS e GLSL iguais), aparência como dado (`WaterLook`, preset
+  `FOREST_WATER` com os números do Pomorog: célula .15×.19, fileiras
+  ` .-_~=~-`, espuma ` .,:*+oO`, reflexo com limiar .05 e fileira vazia a cada 4)
+  e reflexo planar 640² convertido em letras por célula. `engine.createWater`
+  e `{ glyph: 'water' }`; só a água mais próxima (< 11 m) renderiza espelho.
+- `world/circuit.ts` (circuito fechado de `trailLoop.ts`) e `world/chunks.ts`
+  (carregamento por distância, −1 a +2, semeado pelo índice).
+- `presets/ambient.ts`: vagalumes, motas da lanterna e poeira de corrida.
+- `engine.remove(obj, { dispose })` libera geometria, materiais, letras e
+  águas, sem tocar peças marcadas como compartilhadas (`userData.shared`,
+  `userData.sharedGeometry`). Objetos adicionados à parte dentro de outro
+  (árvore dentro de um chunk) mantêm seus estilos.
+- **Desempenho:** o reflexo derrubava para 27 fps (36 ms de CPU por quadro).
+  Ligar e desligar o plano de recorte fazia o Three recalcular o programa de
+  ~800 materiais duas vezes por quadro. Agora o engine mantém um plano de
+  recorte fixo, longe da cena, e o reflexo só move esse plano: **60 fps**
+  (o Pomorog media 47 com a mesma técnica).
+- **Correção de fidelidade, com antes/depois:** o tapete infinito do Pomorog
+  espalhava as lâminas em 26 m e dava a volta em 36 m, o que deixava uma faixa
+  de 10 m sem grama andando com o herói (visível em `procedural-forest-600m.png`
+  e em `floresta-antes-faixa-sem-grama.png`). Agora o tapete infinito se espalha
+  pelo vão inteiro, com a quantidade escalada para a mesma densidade
+  (90 000 × (36/26)² ≈ 172 600). O custo medido do tapete foi desprezível.
+
+### Editor
+
+- `src/areas/forest.ts`: porte de `forestWorld.ts` com o circuito, piso de 64 m
+  que segue o herói em passos de 3,4 m, tapete infinito com máscara de solo
+  (trilha, clareira, margens), chunks com árvores (copa `body`, tronco
+  `surface`), pedras de passagem, rochas, destaque (ruína, tronco caído, pedras
+  em pé, cogumelos), lago ou riacho com ponte, pedras e juncos de margem,
+  acampamento em s = 0. As peças declaram a técnica no próprio nó
+  (`userData.glyph`/`glyphStyle`), como um GLTF faria.
+- Viajante animado (`models.ts` copiado em `src/pomorog/`), ritmo da demo
+  (`paceAt`, `solveBaseSpeed`): caçada de 90 s em circuito de 100 m, 30 s na
+  fogueira, partida, em loop.
+- Painel de ajustes ao vivo (semente da fase 4): área, modo (letras, tela,
+  sem passe de tela), tamanho 5–12 px, luz 65–140%, zoom, giro, pausa e captura.
+- URL: `?area=`, `?ascii=`, `?hunt=<s>` (tamanho do circuito), `?at=<m>`
+  (começa mais adiante, para testes), `?camp=1`, `?zoom=`, `?angle=`, `?pause=`.
+
+### Capturas
+
+`floresta-fogueira.png`, `floresta-lago.png`, `floresta-riacho-ponte.png`,
+`floresta-riacho-modo-tela.png` (antes, modo tela) e
+`floresta-antes-faixa-sem-grama.png` (faixa vazia do tapete antes da correção).
+
+### Testes
+
+`pnpm check` verde: 13 testes (novos: circuito fecha sem emenda e acha o
+ponto mais próximo; chunks −1..+2 com volta; forma da água).
+
+### Pendências da Floresta
+
+- Criaturas e combate (lobo, efeitos de golpe) não entram nesta fatia; os
+  modelos já estão copiados em `src/pomorog/`.
+- Recorte de oclusores entre câmera e herói (raycast) não portado.
+- Sem rótulos HTML (nome, vida).

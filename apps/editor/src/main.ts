@@ -1,10 +1,22 @@
 import * as THREE from 'three'
 import { createAsciiEngine, ENGINE_VERSION, pomorogSpan } from '@ascii-engine/core'
+import { createForest } from './areas/forest'
+import type { Area, AreaOptions } from './areas/types'
 import { buildReferenceScene } from './scene/reference'
 import { buildTerrainScene } from './scene/terrain'
+import type { AsciiEngine } from '@ascii-engine/core'
+import { createPanel } from './panel'
 
-// Reference scene of phase 1 (?scene=terrain: relief check). URL: ?ascii=screen (old screen pass), ?ascii=raw (no letters),
-// ?angle=<rad> (extra camera turn), ?zoom=<.75–1.5>, ?pause=<seconds>, ?yaw=<hero turn>.
+/**
+ * ASCII Engine editor. URL: ?area=<id>, ?ascii=screen|raw, ?angle=<rad>,
+ * ?zoom=<.75–1.5>, ?pause=<seconds>, ?camp=1, ?hunt=<seconds>, ?at=<metres>, ?cell=<px>, ?light=<.65–1.4>.
+ */
+export const AREAS: Record<string, { title: string; create: (engine: AsciiEngine, options: AreaOptions) => Area }> = {
+  dark_forest: { title: 'Floresta Sombria', create: createForest },
+  reference: { title: 'Cena de referência', create: (engine, options) => buildReferenceScene(engine, options.screen) },
+  terrain: { title: 'Relevo (teste)', create: (engine) => buildTerrainScene(engine) },
+}
+
 const params = new URLSearchParams(location.search)
 const host = document.getElementById('app')!
 const canvas = document.createElement('canvas')
@@ -12,39 +24,47 @@ canvas.style.width = canvas.style.height = '100%'; canvas.style.display = 'block
 host.appendChild(canvas)
 
 const engine = createAsciiEngine(canvas)
-const screenMode = params.get('ascii') === 'screen'
-engine.debug.raw = params.get('ascii') === 'raw'
-const terrain = params.get('scene') === 'terrain'
-const scene = terrain ? buildTerrainScene(engine) : buildReferenceScene(engine, screenMode, params.has('yaw') ? Number(params.get('yaw')) : undefined)
+const mode = params.get('ascii') ?? 'letters'
+engine.debug.raw = mode === 'raw'
+const areaId = params.get('area') ?? params.get('scene') ?? 'dark_forest'
+const area = (AREAS[areaId] ?? AREAS.dark_forest).create(engine, { screen: mode === 'screen', camp: params.has('camp'), hunt: params.has('hunt') ? Number(params.get('hunt')) : undefined, at: params.has('at') ? Number(params.get('at')) : undefined })
+const view = {
+  angle: Number(params.get('angle') ?? 0), zoom: Number(params.get('zoom') ?? .9),
+  paused: false, pauseAt: params.has('pause') ? Number(params.get('pause')) : Infinity,
+}
+if (params.has('cell')) engine.setStyle({ cellSize: Number(params.get('cell')) })
+if (params.has('light')) engine.setStyle({ brightness: Number(params.get('light')) })
 
-let angle = Number(params.get('angle') ?? 0), drag = 0, dragX = 0, dragging = false
-const zoom = Number(params.get('zoom') ?? .9)
-const pauseAt = params.has('pause') ? Number(params.get('pause')) : Infinity
+let drag = 0, dragX = 0, dragging = false
 canvas.addEventListener('pointerdown', (e) => { dragging = true; dragX = e.clientX - drag / .006; canvas.setPointerCapture(e.pointerId) })
 canvas.addEventListener('pointermove', (e) => { if (dragging) drag = (e.clientX - dragX) * .006 })
 canvas.addEventListener('pointerup', () => { dragging = false })
+canvas.addEventListener('wheel', (e) => { e.preventDefault(); view.zoom = THREE.MathUtils.clamp(view.zoom * Math.exp(-e.deltaY * .001), .75, 1.5) }, { passive: false })
 
+const panel = createPanel({ engine, view, areas: AREAS, areaId, mode, capture: () => captureNext = true })
 const status = document.getElementById('status')!
 const focus = new THREE.Vector3()
-let last = 0, frames = 0, sample = 0, fps = 0
+let last = 0, frames = 0, sample = 0, fps = 0, captureNext = false
+let angle = Math.PI / 7
 function frame(now: number) {
-  const dt = last ? (now - last) / 1000 : 0; last = now
-  const step = engine.time + dt > pauseAt ? Math.max(0, pauseAt - engine.time) : dt
-  const a = Math.PI / 7 + angle + drag
-  const { width, height } = engine.size
-  // Pomorog framing: focus 2 m ahead of the hero, at chest height.
-  if ('traveller' in scene) {
-    focus.copy(scene.traveller.root.position); focus.y = 1.05
-    focus.x -= Math.sin(a) * 2; focus.z -= Math.cos(a) * 2
-  } else focus.copy(scene.focus)
-  engine.frame(focus, pomorogSpan(height, width / height, zoom), a)
-  scene.update(engine.time + step)
-  engine.render(step)
-  frames++
-  if (now - sample > 1000) { fps = Math.round(frames * 1000 / (now - sample)); frames = 0; sample = now }
-  status.textContent = `ascii-engine ${ENGINE_VERSION} · ${terrain ? 'relevo' : 'cena de referência'}${screenMode ? ' (modo tela)' : ''} · ${fps} fps · arraste para girar`
-  canvas.dataset.ready = 'true'
   requestAnimationFrame(frame)
+  if (document.hidden) { last = now; return }
+  const real = last ? (now - last) / 1000 : 0; last = now
+  let dt = view.paused ? 0 : THREE.MathUtils.clamp(real, 0, .08)
+  if (engine.time + dt > view.pauseAt) dt = Math.max(0, view.pauseAt - engine.time)
+  const { width, height } = engine.size
+  angle += (Math.PI / 7 + view.angle + drag - angle) * (1 - Math.exp(-6 * Math.min(real, .1)))
+  if (dt > 0) area.update(engine.time + dt, dt)
+  engine.frame(area.focus(angle, focus), pomorogSpan(height, width / height, view.zoom), angle)
+  engine.render(dt)
+  if (captureNext) { captureNext = false; download(canvas.toDataURL('image/png')) }
+  frames++
+  if (now - sample > 1000) { fps = Math.round(frames * 1000 / (now - sample)); frames = 0; sample = now; panel.refresh() }
+  status.textContent = `ascii-engine ${ENGINE_VERSION} · ${area.title}${mode !== 'letters' ? ` (${mode})` : ''} · ${fps} fps · ${area.state}`
+  canvas.dataset.ready = 'true'; canvas.dataset.state = area.state; canvas.dataset.fps = String(fps)
 }
 requestAnimationFrame(frame)
-Object.assign(window, { engine, referenceScene: scene })
+function download(url: string) {
+  const a = document.createElement('a'); a.href = url; a.download = `${area.id}-${Date.now()}.png`; a.click()
+}
+Object.assign(window, { engine, area, view })

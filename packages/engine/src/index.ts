@@ -18,3 +18,7 @@ export { createGlyphCloud, PARTICLE_GLYPHS, type GlyphCloud } from './techniques
 export { markScreen } from './techniques/screen'
 export { pomorog, pomorogInterior, pomorogSpan, forestMeadowCover, forestFloorMaterial, campClearing, type AsciiStyle } from './presets/pomorog'
 export { createCampfire, POMOROG_FIRE, type HeatGridSpec } from './presets/campfire'
+export { createWater, createWaterReflection, updateReflectionCamera, waterEdge, waterEdgeGLSL, waterLettersGLSL, waterVec4, FOREST_WATER, type Water, type WaterLook, type WaterOptions, type WaterShape } from './techniques/water'
+export { createCircuit, circuitGLSL, type Circuit } from './world/circuit'
+export { createChunkStreamer, type ChunkStreamerOptions } from './world/chunks'
+export { pushFireflies, pushLanternMotes, createDustTrail } from './presets/ambient'

@@ -28,5 +28,9 @@ export function buildTerrainScene(engine: AsciiEngine) {
   const crate = new THREE.Mesh(new THREE.BoxGeometry(.8, .8, .8), new THREE.MeshStandardMaterial({ color: 0x78644c, roughness: 1, flatShading: true }))
   crate.position.set(3, reliefHeight(3, -2) + .35, -2); crate.castShadow = crate.receiveShadow = true
   engine.add(crate, { type: 'prop' })
-  return { focus: new THREE.Vector3(0, 1, 0), update() {} }
+  return {
+    id: 'terrain', title: 'Relevo (teste §3.4)', hero: new THREE.Vector3(100, 0, 100), state: 'static',
+    focus: (_angle: number, target: THREE.Vector3) => target.set(0, 1, 0),
+    update() {}, dispose() {},
+  }
 }
