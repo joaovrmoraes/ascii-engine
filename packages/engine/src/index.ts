@@ -16,3 +16,5 @@ export type GlyphKind =
   | 'water' // água em letras com reflexo
 
 export const ENGINE_VERSION = '0.0.0'
+
+export { SURFACE_ALPHA, SURFACE_TOLERANCE, surfaceAlpha, tagSurface, type SurfaceKind } from './surface'
