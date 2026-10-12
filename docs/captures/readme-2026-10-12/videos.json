@@ -1,0 +1,128 @@
+[
+  {
+    "file": "docs/showcase/videos/01-terrain.mp4",
+    "expectedFrames": 1176,
+    "programs": [],
+    "stream_groups": [],
+    "streams": [
+      {
+        "codec_name": "h264",
+        "width": 1920,
+        "height": 1080,
+        "pix_fmt": "yuv420p",
+        "r_frame_rate": "30/1",
+        "nb_read_frames": "1176"
+      }
+    ],
+    "format": {
+      "duration": "39.200000",
+      "size": "14366072"
+    },
+    "fullDecode": "passed"
+  },
+  {
+    "file": "docs/showcase/videos/02-water.mp4",
+    "expectedFrames": 2540,
+    "programs": [],
+    "stream_groups": [],
+    "streams": [
+      {
+        "codec_name": "h264",
+        "width": 1920,
+        "height": 1080,
+        "pix_fmt": "yuv420p",
+        "r_frame_rate": "30/1",
+        "nb_read_frames": "2540"
+      }
+    ],
+    "format": {
+      "duration": "84.666667",
+      "size": "31416713"
+    },
+    "fullDecode": "passed"
+  },
+  {
+    "file": "docs/showcase/videos/03-objects.mp4",
+    "expectedFrames": 1975,
+    "programs": [],
+    "stream_groups": [],
+    "streams": [
+      {
+        "codec_name": "h264",
+        "width": 1920,
+        "height": 1080,
+        "pix_fmt": "yuv420p",
+        "r_frame_rate": "30/1",
+        "nb_read_frames": "1975"
+      }
+    ],
+    "format": {
+      "duration": "65.833333",
+      "size": "24377839"
+    },
+    "fullDecode": "passed"
+  },
+  {
+    "file": "docs/showcase/videos/04-effects.mp4",
+    "expectedFrames": 2308,
+    "programs": [],
+    "stream_groups": [],
+    "streams": [
+      {
+        "codec_name": "h264",
+        "width": 1920,
+        "height": 1080,
+        "pix_fmt": "yuv420p",
+        "r_frame_rate": "30/1",
+        "nb_read_frames": "2308"
+      }
+    ],
+    "format": {
+      "duration": "76.933333",
+      "size": "15059818"
+    },
+    "fullDecode": "passed"
+  },
+  {
+    "file": "docs/showcase/videos/05-atmosphere.mp4",
+    "expectedFrames": 1933,
+    "programs": [],
+    "stream_groups": [],
+    "streams": [
+      {
+        "codec_name": "h264",
+        "width": 1920,
+        "height": 1080,
+        "pix_fmt": "yuv420p",
+        "r_frame_rate": "30/1",
+        "nb_read_frames": "1933"
+      }
+    ],
+    "format": {
+      "duration": "64.433333",
+      "size": "23861204"
+    },
+    "fullDecode": "passed"
+  },
+  {
+    "file": "docs/showcase/videos/06-camera.mp4",
+    "expectedFrames": 2977,
+    "programs": [],
+    "stream_groups": [],
+    "streams": [
+      {
+        "codec_name": "h264",
+        "width": 1920,
+        "height": 1080,
+        "pix_fmt": "yuv420p",
+        "r_frame_rate": "30/1",
+        "nb_read_frames": "2977"
+      }
+    ],
+    "format": {
+      "duration": "99.233333",
+      "size": "36874970"
+    },
+    "fullDecode": "passed"
+  }
+]

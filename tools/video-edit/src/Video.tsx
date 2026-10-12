@@ -30,12 +30,12 @@ const Card: React.FC<{chapter: Chapter; index: number}> = ({chapter, index}) => 
     <GlyphField color={chapter.color}/>
     <div style={{position: 'absolute', top: 72, left: 96}}><Brand/></div>
     <div style={{position: 'absolute', top: 400, left: 160, opacity: enter, transform: `translateY(${(1-enter)*32}px)`}}>
-      <div style={{...mono, color: chapter.color, fontSize: 26, letterSpacing: 5}}>PARTE {String(index + 1).padStart(2, '0')} / 06</div>
+      <div style={{...mono, color: chapter.color, fontSize: 26, letterSpacing: 5}}>CHAPTER {String(index + 1).padStart(2, '0')} / 06</div>
       <div style={{fontSize: 100, letterSpacing: -4, fontWeight: 700, marginTop: 35}}>{chapter.title}</div>
       <div style={{fontSize: 36, color: muted, marginTop: 30}}>{chapter.subtitle}</div>
       <div style={{height: 4, width: 130 * motion(f, 6, 26), background: chapter.color, marginTop: 58}}/>
     </div>
-    <div style={{position: 'absolute', bottom: 100, left: 160, ...mono, fontSize: 22, color: muted}}>{SCENE_TITLE.toUpperCase()}  /  COMPOSIÇÃO 3D EM ASCII</div>
+    <div style={{position: 'absolute', bottom: 100, left: 160, ...mono, fontSize: 22, color: muted}}>{SCENE_TITLE.toUpperCase()}  /  ASCII 3D COMPOSITION</div>
   </AbsoluteFill>;
 };
 
@@ -62,7 +62,7 @@ const Footage: React.FC<{chapter: Chapter; index: number; graphicsOnly?: boolean
     <div style={{position: 'absolute', top: 1295, left: 72, right: 72, display: 'flex', alignItems: 'center', gap: 30, opacity: graphicsOnly ? 1 : noteMotion, transform: `translateY(${graphicsOnly ? 0 : (1-noteMotion)*12}px)`}}>
       <div style={{width: 5, height: 65, background: chapter.color}}/>
       <div><div style={{fontSize: 30, color: chapter.color, fontWeight: 600}}>{note.title}</div><div style={{fontSize: 25, marginTop: 10, color: muted}}>{note.detail}</div></div>
-      <div style={{marginLeft: 'auto', ...mono, color: muted, fontSize: 18}}>INTERFACE REAL · {chapter.speed.toFixed(2).replace('.', ',')}×</div>
+      <div style={{marginLeft: 'auto', ...mono, color: muted, fontSize: 18}}>LIVE EDITOR · {chapter.speed.toFixed(2)}×</div>
     </div>
     {!graphicsOnly && <div style={{position: 'absolute', bottom: 0, left: 0, height: 4, background: chapter.color, width: 2560 * Math.min(1, f / length)}}/>}
   </AbsoluteFill>;
@@ -89,11 +89,11 @@ export const Bookend: React.FC<{outro?: boolean}> = ({outro = false}) => {
     </div>
     <div style={{position: 'absolute', top: 72, left: 96}}><Brand/></div>
     <div style={{position: 'absolute', left: 125, top: 450, opacity: enter, transform: `translateY(${(1-enter)*28}px)`}}>
-      <div style={{...mono, color:'#b8d591', fontSize:25, letterSpacing:5}}>{outro ? 'MAPA SALVO · CENA EXPORTADA' : 'UMA CENA, DO INÍCIO AO FIM'}</div>
+      <div style={{...mono, color:'#b8d591', fontSize:25, letterSpacing:5}}>{outro ? 'MAP SAVED · SCENE EXPORTED' : 'ONE SCENE, START TO FINISH'}</div>
       <div style={{fontSize: 112, fontWeight: 700, letterSpacing: -5, lineHeight: 1.07, marginTop: 36}}>{SCENE_LINES[0]}<br/>{SCENE_LINES[1]}<span style={{color: '#b8d591'}}>.</span></div>
-      <div style={{fontSize: 33, color: muted, marginTop: 40, maxWidth: 800, lineHeight: 1.5, whiteSpace: 'pre-line'}}>{outro ? 'Terreno, água, efeitos e atmosfera.\nTudo no mesmo projeto.' : 'Da primeira pincelada ao enquadramento final.'}</div>
+      <div style={{fontSize: 33, color: muted, marginTop: 40, maxWidth: 800, lineHeight: 1.5, whiteSpace: 'pre-line'}}>{outro ? 'Terrain, water, effects and atmosphere.\nAll in the same project.' : 'From the first brush stroke to the final frame.'}</div>
     </div>
-    <div style={{position: 'absolute', left: 125, bottom: 95, ...mono, color: muted, fontSize: 21}}>COMPOSIÇÃO 3D EM LETRAS  /  {outro ? 'ASCII ENGINE' : '06 PARTES'}</div>
+    <div style={{position: 'absolute', left: 125, bottom: 95, ...mono, color: muted, fontSize: 21}}>3D COMPOSITION MADE OF LETTERS  /  {outro ? 'ASCII ENGINE' : '06 CHAPTERS'}</div>
   </AbsoluteFill>;
 };
 

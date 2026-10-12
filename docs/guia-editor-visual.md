@@ -1,335 +1,321 @@
-# Editor visual — terrenos, mapas e itens
+# Visual editor — terrain, maps and items
 
-O editor agora abre diretamente em **http://localhost:1440** (`pnpm dev`).
-Esta entrega fecha o fluxo de criar → editar → salvar → reabrir → exportar
-conteúdo visual. Regras e interface do jogo continuam no Pomorog.
+The editor opens at **http://localhost:1440** (`pnpm dev`). This release
+covers create → edit → save → reopen → export for visual content.
+Game rules and game UI remain in Pomorog.
 
-## Onde fica cada coisa
+## Workspace
 
-O espaço de trabalho segue a organização de editores como a Unity:
+The layout follows editors such as Unity:
 
-- **Hierarquia**, à esquerda: objetos que já estão no mapa, com busca.
-- **Cena**, no centro: selecionar, posicionar e transformar com o mouse.
-- **Inspetor**, à direita: nome, transformação e aparência do objeto;
-  abas separadas para **Terreno** e **Ambiente**.
-- **Projeto / Biblioteca**, embaixo: objetos disponíveis, separados em
-  Natureza, Construções, Formas, Efeitos, Atmosferas e Importados, com busca.
-- **Arquivo**, no topo: novo mapa/item, abrir, salvar e exportar.
-  **Exibição**, acima da cena, guarda câmera e ajustes globais.
+- **Hierarchy**, left: searchable objects already in the map.
+- **Scene**, center: mouse selection, placement and transforms.
+- **Inspector**, right: object name, transform and appearance,
+  with separate **Terrain** and **Environment** tabs.
+- **Project / Library**, bottom: searchable assets in Nature, Buildings,
+  Shapes, Effects, Atmospheres and Imported categories.
+- **File**, top: new map/item, open, save and export.
+  **Display**, above the scene, contains camera and global settings.
 
-Para colocar algo, **arraste um objeto da biblioteca até o chão e solte**.
-Ele entra selecionado, com as setas para mover. Também é possível clicar
-no objeto da biblioteca e depois no chão; Shift permite colocar várias
-cópias e Esc cancela a ferramenta.
+To place an asset, **drag it from the library onto the ground and release**.
+It is selected with movement arrows. Alternatively, click an asset and
+then the ground. Shift places multiple copies; Esc cancels placement.
 
-Com o objeto selecionado, use **W** para mover, **E** para girar e **R**
-para escalar; arraste os eixos ou anéis coloridos. Os valores XYZ também
-podem ser digitados no inspetor. **Global/Local** escolhe a orientação dos
-eixos; **Encaixar** usa passos de 0,5 m, 15° e 0,1 na escala. Um arraste
-inteiro conta como uma ação de desfazer. Os controles de transformação
-valem para objetos; água continua sendo ajustada pelos campos do inspetor.
+With an object selected, use **W** to move, **E** to rotate and **R** to
+scale; drag the colored axes/rings. Enter XYZ values in the inspector.
+**Global/Local** selects axis orientation. **Snap** uses 0.5 m, 15° and
+0.1 scale increments. One complete drag is one undo action. Transform
+controls apply to objects; water uses inspector fields.
 
-**Prévia** usa a câmera inicial salva (ou a vista atual, se não houver uma),
-oculta os controles de seleção na cena e desativa os painéis
-de edição até clicar em **Voltar à edição**. O botão ao lado pausa as
-animações. Esta prévia é visual, sem regras de jogo.
+**Preview** uses the saved initial camera, or the current view when none
+is saved. It hides selection controls and disables editing panels until
+**Back to editing**. The adjacent button pauses animation. This is a
+visual preview without game rules.
 
-## Organizar os painéis
+## Arrange panels
 
-- Arraste o **título ou a alça ⠿** de Hierarquia, Inspetor ou Projeto para
-  soltar e mover o painel pela janela.
-- Ao chegar às bordas esquerda, direita ou inferior, uma faixa azul mostra
-  onde o painel vai encaixar. Solte ali. O painel que ocupava esse espaço
-  troca de lugar ou fica flutuante, sem perder o conteúdo.
-- Arraste a **divisória junto à cena** para redimensionar um painel
-  encaixado. Num painel flutuante, use o **canto inferior direito**.
-- **Encaixar** ou duplo clique no título devolve o painel à sua borda
-  original. **Arquivo → Restaurar painéis** recupera a disposição inicial.
+- Drag the **heading or ⠿ handle** of Hierarchy, Inspector or Project
+  to detach and move a panel within the editor window.
+- A blue strip near the left, right or bottom edge shows the docking
+  target. Drop there. The previous occupant swaps positions or floats
+  without losing its content.
+- Drag the **divider beside the scene** to resize a docked panel.
+  Use the **bottom-right corner** for a floating panel.
+- **Dock** or double-click the heading returns a panel to its original
+  edge. **File → Reset panels** restores the initial layout.
 
-Tamanho e posição ficam salvos neste navegador, separados do arquivo do
-mapa. Os painéis ficam dentro da janela do editor; não são janelas nativas
-separadas. A barra superior e a cena permanecem na estrutura principal.
+Panel positions and sizes are saved in this browser, separately from the
+map file. Panels stay inside the editor window; they are not separate
+native windows. The toolbar and scene remain in the main layout.
 
-## Criar um mapa
+## Create a map
 
-1. **Arquivo → Novo mapa** abre um terreno de 32 × 32 m com árvore, pedra e fogueira.
-2. Na aba **Terreno** do inspetor, escolha elevar, baixar, suavizar, aplainar ou pintar.
-   Arraste sobre o chão; cada traço é uma ação de desfazer. Shift inverte
-   elevar/baixar. Aplainar mantém a altura do início do traço.
-3. **Água** é um pincel contínuo: arraste para desenhar canais ou lagos;
-   Shift apaga só água. **Seguir relevo** acompanha a encosta sem achatá-la,
-   com ondulação descendo. **Nível plano (lago)** escava o leito. Selecione
-   a água na hierarquia para ajustar contorno, nível, fluxo e reflexo.
-   Para água antiga, **Adaptar ao relevo** converte seu contorno em máscara
-   sobre o terreno; a conversão é explícita e pode ser desfeita.
-4. Clique no objeto da biblioteca para ver o modelo real na mão, ou
-   arraste-o para o chão. W/E/R fixam a prévia para ajustar o gizmo; Enter
-   coloca a transformação inteira, Esc cancela. A biblioteca inclui árvore,
-   pedras, caixa, ponte, ruína, tronco, formas básicas, fogueira e efeitos.
-5. A lista à esquerda seleciona o objeto inteiro. O inspetor permite
-   renomear, ocultar, mover, girar, escalar, duplicar e excluir.
-6. O primeiro clique no mapa seleciona o objeto. Clique novamente na mesma
-   parte, ou escolha-a na lista **parte** em **Aparência ASCII**, para ajustar
-   técnica, família de letras e tamanho. O escopo pode ser instância, tipo
-   ou global; todas essas camadas entram no arquivo.
-7. **Ambiente → Clima** seleciona chuva/neve. **Estúdio → Atmosfera**
-   abre a tela dedicada de iluminação, cor e névoa. Os ajustes ficam no mapa;
-   não convertem seus objetos ou terreno automaticamente em outro bioma.
+1. **File → New map** opens 32 × 32 m terrain with a tree, rock and campfire.
+2. In the Inspector **Terrain** tab, choose Raise, Lower, Smooth, Flatten
+   or Paint. Drag over the ground; each stroke is one undo action. Shift
+   reverses Raise/Lower. Flatten keeps the height at the start of the stroke.
+3. **Water** is a continuous brush: drag to paint channels/lakes; Shift
+   erases only water. **Follow terrain** follows slopes without flattening,
+   with downhill surface movement. **Flat level (lake)** digs the bed.
+   Select water in the hierarchy to adjust shape, level, flow and reflection.
+   **Fit to terrain** explicitly converts older water shapes to a mask
+   on the terrain; the conversion can be undone.
+4. Click a library asset to hold its actual model, or drag it onto the
+   ground. W/E/R lock the placement preview to adjust the gizmo; Enter
+   places the complete transform and Esc cancels. Assets include trees,
+   rocks, crates, bridges, ruins, logs, basic shapes, campfire and effects.
+5. The hierarchy selects whole objects. Rename, hide, move, rotate,
+   scale, duplicate or delete them in the inspector.
+6. The first scene click selects an object. Click the same part again,
+   or select it from **part** under **ASCII appearance**, to adjust
+   technique, glyph family and size. Scope can be instance, type or
+   global; all layers are saved in the document.
+7. **Environment → Weather** selects rain/snow. **Studio → Atmosphere**
+   opens lighting, color and fog controls. Settings are saved with the
+   map; they do not automatically convert objects or terrain to another biome.
 
-**Orbitar (O)** permite girar em 3D arrastando com o botão esquerdo,
-incluindo inclinar para cima/baixo. **Alt + arraste esquerdo** e
-**Shift + botão do meio** também orbitam. **Isométrica** restaura o ângulo
-original. Botão direito/meio, ferramenta
-**Q** ou Shift + arraste em modo de seleção deslocam o centro; roda
-aproxima/afasta. **F** foca o objeto. **Ctrl D** duplica,
-**Delete** exclui, **Ctrl Z** desfaz e **Ctrl Shift Z** refaz. **Ctrl S**
-baixa o documento. Os atalhos não interceptam a edição de campos de texto.
-Para deslocar a câmera não é preciso Ctrl: segure o botão direito e
-arraste. O mapa acompanha o mouse na mesma direção e distância, incluindo
-o movimento vertical, independentemente do giro ou zoom.
+**Orbit (O)** rotates in 3D with left drag, including up/down tilt.
+**Alt + left drag** and **Shift + middle button** also orbit.
+**Isometric** restores the initial angle. Right/middle drag, **Q** or
+Shift + drag in selection mode pans; scroll zooms. **F** focuses an object.
+**Ctrl D** duplicates, **Delete** removes, **Ctrl Z** undoes,
+**Ctrl Shift Z** redoes and **Ctrl S** downloads the document.
+Shortcuts do not intercept text field editing. Panning needs no Ctrl:
+right drag moves the map with the mouse in the same direction and distance,
+including vertical screen movement, regardless of rotation or zoom.
 
-Os objetos mantêm a altura definida no inspetor quando o terreno muda.
-Ao colocá-los, a altura inicial vem do chão. A grama é regerada ao terminar
-um traço. A máscara de água é local ao seu contorno.
+Objects keep their inspector-defined height when terrain changes.
+Initial placement height comes from the ground. Grass regrows after a
+stroke. A water mask is local to its shape.
 
-## Água: escoamento, reflexos e interação
+## Water: flow, reflections and interaction
 
-Selecione **Água** na hierarquia. **Simular água** ativa a simulação de
-água rasa: profundidade por célula, fluxo entre vizinhos, gravidade e
-resistência. A água desce e acumula nas partes baixas da área pintada.
-**Lâmina inicial** define a quantidade inicial; **Vazão na nascente** repõe
-água nas extremidades altas. Com vazão zero, o domínio conserva volume.
-**Ondulação** controla pequenas ondas de superfície; **Testar ondulação**
-produz um impacto. Objetos movidos dentro da água e atores informados por
-`engine.setActors` geram ondas e rastros.
+Select **Water** in the hierarchy. **Simulate water** enables shallow-water
+simulation: per-cell depth, neighbor flow, gravity and resistance. Water
+moves downhill and accumulates in low parts of the painted area.
+**Initial depth** sets the starting amount; **Source rate** replenishes
+water at high edges. With zero source rate, the domain conserves volume.
+**Wave amplitude** controls small surface waves; **Test waves** creates
+an impact. Moving objects in water and actors supplied through
+`engine.setActors` produce waves and trails.
 
-O visual padrão privilegia lago calmo, com frentes de onda lentas e
-reflexo legível. **Ondulação** também controla o tremor do reflexo e o
-brilho das pequenas ondas. Espuma aparece com agitação, acompanha a
-corrente e desaparece quando a água para; profundidade sozinha não gera
-espuma. O espelho acompanha a altura simulada das partes calmas.
+The default favors a calm lake, slow wave fronts and readable reflections.
+Wave amplitude also controls reflection jitter and small-wave highlights.
+Foam appears with agitation, follows the current and dissipates when the
+water settles; depth alone does not create foam. The mirror follows the
+simulated height of calm regions.
 
-O reflexo de um objeto depende do ângulo da câmera e de sua posição em
-relação à margem. **Orbitar** permite conferir de todos os lados. Ele não
-fica projetado permanentemente embaixo do objeto. O brilho do luar depende
-da câmera, da normal da superfície e da luz principal em
-**Estúdio → Atmosfera → Rotação/Altura da luz**. Cor e intensidade dessa
-luz também afetam o brilho da água.
+An object's reflection depends on camera angle and its position relative
+to the shoreline. Use **Orbit** to inspect every side. Reflections are
+not permanently projected directly beneath objects. Moonlight depends on
+the camera, surface normal and main light under **Studio → Atmosphere →
+Light rotation / Light elevation**. Its color and intensity also affect
+water highlights.
 
-A simulação usa uma grade de altura limitada à área pintada, com até
-129 × 129 células. Não é um fluido volumétrico: expansão automática para
-fora da pintura, respingos balísticos, água sob saliências e flutuação de
-corpos rígidos ainda não existem. Quedas acompanham o relevo; não há cortina
-livre separada do terreno. Partes calmas têm reflexo planar de objetos;
-as encostas recebem o reflexo da luz, evitando copiar um espelho horizontal
-sobre a queda. Partículas do passe separado ainda não entram no espelho.
+The heightfield simulation stays within the painted area, up to 129 × 129
+cells. It is not volumetric: automatic spread beyond the paint, ballistic
+splashes, water beneath overhangs and rigid-body buoyancy are absent.
+Falls follow terrain; no separate free curtain exists. Calm regions have
+planar object reflections; slopes reflect light rather than copying a
+horizontal mirror over the drop. Particles in the separate pass are not
+included in the mirror yet.
 
-O arquivo salva `waters[].physics` e a superfície inicial; as ondas e o
-escoamento reiniciam ao abrir. A simulação não altera o terreno nem grava
-cada quadro no histórico. Pausar congela o movimento.
+The file stores `waters[].physics` and the initial surface; waves/flow
+restart on reopening. Simulation does not modify terrain or write each
+frame to history. Pause freezes movement.
 
-## Criar e reutilizar itens
+## Create and reuse items
 
-**Arquivo → Novo item** abre um documento sem terreno. Monte-o com formas, prefabs
-ou modelos importados, usando posição/rotação/escala. **Salvar arquivo**
-salva a composição toda. **Exportar este item** salva só o objeto
-selecionado, com origem reposicionada para `[0, 0, 0]`.
+**File → New item** opens a document without terrain. Compose shapes,
+prefabs or imported models with position/rotation/scale. **Save file**
+saves the entire composition. **Export this item** saves only the selected
+object with its origin repositioned to `[0, 0, 0]`.
 
-Em outro documento, **Inserir item salvo** acrescenta os objetos do arquivo
-na posição da câmera e incorpora seus modelos/estilos. A composição entra
-como objetos individuais: agrupamento, parentesco e edição vinculada de
-prefabs ainda não existem. **Abrir** substitui o documento inteiro, com a
-possibilidade de desfazer.
+In another document, **Insert saved item** adds file objects near the
+camera and embeds their models/styles. Items enter as individual objects:
+grouping, parenting and linked prefab editing are not implemented yet.
+**Open** replaces the whole document and can be undone.
 
-## Importar modelos
+## Import models
 
-Use **Importar modelo** no topo da biblioteca, ou arraste arquivos sobre o editor:
+Use **Import model** above the library or drop files onto the editor:
 
-- GLB com recursos incorporados;
-- GLTF junto com seus `.bin` e imagens. Selecione todos de uma vez. Recursos
-  ausentes geram uma mensagem; a cena aberta é preservada.
-- Limite atual: 32 MB por arquivo de modelo. A biblioteca e o JSON final
-  podem ser maiores, pois fontes são incorporadas em data URIs.
-- Nós nomeados viram partes. As declarações `glyph`, `glyph_surface` e
-  `glyph_size` do Blender continuam aceitas.
-- Cada instância tem geometria, material e mixer próprios. O inspetor
-  seleciona um clipe ou **Animação parada**. O arquivo salva o clipe, não o
-  instante da reprodução; animações e efeitos reiniciam ao abrir.
+- GLB with embedded assets.
+- GLTF with its `.bin` files and images, selected together. Missing
+  resources show an error while preserving the open scene.
+- Current limit: 32 MB per model file. The library/final JSON may be
+  larger because sources are embedded as data URIs.
+- Named nodes become parts. Blender declarations `glyph`,
+  `glyph_surface` and `glyph_size` are supported.
+- Each instance has its own geometry, material and mixer. Choose a clip
+  or **Animation stopped** in the inspector. Files save the clip rather
+  than playback time; animations/effects restart on reopening.
 
-Não há dependência do caminho do arquivo na máquina após a importação.
-Texturas externas em GLB e formatos que precisam de decodificadores extras
-não foram validados; prefira GLB incorporado ou GLTF com acompanhantes.
+After import, there is no dependency on the machine's original file path.
+External GLB textures and formats requiring additional decoders have not
+been validated; prefer embedded GLB or GLTF with explicit companions.
 
-## Câmeras de composição
+## Composition cameras
 
-**Criar câmera**, na barra superior, captura o enquadramento atual e cria
-um objeto na hierarquia. Se for a primeira câmera, ela se torna a câmera
-inicial do documento. Ao selecioná-la, uma **prévia pequena no canto**
-mostra o enquadramento ao vivo, inclusive enquanto arrasta o gizmo.
-**Ampliar** abre essa vista na cena. Selecione-a para editar:
+**Create camera** captures the current framing and adds a hierarchy object.
+The first camera becomes the document's initial camera. Selecting it shows
+a **small live corner preview**, including during gizmo drags. **Expand**
+opens that camera view in the scene. Available controls:
 
-- **Posição / Rotação** no inspetor, ou **W / E** com o gizmo na cena.
-- **Altura enquadrada** aproxima ou afasta a composição ortográfica.
-- **Formato** escolhe 16:9, 4:3, 1:1 ou 9:16, sem esticar a imagem.
-- **Ver pela câmera** mostra esse enquadramento. **Voltar à navegação**
-  retorna à câmera livre do editor; o enquadramento salvo não muda.
-- **Capturar enquadramento atual** substitui a pose pela vista do editor.
-- **Apontar para o centro da vista** orienta a câmera para o foco atual.
-- **Usar como câmera inicial** escolhe a vista de **Prévia**, player e exportação.
-- **Duplicar câmera** permite testar outro plano sem perder o anterior.
+- **Position / Rotation** fields or **W / E** gizmos.
+- **Frame height** adjusts the orthographic composition's visible extent.
+- **Aspect ratio** selects 16:9, 4:3, 1:1 or 9:16 without stretching.
+- **View through camera** opens the saved framing. **Back to navigation**
+  restores the free editor camera without changing the saved pose.
+- **Capture current framing** replaces the pose with the editor view.
+- **Aim at view center** points the camera toward the current focus.
+- **Use as initial camera** selects the view used by Preview, player and export.
+- **Duplicate camera** lets you try a second shot while retaining the first.
 
-Câmeras podem ser removidas e desfeitas/refeitas. Nome, pose, tamanho e
-proporção acompanham salvar, reabrir, rascunho local e exportação. O ícone
-e o volume de visão são auxiliares do editor; não aparecem no jogo.
-A projeção atual é ortográfica, coerente com o visual do Pomorog;
-não há câmera em perspectiva nem animação de câmera por keyframes ainda.
+Cameras support deletion and undo/redo. Name, pose, size and aspect ratio
+survive save, reopen, local draft and export. The icon/view volume are
+editor helpers and never appear in the game. Projection is orthographic,
+matching Pomorog; perspective and camera keyframes are not implemented.
 
-## Criar efeitos
+## Create effects
 
-1. Clique em **Estúdio → Efeitos**, ou em **Criar efeito** na barra superior.
-   A tela dedicada mostra somente o efeito num espaço vazio. O mapa fica
-   pausado; **Voltar à cena** restaura a vista e os painéis.
-2. Escolha **Fogo, Fumaça, Faíscas, Magia, Explosão ou Raio**, ou use
-   **Começar do zero**. O seletor também lista bases do Pomorog e efeitos
-   salvos. As bases são copiadas, preservando as receitas originais.
-3. Dê um nome e use **Essencial** para ajustar a camada selecionada:
-   quantidade, tamanho das letras, tempo de vida, subida/queda, espalhamento
-   e cor, conforme o tipo. As camadas podem ser adicionadas, duplicadas ou
-   excluídas. **Avançado** abre forma, velocidade XYZ, gravidade, aparência
-   e JSON (curvas, calor e flipbooks).
-   Dê nomes às camadas e posicione sua **Origem X/Y/Z**, ou arraste o
-   gizmo na prévia. **W** mostra o gizmo, **Q** o oculta e **F** enquadra.
-   **Zerar posição** recoloca a camada na origem; o mapa não é alterado.
-4. A prévia atualiza ao editar. **Reiniciar, Pausar, Parar, Enquadrar** e
-   velocidade ficam abaixo da prévia. Arrastar gira; botão direito move;
-   roda aproxima. Efeitos de disparo repetem automaticamente só na prévia.
-5. **Salvar nos Assets** adiciona o efeito à categoria **Efeitos**.
-   **Ver nos Assets** abre essa categoria. **Salvar e colocar na cena**
-   ativa a colocação: clique no chão para criar uma instância.
-   Duplo clique no asset salvo reabre a receita; salvar atualiza esse asset.
-6. **Importar ou baixar arquivo** contém **Baixar efeito** (`.effect.json`)
-   e **Abrir efeito**. Depois de importar, salve para adicionar aos Assets.
+1. Open **Studio → Effects** or **Create effect**. The dedicated screen
+   shows the effect in empty space while the map is paused.
+   **Back to scene** restores the scene and panels.
+2. Choose **Fire, Smoke, Sparks, Magic, Explosion or Lightning**, or
+   **Start from scratch**. The selector also lists Pomorog presets and
+   saved effects. Presets are copied, preserving original recipes.
+3. Name the effect. **Basic** adjusts the selected layer's count, glyph
+   size, lifetime, upward/downward movement, spread and color as applicable.
+   Add, duplicate or delete layers. **Advanced** exposes shape, XYZ
+   velocity, gravity, appearance and JSON for curves, heat and flipbooks.
+   Name layers and set **Origin X/Y/Z**, or drag the preview gizmo.
+   **W** shows the gizmo, **Q** hides it and **F** frames it.
+   **Reset position** returns a layer to the origin without changing the map.
+4. The preview updates as you edit. **Restart, Pause, Stop, Frame** and
+   playback speed sit below it. Drag to orbit, right drag to pan and
+   scroll to zoom. One-shot effects automatically repeat only in the preview.
+5. **Save to Assets** adds the recipe under **Effects**. **Show in Assets**
+   opens that category. **Save and place in scene** starts placement;
+   click the ground to add an instance. Double-click a saved asset to
+   reopen its recipe; saving updates that asset.
+6. **Import or download file** includes **Download effect** (`.effect.json`)
+   and **Open effect**. Save after importing to add it to Assets.
 
-**Ctrl S**, dentro de cada Studio, salva nos Assets (efeito ou atmosfera).
-Os botões ↶/↷ e Ctrl Z/Ctrl Shift Z desfazem/refazem o rascunho do efeito.
-Um arrasto inteiro do gizmo conta como uma ação. O histórico do efeito é
-separado do histórico da cena. Salvar incorpora as posições à receita;
-**Salvar e colocar na cena** permite mover a composição inteira no mapa.
+**Ctrl S** saves to Assets inside either Studio. ↶/↷ and Ctrl Z/Ctrl Shift Z
+undo/redo the effect draft. One full gizmo drag is one action. Effect history
+is separate from scene history. Saving embeds positions in the recipe;
+**Save and place in scene** moves the entire composition in the map.
 
-**Emitir luz** configura a luz pontual que ilumina objetos e grama ao
-colocar o efeito no mapa. O espaço vazio não contém superfícies para
-mostrar essa iluminação.
+**Emit light** configures a point light that illuminates objects and grass
+when placed in the map. Empty-space preview has no surfaces to show that
+lighting.
 
-Os efeitos salvos acompanham salvar, reabrir, desfazer/refazer, exportar o
-mapa e exportar/inserir um item, no campo `SceneDoc.effects`. Uma instância
-segue a posição do objeto; orientação e escala ainda não transformam toda
-a simulação de partículas. Efeitos sem repetição tocam uma vez na cena;
-a repetição automática do estúdio não altera essa configuração.
+Saved effects survive saving, reopening, undo/redo, map export and item
+export/insertion through `SceneDoc.effects`. Instances follow their object
+position; orientation/scale do not transform the whole particle simulation
+yet. Non-looping effects play once in the scene; preview repetition does
+not change this setting.
 
-## Criar atmosferas
+## Create atmospheres
 
-No **Estúdio → Atmosfera**, comece com luar, entardecer ou brasas e ajuste
-exposição, cor das letras, fundo, luz principal (direção/cor/intensidade),
-sombra, luz ambiente, preenchimento e névoa. A prévia usa o mapa aberto.
-Ctrl Z desfaz as alterações da cena.
+In **Studio → Atmosphere**, start with Moonlight, Dusk or Ember and adjust
+exposure, glyph color, background, main light direction/color/intensity,
+shadows, ambient light, fill and fog. Preview uses the open map.
+Ctrl Z undoes scene changes.
 
-Dê um nome e clique em **Salvar nos Assets**. O preset aparece em
-**Assets → Atmosferas**; **Ver nos Assets** abre essa categoria.
-Um clique no asset aplica a iluminação; duplo clique aplica e abre o
-estúdio para editar. Salvar atualiza o mesmo preset; **Salvar cópia** cria
-outro. Os presets ficam em `SceneDoc.atmospheres` e acompanham o arquivo
-do projeto, rascunho local, desfazer/refazer e exportação. A iluminação
-atual continua em `SceneDoc.style`.
+Name it and choose **Save to Assets**. The preset appears under
+**Assets → Atmospheres**; **Show in Assets** opens that category. Click
+an asset to apply lighting; double-click to apply and open the Studio.
+Save updates the same preset; **Save copy** creates another. Presets live
+in `SceneDoc.atmospheres` and survive project files, local draft, undo/redo
+and export. Current lighting remains in `SceneDoc.style`.
 
-**Baixar atmosfera** e **Abrir atmosfera**, dentro de **Importar ou baixar
-arquivo**, transportam o preset em `.atmosphere.json`. Depois de importar,
-use **Salvar nos Assets**. A biblioteca pertence ao documento aberto;
-não é uma biblioteca global compartilhada entre projetos.
+**Download atmosphere** / **Open atmosphere**, under **Import or download
+file**, transfer a preset as `.atmosphere.json`. Save to Assets after
+importing. The library belongs to the open document; it is not a shared
+global library across projects.
 
-## Criar com IA
+## Create with AI
 
-A API e o MCP permitem ler e editar todo o documento visual, importar
-modelos, criar efeitos, esculpir/pintar, controlar atmosfera e exportar.
-Uma prévia da IA mostra **Aplicar/Descartar**; um lote aceito é uma ação
-de desfazer. A IA também pode aplicar diretamente. Cada aba tem uma sessão
-e cada edição tem uma revisão para impedir sobrescrita de alterações novas.
-Veja [conexão, ferramentas e exemplos](api-mcp.md).
+The API/MCP reads and edits the full visual document, imports models,
+creates effects, sculpts/paints, controls atmosphere and exports.
+An AI preview shows **Apply/Discard**; accepting a batch records one
+undo action. An agent may also apply directly. Each tab has a session
+and each edit has a revision to prevent overwriting newer changes.
+See [connection, tools and examples](api-mcp.md).
 
-## Salvar e exportar para o Pomorog
+## Save and export for Pomorog
 
-Há um rascunho automático em **IndexedDB**, por navegador/origem. O topo
-informa sucesso ou falha. O histórico dura a sessão, com até 30 ações e
-64 MB de snapshots; documentos grandes reduzem a quantidade de ações.
-O arquivo baixado é o meio de levar o trabalho entre máquinas.
+A per-browser/origin automatic draft lives in **IndexedDB**. The toolbar
+reports success/failure. History lasts for the session, up to 30 actions
+and 64 MB of snapshots; large documents reduce action count. Downloaded
+files are the way to transfer work between machines.
 
-**Salvar arquivo** (`.ascii.json`) e **Exportar para Pomorog**
-(`.pomorog.json`) contêm o mesmo `SceneDoc` versão 1: nome, terreno pintado,
-água, grama, ambiente, estilos, instâncias com identidades/sementes,
-transformações, assets e receitas de efeitos incorporados. Ambos podem ser abertos neste editor.
+**Save file** (`.ascii.json`) and **Export for Pomorog** (`.pomorog.json`)
+contain the same version 1 `SceneDoc`: name, painted terrain, water, grass,
+environment, styles, instances with identities/seeds, transforms,
+embedded assets and effect recipes. Both reopen in this editor.
 
-O Pomorog ainda precisa de um importador. A exportação não altera nenhum
-checkout do jogo. Prefabs da biblioteca são receitas identificadas por
-nome, não GLBs gerados: o futuro consumidor precisará de
-`apps/editor/src/scene/prefabs.ts` e `pomorogKit.ts`, ou de receitas
-compatíveis. Modelos importados estão incorporados no documento.
+Pomorog still needs an importer. Export does not modify a game checkout.
+Built-in prefabs are named recipes, not generated GLBs: the consumer
+needs `apps/editor/src/scene/prefabs.ts` and `pomorogKit.ts`, or compatible
+recipes. Imported models are embedded in the document. Legacy prefab IDs
+are preserved even though their editor display labels are English.
 
-O contrato de consumo é:
+Consumption contract:
 
 ```ts
 const doc = parseScene(json)
 const assets = await loadSceneAssets(doc)
-const scene = buildScene(engine, doc, { ...prefabsDoJogo, ...assets.library })
-// No loop visual: scene.update(time); engine.render(dt).
-// Ao sair: scene.dispose(); assets.dispose().
+const scene = buildScene(engine, doc, { ...gamePrefabs, ...assets.library })
+// Visual loop: scene.update(time); engine.render(dt).
+// On exit: scene.dispose(); assets.dispose().
 ```
 
-O núcleo não importa a biblioteca do editor nem regras do Pomorog.
-`parseScene` valida antes de alocar; `buildScene` limpa recursos se uma
-construção falhar. No editor, o documento anterior só é descartado após a
-construção da nova cena.
+The core imports neither the editor library nor Pomorog rules.
+`parseScene` validates before allocation; `buildScene` cleans up if
+construction fails. The editor releases the previous document only after
+the new scene is constructed.
 
-Para uma prévia web independente, com runtime e biblioteca incluídos:
+For an independent web preview with runtime/library included:
 
 ```bash
-pnpm export -- --title "Meu mapa" --scene docs/examples/mapa-prova.pomorog.json --out exports/meu-mapa
-python -m http.server 1441 --directory exports/meu-mapa/web
+pnpm export -- --title "My map" --scene docs/examples/mapa-prova.pomorog.json --out exports/my-map
+python -m http.server 1441 --directory exports/my-map/web
 ```
 
-Essa prévia apresenta o visual sem os painéis de autoria. Não é o jogo com
-regras, inventário, missões ou interface.
+This presents visuals without authoring panels. It does not include
+game rules, inventory, quests or game UI.
 
-## Exemplos e validação
+## Examples and validation
 
-- [Mapa com lago e chuva](examples/mapa-prova.pomorog.json): criado no teste
-  de interação; inclui uma copa personalizada.
-- [Item com modelos animados incorporados](examples/item-roundtrip.json):
-  bloco e dois modelos mínimos de teste, GLTF e GLB. Não é arte final.
-- [Câmera, painéis móveis e criação de efeitos](captures/paineis-efeitos-2026-10-11/README.md).
-- [Primeira reorganização do espaço de trabalho](captures/editor-unity-2026-10-11/README.md).
-- [Validação de persistência e exportação](captures/autoria-2026-10-11/README.md).
-- `pnpm check`: tipos, testes unitários e build.
-- Com `pnpm dev` aberto, `pnpm verify:authoring`: teste do editor real no
-  Chromium isolado, incluindo arrastar da biblioteca e mover/girar/escalar
-  pelos eixos com eventos reais de mouse. Saídas em `/tmp/ascii-authoring-verification`; outro
-  diretório pode ser passado como argumento. Requer Chromium instalado.
-- `pnpm compare`: seis vistas contra a base existente, sem atualizá-la.
+- [Lake and rain map](examples/mapa-prova.pomorog.json): created by the
+  interaction check, including a customized crown.
+- [Item with embedded animated models](examples/item-roundtrip.json):
+  a block and two minimal GLTF/GLB test models, not finished art.
+- [Cameras, movable panels and effect creation](captures/paineis-efeitos-2026-10-11/README.md).
+- [Initial workspace rearrangement](captures/editor-unity-2026-10-11/README.md).
+- [Persistence/export validation](captures/autoria-2026-10-11/README.md).
+- `pnpm check`: types, unit tests and build.
+- With `pnpm dev` running, `pnpm verify:authoring` exercises the real editor
+  in isolated Chromium, including library drag/drop and axis move/rotate/scale
+  with native mouse events. Output: `/tmp/ascii-authoring-verification`,
+  or an explicit directory argument. Requires Chromium.
+- `pnpm compare`: six views against the existing baseline, without updating it.
 
-## O que ainda não está completo
+## Still incomplete
 
-Esta é uma base funcional de autoria visual, não a conclusão de todos os
-sistemas previstos em `START.md`. Permanecem: seleção múltipla e agrupamento,
-biblioteca de prefabs compostos vinculados, editor de chunks com costuras e
-conectores, paleta completa dos cinco biomas, mar/cachoeira/rios por spline,
-pincéis avançados, curvas e linha do tempo gráficas para efeitos, ajustes completos de
-alfabeto/cor/espaçamento por parte e a integração real do jogo. As cinco
-áreas existentes continuam como referências montadas em código.
+This is a working visual authoring base, not every system in `START.md`.
+Outstanding: multiple selection/grouping, linked compound prefabs,
+chunk editing with seams/connectors, the full five-biome palette,
+sea/waterfall/spline rivers, advanced brushes, graphical effect curves
+and timeline, complete per-part alphabet/color/spacing controls and real
+game integration. Existing areas remain code-built references.
 
-A chuva/neve do editor reaproveita as receitas visuais, mas ainda não inclui
-as interações completas de pegadas, acumulação, derretimento e anéis do
-pântano. Objetos/efeitos e terreno podem se sobrepor; a autoria não aplica
-colisões nem regras de posicionamento. O encaixe dos painéis oferece uma
-região por borda; ainda não há divisão arbitrária em várias colunas nem
-agrupamento de todos os painéis em abas.
-O app nativo Tauri e mobile não foram validados nesta entrega.
-A aprovação de equivalência integral com o Pomorog continua
-pendente.
+Editor rain/snow reuse visual recipes but not all footprint, accumulation,
+melting and marsh-ring interactions. Objects, effects and terrain can overlap;
+authoring does not enforce collision or placement rules. Panel docking
+provides one region per edge; arbitrary column splits and universal tab
+groups remain unavailable. Native Tauri/mobile were not validated in this
+release. Full visual equivalence approval against Pomorog is still pending.

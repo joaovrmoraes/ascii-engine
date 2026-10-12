@@ -34,7 +34,7 @@ try {
     return response.result?.value
   }
   const until = async expression => { for (let i = 0; i < 150; i++) { if (await evaluate(expression)) return; await sleep(100) }; throw new Error(`Timed out: ${expression}`) }
-  const action = async expression => { await evaluate(`(async () => { ${expression} })()`); await until('window.area && !area.state.includes("abrindo")'); await sleep(200) }
+  const action = async expression => { await evaluate(`(async () => { ${expression} })()`); await until('window.area && !area.state.includes("opening")'); await sleep(200) }
   const check = async (title, expression) => { if (!await evaluate(expression)) throw new Error(`FAIL: ${title}`); console.log(`PASS ${title}`) }
   const shot = async name => { await sleep(500); const result = await send('Page.captureScreenshot', { format: 'png' }); await writeFile(join(output, name + '.png'), Buffer.from(result.data, 'base64')) }
   await send('Runtime.enable'); await send('Page.enable'); await send('Emulation.setFocusEmulationEnabled', { enabled: true })
@@ -98,7 +98,7 @@ try {
     await mouse('mouseReleased',handle.x+delta.x,handle.y+delta.y,'left'); await sleep(250)
   }
   await dragXAxis('translate')
-  await check('dragging the X gizmo moves the object, updates inspector and leaves camera still', `area.document().objects[3].position[0] > beforeGizmo[0]+.5 && Math.abs(Number(document.querySelector('[data-field="Posição x"]').value)-area.document().objects[3].position[0])<.01 && engine.camera.position.toArray().every((value,i)=>Math.abs(value-cameraBefore[i])<.001)`)
+  await check('dragging the X gizmo moves the object, updates inspector and leaves camera still', `area.document().objects[3].position[0] > beforeGizmo[0]+.5 && Math.abs(Number(document.querySelector('[data-field="Position x"]').value)-area.document().objects[3].position[0])<.01 && engine.camera.position.toArray().every((value,i)=>Math.abs(value-cameraBefore[i])<.001)`)
   await action(`ui('#authoring-toolbar [data-k="undo"]')`)
   await check('gizmo drag is one undo action', 'JSON.stringify(area.document().objects[3].position)===JSON.stringify(beforeGizmo)')
   await dragXAxis('scale')
@@ -132,7 +132,7 @@ try {
   await action(`ui('#authoring-toolbar [data-k="preview"]'); ui('[data-mode="translate"]'); ui('#authoring-toolbar [data-k="undo"]')`)
   await check('undo also removes the dropped object', 'area.document().objects.length===3')
 
-  await action(`ui('#hierarchy [data-object-id="object-2"]'); ui('[data-field="Posição x"]', '-2.5')`)
+  await action(`ui('#hierarchy [data-object-id="object-2"]'); ui('[data-field="Position x"]', '-2.5')`)
   await check('transform edited in inspector is serialized', 'area.document().objects[1].position[0] === -2.5')
   await action(`ui('#selection [data-k="part"]', 'crown'); ui('#selection [data-k="size"]', '.24'); ui('#selection [data-k="apply"]')`)
   await check('part style is serialized', 'area.document().objects[1].options.parts.crown.size === .24')
@@ -157,10 +157,10 @@ try {
   // A minimal animated glTF with a companion .bin, then the same asset as GLB.
   await evaluate(`window.makeModel = () => {
     const buffer = new Float32Array([-.5,0,0, .5,0,0, 0,1,0, 0,1, 0,0,0, 0,.5,0]);
-    const json = {asset:{version:'2.0'},scene:0,scenes:[{nodes:[0]}],nodes:[{name:'blade',mesh:0}],meshes:[{primitives:[{attributes:{POSITION:0},material:0}]}],materials:[{pbrMetallicRoughness:{baseColorFactor:[.8,.6,.3,1],metallicFactor:0,roughnessFactor:1},doubleSided:true}],buffers:[{uri:'item.bin',byteLength:buffer.byteLength}],bufferViews:[{buffer:0,byteOffset:0,byteLength:36},{buffer:0,byteOffset:36,byteLength:8},{buffer:0,byteOffset:44,byteLength:24}],accessors:[{bufferView:0,componentType:5126,count:3,type:'VEC3',min:[-.5,0,0],max:[.5,1,0]},{bufferView:1,componentType:5126,count:2,type:'SCALAR',min:[0],max:[1]},{bufferView:2,componentType:5126,count:2,type:'VEC3'}],animations:[{name:'Flutuar',channels:[{sampler:0,target:{node:0,path:'translation'}}],samplers:[{input:1,output:2}]}]}; return {json,buffer}; }
+    const json = {asset:{version:'2.0'},scene:0,scenes:[{nodes:[0]}],nodes:[{name:'blade',mesh:0}],meshes:[{primitives:[{attributes:{POSITION:0},material:0}]}],materials:[{pbrMetallicRoughness:{baseColorFactor:[.8,.6,.3,1],metallicFactor:0,roughnessFactor:1},doubleSided:true}],buffers:[{uri:'item.bin',byteLength:buffer.byteLength}],bufferViews:[{buffer:0,byteOffset:0,byteLength:36},{buffer:0,byteOffset:36,byteLength:8},{buffer:0,byteOffset:44,byteLength:24}],accessors:[{bufferView:0,componentType:5126,count:3,type:'VEC3',min:[-.5,0,0],max:[.5,1,0]},{bufferView:1,componentType:5126,count:2,type:'SCALAR',min:[0],max:[1]},{bufferView:2,componentType:5126,count:2,type:'VEC3'}],animations:[{name:'Float',channels:[{sampler:0,target:{node:0,path:'translation'}}],samplers:[{input:1,output:2}]}]}; return {json,buffer}; }
   `)
   await evaluate(`(async () => { const {json,buffer} = makeModel(); await area.importFiles([new File([JSON.stringify(json)],'item.gltf'), new File([buffer],'item.bin')]); })()`)
-  await check('GLTF embeds companion buffer and registers animation', 'Object.values(area.document().assets).some(a=>a.name==="item.gltf") && engine.scene.children.some(o=>o.userData.animationClips?.includes("Flutuar"))')
+  await check('GLTF embeds companion buffer and registers animation', 'Object.values(area.document().assets).some(a=>a.name==="item.gltf") && engine.scene.children.some(o=>o.userData.animationClips?.includes("Float"))')
   await evaluate(`(async () => {
     const {json,buffer} = makeModel(); delete json.buffers[0].uri;
     const text = new TextEncoder().encode(JSON.stringify(json)); const length = Math.ceil(text.length/4)*4, glb = new ArrayBuffer(12+8+length+8+buffer.byteLength), view = new DataView(glb), bytes = new Uint8Array(glb);
@@ -195,7 +195,7 @@ try {
   await action(`ui('[data-brush="water"]'); ui('[data-k="water-mode"]','level')`)
   await action(`(() => { const canvas = document.querySelector('canvas'), rect = canvas.getBoundingClientRect(); for(const type of ['pointerdown','pointerup']) canvas.dispatchEvent(new PointerEvent(type,{bubbles:true,button:0,clientX:rect.left+rect.width*.68,clientY:rect.top+rect.height*.57})); })()`)
   await check('flat water brush carves and creates editable water', 'area.document().waters.length === 1 && area.document().terrain.heights.some(h=>h<0)')
-  await action(`ui('[data-mode="translate"]'); ui('#authoring-toolbar [data-k="name"]', 'Mapa de prova'); ui('#environment-settings [data-k="weather"]', 'rain')`)
+  await action(`ui('[data-mode="translate"]'); ui('#authoring-toolbar [data-k="name"]', 'Map de prova'); ui('#environment-settings [data-k="weather"]', 'rain')`)
   await shot('mapa-com-lago')
   await evaluate('window.saved = JSON.stringify(area.document())')
   const saved = await evaluate('saved')
@@ -215,9 +215,9 @@ try {
   const dockedLibrary=await bounds('#asset-browser'), libraryEdge=await bounds('#asset-browser > .panel-resize')
   await dragPointer(libraryEdge.x+libraryEdge.width/2,libraryEdge.y+3,libraryEdge.x+libraryEdge.width/2,libraryEdge.y-97)
   await check('docked library resizes and viewport follows', `document.querySelector('#asset-browser').getBoundingClientRect().height > ${dockedLibrary.height+80} && document.querySelector('canvas').getBoundingClientRect().bottom <= document.querySelector('#asset-browser').getBoundingClientRect().top+1`)
-  await action(`ui('[data-k="create-effect"]'); ui('[data-fx="name"]','Faíscas azuis'); ui('[data-fx-mode="advanced"]'); ui('[data-effect-field="Letras / s"]','42'); ui('[data-effect-field="Cor inicial"]','#7799ff')`)
+  await action(`ui('[data-k="create-effect"]'); ui('[data-fx="name"]','Sparks azuis'); ui('[data-fx-mode="advanced"]'); ui('[data-effect-field="Glyphs / s"]','42'); ui('[data-effect-field="Start color"]','#7799ff')`)
   await sleep(700)
-  await check('effects tab previews a new effect without modifying the map', `!document.querySelector('#effect-editor').hidden && !area.document().effects && !engine.fx.playing.some(e=>e.name==='Faíscas azuis') && Number(document.querySelector('#effect-preview canvas').dataset.letters)>0 && getComputedStyle(document.querySelector('#app > canvas')).visibility==='hidden'`)
+  await check('effects tab previews a new effect without modifying the map', `!document.querySelector('#effect-editor').hidden && !area.document().effects && !engine.fx.playing.some(e=>e.name==='Sparks azuis') && Number(document.querySelector('#effect-preview canvas').dataset.letters)>0 && getComputedStyle(document.querySelector('#app > canvas')).visibility==='hidden'`)
   await action(`ui('[data-fx="save"]')`)
   await until('Object.keys(area.document().effects??{}).length===1')
   await evaluate(`window.customEffectKey=Object.keys(area.document().effects)[0]`)
@@ -235,43 +235,43 @@ try {
   await shot('aba-efeitos')
   await action(`ui('[data-fx="place"]')`)
   await action(`(()=>{const canvas=document.querySelector('canvas'),r=canvas.getBoundingClientRect(); for(const type of ['pointerdown','pointerup'])canvas.dispatchEvent(new PointerEvent(type,{bubbles:true,button:0,clientX:r.x+r.width*.55,clientY:r.y+r.height*.55}))})()`)
-  await check('saved effect is placed as an object with its portable recipe', `area.document().objects.some(o=>o.prefab===customEffectKey) && engine.fx.playing.some(e=>e.name==='Faíscas azuis')`)
+  await check('saved effect is placed as an object with its portable recipe', `area.document().objects.some(o=>o.prefab===customEffectKey) && engine.fx.playing.some(e=>e.name==='Sparks azuis')`)
   await evaluate('window.effectDocument=area.document()')
   await action('await area.openDocument(JSON.parse(JSON.stringify(effectDocument)))')
-  await check('custom effect survives rebuild without a global preset registration', `JSON.stringify(area.document())===JSON.stringify(effectDocument) && engine.fx.playing.some(e=>e.name==='Faíscas azuis') && !engine.fx.library.has('Faíscas azuis')`)
+  await check('custom effect survives rebuild without a global preset registration', `JSON.stringify(area.document())===JSON.stringify(effectDocument) && engine.fx.playing.some(e=>e.name==='Sparks azuis') && !engine.fx.library.has('Sparks azuis')`)
   await action(`(()=>{const doc=area.document(), item={version:1,objects:[doc.objects.find(o=>o.prefab===customEffectKey)],effects:{[customEffectKey]:doc.effects[customEffectKey]}}, input=document.querySelector('#asset-browser [data-k="insert"]'), transfer=new DataTransfer();transfer.items.add(new File([JSON.stringify(item)],'efeito-item.json'));input.files=transfer.files;input.dispatchEvent(new Event('change'))})()`)
   await check('inserting an effect item remaps both its recipe and instance', `Object.keys(area.document().effects).length===2 && new Set(area.document().objects.filter(o=>o.prefab.startsWith('fx:custom-')).map(o=>o.prefab)).size===2`)
   await action('await area.openDocument(effectDocument)')
-  await check('replacing effects releases previous instances', `engine.fx.playing.filter(e=>e.name==='Faíscas azuis').length===1`)
-  await action(`ui('[data-project-tab="studio"]'); ui('[data-studio-tab="effects"]'); ui('[data-fx="json"]','{"name":"inválido","duration":0,"emitters":[]}'); ui('[data-fx="apply"]')`)
-  await check('invalid effect JSON preserves the saved scene', `document.querySelector('.fx-status').textContent.includes('Efeito inválido') && JSON.stringify(area.document())===JSON.stringify(effectDocument)`)
+  await check('replacing effects releases previous instances', `engine.fx.playing.filter(e=>e.name==='Sparks azuis').length===1`)
+  await action(`ui('[data-project-tab="studio"]'); ui('[data-studio-tab="effects"]'); ui('[data-fx="json"]','{"name":"invalid","duration":0,"emitters":[]}'); ui('[data-fx="apply"]')`)
+  await check('invalid effect JSON preserves the saved scene', `document.querySelector('.fx-status').textContent.includes('Invalid effect') && JSON.stringify(area.document())===JSON.stringify(effectDocument)`)
   await action(`ui('[data-project-tab="assets"]')`)
-  await action(`ui('[data-project-tab="studio"]'); ui('[data-studio-tab="atmosphere"]'); ui('[data-studio="preset"]','dusk'); ui('[data-studio="name"]','Entardecer salvo'); ui('[data-studio-field="Intensidade principal"]','2.75'); ui('[data-studio="save"]')`)
+  await action(`ui('[data-project-tab="studio"]'); ui('[data-studio-tab="atmosphere"]'); ui('[data-studio="preset"]','dusk'); ui('[data-studio="name"]','Dusk salvo'); ui('[data-studio-field="Main intensity"]','2.75'); ui('[data-studio="save"]')`)
   await until('Object.keys(area.document().atmospheres??{}).length===1')
   await evaluate(`window.atmosphereKey=Object.keys(area.document().atmospheres)[0]; window.savedAtmosphere=area.document().atmospheres[atmosphereKey]`)
-  await check('atmosphere save creates a named asset immediately', `savedAtmosphere.name==='Entardecer salvo' && savedAtmosphere.style.moon.intensity===2.75 && !!document.querySelector('[data-atmosphere="'+atmosphereKey+'"]')`)
+  await check('atmosphere save creates a named asset immediately', `savedAtmosphere.name==='Dusk salvo' && savedAtmosphere.style.moon.intensity===2.75 && !!document.querySelector('[data-atmosphere="'+atmosphereKey+'"]')`)
   await shot('atmosfera-salva')
-  await action(`ui('[data-studio-field="Intensidade principal"]','3.5'); ui('[data-studio="save"]')`)
+  await action(`ui('[data-studio-field="Main intensity"]','3.5'); ui('[data-studio="save"]')`)
   await check('editing an atmosphere updates the same asset', `Object.keys(area.document().atmospheres).length===1 && area.document().atmospheres[atmosphereKey].style.moon.intensity===3.5`)
   await action(`await area.authoring.undo()`)
   await check('undo restores the previous atmosphere asset', `area.document().atmospheres[atmosphereKey].style.moon.intensity===2.75`)
   await action(`await area.authoring.undo(true)`)
   await check('redo restores the updated atmosphere asset', `area.document().atmospheres[atmosphereKey].style.moon.intensity===3.5`)
   await action(`ui('[data-studio="reveal"]')`)
-  await check('view assets opens the Atmosferas category', `!document.body.classList.contains('studio-mode') && document.querySelector('[data-k="categories"] .active').textContent.includes('Atmosferas') && document.querySelector('[data-atmosphere="'+atmosphereKey+'"]')`)
+  await check('view assets opens the Atmospheres category', `!document.body.classList.contains('studio-mode') && document.querySelector('[data-k="categories"] .active').textContent.includes('Atmospheres') && document.querySelector('[data-atmosphere="'+atmosphereKey+'"]')`)
   await shot('assets-atmosfera')
   await action(`ui('#environment-settings [data-k="atmosphere"]','moon'); ui('[data-atmosphere="'+atmosphereKey+'"]')`)
   await check('atmosphere asset applies its lighting to the open scene', `engine.style.moon.intensity===3.5 && engine.style.atmosphere==='dusk'`)
   await action(`document.querySelector('[data-atmosphere="'+atmosphereKey+'"]')?.dispatchEvent(new MouseEvent('dblclick'))`)
-  await check('double click reopens a named atmosphere for editing', `document.body.classList.contains('studio-mode') && document.querySelector('[data-studio="name"]').value==='Entardecer salvo'`)
+  await check('double click reopens a named atmosphere for editing', `document.body.classList.contains('studio-mode') && document.querySelector('[data-studio="name"]').value==='Dusk salvo'`)
   await action(`ui('[data-studio="copy"]')`)
   await check('save copy creates a separate atmosphere resource', `Object.keys(area.document().atmospheres).length===2`)
   await action(`ui('[data-project-tab="assets"]'); ui('[data-k="library"]')`)
   const effectCard = await evaluate(`(()=>{const card=document.querySelector('[data-prefab="'+customEffectKey+'"]');card.scrollIntoView({block:'center'});const r=card.getBoundingClientRect();return {x:r.x+r.width/2,y:r.y+r.height/2}})()`)
   for (const clickCount of [1,2]) for (const type of ['mousePressed','mouseReleased']) await send('Input.dispatchMouseEvent', { type, ...effectCard, button: 'left', buttons: type==='mousePressed'?1:0, clickCount })
   await sleep(300)
-  await check('double click reopens a saved effect in the void', `document.body.classList.contains('effect-studio-active') && document.querySelector('[data-fx="name"]').value==='Faíscas azuis' && Number(document.querySelector('#effect-preview canvas').dataset.letters)>0`)
-  await action(`(()=>{const slider=document.querySelector('[data-quick="Quantidade por segundo"]');slider.value='65';slider.dispatchEvent(new Event('input'))})()`)
+  await check('double click reopens a saved effect in the void', `document.body.classList.contains('effect-studio-active') && document.querySelector('[data-fx="name"]').value==='Sparks azuis' && Number(document.querySelector('#effect-preview canvas').dataset.letters)>0`)
+  await action(`(()=>{const slider=document.querySelector('[data-quick="Count per second"]');slider.value='65';slider.dispatchEvent(new Event('input'))})()`)
   await action(`ui('[data-fx="save"]')`)
   await check('essential slider edits persist in the reusable recipe', `area.document().effects[customEffectKey].emitters[0].rate===65`)
   await check('saving the reopened effect updates instead of duplicating', `Object.keys(area.document().effects).length===1`)

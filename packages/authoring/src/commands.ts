@@ -6,7 +6,7 @@ export function mergeJson(base: unknown, patch: unknown): unknown {
   if (!patch || typeof patch !== 'object' || Array.isArray(patch)) return structuredClone(patch)
   const result: Record<string, unknown> = base && typeof base === 'object' && !Array.isArray(base) ? { ...base } : {}
   for (const [key, value] of Object.entries(patch)) {
-    if (['__proto__', 'constructor', 'prototype'].includes(key)) throw new Error('Chave reservada: ' + key)
+    if (['__proto__', 'constructor', 'prototype'].includes(key)) throw new Error('Reserved key: ' + key)
     result[key] = mergeJson(result[key], value)
   }
   return result
@@ -38,8 +38,8 @@ export function applyCommands(source: SceneDoc, input: unknown): SceneDoc {
   assertSafeJson(input)
   let doc = parseScene(source)
   const commands = batchSchema.parse(input)
-  const object = (id: string) => { const value = doc.objects.find(o => o.id === id); if (!value) throw new Error('Objeto inexistente: ' + id); return value }
-  const water = (index: number) => { const value = doc.waters?.[index]; if (!value) throw new Error('Água inexistente: ' + index); return value }
+  const object = (id: string) => { const value = doc.objects.find(o => o.id === id); if (!value) throw new Error('Object not found: ' + id); return value }
+  const water = (index: number) => { const value = doc.waters?.[index]; if (!value) throw new Error('Water not found: ' + index); return value }
   for (const cmd of commands) {
     switch (cmd.op) {
       case 'scene.replace': doc = parseScene(cmd.document); break
@@ -50,15 +50,15 @@ export function applyCommands(source: SceneDoc, input: unknown): SceneDoc {
       case 'object.add': doc.objects.push({ ...cmd.object, id: cmd.object.id ?? crypto.randomUUID() } as PlacedObject); break
       case 'object.update': {
         const old = object(cmd.id)
-        if (cmd.patch.id && cmd.patch.id !== cmd.id) throw new Error('object.update preserva o id; crie outro objeto para mudar a identidade.')
+        if (cmd.patch.id && cmd.patch.id !== cmd.id) throw new Error('object.update preserves the id; create another object to change its identity.')
         doc.objects[doc.objects.indexOf(old)] = mergeJson(old, cmd.patch) as PlacedObject
         break
       }
       case 'object.remove': cmd.ids.forEach(object); doc.objects = doc.objects.filter(o => !cmd.ids.includes(o.id!)); break
       case 'object.scatter': {
         const { minX, maxX, minZ, maxZ } = cmd.bounds, range = cmd.scale ?? [1, 1], random = seededRandom(cmd.seed)
-        if (minX > maxX || minZ > maxZ || range[0] > range[1]) throw new Error('Limites invertidos na dispersão.')
-        if (doc.objects.length + cmd.count > 20000) throw new Error('Limite de 20000 objetos.')
+        if (minX > maxX || minZ > maxZ || range[0] > range[1]) throw new Error('Inverted scatter bounds.')
+        if (doc.objects.length + cmd.count > 20000) throw new Error('20000 object limit.')
         const terrain = doc.terrain ? createTerrain(doc.terrain) : undefined
         try { for (let i = 0; i < cmd.count; i++) {
           const x = minX + random() * (maxX - minX), z = minZ + random() * (maxZ - minZ)
@@ -68,25 +68,25 @@ export function applyCommands(source: SceneDoc, input: unknown): SceneDoc {
       }
       case 'terrain.create': doc.terrain = createTerrainData(cmd.size, cmd.resolution); followTerrain(doc); break
       case 'terrain.stroke': {
-        if (!doc.terrain) throw new Error('A cena não tem terreno.')
+        if (!doc.terrain) throw new Error('The scene has no terrain.')
         const terrain = createTerrain(doc.terrain)
         try { for (const stroke of cmd.strokes) {
-          if (stroke.brush === 'paint' && (stroke.layer ?? 0) >= doc.terrain.layers.length) throw new Error('Camada de terreno inexistente.')
+          if (stroke.brush === 'paint' && (stroke.layer ?? 0) >= doc.terrain.layers.length) throw new Error('Terrain layer not found.')
           terrain.apply(stroke)
         }; doc.terrain = terrain.toJSON() } finally { terrain.dispose() }
         followTerrain(doc); break
       }
       case 'water.paint': {
-        if (!doc.terrain) throw new Error('Crie terreno antes de pintar água.')
+        if (!doc.terrain) throw new Error('Create terrain before painting water.')
         let entry: SceneWater
         if (cmd.index !== undefined) entry = water(cmd.index)
         else {
-          if (cmd.erase) throw new Error('Informe index para apagar água existente.')
+          if (cmd.erase) throw new Error('Provide index to erase existing water.')
           entry = { shape: createWaterPaint(doc.terrain.size, doc.terrain.resolution), level: cmd.level ?? 0 }
           if (cmd.mode === 'terrain') entry.shape.mask!.heights = []
           ;(doc.waters ??= []).push(entry)
         }
-        if (entry.shape.kind !== 'paint') throw new Error('Esta água não tem máscara pintável. Use water.update ou crie uma nova.')
+        if (entry.shape.kind !== 'paint') throw new Error('This water has no paintable mask. Use water.update or create another.')
         if (cmd.look) entry.look = mergeJson(mergeJson(FOREST_WATER, entry.look ?? {}), cmd.look) as SceneWater['look']
         if (cmd.level !== undefined) entry.level = cmd.level
         cmd.points.forEach((p, i) => paintWater(entry.shape, cmd.points[Math.max(0, i - 1)], p, cmd.radius, cmd.erase))
@@ -105,22 +105,22 @@ export function applyCommands(source: SceneDoc, input: unknown): SceneDoc {
       case 'effect.define': (doc.effects ??= {})[cmd.id] = structuredClone(cmd.effect) as unknown as EffectDef; break
       case 'asset.define': (doc.assets ??= {})[cmd.id] = { name: cmd.name, source: cmd.source }; break
       case 'resource.remove':
-        if (!doc[cmd.kind]?.[cmd.id]) throw new Error('Recurso inexistente: ' + cmd.id)
-        if (cmd.kind !== 'atmospheres' && doc.objects.some(o => o.prefab === cmd.id)) throw new Error('Remova primeiro as instâncias deste recurso: ' + cmd.id)
+        if (!doc[cmd.kind]?.[cmd.id]) throw new Error('Resource not found: ' + cmd.id)
+        if (cmd.kind !== 'atmospheres' && doc.objects.some(o => o.prefab === cmd.id)) throw new Error('Remove this asset\'s instances first: ' + cmd.id)
         delete doc[cmd.kind]![cmd.id]; break
       case 'atmosphere.define': (doc.atmospheres ??= {})[cmd.id] = { name: cmd.name, style: atmosphereStyle(mergeJson(mergeJson(pomorog, doc.style ?? {}), { ...cmd.style, bodySceneLighting: true, inkFog: true }) as NonNullable<SceneDoc['style']>) }; break
       case 'atmosphere.apply': {
         const asset = doc.atmospheres?.[cmd.id]
-        if (!asset) throw new Error('Atmosfera inexistente: ' + cmd.id)
+        if (!asset) throw new Error('Atmosphere not found: ' + cmd.id)
         doc.style = mergeJson(doc.style ?? {}, asset.style) as SceneDoc['style']; break
       }
       case 'atmosphere.set': doc.style = mergeJson(mergeJson(pomorog, doc.style ?? {}), { ...cmd.style, bodySceneLighting: true, inkFog: true }) as SceneDoc['style']; break
       case 'camera.define': (doc.cameras ??= {})[cmd.id] = structuredClone(cmd.camera) as unknown as NonNullable<SceneDoc['cameras']>[string]; break
       case 'camera.update':
-        if (!doc.cameras?.[cmd.id]) throw new Error('Câmera inexistente: ' + cmd.id)
+        if (!doc.cameras?.[cmd.id]) throw new Error('Camera not found: ' + cmd.id)
         doc.cameras[cmd.id] = mergeJson(doc.cameras[cmd.id], cmd.patch) as NonNullable<SceneDoc['cameras']>[string]; break
       case 'camera.remove':
-        if (!doc.cameras?.[cmd.id]) throw new Error('Câmera inexistente: ' + cmd.id)
+        if (!doc.cameras?.[cmd.id]) throw new Error('Camera not found: ' + cmd.id)
         delete doc.cameras[cmd.id]; if (doc.activeCamera === cmd.id) delete doc.activeCamera; break
       case 'camera.activate': if (cmd.id === null) delete doc.activeCamera; else doc.activeCamera = cmd.id; break
       case 'environment.set': doc.environment = { weather: cmd.weather, intensity: cmd.intensity }; break

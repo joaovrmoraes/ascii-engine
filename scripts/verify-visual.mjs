@@ -34,7 +34,7 @@ try {
     return response.result?.value
   }
   const until = async expression => { for (let i = 0; i < 150; i++) { try { if (await evaluate(expression)) return } catch(error) { if(!/Inspected target navigated|Execution context was destroyed|Cannot find context/.test(error.message)) throw error }; await sleep(100) }; throw new Error(`Timed out: ${expression}`) }
-  const action = async expression => { await evaluate(`(async () => { ${expression} })()`); await until('window.area && !area.state.includes("abrindo")'); await sleep(200) }
+  const action = async expression => { await evaluate(`(async () => { ${expression} })()`); await until('window.area && !area.state.includes("opening")'); await sleep(200) }
   const check = async (title, expression) => { if (!await evaluate(expression)) throw new Error(`FAIL: ${title}`); console.log(`PASS ${title}`) }
   const shot = async name => { await sleep(500); const result = await send('Page.captureScreenshot', { format: 'png' }); await writeFile(join(output, name + '.png'), Buffer.from(result.data, 'base64')) }
   await send('Runtime.enable'); await send('Page.enable'); await send('Emulation.setFocusEmulationEnabled', { enabled: true })
@@ -85,12 +85,12 @@ try {
   await shot('studio-atmosfera')
   await check('studio opens a dedicated screen with a return to scene', `document.body.classList.contains('studio-mode') && !document.querySelector('#studio-toolbar').hidden && document.querySelector('canvas').getBoundingClientRect().height>600`)
   await check('studio contains effects and atmosphere; preset changes the scene lights', `!document.querySelector('#studio-workspace').hidden && !document.querySelector('#atmosphere-studio').hidden && document.querySelector('#effect-editor').hidden && engine.style.moon.color===0xffbd83 && engine.lights.moon.intensity===1.65`)
-  await action(`ui('[data-studio-field="Intensidade principal"]','3'); ui('[data-studio-field="Cor principal"]','#66aaff');ui('[data-studio-field="Cor das letras"]','#aaccff')`)
+  await action(`ui('[data-studio-field="Main intensity"]','3'); ui('[data-studio-field="Main color"]','#66aaff');ui('[data-studio-field="Glyph color"]','#aaccff')`)
   await check('studio color and intensity changes persist in the portable document', `area.document().style.moon.intensity===3 && area.document().style.moon.color===0x66aaff && area.document().style.inkTint[0]===170/255`)
-  await action(`ui('[data-studio-tab="effects"]'); ui('[data-fx="new"]'); ui('[data-effect-field="Emitir luz"]')`)
+  await action(`ui('[data-studio-tab="effects"]'); ui('[data-fx="new"]'); ui('[data-effect-field="Emit light"]')`)
   // Checkbox click dispatches the real change event through its handler.
-  await check('effect studio exposes color, intensity and reach', `!!document.querySelector('[data-effect-field="Cor da luz"]') && !!document.querySelector('[data-effect-field="Alcance (m)"]')`)
-  await action(`ui('[data-effect-field="Intensidade"]','20');ui('[data-effect-field="Cor da luz"]','#3388ff'); ui('[data-fx="save"]')`)
+  await check('effect studio exposes color, intensity and reach', `!!document.querySelector('[data-effect-field="Light color"]') && !!document.querySelector('[data-effect-field="Range (m)"]')`)
+  await action(`ui('[data-effect-field="Intensity"]','20');ui('[data-effect-field="Light color"]','#3388ff'); ui('[data-fx="save"]')`)
   await until('Object.keys(area.document().effects??{}).length===1')
   await check('effect recipe saves its light settings', `Object.values(area.document().effects)[0].light.intensity===20 && Object.values(area.document().effects)[0].light.color===0x3388ff`)
   await shot('studio-efeitos-luz')

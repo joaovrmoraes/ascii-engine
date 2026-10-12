@@ -48,10 +48,10 @@ for (const format of ['yuv420p', 'yuv444p']) {
 const metadata = JSON.parse(execFileSync('ffprobe', ['-v','error','-select_streams','v:0','-show_entries','stream=pix_fmt,color_range,color_space,color_transfer,color_primaries','-of','json', recording], {encoding: 'utf8'}));
 const report = {
   recording: metadata.streams[0],
-  method: 'Screenshot original versus roundtrip controlado do mesmo PNG em H.264 CRF 0. Mesma matriz BT.709/faixa TV; somente a amostragem de crominância muda. A gravação real usa outro instante animado: comparar distribuição, não RMSE contra ela.',
+  method: 'Original screenshot versus controlled H.264 CRF 0 roundtrip of the same PNG. Same BT.709 matrix and TV range; only chroma sampling changes. Actual footage uses a different animation time: compare distributions rather than pixel RMSE.',
   originalScreenshot: stats(ref), originalRecording: stats(video), controlled,
   flatUIPatch: {original: flatPatch(ref), recorded: flatPatch(video)},
-  correction: 'Remotion: saturate(1.4), sem alterar brilho/gamma. Exportação master 4:4:4, Rec.709. Compensação editorial, não restauração dos dados perdidos.',
+  correction: 'Remotion: saturate(1.4), brightness/gamma unchanged. Rec.709 4:4:4 master. Editorial compensation does not restore discarded data.',
 };
 writeFileSync(path.join(dir, 'analise-cor.json'), JSON.stringify(report, null, 2));
 console.log(JSON.stringify(report, null, 2));

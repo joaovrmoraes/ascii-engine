@@ -65,7 +65,7 @@ export function createTerrain(data: TerrainData = createTerrainData()) {
   geometry.setAttribute('color', new THREE.BufferAttribute(colors, 3))
   const material = new THREE.MeshStandardMaterial({ vertexColors: true, roughness: 1, color: 0xffffff })
   const mesh = new THREE.Mesh(geometry, material)
-  mesh.receiveShadow = true; mesh.castShadow = true; mesh.name = 'terreno'
+  mesh.receiveShadow = true; mesh.castShadow = true; mesh.name = 'terrain'
   mesh.userData.glyph = 'surface'; mesh.userData.glyphStyle = { surface: 'earth' }
   const layerColors = () => data.layers.map((l) => new THREE.Color(l.color))
   let palette = layerColors()

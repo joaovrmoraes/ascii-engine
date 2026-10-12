@@ -103,7 +103,7 @@ export function createSnow(engine: AsciiEngine, options: AreaOptions = {}): Area
   engine.add(flakes.mesh, { glyph: 'particle' })
 
   return {
-    id: 'snow_pines', title: 'Pinheiros Nevados',
+    id: 'snow_pines', title: 'Snow Pines',
     hero: actors.player.root.position,
     get state() { return `prints:${snow.footprintCount} snow:${snowAccumulation(engine.time).toFixed(2)} melt:${snowMeltRadius(engine.time).toFixed(2)}` },
     focus: actors.focus,

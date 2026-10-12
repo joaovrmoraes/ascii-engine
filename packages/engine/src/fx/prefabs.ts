@@ -8,7 +8,7 @@ export function createEffectPrefabs(engine: AsciiEngine, definitions: Record<str
   return Object.fromEntries(Object.entries(definitions).map(([key, definition]) => {
     const playing = new WeakMap<THREE.Object3D, EffectInstance>()
     return [key, {
-      title: `efeito: ${definition.name}`,
+      title: `effect: ${definition.name}`,
       create() { return new THREE.Group() },
       update(object: THREE.Object3D) {
         if (!object.visible) { playing.get(object)?.cancel(); playing.delete(object); return }

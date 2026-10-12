@@ -40,7 +40,7 @@ try {
     return response.result?.value
   }
   const until = async expression => { for (let i = 0; i < 150; i++) { if (await evaluate(expression)) return; await sleep(100) }; throw new Error(`Timed out: ${expression}`) }
-  const action = async expression => { await evaluate(`(async () => { ${expression} })()`); await until('window.area && !area.state.includes("abrindo")'); await sleep(200) }
+  const action = async expression => { await evaluate(`(async () => { ${expression} })()`); await until('window.area && !area.state.includes("opening")'); await sleep(200) }
   const check = async (title, expression) => { if (!await evaluate(expression)) throw new Error(`FAIL: ${title}`); console.log(`PASS ${title}`) }
   const shot = async name => { await sleep(500); const result = await send('Page.captureScreenshot', { format: 'png' }); await writeFile(join(output, name + '.png'), Buffer.from(result.data, 'base64')) }
   await send('Runtime.enable'); await send('Page.enable'); await send('Emulation.setFocusEmulationEnabled', { enabled: true })
@@ -69,7 +69,7 @@ try {
   let state=await invoke('scene_read',{full:true})
   const initial=state.document
   const commands=[
-    {op:'scene.replace',document:{version:1,name:'Ambiente criado pelo MCP',objects:[]}},
+    {op:'scene.replace',document:{version:1,name:'Environment criado pelo MCP',objects:[]}},
     {op:'terrain.create',size:24,resolution:65},
     {op:'terrain.stroke',strokes:[{brush:'raise',x:1,z:-2,radius:5,strength:2},{brush:'paint',x:-3,z:0,radius:2,strength:1,layer:1}]},
     {op:'scene.patch',patch:{carpet:{count:35000,seed:48}}},
@@ -94,7 +94,7 @@ try {
   const impact=await invoke('water_disturb',{index:0,x:0,z:0,strength:.2,radius:.8});assert(impact.revision===state.revision,'MCP water impact is transient and preserves document revision')
   await shot('mcp-previa')
   await invoke('scene_apply',{revision:state.revision-1,commands:[{op:'scene.patch',patch:{name:'Stale'}}],preview:false},true)
-  assert((await invoke('scene_read')).scene.name==='Ambiente criado pelo MCP','stale revision rejected without overwriting scene')
+  assert((await invoke('scene_read')).scene.name==='Environment criado pelo MCP','stale revision rejected without overwriting scene')
   const canceled=await invoke('scene_preview',{revision:state.revision,action:'cancel'})
   assert(!canceled.preview,'preview cancel returns to saved scene')
   assert(JSON.stringify((await invoke('scene_read',{full:true})).document)===JSON.stringify(initial),'cancel restores entire original document')
@@ -145,9 +145,9 @@ try {
   state=await invoke('scene_open',{revision:state.revision,path:exported,preview:false})
   assert(JSON.stringify((await invoke('scene_read',{full:true})).document)===JSON.stringify(data),'export and reopen through MCP preserve complete document')
   const beforeHuman=state.revision
-  await action(`document.querySelector('[data-k="name"]').value='Edição humana';document.querySelector('[data-k="name"]').dispatchEvent(new Event('change'))`)
+  await action(`document.querySelector('[data-k="name"]').value='Human edit';document.querySelector('[data-k="name"]').dispatchEvent(new Event('change'))`)
   await invoke('scene_apply',{revision:beforeHuman,preview:false,commands:[{op:'scene.patch',patch:{name:'Overwrite'}}]},true)
-  assert((await invoke('scene_read')).scene.name==='Edição humana','human UI edits advance revision and block stale AI writes')
+  assert((await invoke('scene_read')).scene.name==='Human edit','human UI edits advance revision and block stale AI writes')
   await shot('mcp-cena-editor')
   if(errors.length)throw new Error(errors.join('\n'))
   console.log('PASS no uncaught page exceptions')

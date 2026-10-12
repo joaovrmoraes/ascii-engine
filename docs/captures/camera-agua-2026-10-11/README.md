@@ -1,58 +1,56 @@
-# Câmera em 3D, prévia e água — 11/10/2026
+# 3D camera, preview and water — 2026-10-11
 
-Capturas reais em Chromium com GPU e no Orca Browser; nenhuma imagem gerada.
-A cópia da cena do dono foi usada apenas em perfil isolado para reproduzir
-as duas imagens relatadas. Não foi substituído o documento da aba do dono.
+Real GPU Chromium/Orca Browser captures; no generated images. A copy of the
+owner's scene was used only in an isolated profile to reproduce the reported
+views. The owner's tab document was not replaced.
 
-## Câmera
+## Camera
 
-- [Miniatura ao mover pelo gizmo](camera-miniatura.png).
-- [Câmera selecionada e lago, por cdpshot](camera-cdpshot.png).
-- `verify-composition.log`: arrastos nativos, órbita horizontal/vertical,
-  miniatura ao vivo, prévia pela câmera inicial, histórico, efeitos e player.
-- O teste também suspende `requestAnimationFrame` e verifica que a página
-  visível continua animando e atualiza a câmera pelo caminho alternativo.
-- [Orca Browser](orca-agua.png): a mesma aba antes não recebia rAF, apesar
-  de `document.hidden === false`. Após a correção, tempo avançando e 20 fps.
+- [Live thumbnail during gizmo movement](camera-miniatura.png).
+- [Selected camera and lake, cdpshot](camera-cdpshot.png).
+- verify-composition.log: native drags, horizontal/vertical orbit, live
+  thumbnail, initial-camera preview, history, effects and player.
+- Also suspends requestAnimationFrame and checks that the visible page
+  animates/updates its camera through the fallback.
+- [Orca Browser](orca-agua.png): previously no rAF despite document.hidden
+  being false. After the fix, time advances at 20 fps.
 
-## Água
+## Water
 
-| Antes | Depois |
+| Before | After |
 | --- | --- |
-| ![Água antes](agua-antes.png) | ![Água depois](agua-depois.png) |
+| ![Water before](agua-antes.png) | ![Water after](agua-depois.png) |
 
-- [Cilindro refletido de lado](cilindro-reflexo-lateral.png),
-  [reflexo desligado](cilindro-sem-reflexo.png),
-  [vista pela margem oposta](cilindro-vista-oposta.png).
-- [Luar alinhado à câmera](luar-alinhado.png) e
-  [luz rotacionada](luar-rotacionado.png).
-- [Antes do impacto](agua-antes-impacto.png) e
-  [rastro de um objeto movido na água](agua-rastro-do-objeto.png).
-- [Encosta inicial](encosta-inicio.png), [escoando](encosta-escoando.png)
-  e [controles do inspetor](inspetor-agua.png).
-- [Canais da catedral](catedral-agua.png): contorno GLSL e domínio de
-  simulação em CPU coincidem, preservando a área de água existente.
+- [Side reflection of cylinder](cilindro-reflexo-lateral.png),
+  [reflection disabled](cilindro-sem-reflexo.png),
+  [opposite shore](cilindro-vista-oposta.png).
+- [Camera-aligned moonlight](luar-alinhado.png) and
+  [rotated light](luar-rotacionado.png).
+- [Before impact](agua-antes-impacto.png),
+  [moving-object trail](agua-rastro-do-objeto.png).
+- [Initial slope](encosta-inicio.png), [flow](encosta-escoando.png),
+  [inspector](inspetor-agua.png).
+- [Cathedral channels](catedral-agua.png): GLSL shape and CPU simulation
+  domain match, preserving the existing water region.
 
-`verify-water.log` verifica pixels do canvas (diferença maior que 8/255),
-reflexo conforme a vista, brilho conforme a luz, deslocamento da superfície
-por objetos, corrente descendo, vértices molhados acima do chão e receita
-inalterada pela simulação. O teste do núcleo verifica conservação de
-volume, estabilidade em desnível, nascente e propagação sem cruzar margens.
+verify-water.log checks canvas changes >8/255, view-dependent reflection,
+light-dependent highlights, object-driven surface movement, downhill flow,
+wet vertices above terrain and simulation-independent recipe data. Core tests
+cover volume conservation, elevation stability, sources and waves staying
+inside shores.
 
-## Verificação e limites
+## Validation and limits
 
-`pnpm check`: 77 testes, tipos e build passaram. Os logs de `verify:water`,
-`verify:composition`, `verify:visual`, `verify:authoring` e `verify:api`
-estão nesta pasta. `cdpshot.log` registra 60 fps na captura com miniatura.
-Avisos existentes de bundle grande e comentários PURE do Zod permanecem.
-`compare.log`: cinco vistas passaram; floresta excedeu o limite com
-RMSE 0,0595. `compare-forest.log`: repetição isolada passou com 0,0095,
-sem alteração de código ou baseline. A cena tem oscilação já registrada
-por integrar o percurso do personagem conforme o tempo entre quadros.
+pnpm check: 77 tests, types and build passed. This folder contains water,
+composition, visual, authoring and API logs. cdpshot.log reports 60 fps with
+thumbnail. Existing bundle/Zod PURE warnings remain. Five compare views
+passed; forest exceeded the limit at RMSE 0.0595. Isolated rerun passed at
+0.0095 with unchanged code/baseline. Forest has recorded time-integration
+variation based on frame intervals.
 
-É água rasa sobre uma grade, limitada à máscara pintada. A queda segue o
-relevo; não há fluido volumétrico, expansão fora da pintura, respingos
-balísticos, cortina livre nem flutuação de corpos rígidos. O brilho é da
-luz principal; não foi acrescentado um disco de lua ao céu. Espelho de
-objetos nas partes calmas; partículas separadas não entram no reflexo.
-Tauri nativo não foi executado. Câmeras continuam ortográficas.
+Shallow heightfield water stays within the painted mask. Falls follow terrain;
+no volumetric fluid, expansion beyond paint, ballistic splashes, free curtain
+or rigid buoyancy. Highlights come from the main light, without a new moon
+sky disc. Objects mirror on calm regions; separate particles are excluded.
+Native Tauri was not executed; cameras remain orthographic. Images retain
+historical Portuguese UI.

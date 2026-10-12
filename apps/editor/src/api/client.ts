@@ -9,7 +9,7 @@ export function connectAuthoring(engine: AsciiEngine, area: Area, view: { angle:
   const sessionId = crypto.randomUUID()
   let revision = 0, applying = false, original: SceneDoc | undefined, socket: WebSocket | undefined, stopped = false
   const banner = document.createElement('div'); banner.id = 'ai-preview'; banner.hidden = true
-  banner.innerHTML = '<span>Prévia da IA · ainda não salva</span><button data-ai="accept">Aplicar</button><button data-ai="cancel">Descartar</button><small role="status"></small>'
+  banner.innerHTML = '<span>AI preview · not saved yet</span><button data-ai="accept">Apply</button><button data-ai="cancel">Discard</button><small role="status"></small>'
   document.body.append(banner)
   const state = () => ({ sessionId, revision, preview: !!original, scene: summarizeScene(snapshot()) })
   const hello = () => { if (socket?.readyState === WebSocket.OPEN) socket.send(JSON.stringify({ type: 'hello', sessionId, name: snapshot().name, revision, preview: !!original })) }
@@ -36,17 +36,17 @@ export function connectAuthoring(engine: AsciiEngine, area: Area, view: { angle:
   async function request(raw: unknown): Promise<unknown> {
     assertSafeJson(raw)
     const req = requestSchema.parse(raw)
-    if (applying) throw new Error('O editor está aplicando outra alteração; leia a cena novamente.')
-    if ('revision' in req && req.revision !== revision) throw new Error(`Conflito de revisão: esperado ${revision}, recebido ${req.revision}. Leia scene.read antes de editar.`)
+    if (applying) throw new Error('The editor is applying another change; read the scene again.')
+    if ('revision' in req && req.revision !== revision) throw new Error(`Revision conflict: expected ${revision}, received ${req.revision}. Read scene.read before editing.`)
     if (req.method === 'scene.read') return { ...state(), ...(req.full ? { document: snapshot() } : {}) }
     if (req.method === 'engine.reference') {
       switch (req.topic) {
-        case 'commands': return { commands: commandJsonSchema(), coordinates: 'Metros, Y para cima; rotação em radianos; cores inteiras RGB ou triplas conforme o campo. Leia a revisão antes de alterar. Prévia não grava; accept grava um passo de desfazer.', limits: { objects: 20000, effects: 256, atmospheres: 256, cameras: 128, terrainResolution: 513, pointLights: 8 } }
+        case 'commands': return { commands: commandJsonSchema(), coordinates: 'Meters, Y up; rotations in radians; colors as RGB integers or triples depending on the field. Read the revision before editing. Preview does not save; accept creates one undo step.', limits: { objects: 20000, effects: 256, atmospheres: 256, cameras: 128, terrainResolution: 513, pointLights: 8 } }
         case 'catalog': return editor.catalog()
-        case 'style': return { defaults: pomorog, glyphKinds: ['surface','body','carpet','water','particle','screen'], surfaceFamilies: Object.keys(SURFACE_ALPHA), studioFields: { bodySceneLighting: true, inkFog: true, inkTint: [1, 1, 1] }, note: 'atmosphere.set faz merge recursivo e habilita luz/fog nas letras. options e options.parts por objeto; style.types para todas as cópias. surface/body são técnicas de malhas; water/carpet/particle exigem a geometria correspondente, não atribua essas técnicas a uma malha comum.' }
-        case 'water': return { defaults: FOREST_WATER, physics: DEFAULT_WATER_PHYSICS, modes: ['terrain: escoamento por gravidade na área pintada', 'level: lago plano, escava leito'], interaction: 'water.disturb dispara impulsos transitórios; objetos e atores em movimento geram ondas.', limitation: 'Simulação de água rasa em heightfield: não tem volumes 3D, respingos balísticos, flutuação rígida ou expansão além da máscara. Reflexo de objetos é planar nas partes calmas; encostas refletem a luz direcional.' }
-        case 'effects': return { presets: POMOROG_EFFECTS, definition: 'EffectDef: name, duration (s), loop, emitters[]; light: {color,intensity,distance,decay,flicker,offset,fade}. Copie um preset e modifique; id fx:custom-NOME.', emitterFields: ['name','render','rate','bursts','start','duration','life','shape','offset','speed','velocity','gravity','drag','noise','attract','ground','spin','glyphs','size','color','alpha','glow','ring','beam','ribbon','heat','flipbook','max'] }
-        case 'documents': return { version: 1, fields: ['name','style','terrain','waters','carpet','objects','assets','effects','atmospheres','cameras','activeCamera','environment'], example: { version: 1, name: 'Mapa', objects: [{ id: 'pedra-1', prefab: 'pedregulho', position: [0,0,0], rotation3: [0,0,0], scale3: [1,1,1], options: { glyph: 'body' } }] }, note: 'scene.read full=true retorna todo o documento; scene.replace/patch cobrem todos os campos suportados. assets contêm GLTF/GLB incorporado como data URI. atmospheres: {id:{name,style}} salva iluminação nos Assets; atmosphere.define salva e atmosphere.apply aplica pelo id. Exportação = este documento, sem regras do jogo.' }
+        case 'style': return { defaults: pomorog, glyphKinds: ['surface','body','carpet','water','particle','screen'], surfaceFamilies: Object.keys(SURFACE_ALPHA), studioFields: { bodySceneLighting: true, inkFog: true, inkTint: [1, 1, 1] }, note: 'atmosphere.set merges recursively and enables lighting/fog on glyphs. Per-object options and options.parts; style.types applies to every instance. surface/body are mesh techniques; water/carpet/particle require their corresponding geometry and cannot be assigned to an ordinary mesh.' }
+        case 'water': return { defaults: FOREST_WATER, physics: DEFAULT_WATER_PHYSICS, modes: ['terrain: gravity-driven flow within the painted area', 'level: lago plano, escava leito'], interaction: 'water.disturb produces transient impulses; moving objects and actors generate waves.', limitation: 'Shallow-water heightfield simulation: no 3D volumes, ballistic splashes, rigid-body buoyancy or expansion beyond the mask. Objects reflect on calm planar regions; slopes reflect directional light.' }
+        case 'effects': return { presets: POMOROG_EFFECTS, definition: 'EffectDef: name, duration (s), loop, emitters[]; light: {color,intensity,distance,decay,flicker,offset,fade}. Copy a preset and modify it; id fx:custom-NAME.', emitterFields: ['name','render','rate','bursts','start','duration','life','shape','offset','speed','velocity','gravity','drag','noise','attract','ground','spin','glyphs','size','color','alpha','glow','ring','beam','ribbon','heat','flipbook','max'] }
+        case 'documents': return { version: 1, fields: ['name','style','terrain','waters','carpet','objects','assets','effects','atmospheres','cameras','activeCamera','environment'], example: { version: 1, name: 'Map', objects: [{ id: 'stone-1', prefab: 'pedregulho', position: [0,0,0], rotation3: [0,0,0], scale3: [1,1,1], options: { glyph: 'body' } }] }, note: 'scene.read full=true returns the entire document; scene.replace/patch cover every supported field. assets contain embedded GLTF/GLB as data URIs. atmospheres: {id:{name,style}} saves lighting in Assets; atmosphere.define saves and atmosphere.apply applies by id. Export = this document, without game rules.' }
       }
     }
     if (req.method === 'object.inspect') return editor.inspect(req.id)
@@ -54,12 +54,12 @@ export function connectAuthoring(engine: AsciiEngine, area: Area, view: { angle:
     if (req.method === 'scene.validate') {
       const doc = applyCommands(snapshot(), req.commands)
       const known = new Set([...editor.catalog().filter(p => p.kind === 'builtin').map(p => p.id), ...Object.keys(doc.assets ?? {}), ...Object.keys(doc.effects ?? {})])
-      for (const obj of doc.objects) if (!known.has(obj.prefab)) throw new Error('Prefab inexistente: ' + obj.prefab)
-      return { valid: true, scene: summarizeScene(doc), note: 'Dados e referências válidos; arquivos de modelo são decodificados ao aplicar.' }
+      for (const obj of doc.objects) if (!known.has(obj.prefab)) throw new Error('Prefab not found: ' + obj.prefab)
+      return { valid: true, scene: summarizeScene(doc), note: 'Data and references are valid; model files are decoded when applied.' }
     }
     if (req.method === 'editor.view') { editor.view(req.focus, req.studio, req.cameraId); if (req.angle !== undefined) view.angle = req.angle; if (req.elevation !== undefined) view.elevation = req.elevation; if (req.zoom !== undefined) view.zoom = req.zoom; if (req.paused !== undefined) view.paused = req.paused; return state() }
     if (req.method === 'editor.capture') return { sessionId, revision, mimeType: 'image/png', data: capture() }
-    if (original && !req.method.startsWith('preview.')) throw new Error('Há uma prévia pendente. Aplique ou descarte antes de outra alteração.')
+    if (original && !req.method.startsWith('preview.')) throw new Error('A preview is pending. Apply or discard it before another change.')
     applying = true; lock(true)
     try {
       if (req.method === 'scene.apply' || req.method === 'assets.import') {
@@ -77,10 +77,10 @@ export function connectAuthoring(engine: AsciiEngine, area: Area, view: { angle:
         if (req.preview) original = before
         else await editor.commit()
       } else if (req.method === 'preview.accept') {
-        if (!original) throw new Error('Não há prévia pendente.')
+        if (!original) throw new Error('No preview is pending.')
         await editor.commit(); original = undefined
       } else if (req.method === 'preview.cancel') {
-        if (!original) throw new Error('Não há prévia pendente.')
+        if (!original) throw new Error('No preview is pending.')
         await editor.replace(original); original = undefined
       } else if (req.method === 'history.undo' || req.method === 'history.redo') await editor.undo(req.method === 'history.redo')
       revision++

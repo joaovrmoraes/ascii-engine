@@ -4,8 +4,8 @@ import { applySceneCamera, type SceneCamera } from './camera'
 import { parseScene } from './validation'
 
 const camera: SceneCamera = { name:'Plano geral', projection:'orthographic', position:[3,5,8], rotation:[-.4,.2,0], span:4, aspect:16/9 }
-describe('câmeras portáteis', () => {
-  it('preserva câmera inicial e enquadramento após serialização', () => {
+describe('portable cameras', () => {
+  it('preserves initial camera and framing after serialization', () => {
     const doc = parseScene({version:1,objects:[],cameras:{wide:camera},activeCamera:'wide'})
     expect(parseScene(JSON.parse(JSON.stringify(doc)))).toEqual(doc)
     const view = new THREE.OrthographicCamera()
@@ -15,8 +15,8 @@ describe('câmeras portáteis', () => {
     expect((view.right-view.left)/(view.top-view.bottom)).toBeCloseTo(16/9)
     expect(view.position.toArray()).toEqual(camera.position)
   })
-  it.each([{span:0},{aspect:0},{position:[0,0]},{rotation:[0,NaN,0]},{projection:'invalid'},{near:20,far:2}])('rejeita câmera inválida antes de renderizar: %j', patch => {
-    expect(()=>parseScene({version:1,objects:[],cameras:{wide:{...camera,...patch}}})).toThrow('Cenário inválido')
+  it.each([{span:0},{aspect:0},{position:[0,0]},{rotation:[0,NaN,0]},{projection:'invalid'},{near:20,far:2}])('rejects invalid cameras before rendering: %j', patch => {
+    expect(()=>parseScene({version:1,objects:[],cameras:{wide:{...camera,...patch}}})).toThrow('Invalid scene')
   })
-  it('rejeita referência inicial inexistente', () => expect(()=>parseScene({version:1,objects:[],activeCamera:'missing'})).toThrow('câmera inexistente'))
+  it('rejects a missing initial camera reference', () => expect(()=>parseScene({version:1,objects:[],activeCamera:'missing'})).toThrow('camera not found'))
 })

@@ -27,7 +27,7 @@ describe('portable scene validation', () => {
     expect(parseScene(JSON.parse(JSON.stringify(doc)))).toEqual(doc)
   })
   it('round-trips named atmosphere assets without applying them to the scene', () => {
-    const input = { ...legacy, atmospheres: { sunset: { name: 'Pôr do sol', style: { background: 0x221100, fog: null, inkTint: [1,.7,.5] } } } }
+    const input = { ...legacy, atmospheres: { sunset: { name: 'Sunset', style: { background: 0x221100, fog: null, inkTint: [1,.7,.5] } } } }
     const doc = parseScene(input, library)
     expect(parseScene(JSON.parse(JSON.stringify(doc)))).toEqual(doc)
     expect(doc.style).toBeUndefined()
@@ -47,7 +47,7 @@ describe('portable scene validation', () => {
     { ...legacy, atmospheres: { dusk: { name: 'Dusk', style: { brightness: -1 } } } },
     { ...legacy, atmospheres: { dusk: { name: 'Dusk', style: { types: {} } } } },
     JSON.parse('{"version":1,"objects":[],"__proto__":{"polluted":true}}'),
-  ])('rejects invalid data before it can reach scene allocation (%#)', input => expect(() => parseScene(input, library)).toThrow('Cenário inválido'))
+  ])('rejects invalid data before it can reach scene allocation (%#)', input => expect(() => parseScene(input, library)).toThrow('Invalid scene'))
 })
 
 describe('document history', () => {

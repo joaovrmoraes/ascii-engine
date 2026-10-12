@@ -1,31 +1,30 @@
-# 0001 — Autoria visual local por API e MCP
+# ADR 0001 — Local visual authoring through API and MCP
 
-Data: 11/10/2026. Escopo solicitado pelo dono: IA pode criar todo o conteúdo
-visual e também editar a cena aberta, com prévia e desfazer.
+Date: 2026-10-11. Owner-requested scope: an agent can create all visual
+content and edit the open scene, with preview and undo.
 
-O contrato é o mesmo `SceneDoc` que o editor salva/exporta. Comandos
-atômicos em `packages/authoring` transformam cópias e validam antes da
-materialização. `scene.replace/patch` dão acesso a todos os campos, além
-de comandos convenientes para terreno, água, objetos, recursos e ambiente.
+The contract is the same `SceneDoc` the editor saves/exports. Atomic
+commands in `packages/authoring` transform copies and validate before
+materialization. `scene.replace/patch` expose all fields, alongside
+convenience commands for terrain, water, objects, resources and environment.
 
-O adaptador do editor materializa a candidata antes de liberar a antiga,
-mantém revisão da sessão, bloqueia edição durante prévia e usa o histórico
-já existente. A IA pode aplicar diretamente ou aceitar sua prévia; não há
-aprovação humana obrigatória. Uma revisão antiga é rejeitada.
+The editor adapter materializes the candidate before releasing the old
+scene, maintains a session revision, locks editing during preview and
+uses the existing history. An agent can apply directly or accept its own
+preview; human approval is not mandatory. Stale revisions are rejected.
 
-A ponte HTTP/WebSocket fica em `apps/automation`, escuta só loopback:1442
-e exige sessão explícita. Não escolhe automaticamente outra aba. Vite
-inicia a ponte em desenvolvimento; `pnpm api` é a entrada independente.
-O MCP oficial usa stdio e adapta ferramentas à API. Acesso a arquivos
-locais fica no processo MCP, em caminhos explícitos; o documento incorpora
-os recursos e não guarda caminhos privados da máquina.
+The HTTP/WebSocket bridge lives in `apps/automation`, listens on loopback:1442
+and requires an explicit session. It never selects another tab automatically.
+Vite starts it in development; `pnpm api` is the independent entry point.
+The official MCP server uses stdio and adapts tools to the API. Local file
+access stays in the MCP process with explicit paths; documents embed assets
+without retaining private machine paths.
 
-O núcleo não importa HTTP, MCP, UI ou regras do jogo. Receitas Pomorog
-continuam na biblioteca do editor. O player exportado não se conecta à
-ponte. A integração final do jogo continua fora desta mudança.
+The core imports no HTTP, MCP, UI or game rules. Pomorog recipes remain
+in the editor library. Exported players do not connect to the bridge.
+Final game integration is outside this change.
 
-Limitações: editor precisa estar aberto; sessão muda ao recarregar;
-prévia não aceita é volátil; desktop ainda precisa de execução validada;
-controle de painéis e sistema operacional não integra a API de conteúdo.
-Testes cobrem contrato, isolamento/erros, transporte e MCP até o renderer
-real, importação, exportação e reabertura.
+Limits: the editor must be open; sessions change on reload; unaccepted
+previews are volatile; desktop execution still needs validation; panel and
+OS control are outside the content API. Tests cover contracts, isolation,
+errors, transport and MCP through the real renderer, import, export and reopen.

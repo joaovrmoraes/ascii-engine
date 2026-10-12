@@ -68,7 +68,7 @@ export function spriteSheetToFlipbook(image: HTMLImageElement | ImageBitmap | HT
 /** An animated GIF (or WebP/APNG) through `ImageDecoder` where the browser has it. */
 export async function gifToFlipbook(data: ArrayBuffer, type: string, options: GlyphConversion & { fps?: number; maxFrames?: number }): Promise<FlipbookData> {
   const Decoder = (globalThis as unknown as { ImageDecoder?: new (init: { data: ArrayBuffer; type: string }) => { tracks: { ready: Promise<void>; selectedTrack?: { frameCount: number } }; decode(o: { frameIndex: number }): Promise<{ image: VideoFrame }>; close(): void } }).ImageDecoder
-  if (!Decoder) throw new Error('ImageDecoder indisponível neste navegador: use sprite sheet ou vídeo')
+  if (!Decoder) throw new Error('ImageDecoder unavailable in this browser: use a sprite sheet or video')
   const decoder = new Decoder({ data, type })
   await decoder.tracks.ready
   const count = Math.min(options.maxFrames ?? 120, decoder.tracks.selectedTrack?.frameCount ?? 1)

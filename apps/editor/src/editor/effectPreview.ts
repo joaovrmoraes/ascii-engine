@@ -6,12 +6,12 @@ import { createAsciiEngine, parseEffect, type EffectDef, type EffectInstance } f
 /** A disposable, empty stage. Never borrows objects, camera or style from the map. */
 export function createEffectPreview(callbacks: { move(offset: [number,number,number], commit: boolean): void }) {
   const root = document.createElement('section'); root.id = 'effect-preview'; root.hidden = true
-  root.setAttribute('aria-label', 'Prévia isolada do efeito')
-  root.innerHTML = `<canvas aria-label="Efeito em espaço vazio"></canvas>
-    <div class="fx-preview-title"><strong>Prévia do efeito</strong><span>Espaço vazio</span><button data-preview="gizmo" aria-pressed="true">Mover camada · W</button></div>
-    <div class="fx-playback"><button data-preview="restart">↻ Reiniciar</button><button data-preview="pause">Pausar</button><button data-preview="stop">Parar</button><button data-preview="frame">Enquadrar</button>
-    <label>Velocidade <select data-preview="speed"><option value="0.25">0,25×</option><option value="0.5">0,5×</option><option value="1" selected>1×</option><option value="2">2×</option></select></label><output>0,00 s</output></div>
-    <p class="fx-preview-hint">Arraste os eixos para mover a camada · Alt + arraste gira · botão direito move a vista</p>`
+  root.setAttribute('aria-label', 'Isolated effect preview')
+  root.innerHTML = `<canvas aria-label="Effect in empty space"></canvas>
+    <div class="fx-preview-title"><strong>Effect preview</strong><span>Empty space</span><button data-preview="gizmo" aria-pressed="true">Move layer · W</button></div>
+    <div class="fx-playback"><button data-preview="restart">↻ Restart</button><button data-preview="pause">Pause</button><button data-preview="stop">Stop</button><button data-preview="frame">Frame</button>
+    <label>Speed <select data-preview="speed"><option value="0.25">0.25×</option><option value="0.5">0.5×</option><option value="1" selected>1×</option><option value="2">2×</option></select></label><output>0.00 s</output></div>
+    <p class="fx-preview-hint">Drag axes to move the layer · Alt + drag to orbit · right drag to pan</p>`
   document.getElementById('app')!.append(root)
   let canvas = root.querySelector('canvas')!
   const time = root.querySelector('output')!
@@ -38,7 +38,7 @@ export function createEffectPreview(callbacks: { move(offset: [number,number,num
   function syncAnchor() {
     if (!anchor || transform?.dragging) return
     const layer = definition?.emitters[selectedEmitter]
-    root.querySelector('.fx-preview-title span')!.textContent = layer ? `Origem · ${layer.name || 'Camada ' + (selectedEmitter + 1)}` : 'Espaço vazio'
+    root.querySelector('.fx-preview-title span')!.textContent = layer ? `Origin · ${layer.name || 'Layer ' + (selectedEmitter + 1)}` : 'Empty space'
     anchor.position.set(...(layer?.offset ?? [0,0,0])); anchor.visible = !!layer
     if (transform) { transform.getHelper().visible = gizmoVisible && !!layer; transform.enabled = gizmoVisible && !!layer }
   }
@@ -79,18 +79,18 @@ export function createEffectPreview(callbacks: { move(offset: [number,number,num
     }
     canvas.dataset.time = String(engine.time); canvas.dataset.letters = String(instance?.letters ?? 0)
     canvas.dataset.effect = definition?.name ?? ''; canvas.dataset.state = stopped ? 'stopped' : paused ? 'paused' : 'playing'
-    time.textContent = `${(instance?.time ?? 0).toFixed(2).replace('.', ',')} s`
+    time.textContent = `${(instance?.time ?? 0).toFixed(2)} s`
   }
   function restart() {
     if (!definition || root.hidden) return
     ensure(); instance?.cancel(); instance = engine!.fx.play(definition, new THREE.Vector3())
-    paused = false; stopped = false; idle = 0; get('pause').textContent = 'Pausar'
+    paused = false; stopped = false; idle = 0; get('pause').textContent = 'Pause'
     if (definition.loop) for (let i = 0; i < 6; i++) draw(1 / 30)
     else draw(1 / 60)
   }
-  function stop() { instance?.cancel(); instance = undefined; stopped = true; paused = false; get('pause').textContent = 'Pausar'; draw(0) }
+  function stop() { instance?.cancel(); instance = undefined; stopped = true; paused = false; get('pause').textContent = 'Pause'; draw(0) }
   get('restart').onclick = restart; get('stop').onclick = stop; get('frame').onclick = fit
-  get('pause').onclick = () => { if (stopped) restart(); else { paused = !paused; get('pause').textContent = paused ? 'Continuar' : 'Pausar'; draw(0) } }
+  get('pause').onclick = () => { if (stopped) restart(); else { paused = !paused; get('pause').textContent = paused ? 'Resume' : 'Pause'; draw(0) } }
   get<HTMLSelectElement>('speed').onchange = event => { speed = Number((event.target as HTMLSelectElement).value) }
   addEventListener('keydown', event => {
     if (root.hidden || event.ctrlKey || event.metaKey || (event.target instanceof HTMLElement && event.target.matches('input,textarea,select'))) return

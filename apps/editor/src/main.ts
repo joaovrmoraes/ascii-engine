@@ -28,16 +28,16 @@ import { createSelection } from './selection'
  * ?zoom=<.75–1.5>, ?pause=<seconds>, ?camp=1, ?hunt=<seconds>, ?at=<metres>, ?peaceful=1, ?cell=<px>, ?light=<.65–1.4>.
  */
 export const AREAS: Record<string, AreaEntry> = {
-  dark_forest: { title: 'Floresta Sombria', create: createForest },
-  rain_marsh: { title: 'Pântano da Chuva', create: createMarsh, hooks: marshHooks },
-  snow_pines: { title: 'Pinheiros Nevados', create: createSnow },
-  old_mine: { title: 'Mina Antiga', create: createMine },
-  sunken_cathedral: { title: 'Catedral Submersa', create: createCathedral },
-  sandbox: { title: 'Cenário: terreno e prefabs', create: createSandbox },
-  effects: { title: 'Efeitos (sistema)', create: createEffectsArea },
-  gltf: { title: 'Importação GLTF (teste)', create: createGltfDemo },
-  reference: { title: 'Cena de referência', create: (engine, options) => buildReferenceScene(engine, options.screen) },
-  terrain: { title: 'Relevo (teste)', create: (engine) => buildTerrainScene(engine) },
+  dark_forest: { title: 'Dark Forest', create: createForest },
+  rain_marsh: { title: 'Rain Marsh', create: createMarsh, hooks: marshHooks },
+  snow_pines: { title: 'Snow Pines', create: createSnow },
+  old_mine: { title: 'Old Mine', create: createMine },
+  sunken_cathedral: { title: 'Sunken Cathedral', create: createCathedral },
+  sandbox: { title: 'Scene: terrain and prefabs', create: createSandbox },
+  effects: { title: 'Effects (system)', create: createEffectsArea },
+  gltf: { title: 'GLTF import (demo)', create: createGltfDemo },
+  reference: { title: 'Reference scene', create: (engine, options) => buildReferenceScene(engine, options.screen) },
+  terrain: { title: 'Terrain (demo)', create: (engine) => buildTerrainScene(engine) },
 }
 
 const params = new URLSearchParams(location.search)
@@ -63,7 +63,7 @@ const engine = createAsciiEngine(canvas, { hooks: entry.hooks, style: game?.styl
 const mode = params.get('ascii') ?? 'letters'
 engine.debug.raw = mode === 'raw'
 const area = await Promise.resolve().then(() => entry.create(engine, { screen: mode === 'screen', camp: params.has('camp'), hunt: params.has('hunt') ? Number(params.get('hunt')) : undefined, at: params.has('at') ? Number(params.get('at')) : undefined, peaceful: params.has('peaceful'), scene: sceneDoc })).catch(error => {
-  const message = document.createElement('p'); message.textContent = `Não foi possível abrir a cena: ${error}`; message.style.cssText = 'position:fixed;inset:20px;z-index:10;background:#141219;padding:20px'; document.body.append(message)
+  const message = document.createElement('p'); message.textContent = `Could not open the scene: ${error}`; message.style.cssText = 'position:fixed;inset:20px;z-index:10;background:#141219;padding:20px'; document.body.append(message)
   throw error
 })
 const view = {
@@ -111,8 +111,8 @@ canvas.addEventListener('wheel', (e) => { e.preventDefault(); if (area.cameraVie
 
 const imported: GlyphModel[] = []
 const importAt = (file: File) => importFile(engine, file, area.focus(angle, new THREE.Vector3()).setY(0))
-  .then((model) => { imported.push(model); status.dataset.note = `importado: ${file.name} (${model.parts.length} partes)` })
-  .catch((error) => { status.dataset.note = `erro ao importar ${file.name}: ${error}` })
+  .then((model) => { imported.push(model); status.dataset.note = `imported: ${file.name} (${model.parts.length} parts)` })
+  .catch((error) => { status.dataset.note = `import error for ${file.name}: ${error}` })
 addEventListener('dragover', (e) => e.preventDefault())
 const importFiles = (files: File[]) => {
   if (player) return
@@ -144,7 +144,7 @@ function frame(now: number) {
   if (document.hidden) { last = now; return }
   const real = last ? (now - last) / 1000 : 0; last = now
   if (area.renderPreview?.(Math.max(0, real))) {
-    status.textContent = 'Estúdio de efeitos · prévia isolada · o mapa está pausado'
+    status.textContent = 'Effect studio · isolated preview · the map is paused'
     return
   }
   let dt = view.paused ? 0 : THREE.MathUtils.clamp(real, 0, .08)

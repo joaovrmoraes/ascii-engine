@@ -3,7 +3,7 @@ import { WebSocket } from 'ws'
 import { randomUUID } from 'node:crypto'
 import { startBridge } from './bridge'
 
-it('roteia por sessão explícita, bloqueia origens externas e falha ao desconectar', async () => {
+it('routes by explicit session, blocks external origins and fails on disconnection', async () => {
   const bridge = await startBridge(0), base = `http://127.0.0.1:${bridge.port}`
   const connect = async () => {
     const ws = new WebSocket(`ws://127.0.0.1:${bridge.port}/editor`, { origin:'http://localhost:1440' }), id = randomUUID()

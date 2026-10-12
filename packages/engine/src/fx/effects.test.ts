@@ -28,7 +28,7 @@ describe('effect system', () => {
     function sample(offset: [number,number,number]) {
       const points: number[][] = [], cloud = { push: (x:number,y:number,z:number) => points.push([x,y,z]) }
       const fx = createEffectSystem(cloud as never, new THREE.Scene())
-      fx.play({ name:'Camada', duration:2, emitters:[{name:'Minha camada',render,offset}] }, new THREE.Vector3())
+      fx.play({ name:'Layer', duration:2, emitters:[{name:'Minha camada',render,offset}] }, new THREE.Vector3())
       fx.update(.02, .5, new THREE.PerspectiveCamera()); fx.dispose(); return points
     }
     const before = sample([0,0,0]), after = sample([2,3,-4])
@@ -101,8 +101,8 @@ describe('portable effect authoring', () => {
   })
   it('rejects malformed effect data before playback or scene replacement', () => {
     const base = { name:'teste',duration:1,emitters:[] }
-    for (const value of [{...base,duration:0},{...base,emitters:[{life:[3,1]}]},{...base,emitters:[{render:'unknown'}]},{...base,emitters:[{ring:{from:0,to:1,count:Infinity}}]},{...base,emitters:[{shape:{kind:'box',size:[1]}}]},{...base,emitters:[{heat:{rows:1}}]}, JSON.parse('{"name":"teste","duration":1,"emitters":[],"__proto__":{}}')]) expect(()=>parseEffect(value)).toThrow('Efeito inválido')
-    expect(()=>parseScene({version:1,objects:[],effects:{'fx:custom-bad':{...base,emitters:[{rate:-1}]}}})).toThrow('Efeito inválido')
+    for (const value of [{...base,duration:0},{...base,emitters:[{life:[3,1]}]},{...base,emitters:[{render:'unknown'}]},{...base,emitters:[{ring:{from:0,to:1,count:Infinity}}]},{...base,emitters:[{shape:{kind:'box',size:[1]}}]},{...base,emitters:[{heat:{rows:1}}]}, JSON.parse('{"name":"teste","duration":1,"emitters":[],"__proto__":{}}')]) expect(()=>parseEffect(value)).toThrow('Invalid effect')
+    expect(()=>parseScene({version:1,objects:[],effects:{'fx:custom-bad':{...base,emitters:[{rate:-1}]}}})).toThrow('Invalid effect')
   })
 })
 

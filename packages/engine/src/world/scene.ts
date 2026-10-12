@@ -70,7 +70,7 @@ export interface Prefab {
 }
 export type PrefabLibrary = Record<string, Prefab>
 
-export function emptyScene(name = 'cenário'): SceneDoc { return { version: 1, name, objects: [] } }
+export function emptyScene(name = 'scene'): SceneDoc { return { version: 1, name, objects: [] } }
 
 export function seededRandom(seed: number) {
   return () => { seed = (Math.imul(seed, 1664525) + 1013904223) >>> 0; return seed / 4294967296 }
@@ -125,7 +125,7 @@ export function buildScene(engine: AsciiEngine, source: SceneDoc, library: Prefa
   } catch (error) { dispose(); engine.setStyle(previousStyle, { replace: true }); throw error }
   function place(item: PlacedObject) {
     const prefab = library[item.prefab]
-    if (!prefab) throw new Error(`ascii-engine: prefab desconhecido "${item.prefab}"`)
+    if (!prefab) throw new Error(`ascii-engine: unknown prefab "${item.prefab}"`)
     const seed = item.seed ?? 48017
     const object = prefab.create({ seed, random: seededRandom(seed), item })
     object.position.set(...item.position); object.rotation.y = item.rotation ?? 0; object.scale.setScalar(item.scale ?? 1)

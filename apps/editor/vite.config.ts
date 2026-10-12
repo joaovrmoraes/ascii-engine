@@ -1,7 +1,7 @@
 import { defineConfig } from 'vite'
 import { startBridge } from '../automation/src/bridge'
 
-// Porta 1440 para não colidir com o Pomorog (1420/1430).
+// Port 1440 avoids conflicts with Pomorog (1420/1430).
 // `base: './'`: exported games (web folder or Tauri) load assets relatively.
 export default defineConfig({
   base: './',
@@ -12,7 +12,7 @@ export default defineConfig({
     catch (error) {
       if ((error as NodeJS.ErrnoException).code !== 'EADDRINUSE') throw error
       const response = await fetch('http://127.0.0.1:1442/health').then(r => r.json())
-      if (response.name !== 'ascii-engine-authoring') throw new Error('A porta 1442 está ocupada por outro serviço.')
+      if (response.name !== 'ascii-engine-authoring') throw new Error('Port 1442 is occupied by another service.')
     }
   } }],
   server: { port: 1440, strictPort: true },

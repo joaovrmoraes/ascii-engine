@@ -6,11 +6,11 @@ export function createSceneCameras(engine: AsciiEngine, callbacks: { viewChanged
   let definitions: Record<string, SceneCamera> = {}, active: string | undefined, selected: string | undefined, viewed: string | undefined
   const overlay = new THREE.Scene(), handles = new Map<string, { object: THREE.Group; camera: THREE.OrthographicCamera; helper: THREE.CameraHelper }>()
   const bar = document.createElement('div'); bar.id = 'camera-view-bar'; bar.hidden = true
-  const label = document.createElement('span'), exit = document.createElement('button'); exit.textContent = 'Voltar à navegação'; exit.onclick = () => view(null); bar.append(label, exit)
+  const label = document.createElement('span'), exit = document.createElement('button'); exit.textContent = 'Back to navigation'; exit.onclick = () => view(null); bar.append(label, exit)
   document.getElementById('app')!.append(bar)
-  const preview = document.createElement('section'); preview.id = 'camera-preview'; preview.hidden = true; preview.setAttribute('aria-label', 'Prévia da câmera selecionada')
+  const preview = document.createElement('section'); preview.id = 'camera-preview'; preview.hidden = true; preview.setAttribute('aria-label', 'Selected camera preview')
   const previewTitle = document.createElement('strong'), previewCanvas = document.createElement('canvas'), previewOpen = document.createElement('button')
-  previewOpen.textContent = 'Ampliar'; previewOpen.onclick = () => { if (selected) { view(selected); callbacks.select(handles.get(selected)!.object) } }
+  previewOpen.textContent = 'Expand'; previewOpen.onclick = () => { if (selected) { view(selected); callbacks.select(handles.get(selected)!.object) } }
   const header = document.createElement('header'); header.append(previewTitle, previewOpen); preview.append(header, previewCanvas); document.getElementById('app')!.append(preview)
   const previewContext = previewCanvas.getContext('2d')!, savedCamera = new THREE.OrthographicCamera()
   let lastPreview = -Infinity
@@ -45,8 +45,8 @@ export function createSceneCameras(engine: AsciiEngine, callbacks: { viewChanged
     }
     updateBar()
   }
-  function updateBar() { bar.hidden = !viewed || document.body.classList.contains('effect-studio-active'); label.textContent = viewed ? `Câmera · ${definitions[viewed]?.name}` : '' }
-  function view(id: string | null) { if (id && !definitions[id]) throw new Error('Câmera inexistente: ' + id); viewed = id ?? undefined; updateBar(); callbacks.viewChanged() }
+  function updateBar() { bar.hidden = !viewed || document.body.classList.contains('effect-studio-active'); label.textContent = viewed ? `Camera · ${definitions[viewed]?.name}` : '' }
+  function view(id: string | null) { if (id && !definitions[id]) throw new Error('Camera not found: ' + id); viewed = id ?? undefined; updateBar(); callbacks.viewChanged() }
   function capture(name: string): SceneCamera {
     const c = engine.camera
     return { name, projection: 'orthographic', position: c.position.toArray(), rotation: [c.rotation.x,c.rotation.y,c.rotation.z], span: (c.top - c.bottom) / (2 * c.zoom), aspect: (c.right - c.left) / (c.top - c.bottom), near: c.near, far: c.far }
@@ -55,7 +55,7 @@ export function createSceneCameras(engine: AsciiEngine, callbacks: { viewChanged
     load({ version: 1, objects: [], cameras: definitions, activeCamera: active }); selected = id; callbacks.select(handles.get(id)!.object); callbacks.changed()
   }
   function add() {
-    const id = `camera-${crypto.randomUUID()}`; definitions[id] = capture(`Câmera ${Object.keys(definitions).length + 1}`); active ??= id; rebuildAndSelect(id)
+    const id = `camera-${crypto.randomUUID()}`; definitions[id] = capture(`Camera ${Object.keys(definitions).length + 1}`); active ??= id; rebuildAndSelect(id)
   }
   function syncSelected() {
     if (!selected) return
@@ -71,9 +71,9 @@ export function createSceneCameras(engine: AsciiEngine, callbacks: { viewChanged
       const field = document.createElement('input'); field.type = type; field.value = typeof value === 'number' ? String(Number(value.toFixed(3))) : value; field.step = '.1'; field.dataset.cameraField = title; field.setAttribute('aria-label', title)
       field.onchange = () => { if (type === 'number' && !Number.isFinite(field.valueAsNumber)) return; change(field.value); refreshPose(id); callbacks.changed() }; row.append(field); root.append(row)
     }
-    const hint = document.createElement('p'); hint.className = 'empty-note'; hint.textContent = 'Câmera ortográfica · W move, E gira. O enquadramento é salvo com a cena.'; root.append(hint)
-    input('Nome da câmera', def.name, value => { if (value.trim()) def.name = value.trim() }, 'text')
-    for (const [property, title] of [['position','Posição'],['rotation','Rotação']] as const) {
+    const hint = document.createElement('p'); hint.className = 'empty-note'; hint.textContent = 'Orthographic camera · W move, E rotate. Framing is saved with the scene.'; root.append(hint)
+    input('Camera name', def.name, value => { if (value.trim()) def.name = value.trim() }, 'text')
+    for (const [property, title] of [['position','Position'],['rotation','Rotation']] as const) {
       const row = document.createElement('div'); row.className = 'vector-row'; const legend = document.createElement('span'); legend.textContent = title; row.append(legend)
       for (const [i, axis] of ['x','y','z'].entries()) {
         const cell = document.createElement('label'); cell.textContent = axis.toUpperCase(); cell.className = `axis-${axis}`
@@ -84,20 +84,20 @@ export function createSceneCameras(engine: AsciiEngine, callbacks: { viewChanged
       }
       root.append(row)
     }
-    input('Altura enquadrada (m)', def.span * 2, value => { const n = Number(value); if (n >= .02 && n <= 20000) def.span = n / 2 })
-    const aspect = document.createElement('label'); aspect.textContent = 'Formato'; const select = document.createElement('select'); select.dataset.cameraField = 'Formato'; select.setAttribute('aria-label', 'Formato da câmera')
-    select.replaceChildren(new Option(`Atual (${def.aspect.toFixed(2)}:1)`, String(def.aspect)), new Option('Paisagem 16:9', String(16/9)), new Option('Paisagem 4:3', String(4/3)), new Option('Quadrado 1:1', '1'), new Option('Retrato 9:16', String(9/16)))
+    input('Frame height (m)', def.span * 2, value => { const n = Number(value); if (n >= .02 && n <= 20000) def.span = n / 2 })
+    const aspect = document.createElement('label'); aspect.textContent = 'Aspect ratio'; const select = document.createElement('select'); select.dataset.cameraField = 'Aspect ratio'; select.setAttribute('aria-label', 'Camera aspect ratio')
+    select.replaceChildren(new Option(`Current (${def.aspect.toFixed(2)}:1)`, String(def.aspect)), new Option('Landscape 16:9', String(16/9)), new Option('Landscape 4:3', String(4/3)), new Option('Square 1:1', '1'), new Option('Portrait 9:16', String(9/16)))
     select.onchange = () => { def.aspect = Number(select.value); refreshPose(id); callbacks.changed() }; aspect.append(select); root.append(aspect)
     const actions = document.createElement('div'); actions.className = 'camera-actions'; root.append(actions)
     function button(title: string, key: string, action: () => void) { const b = document.createElement('button'); b.textContent = title; b.dataset.cameraAction = key; b.onclick = action; actions.append(b) }
-    button(viewed === id ? 'Voltar à navegação' : 'Ver pela câmera', 'view', () => { view(viewed === id ? null : id); callbacks.select(handles.get(id)!.object) })
-    button('Capturar enquadramento atual', 'capture', () => { definitions[id] = capture(def.name); rebuildAndSelect(id) })
-    button('Apontar para o centro da vista', 'aim', () => { const object = handles.get(id)!.object; object.lookAt(callbacks.focus()); object.rotateY(Math.PI); syncSelected(); callbacks.changed() })
-    button(active === id ? '✓ Câmera inicial' : 'Usar como câmera inicial', 'activate', () => { active = id; callbacks.changed() })
-    button('Duplicar câmera', 'duplicate', duplicate)
-    const note = document.createElement('p'); note.className = 'empty-note'; note.textContent = 'Ao ver pela câmera, a proporção é preservada. Volte à navegação para mover objetos e o gizmo.'; root.append(note)
+    button(viewed === id ? 'Back to navigation' : 'View through camera', 'view', () => { view(viewed === id ? null : id); callbacks.select(handles.get(id)!.object) })
+    button('Capture current framing', 'capture', () => { definitions[id] = capture(def.name); rebuildAndSelect(id) })
+    button('Aim at view center', 'aim', () => { const object = handles.get(id)!.object; object.lookAt(callbacks.focus()); object.rotateY(Math.PI); syncSelected(); callbacks.changed() })
+    button(active === id ? '✓ Initial camera' : 'Use as initial camera', 'activate', () => { active = id; callbacks.changed() })
+    button('Duplicate camera', 'duplicate', duplicate)
+    const note = document.createElement('p'); note.className = 'empty-note'; note.textContent = 'Camera view preserves the aspect ratio. Return to navigation to move objects and use the gizmo.'; root.append(note)
   }
-  function duplicate() { if (!selected) return; const id = `camera-${crypto.randomUUID()}`; definitions[id] = { ...structuredClone(definitions[selected]), name: definitions[selected].name + ' cópia' }; rebuildAndSelect(id) }
+  function duplicate() { if (!selected) return; const id = `camera-${crypto.randomUUID()}`; definitions[id] = { ...structuredClone(definitions[selected]), name: definitions[selected].name + ' copy' }; rebuildAndSelect(id) }
   function remove() { if (!selected) return; const id = selected; delete definitions[id]; if (active === id) active = undefined; if (viewed === id) viewed = undefined; load({version:1,objects:[],cameras:definitions,activeCamera:active}); callbacks.select(); callbacks.changed() }
   return {
     add, load, inspector, duplicate, remove, syncSelected, view,

@@ -168,7 +168,7 @@ export function createAsciiEngine(canvas: HTMLCanvasElement, options: AsciiEngin
   function apply(entry: Entry) {
     const { object, options: instance } = entry
     const type = instance.type ? types[instance.type] : undefined
-    if (instance.type && !type) throw new Error(`ascii-engine: tipo de objeto desconhecido "${instance.type}"`)
+    if (instance.type && !type) throw new Error(`ascii-engine: unknown object type "${instance.type}"`)
     const partNames = new Set([...Object.keys(type?.parts ?? {}), ...Object.keys(instance.parts ?? {})])
     const groups = new Map<string, { style: GlyphStyle; meshes: THREE.Object3D[] }>()
     const missing: string[] = []
@@ -196,7 +196,7 @@ export function createAsciiEngine(canvas: HTMLCanvasElement, options: AsciiEngin
       for (const child of [...node.children]) visit(child, part, nodeStyle)
     }
     visit(object, undefined, undefined)
-    if (missing.length) throw new Error(`ascii-engine: sem técnica declarada (glyph) em ${missing.slice(0, 5).join(', ')}`)
+    if (missing.length) throw new Error(`ascii-engine: no declared technique (glyph) on ${missing.slice(0, 5).join(', ')}`)
     for (const { style: s, meshes } of groups.values()) applyTechnique(s, meshes)
   }
 
@@ -223,19 +223,19 @@ export function createAsciiEngine(canvas: HTMLCanvasElement, options: AsciiEngin
       }
       case 'carpet':
         for (const mesh of nodes) {
-          if (!carpets.some((c) => c.mesh === mesh)) throw new Error('ascii-engine: carpet precisa vir de engine.createCarpet()')
+          if (!carpets.some((c) => c.mesh === mesh)) throw new Error('ascii-engine: carpet must come from engine.createCarpet()')
           carpetScene.add(mesh)
         }
         return
       case 'particle':
         for (const mesh of nodes) {
-          if (!clouds.some((c) => c.mesh === mesh) && !streaks.some((r) => r.mesh === mesh)) throw new Error('ascii-engine: particle precisa vir de engine.createParticles() ou createRainStreaks()')
+          if (!clouds.some((c) => c.mesh === mesh) && !streaks.some((r) => r.mesh === mesh)) throw new Error('ascii-engine: particle must come from engine.createParticles() or createRainStreaks()')
           particleScene.add(mesh)
         }
         return
       case 'water':
         for (const mesh of nodes) {
-          if (!waters.some((w) => w.mesh === mesh)) throw new Error('ascii-engine: water precisa vir de engine.createWater()')
+          if (!waters.some((w) => w.mesh === mesh)) throw new Error('ascii-engine: water must come from engine.createWater()')
           if (!mesh.parent) scene.add(mesh)
         }
         return
@@ -334,14 +334,14 @@ export function createAsciiEngine(canvas: HTMLCanvasElement, options: AsciiEngin
     /** Changes one part of one instance ("only this crown") and re-applies it. */
     setPartStyle(object: THREE.Object3D, part: string, partStyle: GlyphStyle) {
       const entry = entries.get(object)
-      if (!entry) throw new Error('ascii-engine: objeto não foi adicionado com engine.add')
+      if (!entry) throw new Error('ascii-engine: object was not added with engine.add')
       entry.options.parts = { ...entry.options.parts, [part]: { ...entry.options.parts?.[part], ...partStyle } }
       unapply(entry); apply(entry)
     },
     /** Changes the instance layer of one added object (all its parts unless they override). */
     setInstanceStyle(object: THREE.Object3D, instanceStyle: GlyphStyle) {
       const entry = entries.get(object)
-      if (!entry) throw new Error('ascii-engine: objeto não foi adicionado com engine.add')
+      if (!entry) throw new Error('ascii-engine: object was not added with engine.add')
       entry.options = { ...entry.options, ...instanceStyle }
       unapply(entry); apply(entry)
     },

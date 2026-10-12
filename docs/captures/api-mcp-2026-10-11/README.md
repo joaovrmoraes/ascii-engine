@@ -1,27 +1,26 @@
-# Autoria real pelo MCP — 11/10/2026
+# Real authoring through MCP — 2026-10-11
 
-Capturas do `pnpm verify:api`, em Chromium isolado com GPU, sem editar o
-rascunho do navegador do dono. O cliente oficial MCP iniciou o servidor
-stdio, descobriu ferramentas e passou pela ponte HTTP/WebSocket até o
-mesmo editor visual. Não houve injeção direta de cena para executar os
-comandos de autoria testados.
+Screenshots from `pnpm verify:api`, isolated GPU Chromium, without modifying
+the owner's browser draft. The official MCP client started the stdio server,
+discovered tools and passed through HTTP/WebSocket into the same visual
+editor. Tested authoring commands did not use direct scene injection.
 
-- `mcp-previa.png`: lote completo na cena, ainda não aceito, com botões
-  Aplicar/Descartar e edição manual bloqueada.
-- `mcp-cena.png`: imagem retornada por `editor_capture` ao cliente MCP.
-- `mcp-cena-editor.png`: cena aceita, com modelo importado e edição manual
-  posterior usada para verificar conflito de revisão.
-- [Documento portátil](../../examples/mapa-mcp.pomorog.json): exportado
-  pelo MCP com relevo, água, árvores, fogueira, efeito azul, atmosfera,
-  chuva e um GLTF de teste incorporado.
+- `mcp-previa.png`: complete unaccepted batch, Apply/Discard buttons and
+  manual editing locked.
+- `mcp-cena.png`: image returned by `editor_capture` to the MCP client.
+- `mcp-cena-editor.png`: accepted scene with imported model; later manual
+  edits tested revision conflict.
+- [Portable document](../../examples/mapa-mcp.pomorog.json): MCP export
+  with terrain, water, trees, campfire, blue effect, atmosphere, rain and
+  an embedded test GLTF.
 
-Verificado: aplicação atômica, cancelamento integral, um desfazer por
-lote, refazer, erro sem perda de recursos, conflito com revisão antiga,
-importação com acompanhantes, inspeção de partes, captura PNG, exportação
-sem sobrescrita acidental e reabertura idêntica. A configuração do cliente
-MCP do dono não foi alterada; o cliente usado aqui é o de integração.
+Verified atomic application, complete cancel, one undo per batch, redo,
+errors without resource loss, stale revisions, companion import, part
+inspection, PNG capture, export without accidental overwrite and identical
+reopen. The owner's MCP client configuration was not changed; this used
+the integration client.
 
-`orca-api-canvas.png`: leitura da cena do dono pela própria API no Orca,
-sem edição (revisão 0). O canvas é renderizado sob demanda porque essa aba
-não executava os quadros de animação. O screenshot do viewport do Orca
-continuou expirando; esta imagem veio do canvas, não do viewport.
+`orca-api-canvas.png`: read-only access to the owner's scene through its
+API in Orca (revision 0). Canvas was rendered on demand because the tab
+was not running animation frames. Viewport screenshot still timed out;
+this is a canvas image, not the viewport. Historical UI language: Portuguese.

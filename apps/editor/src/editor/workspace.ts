@@ -6,68 +6,68 @@ export function createWorkspace() {
   document.body.classList.add('authoring')
   const root = document.createElement('div'); root.id = 'editor-workspace'
   root.innerHTML = `
-    <header id="studio-toolbar" hidden><button data-k="close-studio">← Voltar à cena</button><strong>Estúdio</strong><nav aria-label="Área do estúdio"><button data-studio-page="effects">Efeitos</button><button data-studio-page="atmosphere">Atmosfera</button></nav><span>Prévia ao vivo</span></header>
+    <header id="studio-toolbar" hidden><button data-k="close-studio">← Back to scene</button><strong>Studio</strong><nav aria-label="Studio workspace"><button data-studio-page="effects">Effects</button><button data-studio-page="atmosphere">Atmosphere</button></nav><span>Live preview</span></header>
     <header id="authoring-toolbar">
       <div class="menu-row"><strong class="brand">${icon('cube')} ASCII Engine</strong>
-        <details class="editor-menu"><summary>Arquivo</summary><div class="menu-items">
-          <button data-k="new">Novo mapa <kbd>terreno</kbd></button><button data-k="item">Novo item <kbd>vazio</kbd></button>
-          <label class="file">Abrir documento…<input data-k="open" type="file" accept=".json" hidden></label>
-          <button data-k="save">Salvar arquivo <kbd>Ctrl S</kbd></button><button data-k="export">Exportar para Pomorog…</button><button data-k="reset-layout">Restaurar painéis</button>
+        <details class="editor-menu"><summary>File</summary><div class="menu-items">
+          <button data-k="new">New map <kbd>terrain</kbd></button><button data-k="item">New item <kbd>empty</kbd></button>
+          <label class="file">Open document…<input data-k="open" type="file" accept=".json" hidden></label>
+          <button data-k="save">Save file <kbd>Ctrl S</kbd></button><button data-k="export">Export for Pomorog…</button><button data-k="reset-layout">Reset panels</button>
         </div></details>
-        <button data-k="undo" title="Desfazer (Ctrl Z)" aria-label="Desfazer">↶</button><button data-k="redo" title="Refazer (Ctrl Shift Z)" aria-label="Refazer">↷</button>
-        <span class="document-title"><input data-k="name" aria-label="Nome do documento"><span class="document-kind">Cena visual</span></span>
+        <button data-k="undo" title="Undo (Ctrl Z)" aria-label="Undo">↶</button><button data-k="redo" title="Redo (Ctrl Shift Z)" aria-label="Redo">↷</button>
+        <span class="document-title"><input data-k="name" aria-label="Document name"><span class="document-kind">Visual scene</span></span>
         <span data-k="note" class="save-note" role="status"></span>
       </div>
       <div class="main-toolbar">
-        <button data-k="library">${icon('plus')} Adicionar objeto</button>
-        <button data-k="create-camera">${icon('camera')} Criar câmera</button>
-        <button data-k="create-effect">${icon('spark')} Criar efeito</button>
-        <button data-k="save-short">${icon('save')} Salvar</button>
-        <div class="preview-controls"><button data-k="preview">${icon('play')} Prévia</button><button data-k="pause" title="Pausar animação" aria-label="Pausar animação">${icon('pause')}</button></div>
-        <button data-k="export-short" class="export-action">Exportar ${icon('import')}</button>
+        <button data-k="library">${icon('plus')} Add object</button>
+        <button data-k="create-camera">${icon('camera')} Create camera</button>
+        <button data-k="create-effect">${icon('spark')} Create effect</button>
+        <button data-k="save-short">${icon('save')} Save</button>
+        <div class="preview-controls"><button data-k="preview">${icon('play')} Preview</button><button data-k="pause" title="Pause animation" aria-label="Pause animation">${icon('pause')}</button></div>
+        <button data-k="export-short" class="export-action">Export ${icon('import')}</button>
       </div>
     </header>
-    <aside id="hierarchy" aria-label="Hierarquia">
-      <div class="dock-heading">Hierarquia <span data-k="count"></span></div>
-      <label class="search-field">${icon('search')}<input data-k="search" type="search" placeholder="Buscar na cena" aria-label="Buscar na cena"></label>
+    <aside id="hierarchy" aria-label="Hierarchy">
+      <div class="dock-heading">Hierarchy <span data-k="count"></span></div>
+      <label class="search-field">${icon('search')}<input data-k="search" type="search" placeholder="Search scene" aria-label="Search scene"></label>
       <div class="scene-name">▾ ${icon('cube')} <span data-k="scene-name"></span></div>
-      <div data-k="objects" role="list" aria-label="Objetos da cena"></div>
-      <div class="hierarchy-footer">Tudo o que está neste mapa</div>
+      <div data-k="objects" role="list" aria-label="Scene objects"></div>
+      <div class="hierarchy-footer">Everything in this map</div>
     </aside>
     <div id="scene-toolbar">
-      <div class="scene-tab"><span class="active">${icon('cube')} Cena</span><span class="scene-description">Vista do editor</span></div>
-      <div class="scene-tools" role="toolbar" aria-label="Ferramentas da cena">
-        <button data-mode="orbit" title="Orbitar em 3D (O): arraste na cena">${icon('rotate')}<span>Orbitar</span></button>
-        <button data-mode="hand" title="Navegar (Q)">${icon('hand')}<span>Q</span></button>
-        <button data-mode="translate" title="Mover (W)">${icon('move')}<span>W</span></button>
-        <button data-mode="rotate" title="Girar (E)">${icon('rotate')}<span>E</span></button>
-        <button data-mode="scale" title="Escalar (R)">${icon('scale')}<span>R</span></button>
+      <div class="scene-tab"><span class="active">${icon('cube')} Scene</span><span class="scene-description">Editor view</span></div>
+      <div class="scene-tools" role="toolbar" aria-label="Scene tools">
+        <button data-mode="orbit" title="Orbit in 3D (O): drag in the scene">${icon('rotate')}<span>Orbit</span></button>
+        <button data-mode="hand" title="Pan (Q)">${icon('hand')}<span>Q</span></button>
+        <button data-mode="translate" title="Move (W)">${icon('move')}<span>W</span></button>
+        <button data-mode="rotate" title="Rotate (E)">${icon('rotate')}<span>E</span></button>
+        <button data-mode="scale" title="Scale (R)">${icon('scale')}<span>R</span></button>
         <span class="tool-divider"></span>
-        <select data-k="space" aria-label="Espaço das transformações"><option value="world">Global</option><option value="local">Local</option></select>
-        <button data-k="snap" aria-pressed="false" title="Encaixe: 0,5 m / 15° / escala 0,1">${icon('grid')} Encaixar</button>
-        <button data-k="frame" title="Focar seleção (F)">${icon('focus')}</button>
-        <button data-k="reset-view" title="Restaurar ângulo isométrico">Isométrica</button>
-        <button data-k="view" class="view-action">Exibição ▾</button>
+        <select data-k="space" aria-label="Transform space"><option value="world">Global</option><option value="local">Local</option></select>
+        <button data-k="snap" aria-pressed="false" title="Snap: 0.5 m / 15° / 0.1 scale">${icon('grid')} Snap</button>
+        <button data-k="frame" title="Focus selection (F)">${icon('focus')}</button>
+        <button data-k="reset-view" title="Reset isometric angle">Isometric</button>
+        <button data-k="view" class="view-action">Display ▾</button>
       </div>
     </div>
-    <div id="scene-hint"><span data-k="instruction"></span><button data-k="cancel" hidden>Cancelar <kbd>Esc</kbd></button></div>
+    <div id="scene-hint"><span data-k="instruction"></span><button data-k="cancel" hidden>Cancel <kbd>Esc</kbd></button></div>
     <div id="placement-label" hidden></div>
-    <aside id="authoring-sidebar" aria-label="Inspetor">
-      <div class="dock-heading">Inspetor</div>
-      <nav class="inspector-tabs" aria-label="Painéis do inspetor"><button data-tab="object">Objeto</button><button data-tab="terrain">Terreno</button><button data-tab="environment">Ambiente</button></nav>
+    <aside id="authoring-sidebar" aria-label="Inspector">
+      <div class="dock-heading">Inspector</div>
+      <nav class="inspector-tabs" aria-label="Inspector panels"><button data-tab="object">Object</button><button data-tab="terrain">Terrain</button><button data-tab="environment">Environment</button></nav>
       <section data-pane="object"><div id="object-inspector" data-k="inspector"></div><div data-mount="selection"></div></section>
       <section data-pane="terrain" hidden><div id="tools"></div></section>
       <section data-pane="environment" hidden><div id="environment-settings"></div></section>
-      <section data-pane="view" hidden><div class="component-title">Exibição da cena</div><div data-mount="panel"></div></section>
+      <section data-pane="view" hidden><div class="component-title">Scene display</div><div data-mount="panel"></div></section>
     </aside>
-    <section id="asset-browser" aria-label="Biblioteca de objetos">
-      <div class="dock-heading"><div class="project-tabs"><button data-project-tab="assets">${icon('folder')} Projeto</button><button data-project-tab="studio">${icon('spark')} Estúdio</button></div>
-        <div class="asset-actions"><label class="file">${icon('import')} Importar modelo<input data-k="model-import" type="file" multiple accept=".glb,.gltf,.bin,.png,.jpg,.jpeg,.webp" hidden></label><label class="file">Inserir item salvo<input data-k="insert" type="file" accept=".json" hidden></label></div>
+    <section id="asset-browser" aria-label="Asset library">
+      <div class="dock-heading"><div class="project-tabs"><button data-project-tab="assets">${icon('folder')} Project</button><button data-project-tab="studio">${icon('spark')} Studio</button></div>
+        <div class="asset-actions"><label class="file">${icon('import')} Import model<input data-k="model-import" type="file" multiple accept=".glb,.gltf,.bin,.png,.jpg,.jpeg,.webp" hidden></label><label class="file">Insert saved item<input data-k="insert" type="file" accept=".json" hidden></label></div>
       </div>
-      <div class="asset-body"><nav data-k="categories" aria-label="Categorias de objetos"></nav><div class="asset-content">
-        <div class="asset-search-row"><label class="search-field">${icon('search')}<input data-k="asset-search" type="search" placeholder="Buscar objetos…" aria-label="Buscar objetos"></label><span>Arraste para a cena · ou clique e escolha um ponto</span></div>
-        <div data-k="assets" role="list" aria-label="Objetos disponíveis"></div>
-      </div></div><section id="studio-workspace" hidden><nav class="studio-tabs" aria-label="Estúdio"><button data-studio-tab="effects">Efeitos</button><button data-studio-tab="atmosphere">Atmosfera</button></nav><section id="effect-editor" hidden></section><section id="atmosphere-studio" hidden></section></section>
+      <div class="asset-body"><nav data-k="categories" aria-label="Asset categories"></nav><div class="asset-content">
+        <div class="asset-search-row"><label class="search-field">${icon('search')}<input data-k="asset-search" type="search" placeholder="Search assets…" aria-label="Search assets"></label><span>Drag into the scene · or click and choose a position</span></div>
+        <div data-k="assets" role="list" aria-label="Available assets"></div>
+      </div></div><section id="studio-workspace" hidden><nav class="studio-tabs" aria-label="Studio"><button data-studio-tab="effects">Effects</button><button data-studio-tab="atmosphere">Atmosphere</button></nav><section id="effect-editor" hidden></section><section id="atmosphere-studio" hidden></section></section>
     </section>`
   document.body.append(root)
   root.querySelector('[data-mount="panel"]')!.append(document.getElementById('panel')!)

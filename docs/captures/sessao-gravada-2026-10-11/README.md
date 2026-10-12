@@ -1,51 +1,52 @@
-# Sessão de composição gravada no OBS — 11/10/2026
+# OBS composition session — 2026-10-11
 
-Gravação real da janela do editor pelo OBS nativo, usando o portal PipeWire
-do Hyprland. Editor em tela cheia na área 5 e OBS na área 6. Cliques, arrastos
-e ajustes pela interface, com cursor visível. Perfil separado do mapa do dono
-aberto no Orca. Nenhuma alteração no código da engine nesta etapa.
+Real native OBS capture of the editor window via Hyprland's PipeWire portal.
+Fullscreen editor on workspace 5, OBS on 6. Visible-cursor clicks/drags and
+adjustments through the interface; profile separate from the owner's Orca
+map. No engine code changes in this stage.
 
-## Arquivos entregues
+## Delivered files
 
-- [Vídeo MP4](/home/jonny/Videos/ASCII-Engine-2026-10-11/ASCII-Engine-criacao-completa.mp4):
-  310,6 segundos, 2560×1080, 30 fps, H.264, sem áudio.
-- [Mapa editável](/home/jonny/Videos/ASCII-Engine-2026-10-11/Lago-das-Brasas.ascii.json).
-- [Exportação Pomorog](/home/jonny/Videos/ASCII-Engine-2026-10-11/Lago-das-Brasas.pomorog.json).
+- [MP4](/home/jonny/Videos/ASCII-Engine-2026-10-11/ASCII-Engine-criacao-completa.mp4):
+  310.6 s, 2560×1080/30 fps, H.264, no audio.
+- [Editable map](/home/jonny/Videos/ASCII-Engine-2026-10-11/Lago-das-Brasas.ascii.json).
+- [Pomorog export](/home/jonny/Videos/ASCII-Engine-2026-10-11/Lago-das-Brasas.pomorog.json).
 
-O master `2026-10-11 22-23-26.mkv` está na mesma pasta. Vídeos ficam fora do
-repositório. Tentativas com falhas de captura foram separadas em `bastidores/`.
+2026-10-11 22-23-26.mkv master is in the same folder. Videos remain outside
+Git; failed capture attempts are separated in bastidores/. This historical
+recording shows Portuguese UI and retains its original asset names.
 
-## Capítulos
+## Chapters
 
-| Início | Conteúdo |
+| Start | Content |
 | --- | --- |
-| 00:00 | Novo mapa, elevação e suavização do terreno |
-| 00:43 | Pincel de água e caminho |
-| 01:19 | Árvores, pedras, ruína e tronco |
-| 02:16 | Estúdio de efeito: chama, camadas, luz e salvar nos Assets |
-| 03:11 | Estúdio de atmosfera: cor, iluminação, névoa e salvar nos Assets |
-| 04:04 | Água, câmera com miniatura, salvar, exportar e Prévia |
+| 00:00 | New map, terrain raise/smooth |
+| 00:43 | Water brush/path |
+| 01:19 | Trees, rocks, ruin/log |
+| 02:16 | Effect Studio: flame, layers, light, save to Assets |
+| 03:11 | Atmosphere Studio: color, lighting, fog, save to Assets |
+| 04:04 | Water, camera thumbnail, save/export/Preview |
 
-## Evidências do próprio vídeo
+## Evidence from the video
 
-Quadros extraídos do MP4 final por FFmpeg, sem substituição por screenshots:
+Frames extracted by FFmpeg from final MP4, not replaced with screenshots:
 
-- [Terreno](terreno.png), segundo 35.
-- [Estúdio de efeito e luz](efeito.png), segundo 163.
-- [Estúdio de atmosfera](atmosfera.png), segundo 222.
-- [Câmera](camera.png), segundo 285.
-- [Prévia final](previa-final.png), segundo 306.
+- [Terrain](terreno.png), second 35.
+- [Effect Studio/light](efeito.png), second 163.
+- [Atmosphere Studio](atmosfera.png), second 222.
+- [Camera](camera.png), second 285.
+- [Final preview](previa-final.png), second 306.
 
-## Verificação
+## Validation
 
-- [Metadados do vídeo](validacao-video.json) e
-  [resultado da decodificação integral](validacao-video.txt): sem erros.
-- [Leitura do mapa exportado](validacao-mapa.json) pelo parser da engine:
-  terreno de 32 m, 10 objetos, uma água, um efeito, uma atmosfera e uma câmera
-  inicial válida. Mapa e exportação foram baixados pelos botões da interface.
-- [pnpm check](pnpm-check.log): 79 testes, tipos e build passaram. Avisos de
-  chunks grandes e anotações do Zod permanecem.
+- [Video metadata](validacao-video.json) /
+  [full decode](validacao-video.txt): no errors.
+- [Engine parser reading](validacao-mapa.json): 32 m terrain, ten objects,
+  one water/effect/atmosphere and valid initial camera. Map/export were
+  downloaded through interface buttons.
+- [pnpm check](pnpm-check.log): 79 tests, types/build passed;
+  existing large-chunk/Zod annotation warnings remain.
 
-A sessão cobre a composição pedida, sem narração. Não verifica consumo do
-arquivo pelo Pomorog nem demonstra todas as ferramentas avançadas da engine.
-OBS foi encerrado normalmente ao terminar e o foco voltou para o Orca.
+The session covers the requested composition, without narration. It does
+not verify Pomorog consumption or demonstrate every advanced tool. OBS
+closed normally at completion and focus returned to Orca.

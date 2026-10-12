@@ -1,6 +1,6 @@
 /**
- * @ascii-engine/core — 3D convertido em ASCII, com as letras presas às coisas.
- * Núcleo extraído do Pomorog (reference/pomorog/src-visual). Não importa jogo,
+ * @ascii-engine/core — 3D rendered in ASCII, with letters attached to objects.
+ * Core extracted from Pomorog (reference/pomorog/src-visual). It imports no game,
  * UI nem Tauri; efeitos de bioma entram por ganchos (`AsciiPassHook`) ou presets.
  */
 export const ENGINE_VERSION = '0.1.0'

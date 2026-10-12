@@ -34,7 +34,7 @@ try {
     return response.result?.value
   }
   const until = async expression => { for (let i = 0; i < 150; i++) { if (await evaluate(expression)) return; await sleep(100) }; throw new Error(`Timed out: ${expression}`) }
-  const action = async expression => { await evaluate(`(async () => { ${expression} })()`); await until('window.area && !area.state.includes("abrindo")'); await sleep(200) }
+  const action = async expression => { await evaluate(`(async () => { ${expression} })()`); await until('window.area && !area.state.includes("opening")'); await sleep(200) }
   const check = async (title, expression) => { if (!await evaluate(expression)) throw new Error(`FAIL: ${title}`); console.log(`PASS ${title}`) }
   const shot = async name => { await sleep(500); const result = await send('Page.captureScreenshot', { format: 'png' }); await writeFile(join(output, name + '.png'), Buffer.from(result.data, 'base64')) }
   await send('Runtime.enable'); await send('Page.enable'); await send('Emulation.setFocusEmulationEnabled', { enabled: true })
@@ -103,9 +103,9 @@ try {
   await capture('encosta-escoando')
   await check('flow leaves sculpted terrain and authored water unchanged',`JSON.stringify(area.document())===beforeFlow`)
   await check('wet water vertices remain above the mountain surface',`(()=>{const w=engine.waters[0],p=w.mesh.geometry.attributes.position,d=area.document().terrain;for(let i=0;i<p.count;i++)if(w.dynamics.wet[i] && w.dynamics.depth[i]>.003 && p.getY(i)<d.heights[i]-.002)return false;return true})()`)
-  await action(`Array.from(document.querySelectorAll('.hierarchy-object')).find(b=>b.textContent==='Água 1').click();ui('[data-field="Lâmina inicial (m)"]','0.12')`)
+  await action(`Array.from(document.querySelectorAll('.hierarchy-object')).find(b=>b.textContent==='Water 1').click();ui('[data-field="Initial depth (m)"]','0.12')`)
   await check('water inspector persists physical settings',`area.document().waters[0].physics.depth===.12`)
-  await action(`ui('[data-field="Vazão na nascente (m/s)"]','0')`)
+  await action(`ui('[data-field="Source rate (m/s)"]','0')`)
   await check('water source can be closed in the inspector',`area.document().waters[0].physics.source===0`)
   await shot('inspetor-agua')
   await send('Page.navigate',{url:'http://localhost:1440/?area=sunken_cathedral&pause=5'})

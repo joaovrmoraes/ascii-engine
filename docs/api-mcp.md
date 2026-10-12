@@ -1,108 +1,110 @@
-# Autoria visual por IA — API e MCP
+# AI visual authoring — API and MCP
 
-A IA tem acesso a todo o documento visual do editor: terreno, pintura,
-água, modelos, objetos e suas partes, efeitos, luzes, atmosfera, clima e
-exportação. Pode editar a cena aberta, apresentar uma prévia ou aplicar
-diretamente. Cada lote aplicado vira uma ação de desfazer.
+An agent can access the editor's full visual document: terrain, painting,
+water, models, objects and their parts, effects, lights, atmosphere, weather
+and export. It can edit the open scene, show a preview or apply directly.
+Each applied batch becomes one undo action.
 
-Isso cobre os recursos visuais implementados no editor. A API não cria
-regras de jogo, não instala um importador no Pomorog e não adiciona ao
-renderer recursos que ele ainda não implementa.
+This covers visual features implemented in the editor. The API does not
+create game rules, install a Pomorog importer or add unsupported renderer
+features.
 
-## Iniciar e conectar
+## Start and connect
 
-Na raiz do projeto:
+From the project root:
 
 ```sh
 pnpm install
 pnpm dev
 ```
 
-Abra `http://localhost:1440/?area=sandbox`. O desenvolvimento inicia também
-a API em `http://127.0.0.1:1442`. Cada aba recebe uma sessão própria; a IA
-precisa escolher explicitamente o `sessionId`. O servidor não escolhe a
-primeira aba automaticamente.
+Open `http://localhost:1440/?area=sandbox`. Development also starts the
+API at `http://127.0.0.1:1442`. Every tab has its own session; the agent
+must explicitly select `sessionId`. The server never chooses the first
+available tab automatically.
 
-O servidor MCP usa **stdio**. Para um cliente MCP, adapte os caminhos de
-[`.mcp.example.json`](../.mcp.example.json) à instalação. O comando direto é:
+The MCP server uses **stdio**. For an MCP client, adapt the paths in
+[`.mcp.example.json`](../.mcp.example.json) to your installation. Run directly
+from the project root with:
 
 ```sh
-node /home/jonny/Documents/ascii-engine/apps/automation/node_modules/tsx/dist/cli.mjs \
-  /home/jonny/Documents/ascii-engine/apps/automation/src/mcp.ts
+node apps/automation/node_modules/tsx/dist/cli.mjs apps/automation/src/mcp.ts
 ```
 
-Também existe `pnpm mcp` para iniciar pelo workspace. Esse processo fala
-JSON-RPC pelo stdin/stdout; não é um terminal interativo. A configuração
-global do seu cliente de IA não é modificada pelo projeto.
+`pnpm mcp` also starts it through the workspace. The process speaks JSON-RPC
+through stdin/stdout; it is not an interactive terminal. The project does
+not modify your AI client's global configuration.
 
-Para usar o editor compilado/desktop com a ponte separada, inicie `pnpm api`
-e abra o editor. O player exportado não abre conexão de autoria. A integração
-desktop ainda não foi executada nesta etapa; a verificação ponta a ponta
-foi feita no editor web com Chromium e GPU.
+To use the built/desktop editor with a separate bridge, start `pnpm api`
+and open the editor. Exported players never connect to authoring.
+Desktop integration has not been executed in this stage; end-to-end
+verification used the web editor with Chromium and GPU.
 
-`ASCII_ENGINE_API` muda o endereço consultado pelo servidor MCP. A ponte
-escuta somente em loopback, na porta 1442; não é um serviço público.
-Os navegadores autorizados são localhost:1440, 127.0.0.1:1440 e origens
-locais do Tauri. API HTTP não habilita CORS para sites externos.
+`ASCII_ENGINE_API` changes the address used by the MCP server. The bridge
+listens on loopback only, on port 1442; it is not a public service.
+Allowed browser origins are localhost:1440, 127.0.0.1:1440 and local Tauri
+origins. The HTTP API does not enable CORS for external sites.
 
-## Ferramentas MCP
+## MCP tools
 
-| Ferramenta | Operação |
+| Tool | Operation |
 | --- | --- |
-| `engine_sessions` | Lista cenas conectadas, revisão e prévia pendente. |
-| `engine_reference` | Catálogo atual, esquema dos comandos, presets completos de efeitos/água/estilo e contrato do documento. |
-| `scene_read` | Lê cena e revisão. `full: true` inclui todos os arrays e fontes incorporadas. |
-| `scene_validate` | Valida lote e referências sem editar. Modelos são decodificados na aplicação. |
-| `scene_apply` | Executa comandos em lote. `preview: true` por padrão; `false` aplica diretamente. |
-| `scene_preview` | `accept` grava a prévia; `cancel` restaura a cena anterior. |
-| `scene_history` | `undo`/`redo` no mesmo histórico usado pela interface. |
-| `object_inspect` | Documento do objeto, partes, opções ASCII e clipes de animação. |
-| `editor_view` | Foco XYZ, ângulo horizontal, `elevation` em radianos (0,02–π/2−0,01), zoom, pausa, câmera salva e tela do Estúdio. |
-| `water_disturb` | Impulso transitório: `index`, `x`, `z`, `strength` (−1–1) e `radius` (0,05–8 m). Não altera revisão/histórico. |
-| `editor_capture` | Retorna imagem PNG da cena renderizada como conteúdo de imagem MCP. |
-| `assets_import` | Importa GLB ou GLTF e acompanhantes de caminhos locais explícitos. |
-| `scene_open` | Abre documento visual local, com prévia ou aplicação direta. |
-| `scene_export` | Exporta documento incorporando modelos e efeitos; exige `overwrite: true` para substituir arquivo. |
+| `engine_sessions` | Lists connected scenes, revision and pending preview. |
+| `engine_reference` | Live catalog, command schema, complete effect/water/style presets and document contract. |
+| `scene_read` | Reads scene and revision. `full: true` includes all arrays and embedded sources. |
+| `scene_validate` | Validates a batch and its references without editing. Models are decoded when applied. |
+| `scene_apply` | Applies a command batch. `preview: true` by default; `false` applies directly. |
+| `scene_preview` | `accept` saves the preview; `cancel` restores the previous scene. |
+| `scene_history` | `undo`/`redo` using the same history as the interface. |
+| `object_inspect` | Object document, parts, ASCII options and animation clips. |
+| `editor_view` | XYZ focus, horizontal angle, `elevation` in radians (0.02–π/2−0.01), zoom, pause, saved camera and Studio page. |
+| `water_disturb` | Transient impulse: `index`, `x`, `z`, `strength` (−1–1), `radius` (0.05–8 m). Does not change revision/history. |
+| `editor_capture` | Returns a rendered scene PNG as MCP image content. |
+| `assets_import` | Imports GLB or GLTF and companion files from explicit local paths. |
+| `scene_open` | Opens a local visual document, with preview or direct application. |
+| `scene_export` | Exports a document with embedded models/effects; requires `overwrite: true` to replace a file. |
 
-Fluxo recomendado para a IA: listar sessões → ler cena/revisão → consultar
-catálogo e referências necessárias → montar lote → prévia → capturar e
-conferir → aceitar. A IA pode aceitar a própria prévia e aplicar diretamente.
-Os botões **Aplicar** e **Descartar** também aparecem para a pessoa no
-editor; não são uma aprovação obrigatória.
+Recommended agent workflow: list sessions → read scene/revision → consult
+catalog and required references → build a batch → preview → capture and
+inspect → accept. An agent can accept its own preview or apply directly.
+**Apply** and **Discard** buttons are also available in the editor; they
+are not a mandatory human approval gate.
 
-Durante a prévia, os controles de edição ficam bloqueados; a câmera
-continua navegável. A prévia não entra no rascunho nem no histórico até
-ser aceita. Fechar/recarregar a aba descarta a prévia não aceita. Edições
-manuais avançam a revisão; um comando baseado numa revisão antiga falha.
-Leia novamente antes de tentar outra vez, inclusive após timeout ou
-desconexão, pois o editor pode ter concluído a operação.
+Editing controls are locked during a preview; camera navigation remains
+available. Preview does not enter the draft or history until accepted.
+Closing/reloading the tab discards an unaccepted preview. Manual edits
+advance the revision; commands based on an older revision fail. Read again
+before retrying, including after timeouts or disconnection, because the
+editor may already have completed the operation.
 
-## Comandos de documento
+## Document commands
 
-`engine_reference(topic: "commands")` entrega o JSON Schema completo.
-As operações são:
+`engine_reference(topic: "commands")` returns the complete JSON Schema.
+Operations include:
 
-| Grupo | Comandos |
+| Group | Commands |
 | --- | --- |
-| Documento completo | `scene.replace`, `scene.patch` |
-| Objetos | `object.add`, `object.update`, `object.remove`, `object.scatter` |
-| Terreno | `terrain.create`, `terrain.stroke` |
-| Água | `water.paint`, `water.update`, `water.remove` |
-| Recursos | `effect.define`, `asset.define`, `resource.remove` |
-| Ambiente | `atmosphere.set`, `environment.set` |
+| Full document | `scene.replace`, `scene.patch` |
+| Objects | `object.add`, `object.update`, `object.remove`, `object.scatter` |
+| Terrain | `terrain.create`, `terrain.stroke` |
+| Water | `water.paint`, `water.update`, `water.remove` |
+| Resources | `effect.define`, `asset.define`, `resource.remove` |
+| Environment | `atmosphere.set`, `environment.set` |
+| Saved atmospheres | `atmosphere.define`, `atmosphere.apply` |
+| Cameras | `camera.define`, `camera.update`, `camera.remove`, `camera.activate` |
 
-`scene.patch` faz merge recursivo de objetos e substitui listas inteiras.
-`unset` remove campos opcionais do documento. Essa operação permite editar
-heightmaps, pesos/camadas de terreno, carpet, receitas avançadas, estilos
-globais/por tipo e qualquer campo do contrato `SceneDoc`, mesmo sem um
-comando específico. `scene.replace` aceita o documento completo.
+`scene.patch` recursively merges objects and replaces entire arrays.
+`unset` removes optional document fields. Use it to edit heightmaps,
+terrain weights/layers, carpet, advanced recipes, global/type styles and
+any `SceneDoc` field even without a dedicated command. `scene.replace`
+accepts a complete document.
 
-Posições e medidas são em metros; Y é altura. `rotation3` usa radianos.
-Cores inteiras são RGB hexadecimal convertido em número; `inkTint` e
-cores de partículas usam triplas. Não atribua `water`, `carpet` ou `particle`
-a uma malha comum: essas técnicas precisam das geometrias correspondentes.
+Positions and dimensions use meters; Y is height. `rotation3` uses radians.
+Integer colors are hexadecimal RGB converted to a number; `inkTint` and
+particle colors use triples. Do not assign `water`, `carpet` or `particle`
+to ordinary meshes: those techniques require their corresponding geometry.
 
-Exemplo de lote, enviado com a revisão atual:
+Example batch, sent with the current revision:
 
 ```json
 {
@@ -116,7 +118,7 @@ Exemplo de lote, enviado com a revisão atual:
     { "op": "water.paint", "mode": "terrain", "radius": 1,
       "points": [{ "x": 2, "z": -3 }, { "x": 0, "z": 0 }, { "x": -4, "z": 3 }] },
     { "op": "object.add", "object": {
-      "id": "fogueira-central", "prefab": "fogueira", "position": [-3, 0, -2]
+      "id": "central-campfire", "prefab": "fogueira", "position": [-3, 0, -2]
     } },
     { "op": "atmosphere.set", "style": {
       "moon": { "intensity": 1.8 }, "inkTint": [0.8, 0.9, 1]
@@ -126,68 +128,72 @@ Exemplo de lote, enviado com a revisão atual:
 }
 ```
 
-`water.paint` sem `index` cria uma água; com `index` continua a mesma máscara.
-`erase: true` apaga apenas água. Modo `terrain` acompanha relevo existente;
-modo `level` escava o leito e mantém superfície plana. A ondulação na
-encosta desce segundo a normal; não há simulação de volume de fluido.
-Reflexos continuam planares, com aproximação local para encostas.
+Built-in prefab and effect IDs such as `fogueira`, `caixa` and `raio` retain
+their historical spelling for compatibility. Their editor labels are English;
+always use IDs returned by the live catalog in commands.
 
-Para criar objetos inéditos, componha os prefabs/formas disponíveis ou
-importe GLTF/GLB. `assets_import` não adivinha arquivos acompanhantes:
-liste o modelo, buffers e imagens. A resposta contém os novos ids para
-`object.add`. `asset.define` aceita diretamente uma fonte incorporada.
-Modelos inválidos não substituem a cena aberta. Para efeitos novos, copie
-uma receita de `engine_reference(topic: "effects")`, altere seus emissores
-e luz, e use `effect.define` com id `fx:custom-NOME`; depois posicione esse
-id com `object.add`.
+`water.paint` without `index` creates water; with `index` it continues the
+same mask. `erase: true` erases only water. `terrain` mode follows existing
+slopes; `level` mode digs the bed and keeps a flat surface. Surface movement
+on slopes follows the normal; there is no volumetric fluid simulation.
+Reflections remain planar, with local approximation for slopes.
 
-Para salvar iluminação nos Assets, use `atmosphere.define` com `id`, `name`
-e `style`; campos omitidos herdam a iluminação atual. Isso adiciona
-`SceneDoc.atmospheres[id]`, sem aplicar o preset. `atmosphere.apply` com
-esse `id` aplica a iluminação, preservando o restante do documento.
-`resource.remove` aceita `kind: "atmospheres"`. Catálogo, exportação,
-prévia e histórico incluem esses recursos, como os criados pelo estúdio.
-`atmosphere.set` continua ajustando a iluminação atual diretamente.
-`editor_capture` captura a prévia isolada quando o estúdio de efeitos está aberto.
+To create new objects, compose available prefabs/shapes or import GLTF/GLB.
+`assets_import` does not guess companion files: list the model, buffers and
+images. The response contains new IDs for `object.add`. `asset.define`
+accepts an embedded source directly. Invalid models do not replace the
+open scene. For new effects, copy a recipe from
+`engine_reference(topic: "effects")`, adjust emitters/light, register it
+with `effect.define` and id `fx:custom-NAME`, then place it with `object.add`.
 
-## Câmeras de composição
+Save lighting to Assets with `atmosphere.define`, using `id`, `name` and
+`style`; omitted fields inherit the current lighting. This adds
+`SceneDoc.atmospheres[id]` without applying it. `atmosphere.apply` with that
+`id` applies lighting while preserving the rest of the document.
+`resource.remove` accepts `kind: "atmospheres"`. Catalog, export, preview
+and history include these assets just like those created in the Studio.
+`atmosphere.set` continues to adjust current lighting directly.
+`editor_capture` captures the isolated preview when the effect Studio is open.
 
-`camera.define` recebe `id` e `camera`:
+## Composition cameras
+
+`camera.define` accepts `id` and `camera`:
 
 ```json
-{"op":"camera.define","id":"plano-geral","camera":{"name":"Plano geral","projection":"orthographic","position":[10,12,16],"rotation":[-0.6,0.3,0],"span":8,"aspect":1.7777777778}}
+{"op":"camera.define","id":"wide-shot","camera":{"name":"Wide shot","projection":"orthographic","position":[10,12,16],"rotation":[-0.6,0.3,0],"span":8,"aspect":1.7777777778}}
 ```
 
-Rotação XYZ em radianos; `span` é metade da altura visível em metros.
-`near`/`far` são opcionais. `camera.update` altera a pose e o enquadramento;
-`camera.remove` exclui; `camera.activate` escolhe o id inicial do player
-(`id: null` limpa a escolha). Tudo integra prévia, histórico e exportação.
-`object_inspect` aceita o id de uma câmera.
+XYZ rotation uses radians; `span` is half the visible height in meters.
+`near`/`far` are optional. `camera.update` changes pose/framing;
+`camera.remove` deletes; `camera.activate` chooses the initial player id
+(`id: null` clears it). All operations participate in preview, history
+and export. `object_inspect` accepts camera IDs.
 
-`editor_view(cameraId: "plano-geral")` abre esse enquadramento no editor;
-`cameraId: null` volta à navegação. Essa visualização não altera o documento.
-A captura preserva a proporção. Câmeras ficam em `SceneDoc.cameras` e a
-escolha inicial em `SceneDoc.activeCamera`. A projeção suportada é ortográfica.
+`editor_view(cameraId: "wide-shot")` opens that framing in the editor;
+`cameraId: null` returns to navigation. This view does not change the
+document. Capture preserves aspect ratio. Cameras live in
+`SceneDoc.cameras`; the initial choice lives in `SceneDoc.activeCamera`.
+Orthographic is the supported projection.
 
-Emissores de efeito aceitam `name` e `offset: [x,y,z]`. Esse deslocamento
-funciona também em calor e rastros e é o mesmo manipulado pelo gizmo do Studio.
+Effect emitters accept `name` and `offset: [x,y,z]`. The offset also works
+for heat and trails, and matches the position manipulated by the Studio gizmo.
 
-## API HTTP e JavaScript
+## HTTP and JavaScript API
 
 ```sh
 curl http://127.0.0.1:1442/v1/sessions
 curl http://127.0.0.1:1442/v1/request \
   -H 'Content-Type: application/json' \
-  -d '{"sessionId":"UUID-DA-ABA","request":{"method":"scene.read","full":false}}'
+  -d '{"sessionId":"TAB-UUID","request":{"method":"scene.read","full":false}}'
 ```
 
-O envelope HTTP é `{sessionId, request}`; sucesso retorna `{result}`;
-erro retorna `{error}` com status não 2xx. Métodos disponíveis estão em
-`packages/authoring/src/schema.ts`; usam nomes como `scene.apply`,
-`preview.accept`, `history.undo`, `assets.import`, `editor.capture`.
-Na importação HTTP, `files` contém `{name, data, mime?}` com bytes base64.
+The HTTP envelope is `{sessionId, request}`; success returns `{result}`;
+errors return `{error}` with a non-2xx status. Available methods are in
+`packages/authoring/src/schema.ts`, with names such as `scene.apply`,
+`preview.accept`, `history.undo`, `assets.import` and `editor.capture`.
+HTTP import `files` contains `{name, data, mime?}`, with base64 bytes.
 
-Na própria página:
+Within the page:
 
 ```js
 const api = window.asciiEngineApi
@@ -198,48 +204,47 @@ await api.request({
 })
 ```
 
-O pacote `@ascii-engine/authoring` também exporta `applyCommands(doc, batch)`
-para gerar/validar documentos sem editor nem GPU. Prefabs do catálogo e
-decodificação de modelos são verificados pelo editor ao materializar a cena.
+`@ascii-engine/authoring` also exports `applyCommands(doc, batch)` to
+generate/validate documents without an editor or GPU. The editor checks
+catalog prefabs and decodes models when materializing the scene.
 
-## Física superficial da água
+## Surface water physics
 
-`water.update` aceita `patch.physics`, por exemplo:
+`water.update` accepts `patch.physics`, for example:
 
 ```json
 {"op":"water.update","index":0,"patch":{"physics":{"enabled":true,"depth":0.08,"gravity":9.81,"damping":2,"source":0.04,"waves":0.012}}}
 ```
 
-Os valores são metros/segundos; `source` repõe profundidade nas extremidades
-altas. Zero fecha a nascente. A simulação conserva volume sem fonte e
-produz ondas com movimento de objetos ou atores. Use `water_disturb` para
-injetar um impacto, com `editor_view.paused: false` para propagá-lo. Na API
-HTTP, o método correspondente é `water.disturb`.
+Values use meters/seconds; `source` replenishes depth at high edges. Zero
+closes the inlet. Without a source, simulation conserves volume; moving
+objects/actors produces waves. Use `water_disturb` to inject an impact and
+`editor_view.paused: false` to propagate it. The HTTP method is `water.disturb`.
 
-A grade de simulação tem no máximo 129 × 129 células e fica dentro da
-máscara. Não inclui fluido volumétrico, expansão da margem, cortina de
-cachoeira livre, respingos balísticos nem flutuação rígida. Reflexos de
-objetos são planares nas partes calmas; o luar nas encostas segue as
-normais, a câmera e `style.moon`. Estado transitório não entra no arquivo.
+The simulation grid has at most 129 × 129 cells and stays inside the mask.
+It does not include volumetric fluid, expanding shores, a separate free
+waterfall curtain, ballistic splashes or rigid buoyancy. Objects reflect
+on calm planar regions; moonlight on slopes follows normals, the camera
+and `style.moon`. Transient state is never written to the scene file.
 
-## Limites e validação
+## Limits and validation
 
-- 20000 objetos, 256 receitas de efeito e 256 atmosferas salvas; terreno/máscara até 513 × 513.
-- Até 2000 comandos por lote, 1000 amostras por pincel e 2000 cópias por dispersão.
-- 32 MB por modelo no importador; 45 MB totais de arquivos no MCP, 64 MB no transporte.
-- Histórico do editor: até 30 ações/64 MB, podendo reduzir ações com modelos grandes.
-- Até 8 luzes pontuais adicionais iluminam letras; muitas águas em níveis
-  diferentes exigem mais passes de reflexo.
-- A API não controla layout dos painéis nem configurações do sistema operacional.
-  Cobre a autoria visual e a câmera do editor; não execução arbitrária de código.
-- A conexão não instala automaticamente o MCP no cliente de IA. Configure o
-  cliente com o exemplo; gravar arquivos no repositório não adiciona uma
-  ferramenta a uma conversa já iniciada.
+- 20000 objects, 256 effect recipes and 256 saved atmospheres; terrain/masks up to 513 × 513.
+- Up to 2000 commands per batch, 1000 brush samples and 2000 scatter instances.
+- 32 MB per imported model; 45 MB total MCP file import; 64 MB transport limit.
+- Editor history: up to 30 actions/64 MB, reduced when models are large.
+- Up to 8 additional point lights illuminate glyphs; water at many different
+  levels requires more reflection passes.
+- The API covers visual content and editor cameras, not panel layout,
+  operating system configuration or arbitrary code execution.
+- The connection does not automatically install MCP in an AI client.
+  Configure the client using the example; repository files do not add
+  tools to an already running conversation.
 
-Verificações: `pnpm check`, `pnpm verify:api` (MCP oficial → HTTP → editor
-real → exportar/reabrir, com perfil isolado), `pnpm verify:authoring`,
-`pnpm verify:visual` e `pnpm compare`. Capturas em
+Checks: `pnpm check`, `pnpm verify:api` (official MCP → HTTP → real editor →
+export/reopen, isolated profile), `pnpm verify:authoring`, `pnpm verify:visual`
+and `pnpm compare`. Screenshots:
 [`captures/api-mcp-2026-10-11`](captures/api-mcp-2026-10-11/README.md).
 
-O servidor usa o [SDK TypeScript oficial do MCP](https://ts.sdk.modelcontextprotocol.io/v2/get-started/first-server),
-transporte stdio e descoberta de ferramentas com JSON Schema.
+The server uses the [official MCP TypeScript SDK](https://ts.sdk.modelcontextprotocol.io/v2/get-started/first-server),
+stdio transport and JSON Schema tool discovery.

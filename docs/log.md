@@ -1,868 +1,526 @@
-# Registro de trabalho
-
-## 12/10/2026 — Regravação próxima: Margem Viva
-
-- Pedido: refazer a sessão com a câmera mais perto para perceber vento na
-  grama e o movimento da água/efeitos. Mantida a edição Remotion em seis partes.
-- Nova composição **Margem Viva**, feita pelos controles visíveis do editor:
-  terreno, lago e caminho, objetos, efeito **Brasa Viva** com camadas/luz,
-  atmosfera **Luar da Margem Viva**, câmera, salvar e exportar.
-- Zoom 1,0–1,9, deslocando a vista para a área de trabalho. Vista baixa da
-  grama e pausas de 9 s no vento/fogo/água; Prévia final por 14 s. Altura da
-  câmera final reduzida de 15 m para **6,5 m**.
-- OBS nativo em espaço separado, captura PipeWire da janela, 2560×1080/30 fps.
-  Fonte **I444/Rec.709** desde a gravação, x264 CRF 16, zero quadros perdidos.
-  Master preserva 4:4:4; nova edição sem compensação de saturação. Versão
-  compatível 4:2:0 ainda pode perder cor nos traços finos.
-- Filmagem original de cerca de 7min34; edição de 13149 quadros, **7min18,3**,
-  2560×1440. Água, grama, fogo e câmera ficam em velocidade normal; demais
-  etapas 1,15×–1,30×. Timeline antiga preservada em
-  `tools/video-edit/src/editions/lago-das-brasas.ts`.
-- Arquivos em `/home/jonny/Videos/ASCII-Engine-Closeup-2026-10-11/`:
-  originais OBS, MP4 sem áudio, mapa editável, exportação e `edicao/`.
-- `parseScene` aceitou o mapa: 10 objetos, uma água, um efeito, uma atmosfera
-  e uma câmera inicial. Quatro trechos do vídeo (grama/fogo/água/prévia)
-  conferidos com 90 quadros únicos por trecho, sem congelamento nos recortes.
-- `pnpm check`: **79 testes**, tipos e build passaram. Tipos do Remotion
-  passaram. [Capturas extraídas do vídeo e evidências](captures/regravacao-proxima-2026-10-11/README.md).
-- Filme completo e seis partes passaram na contagem exata de quadros e
-  decodificação integral; master 4:4:4 também decodificado sem erros.
-- Sem mudança na engine ou no mapa do dono aberto no Orca. Sem áudio/narração
-  e sem teste de importação no Pomorog. Captura feita no Chromium externo;
-  OBS/navegador encerrados normalmente e foco devolvido ao Orca.
-
-## 11/10/2026 — Edição Remotion e diagnóstico de cor da gravação
-
-- Pedido: dividir a gravação em partes com Remotion e corrigir a cor desbotada.
-- Projeto independente em `tools/video-edit`, Remotion 4.0.534, com linha do
-  tempo editável: terreno, água, objetos, efeito/luz, atmosfera e câmera/exportação.
-  Abertura, cartelas animadas, explicações sincronizadas e encerramento.
-- Quadro 2560×1440 a 30 fps, mantendo a captura 2560×1080 sem redução.
-  Velocidades 1,15×–1,40× indicadas; duração 8236 quadros, cerca de 4min35.
-  Filme completo, seis arquivos e player local em
-  `/home/jonny/Videos/ASCII-Engine-2026-10-11/edicao/`.
-- Render integral no navegador pressionou a RAM. Remotion passou a gerar as
-  animações e faixas; FFmpeg compõe a captura e exporta com dois threads.
-  Navegador sem janela e cache no disco; desktop do dono preservado.
-- Diagnóstico: OBS em NV12/4:2:0, Rec.709 parcial identificado corretamente.
-  Ensaio com o mesmo PNG confirma perda de cor dos glifos por subamostragem.
-  Os cinzas quase não mudam; não se aplicou correção global de gamma/preto.
-- Saturação compensada em 1,4× por matriz RGB; master H.264 4:4:4 e versão
-  compatível 4:2:0. A versão compatível é codificada uma vez e dividida com
-  keyframes nos capítulos. Nenhuma configuração pessoal do OBS foi alterada.
-- `pnpm check`: 79 testes, tipos e build passaram; tipos do projeto Remotion
-  também passaram. Filme e seis partes passaram na contagem de quadros e
-  decodificação integral; master 4:4:4 também decodificado sem erros.
-  [Capturas, diagnóstico e verificações](captures/edicao-remotion-2026-10-11/README.md).
-- Limites: sem áudio; compensação não recupera informação perdida no original.
-  4:2:0 ainda perde cor nos traços finos. Sem alteração na engine ou nos mapas.
-
-## 11/10/2026 — Sessão completa de composição gravada no OBS
-
-- O dono aprovou a água da etapa anterior e pediu uma gravação pela interface:
-  mapa, terreno, água, objetos, efeito, luz, atmosfera e câmera. Confirmou OBS
-  nativo e pediu cuidado com o mosaico de janelas do Omarchy/Hyprland.
-- Editor em tela cheia na área 5, OBS separado na área 6 e Orca preservado na
-  área 3. Perfil de demonstração isolado; o mapa aberto no Orca não foi trocado.
-- Gravação final com OBS e captura da janela pelo portal PipeWire, incluindo
-  cursor real. Criação feita pelos controles visíveis do editor. O mapa não
-  foi montado pela API; leitura de estado ajudou a localizar os controles.
-- Criado **Lago das Brasas**: terreno de 32 m com relevo e caminho, lago calmo,
-  árvores, pedras, ruína, tronco, efeito **Brasa da margem** com camadas e luz,
-  atmosfera **Luar do Lago das Brasas** e câmera inicial. Efeito e atmosfera
-  foram salvos nos Assets; a sessão termina na Prévia após salvar e exportar.
-- Entrega em `/home/jonny/Videos/ASCII-Engine-2026-10-11/`:
-  `ASCII-Engine-criacao-completa.mp4`, `Lago-das-Brasas.ascii.json` e
-  `Lago-das-Brasas.pomorog.json`. Vídeo de **5min11**, 2560×1080, 30 fps,
-  H.264, sem áudio, com seis capítulos. Master MKV preservado fora do Git.
-- Uma consulta às propriedades XComposite abortou o OBS no início; a captura
-  XComposite também congelou quadros em uma tentativa posterior. Essas tomadas
-  foram descartadas da entrega. A sessão foi repetida com PipeWire e conferida
-  no arquivo final. OBS encerrado normalmente depois de finalizar a gravação.
-- Validação: decodificação integral do MP4 por FFmpeg sem erros, inspeção de
-  quadros do vídeo e leitura do arquivo salvo com `parseScene`: 10 objetos,
-  uma água, um efeito, uma atmosfera e uma câmera inicial válida.
-  `pnpm check` passou: **79 testes**, tipos e build. Permanecem os avisos do
-  Vite sobre tamanho de chunks e comentários de anotação do Zod.
-- [Quadros da gravação e verificações](captures/sessao-gravada-2026-10-11/README.md).
-  Nenhuma alteração no código da engine. A gravação cobre o fluxo de composição
-  solicitado; não é uma demonstração de todas as opções avançadas ou de
-  importação de modelos. Compatibilidade da exportação dentro do Pomorog não
-  foi testada nesta sessão.
-
-## 11/10/2026 — Água calma e correção da vista rasante
-
-- O dono pediu nova inspeção da cena aberta no Orca e escolheu lago calmo,
-  reflexo legível e ondas suaves; alertou para água/grama ao girar a câmera.
-- A inspeção real mostrou áreas escuras extensas e espuma em blocos na
-  encosta. Uma cópia da cena e da profundidade/corrente após cerca de
-  11 minutos permitiu repetir o caso em perfil isolado.
-- Ondas visuais usam frentes contínuas, movimento mais lento, advecção em
-  fases curtas e cor em degraus. Ondulação controla também tremor/brilho.
-- Espuma agora responde à convergência da corrente, é transportada e
-  desaparece. Profundidade acumulada não gera mais uma grade de `O`.
-- O espelho usa a altura simulada de regiões calmas próximas. Um lago
-  que acumulou água continua refletindo na superfície atual.
-- Correção na amostragem do atlas: derivadas da grade contínua, antes de
-  `fract` e da seleção da letra. A comparação na câmera rasante mostrou
-  redução das faixas verdes que pareciam atravessar a margem.
-- Teste de contorno compara pixels com/sem água em quatro giros e duas
-  inclinações, projetando também a espessura da borda: zero pixels fora
-  da margem tolerada nas oito vistas. Não considera a borda uma lâmina
-  infinitamente plana, que dava falso positivo em câmera baixa.
-- `pnpm check`: **79 testes**, tipos e build; `verify:water` e as seis
-  vistas de `pnpm compare` passaram. Testes novos cobrem poça profunda
-  parada, dissipação de espuma, nascente por 120 s e espelho na altura atual.
-- Validação visual: Orca (aba e canvas real), cópia isolada em múltiplos
-  ângulos e sequência `cdpshot.mjs` a 60 fps. Uma captura inteira do Orca
-  deu timeout e outra mosaico; foram descartadas. O documento do dono
-  não foi substituído. [Capturas e logs](captures/agua-calma-2026-10-11/README.md).
-- Limites anteriores continuam: fluido superficial na pintura, espelho
-  planar por corpo, sem respingos/flutuação/água volumétrica. Tauri não
-  executado; aprovação estética final permanece com o dono.
-
-## 11/10/2026 — Órbita 3D, miniatura da câmera e dinâmica superficial da água
-
-- Pedidos: câmera funcionando em Prévia; girar/inclinar a cena sem depender
-  de Alt; enquadramento pequeno enquanto posiciona a câmera; reflexo lateral
-  do cilindro/luar; água descendo e reagindo a movimento.
-- **Orbitar (O)**: arrasto esquerdo gira e inclina; Alt esquerdo e Shift meio
-  também orbitam. **Isométrica** restaura a orientação. Pan perto do horizonte
-  usa o plano da vista para evitar deslocamentos enormes.
-- Selecionar câmera mostra miniatura a 12 fps, atualizada pelo gizmo/campos,
-  com botão Ampliar. Usa o renderer existente e recorte proporcional; não
-  cria segunda cena/contexto nem avança água/partículas duas vezes.
-- **Prévia** agora usa a câmera inicial; sair restaura a navegação. A aba
-  real do Orca estava visível sem receber `requestAnimationFrame` (tempo 0).
-  Renderização alternativa a 20 fps destravou câmera/animação nessa condição;
-  rAF normal continua prioritário e documento oculto não anima.
-- Reflexo de objetos ganhou legibilidade e fileiras vazias corretas. O caso
-  do cilindro foi reproduzido: ele aparece quando a projeção refletida cai
-  dentro do lago, conforme a câmera. Encostas não recebem mais o espelho
-  horizontal deslocado; o brilho da lua usa luz, câmera e normal da superfície.
-  Atmosfera ganhou controles de rotação/altura da luz em graus.
-- `world/waterDynamics.ts`: fluxo de água rasa entre células, profundidade,
-  gravidade, resistência, limite de estabilidade e nascente opcional nas
-  extremidades altas. Volume conservado sem nascente; ondas por impulsos.
-  A malha, corrente e espuma seguem o estado; o terreno não é alterado.
-- `waters[].physics` guarda parâmetros. Inspetor: simular, lâmina inicial,
-  vazão, resistência, ondulação e impacto de teste. Objetos em movimento e
-  atores via `engine.setActors` produzem ondas. Estado transitório reinicia
-  ao abrir e não infla arquivo/histórico. Contornos customizados com GLSL
-  usam a função de distância correspondente na grade física.
-- API/MCP: `editor_view.elevation`, `water_disturb` (14 ferramentas), referência
-  de física e `water.update.patch.physics`. Impulso não muda revisão. Ponte
-  local reiniciada com o novo esquema, sem mudar configuração do cliente.
-- Validação: **77 testes**, tipos e build em `pnpm check`;
-  `verify:composition`, `verify:water`, `verify:visual`, `verify:authoring`
-  e `verify:api` passaram. Órbita/gizmos usam eventos nativos; água tem
-  comparação real de pixels, teste de interação e conservação de volume.
-  Capturas por cdpshot e Orca; [evidências](captures/camera-agua-2026-10-11/README.md).
-  `pnpm compare`: cinco vistas passaram na primeira execução; floresta
-  teve RMSE 0,0595 e passou isoladamente com 0,0095, sem mudar código/base.
-  É a oscilação de integração temporal já observada nessa cena.
-- Limites: simulação superficial dentro da máscara; sem fluido volumétrico,
-  expansão fora da pintura, respingos balísticos, queda livre separada do
-  relevo ou flutuação rígida. Sem disco de lua no céu; há brilho refletido da
-  luz principal. Espelho de objetos nas partes calmas, sem partículas do
-  passe separado. Perspectiva/keyframes seguem pendentes; Tauri não aberto.
-
-## 11/10/2026 — Composição: câmeras salvas e posicionamento de efeitos
-
-- Pedido ampliado pelo dono: posicionar efeitos, posicionar câmeras na
-  cena e melhorar o fluxo de composição de arte 3D.
-- **Criar câmera** captura a vista atual. Câmeras nomeadas entram na
-  hierarquia, têm ícone e volume de visão na cena auxiliar do editor,
-  gizmo W/E, campos XYZ/rotação, altura enquadrada, proporção, duplicação,
-  exclusão e histórico. Ver pela câmera preserva proporção e pose;
-  voltar à navegação restaura a vista livre do editor.
-- Contrato `SceneDoc.cameras`/`activeCamera` e `applySceneCamera` no núcleo.
-  Câmera inicial funciona no player e nos documentos exportados. Nenhum
-  auxiliar da câmera entra na geometria do mundo ou no passe ASCII.
-- Camadas de efeito têm nomes, origem XYZ, gizmo no void, zerar posição,
-  desfazer/refazer local. Um arrasto é uma ação; o histórico da cena não
-  é alterado por um rascunho. Salvar incorpora posição/nome ao asset;
-  colocar na cena mantém o gizmo do objeto inteiro. Calor e rastro agora
-  respeitam os três eixos de `EmitterDef.offset` (calor ignorava o offset).
-- Ctrl S salva nos Assets dentro dos estúdios. Nomes de camadas das bases
-  facilitam encontrar Chama, Brasas, Faíscas e Fumaça. Receitas originais
-  permanecem intactas; nomes são colocados nas cópias de autoria.
-- API/MCP: `camera.define/update/remove/activate`; `editor_view.cameraId`
-  abre/fecha uma câmera salva; `object_inspect` aceita ids de câmera.
-  Exportação e histórico incluem câmeras e posições das camadas.
-- Validação: `pnpm check` passou (72 testes, tipos e build);
-  `pnpm verify:composition` passou com arrastos nativos dos gizmos de câmera
-  e camada, histórico, Ctrl S, colocação, recarga e player;
-  `pnpm verify:authoring`, `pnpm verify:api` e `pnpm verify:visual` passaram.
-  A verificação visual manteve respostas de reflexo (405 pixels) e luz
-  de fogueira (3640 pixels). Capturas reais por cdpshot e Orca Browser.
-- [Capturas e logs](captures/composicao-2026-10-11/README.md).
-- Limites explícitos: câmeras são ortográficas; perspectiva, animação por
-  keyframes, curvas/timeline gráficas de efeitos e biblioteca global entre
-  documentos continuam pendentes. O app nativo Tauri não foi aberto nesta
-  etapa. A composição não é um editor de regras de jogo.
-
-## 11/10/2026 — Prévia vazia de efeitos e Assets de atmosfera
-
-- Efeitos têm uma engine de prévia separada, sem terreno, com órbita,
-  deslocamento, zoom, enquadrar, pausar, parar, reiniciar e velocidade.
-  O mapa pausa durante a edição; ao sair, o contexto da prévia é liberado.
-- Modelos Fogo, Fumaça, Faíscas, Magia, Explosão e Raio; controles Essencial
-  e Avançado, camadas e salvamento fixo no rodapé.
-- **Salvar nos Assets** e **Ver nos Assets** em ambos os estúdios.
-  Atmosferas nomeadas usam `SceneDoc.atmospheres`, categoria própria,
-  aplicar por clique, editar por duplo clique e salvar cópia. Efeitos
-  também reabrem por duplo clique real e atualizam o mesmo asset.
-- Recursos acompanham rascunho local, arquivo, exportação, desfazer e refazer.
-  API/MCP expõe `atmosphere.define/apply`, catálogo e captura do Studio.
-- Validação: `pnpm check` (61 testes, tipos e build), `pnpm verify:authoring`
-  e `pnpm verify:api`; capturas reais por `cdpshot.mjs` e Orca Browser.
-  A prévia foi vista no Orca; a animação nesse host pode ficar suspensa.
-- Capturas: [Studio e Assets](captures/studio-assets-2026-10-11/README.md).
-- Biblioteca ainda pertence ao documento; não é global entre projetos.
-  Curvas gráficas e linha do tempo continuam pendentes. Pedido seguinte do
-  dono: posicionamento de camadas por gizmo e câmeras de composição salvas.
-
-## 11/10/2026 — Estúdio dedicado, água no relevo e autoria completa por API/MCP
-
-- Escopo confirmado pelo dono: Estúdio como tela dedicada de Efeitos e
-  Atmosfera; água seguindo a montanha; IA cria todo o conteúdo visual e
-  pode editar a cena aberta com prévia e desfazer.
-- Estúdio com cena grande e controles à direita; voltar restaura o layout.
-  Atmosfera controla exposição, tinta, fundo, luz principal/ambiente,
-  sombra e névoa; presets portáteis `.atmosphere.json`. Efeitos têm campos
-  de luz além de seus emissores. Objetos pendentes mostram modelo real e
-  permitem W/E/R, gizmo, Enter e Esc antes de gravar no mapa.
-- Um pincel Água, com máscara contínua, Shift para apagar, modo plano e
-  Seguir relevo. Malha e ondulação seguem a encosta, sem achatar o terreno.
-  A conversão de águas antigas é explícita no inspetor. Máscaras/alturas
-  são serializadas e restauradas por desfazer/reabrir.
-- Reflexos: todas as águas visíveis são atualizadas; planos iguais
-  compartilham textura. Materiais iluminados no passe auxiliar evitam
-  dupla perda de letras. O resultado final continua em letras. Nas encostas
-  há aproximação planar local; não há simulação física de água nem reflexo
-  de partículas do passe separado.
-- Até 8 PointLights chegam às letras de corpos, grama e partículas.
-  Estúdio habilita `bodySceneLighting`/`inkFog`; cenas antigas conservam
-  iluminação aprovada. Não foram alteradas as bases da comparação.
-- `packages/authoring`: comandos atômicos/validados para o documento todo,
-  objetos, dispersão, terreno, água, efeitos, assets, atmosfera e clima.
-  Nenhuma dependência de editor ou renderer. `scene.replace/patch` permitem
-  todo campo do contrato visual, além dos comandos de conveniência.
-- `apps/editor/src/api`: sessão por aba, revisão, prévia sem autosave,
-  aceitar/descartar, histórico integrado, inspeção, câmera, PNG e importação.
-  A IA pode aceitar diretamente; botões humanos são opcionais. Edição manual
-  invalida a revisão antiga. Erros de materialização preservam cena/recursos.
-- `apps/automation`: API HTTP/WebSocket loopback:1442 e 13 ferramentas MCP
-  stdio usando SDK oficial v2. Vite inicia a ponte; `pnpm api` é independente.
-  MCP importa caminhos explícitos e exporta JSON portátil por gravação
-  temporária; sobrescrita exige parâmetro explícito. Configuração de cliente
-  em `.mcp.example.json`, sem alterar configuração global do dono.
-- Arquitetura em START e `docs/decisions/0001-authoring-api.md`; uso em
-  [API/MCP](api-mcp.md) e [guia visual](guia-editor-visual.md).
-- Verificação: `pnpm check` passou (56 testes, tipos e build),
-  `pnpm verify:api`, `pnpm verify:visual`, `pnpm verify:authoring` e as seis
-  vistas de `pnpm compare` passaram. Build mantém aviso de chunk grande
-  e avisos de comentários PURE no Zod; sem falha de compilação.
-- Capturas: [MCP](captures/api-mcp-2026-10-11/README.md),
-  [Estúdio/água/luz](captures/studio-agua-2026-10-11/README.md).
-  [Mapa de exemplo](examples/mapa-mcp.pomorog.json) criado/importado/exportado
-  pelo cliente MCP no teste. Perfis isolados; nenhum comando de teste foi
-  enviado à sessão do dono.
-- Orca Browser: aba consultada, API carregada e sessão registrada.
-  A aba continua sem quadros de animação; screenshot do viewport expira.
-  A captura da API força enquadramento/render sem avançar tempo e retornou
-  PNG válido no Orca, revisão 0 preservada (`orca-api-canvas.png`).
-  Capturas da interface vêm do Chromium GPU e cdpshot. Vite com a ponte
-  já ativa também iniciou corretamente em uma porta temporária.
-- Pendentes: execução da conexão no binário Tauri, configuração do MCP no
-  cliente de IA do dono e importador dentro do Pomorog. A API cobre autoria
-  visual implementada; não introduz regras do jogo, edição de layout por
-  API, hierarquia de prefabs nem sistemas visuais ausentes no renderer.
-
-## 11/10/2026 — Câmera corrigida, painéis móveis e aba de efeitos
-
-- Pedidos do dono: corrigir navegação da câmera, mover/redimensionar a UI
-  e criar efeitos em uma aba própria. Câmera corrigida por projeção do
-  deslocamento da tela no chão: havia inversão vertical e ganho arbitrário
-  de 1,4. Botão direito/meio acompanha o mouse, sem Ctrl.
-- `editor/layout.ts`: painéis flutuantes, redimensionamento, encaixe nas
-  três bordas, alça de arraste, recuperação de painéis e persistência da
-  disposição em localStorage. Canvas ocupa o espaço liberado.
-- Aba Efeitos junto de Projeto, campos para emissores, cores, forma,
-  movimento, duração e repetição; prévia, bases, salvar/colocar na cena,
-  importar/baixar receita e JSON avançado.
-- `SceneDoc.effects` opcional: validação de receitas e criação de prefabs
-  no núcleo. Runtime aceita uma definição isolada sem sobrescrever presets.
-  Salvar/reabrir/exportar/duplicar e inserir composições preservam receitas.
-- `pnpm check`: 44 testes, tipos e build. `pnpm verify:authoring` passou
-  com os novos fluxos e os anteriores, sem exceções. `pnpm compare` passou
-  nas seis vistas, sem alterar baselines. [Evidências](captures/paineis-efeitos-2026-10-11/README.md).
-- Limites: encaixe de um painel por borda, sem janelas nativas separadas;
-  curvas/linha do tempo gráficas e transformação completa das partículas
-  por escala/rotação ainda pendentes. Nenhum push ou mudança em `reference/`.
-- Próxima correção, relatada pelo dono durante esta etapa: água/reflexos,
-  pincel contínuo de água, prévia do objeto ao colocar, luz dos efeitos e
-  atmosfera. Esses pontos não são considerados resolvidos por esta etapa.
-
-## 11/10/2026 — Usabilidade: espaço de trabalho inspirado na Unity
-
-- Pedido do dono: a interface estava confusa, especialmente para colocar
-  itens. Reorganizado o editor em hierarquia à esquerda, cena central,
-  inspetor à direita e biblioteca embaixo. Ícones SVG, busca, categorias,
-  menu Arquivo e abas separadas para objeto, terreno e ambiente.
-- Colocação por arrastar e soltar da biblioteca, com indicação do ponto
-  no chão; alternativa de clicar no item e depois no chão. Shift repete,
-  Esc cancela. O objeto entra selecionado no modo mover.
-- Controles visuais W/E/R para mover/girar/escalar, espaço local/global,
-  encaixe e valores XYZ. Um arraste é uma ação de desfazer. Câmera:
-  Alt + arraste gira; botão direito/meio ou ferramenta Q deslocam.
-  Prévia desativa os painéis de edição e oculta os controles na cena.
-- `apps/editor/src/editor/`: espaço de trabalho, símbolos e
-  `TransformControls` em cena de sobreposição exclusiva do editor. Nenhuma
-  dependência nova nem mudança no núcleo, shaders, receitas ou documento.
-  Atualizados guia e `START.md` com a organização e os controles atuais.
-- `pnpm check`: **41 testes**, tipos e build passaram. Aviso de bundle
-  >500 kB permanece. `pnpm verify:authoring /tmp/unity-editor-final` passou
-  com arraste nativo da biblioteca e transformações pelos três controles,
-  inspetor, câmera estável ao transformar, histórico, prévia e os fluxos
-  anteriores de importar/salvar/reabrir/exportar. Sem exceções na página.
-- [Capturas antes/depois e métricas](captures/editor-unity-2026-10-11/README.md):
-  `cdpshot.mjs`, integração via CDP e página inteira no **Orca Browser**.
-  `pnpm compare` passou em cinco vistas e falhou na floresta durante a
-  execução concorrente. A floresta passou ao repetir isoladamente
-  (`pnpm compare floresta`), sem alterar código ou baseline; oscilação
-  temporal registrada, causa não isolada.
-- Limites: painéis fixos, seleção de um objeto, sem agrupamento. Água
-  usa campos no inspetor; os eixos transformam objetos. As pendências de
-  autoria das cinco áreas e do importador do Pomorog continuam no guia.
-  Sem validação nova de Tauri/mobile.
-- Branch local `feat/unity-editor-workspace`, sem push. Nenhuma alteração
-  no checkout do Pomorog ou em `reference/`.
-
-## 11/10/2026 — Autoria visual e exportação portável
-
-- Escopo confirmado pelo dono: terrenos, mapas, itens e afins; regras e
-  interface do jogo ficam fora. Plano em
-  [`plano-autoria-pomorog.md`](plano-autoria-pomorog.md), guia e limites em
-  [`guia-editor-visual.md`](guia-editor-visual.md).
-- Conferidos sem alteração `~/Documents/pomorog` (`main`, `f79d3c7`, com
-  mudanças locais do dono) e seu worktree visual `pearleye` (`27af922`).
-  A referência deste repositório corresponde ao segundo.
-- Documento: normalização/validação, identidades e sementes estáveis,
-  transformações 3D, visibilidade, nome, estilos globais/de tipo/por parte,
-  GLTF/GLB incorporados e escolha de clipe. A construção de uma cena que
-  falha limpa recursos; o editor mantém a anterior até a nova ficar pronta.
-- Editor: entrada padrão no sandbox; lista e inspetor de objetos/águas;
-  mover/girar/escalar/duplicar/apagar/focar; seleção de partes por lista;
-  mapa ou item sem terreno; inserir item salvo; desfazer/refazer por ação
-  e traço; rascunho em IndexedDB com erro visível; exportação visual JSON.
-- Ambiente: chuva/neve e efeitos da biblioteca no documento. Lago/riacho
-  escavam usando o mesmo `waterEdge` do componente. Máscara de grama fica
-  restrita ao contorno. Formas básicas permitem compor itens.
-- Descarte: carpet/partículas/chuva deixam os registros de atualização;
-  camadas removidas sem descarte podem ser readicionadas; efeitos possuem
-  cancelamento imediato; fogueiras têm buffers independentes. Observável
-  `engine.resources` usado nas verificações de recarga.
-- Testes: `pnpm check` passou (**41 testes**, tipos e build),
-  `pnpm verify:authoring /tmp/ascii-authoring-final` passou no Chromium real:
-  transformações, partes, histórico, item sem terreno, GLTF+bin, GLB,
-  clipes, dados malformados, falha durante construção, reabertura repetida,
-  clima, pincéis, lago e restauração após recarregar o navegador. Nenhuma
-  exceção não tratada na página. Aviso de bundle Vite >500 kB permanece.
-- `pnpm compare`: seis vistas dentro dos limites existentes, sem atualizar
-  baselines. [Capturas e métricas](captures/autoria-2026-10-11/README.md).
-- Exportação web criada em `/tmp/ascii-authoring-export`, servida na porta
-  1441 e capturada com `cdpshot.mjs`: modo jogador, 3 objetos, lago e chuva.
-  Orca Browser: inspeção por snapshot e captura do canvas renderizado;
-  screenshot da página completa falhou por timeout do compositor.
-- Exemplos para abrir em [`examples/`](examples/). Atualizados `START.md`
-  e `README.md`. Nenhuma alteração no Pomorog nem em `reference/`.
-- Pendências: importador do Pomorog, fidelidade completa das cinco áreas,
-  agrupamento/gizmos, biblioteca vinculada, editor de chunks/costuras,
-  águas/pincéis avançados e editor completo de efeitos. A autoria básica
-  está utilizável; o plano inteiro de engine não está concluído.
-- Branch local `feat/scene-authoring`. Sem push, publicação ou teste novo
-  de desktop/mobile.
-
-
-## 11/10/2026 — Auditoria do estado real e retomada
-
-- Relatório: [`relatorio-engine-2026-10-11.md`](relatorio-engine-2026-10-11.md).
-  Código conferido no commit `ed2d4f3`, árvore inicialmente limpa.
-- Diagnóstico: núcleo gráfico funcional e cinco áreas demonstráveis;
-  autoria de um jogo pelo editor ainda incompleta. Corrigido o resumo de
-  `START.md`, que tratava fases parciais como implementadas e sugeria que
-  faltava somente aprovação visual. `README.md` aponta para a auditoria.
-- Problemas reproduzidos em Chromium isolado: ajustes de instância/global
-  ausentes no JSON; tipo sobrescrito pelo padrão do prefab ao reconstruir;
-  árvore com geometria diferente para o mesmo documento; tapete removido
-  ainda atualizado; sandbox falha com cenário sem terreno.
-- Revisão de código: GLBs importados ficam fora do documento; recarga
-  descarta a cena atual antes de validar/construir a nova; faltam ferramentas
-  de autoria, integração dos chunks e projeto com assets persistentes.
-- Testes: `pnpm check` passou (25 testes, TypeScript e build); `pnpm compare`
-  passou nas seis vistas, sem atualizar baselines. Editor sem testes próprios.
-- Capturas e reprodução em
-  [`captures/auditoria-2026-10-11/`](captures/auditoria-2026-10-11/README.md):
-  referência, cinco áreas, sandbox, GLTF, efeitos, exportação web e sandbox
-  no **Orca Browser**. A captura no Orca funcionou nesta sessão.
-- Exportação web refeita para pasta temporária, servida por HTTP e
-  conferida em modo jogador; sem novo build/execução desktop ou mobile.
-- Próximo marco recomendado: criar uma cena, ajustar partes, importar um
-  modelo, salvar, reabrir igual e exportar. Começar por persistência,
-  sementes, validação e descarte; depois completar as ferramentas previstas.
-- Esta etapa altera apenas documentação e evidências. Os bugs encontrados
-  continuam abertos; nenhuma alteração em `reference/`, push ou publicação.
-
-As entradas abaixo registram o histórico de implementação e suas pendências
-naquele momento; para o estado consolidado, consulte a auditoria acima.
-
-## 11/10/2026 — Fase 1: núcleo extraído
-
-**Estado:** fase 1 concluída no navegador headless; falta conferir no Orca
-Browser (ver pendências).
-
-### O que mudou
-
-Porte de `reference/pomorog/src-visual/` para `packages/engine/src/`, com os
-números, alfabetos, cores e a ordem de desenho preservados:
-
-| Módulo | Origem | Mudanças em relação ao Pomorog |
-| --- | --- | --- |
-| `surface.ts` | `surface.ts` | `surfaceAlpha()` centraliza o `toFixed(2)`; teste novo |
-| `illumination.ts`, `exploration.ts` | idem | `createIllumination({ interior, obstacles })` sem acampamento fixo; lanterna e fogueira por `place()` |
-| `ascii.ts` | `ascii.ts` | sem `swampShoreGLSL`/`wetWeather`: o tom azulado do herói na água vira um gancho `AsciiPassHook` (fase 2) |
-| `techniques/surface.ts` | `worldGlyph.ts` | `glyphMaterial` → `surfaceMaterial`; sem `applyWorldGlyphs` (a técnica é declarada); água fica para a fase 2 |
-| `techniques/body.ts` | `glyphBody.ts` | uniforms por engine (não globais); aceita lista de malhas (uma parte = um corpo, hash único); `removeGlyphBody` para reaplicar estilo |
-| `techniques/carpet.ts` | `grass.ts` | `createCarpet` exige receita; sai o prado fixo do jogo; `extent`/`center` na receita |
-| `techniques/particle.ts` | `glyphCloud.ts` | igual; é o "buffer de letras" que os emissores do §3.3 vão alimentar |
-| `techniques/screen.ts` | `actorInk.ts` | `markScreen(material, kind)` |
-| `presets/pomorog.ts` | `scene.ts`, `forestWorld.ts`, `groundCover.ts` | estilo `pomorog` (luzes, névoa, célula 6, brilho 1, sombra .62), tipos `tree/rock/creature/hero/prop/ground`, piso da floresta, tapete do prado, enquadramento `pomorogSpan` |
-| `presets/campfire.ts` | `effects.ts` (fogueira) | grade de calor como dado (`HeatGridSpec`, padrão `POMOROG_FIRE`) |
-| `style.ts` | — | estilo por parte (§3.1): `global → tipo → parte do tipo → userData do nó → instância → parte da instância` |
-| `engine.ts` | `scene.ts` (render) | `createAsciiEngine`, `add(obj, { glyph, surface, size, type, parts })`, `setPartStyle`, `setTypeStyle`, `createCarpet`, `createParticles`, `setStyle`, `setLights`, `setActors`, `frame`, `render(dt)` com `dt ∈ [0, .08]`, `debug.raw` |
-
-Detalhes:
-
-- A técnica é **declarada**. Um nó sem técnica resolvida gera erro com o nome
-  do nó. `userData.glyph`/`userData.glyphStyle` valem por nó (base da fase 3).
-- O engine **não altera materiais compartilhados**: cada técnica usa uma variante
-  em cache por (material, estilo) e guarda o original, o que permite
-  `setPartStyle` reaplicar só aquela parte.
-- Correção encontrada ao validar: `Material.clone()` do Three não copia
-  `onBeforeCompile`; sem copiar, o piso perdia a cor da floresta e virava
-  `o`/`c` cinza em toda parte.
-- Mantido por fidelidade: `pixelScale` e a resolução do passe de tela usam a
-  altura em px CSS, como no Pomorog (com DPR 1,5 as letras de `body` e
-  `particle` ficam proporcionalmente menores). Avaliar depois, com antes/depois.
-
-Editor (`apps/editor`): `src/scene/reference.ts` monta o acampamento da
-Floresta Sombria fixa do Pomorog: chão `surface`/terra, toras, saco de dormir,
-caixa, assento e abrigo em `surface` (tipo da cor declarado com a mesma regra HSL
-do Pomorog, `pomorogKind`), anel de pedras, pedregulho e pedrinhas `body`, 4
-árvores com tronco `surface` e copa `body` (`type: 'tree'`, por parte), tapete
-de 70 mil letras, fogueira `particle` e o viajante `screen` (modelo estático
-copiado de `models.ts`). Na URL: `?ascii=screen` (modo tela antigo),
-`?ascii=raw` (sem letras), `?angle=`, `?zoom=`, `?pause=`, `?yaw=`,
-`?scene=terrain` (teste de relevo do §3.4). Arrastar gira a câmera.
-
-### Capturas (`docs/captures/`, Chromium headless com GPU, 1600×757, DPR 1)
-
-| Arquivo | Conteúdo |
-| --- | --- |
-| `fase1-referencia.png` | cena de referência, zoom .9; comparar com `procedural-forest-start.png` |
-| `fase1-referencia-girada.png` | mesma cena, câmera +.6 rad: as letras acompanham chão, caixas e copas |
-| `fase1-referencia-perto.png`, `fase1-perto-3x.png` | zoom 1.5 e recorte 2×; comparar com `after-world-glyph-closeup.png` e `ascii-fire-grid.png` |
-| `fase1-modo-tela-antes.png` | tudo no passe de tela antigo (`?ascii=screen`): o "antes", equivalente às rejeitadas `rejected-screen-*` |
-| `fase1-relevo.png` | terreno com colina, crista e depressão (`?scene=terrain`) |
-
-Comparação: tapete `| / \ ! v` com flores `* o`, copas em nuvem `Y v % &`,
-pedras em `o O 0 # @` cinza claro, tábuas e caixa com traços `/ |` sobre fundo
-quase preto, fogueira `@ # % x * + : .` com brasas, e herói no passe de tela
-(silhueta escura com letras laranja de 5 px, como na captura aprovada). Nenhum
-objeto de cenário passa pela grade de tela.
-
-### Testes
-
-- `pnpm check`: typecheck, 9 testes (IDs de material, arredondamento de 8 bits,
-  distância mínima entre IDs, injeção do alpha; resolução de estilo em camadas,
-  copa × tronco, parte de uma instância) e build. Verde.
-- Núcleo sem imports de jogo, React ou Tauri (só `three`); nomes de bioma
-  aparecem apenas em `presets/pomorog.ts`.
-- Sem erros de console (`PAGE` no cdpshot).
-
-### Pendências
-
-- **Orca Browser:** a aba `http://localhost:1440/?pause=4` foi aberta, mas o
-  painel estava oculto e não desenhou quadros (captura expira). Conferir com o
-  painel visível.
-- Herói estático (sem animação de passada); a animação do `models.ts` fica para
-  a fatia da Floresta.
-- Relevo (§3.4): a grade troca de plano a 45° e deixa uma emenda visível na
-  encosta; em encostas médias a letra estica. Considerar mistura triplanar ou
-  grade alinhada à encosta na fase do terreno.
-- Água (`worldWaterGLSL`, reflexo), chuva, neve e efeitos de combate: fase 2.
-- Vagalumes/motas da lanterna (`effects.ts`) não portados.
-- `setPartStyle`/`setTypeStyle` reaplicam a parte inteira (recria a nuvem de
-  letras); suficiente para o editor da fase 4, sem otimização.
-
-## 11/10/2026 — Fatia 1: Floresta Sombria
-
-**Estado:** área montada no editor (`?area=dark_forest`, padrão), no nível das
-capturas aprovadas (`procedural-forest-*.png`). Falta a aprovação do dono
-lado a lado.
-
-### Núcleo
-
-- `techniques/water.ts`: água como componente (§3.2). Forma `stream`/`pond`
-  (`waterEdge` em JS e GLSL iguais), aparência como dado (`WaterLook`, preset
-  `FOREST_WATER` com os números do Pomorog: célula .15×.19, fileiras
-  ` .-_~=~-`, espuma ` .,:*+oO`, reflexo com limiar .05 e fileira vazia a cada 4)
-  e reflexo planar 640² convertido em letras por célula. `engine.createWater`
-  e `{ glyph: 'water' }`; só a água mais próxima (< 11 m) renderiza espelho.
-- `world/circuit.ts` (circuito fechado de `trailLoop.ts`) e `world/chunks.ts`
-  (carregamento por distância, −1 a +2, semeado pelo índice).
-- `presets/ambient.ts`: vagalumes, motas da lanterna e poeira de corrida.
-- `engine.remove(obj, { dispose })` libera geometria, materiais, letras e
-  águas, sem tocar peças marcadas como compartilhadas (`userData.shared`,
-  `userData.sharedGeometry`). Objetos adicionados à parte dentro de outro
-  (árvore dentro de um chunk) mantêm seus estilos.
-- **Desempenho:** o reflexo derrubava para 27 fps (36 ms de CPU por quadro).
-  Ligar e desligar o plano de recorte fazia o Three recalcular o programa de
-  ~800 materiais duas vezes por quadro. Agora o engine mantém um plano de
-  recorte fixo, longe da cena, e o reflexo só move esse plano: **60 fps**
-  (o Pomorog media 47 com a mesma técnica).
-- **Correção de fidelidade, com antes/depois:** o tapete infinito do Pomorog
-  espalhava as lâminas em 26 m e dava a volta em 36 m, o que deixava uma faixa
-  de 10 m sem grama andando com o herói (visível em `procedural-forest-600m.png`
-  e em `floresta-antes-faixa-sem-grama.png`). Agora o tapete infinito se espalha
-  pelo vão inteiro, com a quantidade escalada para a mesma densidade
-  (90 000 × (36/26)² ≈ 172 600). O custo medido do tapete foi desprezível.
-
-### Editor
-
-- `src/areas/forest.ts`: porte de `forestWorld.ts` com o circuito, piso de 64 m
-  que segue o herói em passos de 3,4 m, tapete infinito com máscara de solo
-  (trilha, clareira, margens), chunks com árvores (copa `body`, tronco
-  `surface`), pedras de passagem, rochas, destaque (ruína, tronco caído, pedras
-  em pé, cogumelos), lago ou riacho com ponte, pedras e juncos de margem,
-  acampamento em s = 0. As peças declaram a técnica no próprio nó
-  (`userData.glyph`/`glyphStyle`), como um GLTF faria.
-- Viajante animado (`models.ts` copiado em `src/pomorog/`), ritmo da demo
-  (`paceAt`, `solveBaseSpeed`): caçada de 90 s em circuito de 100 m, 30 s na
-  fogueira, partida, em loop.
-- Painel de ajustes ao vivo (semente da fase 4): área, modo (letras, tela,
-  sem passe de tela), tamanho 5–12 px, luz 65–140%, zoom, giro, pausa e captura.
-- URL: `?area=`, `?ascii=`, `?hunt=<s>` (tamanho do circuito), `?at=<m>`
-  (começa mais adiante, para testes), `?camp=1`, `?zoom=`, `?angle=`, `?pause=`.
-
-### Capturas
-
-`floresta-fogueira.png`, `floresta-lago.png`, `floresta-riacho-ponte.png`,
-`floresta-riacho-modo-tela.png` (antes, modo tela) e
-`floresta-antes-faixa-sem-grama.png` (faixa vazia do tapete antes da correção).
-
-### Testes
-
-`pnpm check` verde: 13 testes (novos: circuito fecha sem emenda e acha o
-ponto mais próximo; chunks −1..+2 com volta; forma da água).
-
-### Pendências da Floresta
-
-- Criaturas e combate (lobo, efeitos de golpe) não entram nesta fatia; os
-  modelos já estão copiados em `src/pomorog/`.
-- Recorte de oclusores entre câmera e herói (raycast) não portado.
-- Sem rótulos HTML (nome, vida).
-
-## 11/10/2026 — Fatia 2: Pântano da Chuva
-
-**Estado:** área montada (`?area=rain_marsh`). A água e a chuva mantêm o
-visual antigo aprovado, no passe de tela. Árvores de várzea, pedras, juncos,
-plantas aquáticas, margens, passarela e cabana são letras nos objetos.
-
-### Núcleo
-
-- `weather/storm.ts` (`stormAt`), `weather/rain.ts` (traços de 1 px ao longo
-  da queda, raio em `| / \`, gotas determinísticas por índice) e
-  `world/rippleField.ts` (ondas amortecidas em passo fixo).
-- `presets/marshWater.ts`: preset de água "pântano antigo" (§3.2). Ilhas como
-  dados, nível que sobe com a enchente, IDs antigos (água .8, grama submersa .3,
-  reflexo 0), traços de onda, anéis ASCII `- _ | / \` pela tangente na tela
-  (passos, chuva, corpos, golpes), espirros, ondas de arrasto das botas e
-  gotas escorrendo dos ombros.
-- O passe de tela recebe o tom azulado de quem está dentro d'água por um
-  **gancho** (`marshHooks` no editor), não por import: era o acoplamento
-  `swampShoreGLSL` que a fase 1 removeu.
-- `engine.addWater` (qualquer água com espelho), `engine.createRainStreaks`,
-  `engine.setGain` (o relâmpago clareia chuva e raio) e `engine.setFlash`.
-- Materiais `ShaderMaterial` (água, piso antigo) passam intactos pelas
-  técnicas `screen`/`surface`: já escrevem o próprio ID.
-- Correção: `engine.add` ignorava `LineSegments`, e por isso a chuva não aparecia.
-
-### Editor
-
-- `src/areas/common.ts`: acampamento, fogueira (com vapor quando a chuva
-  apaga o fogo), viajante numa rota de pontos, lanterna e o piso antigo do
-  passe de tela, compartilhados pelas áreas fixas.
-- `src/areas/marsh.ts` e `src/scene/shoreDetails.ts`: porte de
-  `swampEnvironment.ts` e das margens. A técnica fica declarada em cada nó com
-  a mesma regra do catálogo §19 (folhagem e rochas facetadas viram nuvem de
-  letras; o resto, letras na face).
-
-### Capturas
-
-`pantano.png`, `pantano-perto-chuva-aneis.png` e `pantano-relampago.png`.
-Comparar com o painel do pântano em `all-areas-ground-cover.png`.
-
-### Pendências
-
-- O pântano roda a ~40–49 fps no headless, contra 60 da floresta. O custo
-  está no campo de ondas, recalculado na CPU a cada quadro, e no espelho
-  sempre ativo. Otimizar depois.
-- Sem som de trovão (áudio fica fora da engine por enquanto).
-
-## 11/10/2026 — Fatia 3: Pinheiros Nevados
-
-**Estado:** área montada (`?area=snow_pines`), equivalente ao painel da neve em
-`all-areas-ground-cover.png`. Roda a 60 fps.
-
-- Núcleo: `presets/snow.ts` com o chão de neve (cor por máscara de
-  cobertura, clareira derretida que cresce de 1,48 a 1,83 m, mapa de pegadas
-  512² com dedos e calcanhar que somem em 110 s), flocos `. + *` lentos que
-  não caem sob as copas e derretem sobre a clareira, acúmulo
-  (`snowAccumulation`), e o estilo `pomorogSnow` (luzes da neve, ambiente .42
-  nos corpos de letras).
-- Editor: `src/areas/snow.ts`. Pinheiros com galhos de folhas em nuvem de
-  letras e prateleiras de neve (rampa `snow`) que engrossam com o tempo,
-  pedregulhos, cerca quebrada, capim seco e tapete de crosta de neve.
-- Capturas: `neve.png` e `neve-perto-pegadas.png`.
-
-## 11/10/2026 — Fatias 4 e 5: Mina Antiga e Catedral Submersa
-
-**Estado:** as duas áreas montadas (`?area=old_mine`, `?area=sunken_cathedral`),
-equivalentes aos painéis de `all-areas-ground-cover.png`. 60 fps.
-
-- Núcleo: `engine.setObstacles` refaz o mapa de descoberta com os obstáculos
-  da cena já montada (a lanterna só revela o que enxerga). A água ganhou
-  contorno livre (`edgeGLSL`, `crestGLSL`, `flow`, `distance`), usado nos
-  corredores alagados da catedral (era `channelWater.ts`).
-- Editor: `src/areas/interiors.ts` com o código de montagem do Pomorog quase
-  literal: trilhos, escoras, rochas e cristais, lampiões pendurados com luz,
-  cascalho, carrinho; lajes, colunas com nervuras, bancos, arcos, altar,
-  vitral com brilho, fragmentos com musgo. Piso iluminado com textura
-  (`createLitFloor`), lanterna 19, estilo `pomorogInterior`, tapetes de
-  cascalho e de musgo.
-- Correção nas áreas fixas: o abrigo de tábuas só existe no acampamento da
-  floresta procedural (no Pomorog, `if (procedural)`); ele tinha entrado por
-  engano no pântano e na neve. Capturas refeitas.
-- Capturas: `mina.png`, `catedral.png` (e `neve.png`, `pantano.png` refeitas).
-
-### Critério de sucesso (§1.1)
-
-As 5 áreas do Pomorog podem ser montadas na engine e escolhidas no editor
-(painel → área). Falta a comparação lado a lado aprovada pelo dono e a
-conferência no Orca Browser com o painel visível.
-
-## 11/10/2026 — Criaturas e efeitos de combate (Fase 2, combate)
-
-- Núcleo: `presets/combat.ts` com os efeitos de combate do Pomorog
-  (`effects.ts`), todos em letras e ×1,4: crescente da espada com estrela e
-  faíscas, garras vermelhas, raio em três colunas, bola de fogo com rastro e
-  explosão, espinhos de gelo, anel de engajamento, anel de impacto, aura de
-  conjuração com luz própria (que acende a grama via `carpet.setGlow`),
-  dissolução da criatura e entradas em cena (rachaduras e terra ao sair do
-  chão, poeira na investida, vento no voo). `fx.hit()` recebe o golpe como o
-  `feedback` do jogo.
-- Editor: `src/areas/encounters.ts`. Os encontros da demo (lobo, larva,
-  aranha, vespa, goblin) são criaturas de `models.ts`/`beasts.ts` com
-  `type: 'creature'` (corpo de letras .155 m, oclusor escuro da própria cor),
-  com entrada, golpes roteirizados, magias alternadas, morte e bolsa de saque
-  no passe de tela. Ligado à Floresta (`?peaceful=1` desliga). A câmera
-  recentraliza como no Pomorog (1,25 m à frente, puxada 32% para a criatura).
-- Capturas: `floresta-combate-lobo.png` e `floresta-magias-aura-fogo.png`.
-
-## 11/10/2026 — Fase 3: importação GLTF
-
-- Núcleo: `import/gltf.ts`. `loadGlyphModel(url | ArrayBuffer)` lê .gltf/.glb.
-  As propriedades personalizadas do Blender chegam por `extras` → `userData`:
-  `glyph` (técnica), `glyph_surface`, `glyph_size` ou `glyphStyle` em JSON.
-  Cada nó com nome vira uma parte (§3.1), e o mixer toca todos os clipes.
-- Padrão quando falta marcação (`defaultGlyphStyle`), decidido por nome e
-  geometria, nunca por cor:
-  - malha com esqueleto → `body`;
-  - nomes de folhagem ou neve, ou geometria facetada → `body`;
-  - o resto → `surface`, com a família tirada do nome (casca, madeira, pedra, terra).
-- `body` em malhas com esqueleto: cada letra guarda o triângulo e o peso
-  baricêntrico e é re-esqueletizada a cada quadro (`updateSkinnedBody`), de
-  modo que as letras acompanham os ossos.
-- Editor:
-  - a área `?area=gltf` monta uma serpente com 6 ossos e animação, e uma
-    árvore com partes `tronco`/`copa` e propriedades no estilo do Blender;
-    exporta para GLB (`GLTFExporter`) e reimporta pelo leitor, ou seja, o
-    mesmo caminho de um arquivo do Blender;
-  - o painel ganhou "importar .glb/.gltf" e arrastar e soltar na janela.
-- Testes: 16 (novos: propriedades do Blender, padrão por nome e geometria,
-  nós já marcados preservados).
-- Captura: `gltf-serpente-arvore.png` (dois quadros da serpente nadando).
-- Pendência: sem um .glb real do Blender no repositório; o teste usa o
-  exportador do Three.
-
-## 11/10/2026 — Fase 4: editor de ajustes
-
-- **Seleção por parte (§3.1):**
-  - um clique seleciona a parte sob o cursor, destacada com uma caixa dourada;
-  - um segundo clique ou o Esc sobe para o objeto inteiro;
-  - o painel à esquerda mostra a técnica, a família de letras e o tamanho
-    resolvidos;
-  - a mudança é salva onde o usuário escolhe: **só esta**
-    (`setPartStyle`/`setInstanceStyle`), **todas desta parte neste tipo**
-    (`setTypeStyle`) ou **estilo global** (`setStyle({ glyphs })`).
-- Núcleo:
-  - `engine.pick(ndc)` devolve objeto, nó, parte, tipo e estilo resolvido;
-  - `engine.setInstanceStyle`, `engine.exportStyle` e `engine.types`;
-  - cada nó guarda o estilo resolvido (`userData.glyphResolved`);
-  - mudar a camada global ou os tipos re-resolve todos os objetos;
-  - objetos adicionados à parte (a árvore dentro do chunk) mantêm seus
-    estilos quando o pai é reaplicado;
-  - a camada da instância não vaza mais `type`/`parts` para o estilo resolvido.
-- **Presets em JSON:** "salvar preset .json" e "carregar preset .json" (camada
-  global, tipos de objeto, luzes, tamanho da célula, brilho).
-- **Comparação de imagens automática:** `pnpm compare` (`scripts/compare.mjs`)
-  captura vistas congeladas de cada área no Chromium sem janela e compara com
-  `docs/captures/baseline/` (ImageMagick, RMSE). Diferenças em
-  `docs/captures/diff/` (fora do git). `--update` grava uma nova base.
-  Repetibilidade medida:
-  - referência, floresta, neve, mina e catedral: RMSE ≤ 0,014 entre execuções;
-  - pântano: até 0,15, porque os anéis da chuva dependem do ritmo dos
-    quadros; tem limite próprio.
-- Captura: `estilo-por-parte-uma-copa.png`. Só a copa desta árvore foi
-  trocada para `surface` (o visual rejeitado "bola cheia de letras",
-  reproduzido de propósito); as outras copas seguem em nuvem de letras.
-- Pendência: a tabela completa de ajustes do §16 (célula e tinta por
-  material, rampas, vento) ainda está em constantes do shader. Hoje só ficam
-  ao vivo a célula do passe de tela, o brilho, o zoom, o giro e o estilo por
-  parte.
-
-## 11/10/2026 — Fase 5: cenários, prefabs, chunks e terreno com pincéis (§3.4)
-
-- Núcleo:
-  - `world/terrain.ts`: terreno por mapa de alturas (malha de 32 m, 129²) com
-    pincéis `raise`, `lower`, `smooth`, `flatten`, `dig` e `paint` (até 4
-    camadas de chão com cor e densidade de grama: musgo, terra, pedra, neve);
-    `heightAt`, `layerAt` e `grassAt`. É declarado como `surface`/terra, e a
-    grade de letras segue o relevo.
-  - `world/scene.ts`: formato `SceneDoc` em JSON (estilo, terreno, águas,
-    tapete, objetos de prefab com posição, giro, escala e estilo por
-    instância/parte). Funções `buildScene`, `place`, `remove`, `addWater`,
-    `regrow` (refaz o tapete pelas camadas pintadas) e `toJSON`. O prefab
-    vira tipo de objeto: mudar o estilo do tipo muda todas as cópias.
-  - Geração por regras: `generateChunkGrid` encaixa chunks numa grade de modo
-    que os conectores de borda casem (trilha, riacho, mato), com pesos,
-    filtro de bioma, chunks fixos, borda exigida e semente determinística
-    (com retrocesso). `rotateConnectors` gira os conectores. O carregamento
-    por distância já existia (`createChunkStreamer`).
-- Editor: área **Cenário** (`?area=sandbox`) com painel de ferramentas:
-  - pincéis: esculpir ±, suavizar, aplainar, pintar chão, cavar lago (cava,
-    pinta a margem e põe água), pôr objeto, apagar objeto;
-  - controles de raio e força, regerar grama, salvar e abrir cenário .json,
-    novo cenário;
-  - o documento fica guardado no navegador (localStorage, quando disponível);
-  - os prefabs (`scene/prefabs.ts`): árvore, pedregulho, caixa, ponte, ruína,
-    pedras em pé, tronco caído e fogueira com fogo e luz.
-- Testes: 21 (novos: chunks casando bordas e borda externa, determinismo e
-  chunks fixos, bioma, rotação de conectores, pincéis de terreno).
-- Captura: `cenario-pincel-lago-ponte-morro.png`, montada só com eventos de
-  ponteiro (morro esculpido e suavizado, pedra pintada, lago cavado, ponte,
-  ruína e árvores postas, grama regerada).
-- Pendências:
-  - em encostas muito íngremes as lâminas do tapete afundam na rampa
-    (falta inclinar a lâmina pela normal);
-  - costura automática entre chunks vizinhos e editor visual de chunks com
-    conectores;
-  - o editor de cenário ainda não monta mapas a partir do gerador de chunks
-    (só os testes usam);
-  - desfazer e refazer ainda não existem.
-
-## 11/10/2026 — Fase 6: sistema de efeitos (§3.3)
-
-- Núcleo `fx/effects.ts`: um efeito é um dado (`EffectDef`) com linha do
-  tempo (duração, loop) e emissores.
-  - **Emissão:** contínua (`rate`) ou em rajadas (`bursts`), dentro de uma
-    janela da linha do tempo.
-  - **Formas de nascimento:** ponto, esfera (volume ou casca), cone, anel,
-    caixa e linha.
-  - **Movimento:** velocidade e rapidez, gravidade, arrasto, ruído, atração,
-    giro, pousar no chão.
-  - **Ao longo da vida:** tamanho, cor e alfa por curva ou gradiente, brilho
-    e **sequência de letras**.
-  - **Tipos de render, todos em letras:** partícula, anel/onda de choque (com
-    letra pela tangente na tela), feixe em zigue-zague, fita/rastro, grade de
-    calor (a fogueira `HeatGridSpec`), decal no chão e **flipbook ASCII**.
-  - **Luz própria** com cintilação e curva de esmaecimento.
-  - **Fixação:** o efeito pode seguir um objeto, uma parte ou um osso
-    (`instance.attach(obj)`).
-  - **Orçamento:** letras por emissor (`max`) e por cena (`budget`).
-- `engine.fx.play('fogueira', alvo)`: o sistema nasce no primeiro uso, com os
-  efeitos do Pomorog já registrados.
-- `fx/presets.ts`: efeitos do Pomorog refeitos como dados (fogueira, poeira,
-  vagalumes, morte, aura, raio, explosão de fogo, gelo, anel de chuva,
-  rastro).
-- `fx/flipbook.ts`: imagem → letras por célula (o brilho escolhe a densidade
-  da letra, a imagem dá a cor), em **sprite sheet**, **GIF/WebP animado**
-  (`ImageDecoder` do navegador) ou **vídeo** amostrado em N quadros por
-  segundo.
-- Editor, área **Efeitos** (`?area=effects`):
-  - lista de efeitos, tocar em loop ou uma vez, parar;
-  - "preso ao alvo" (um poste andando em círculo);
-  - JSON do efeito editável ao vivo, salvar efeito .json;
-  - importar imagem, GIF ou vídeo como flipbook;
-  - orçamento visível (letras, efeitos e emissores ativos).
-- Testes: 25 (novos: rajada, envelhecimento e fim; loop com orçamento e grade
-  de calor; letras fora do alfabeto; conversão de imagem em letras).
-- Captura: `efeitos-presets.png` (fogueira, raio, explosão, gelo / aura,
-  morte, rastro, flipbook de uma sprite sheet gerada).
-- **Achado de fidelidade:**
-  - o alfabeto das partículas do Pomorog (`glyphCloud.ts`) não tem `@` nem
-    `x`;
-  - a fogueira e os efeitos pedem `@ # % x …`, mas o jogo desenha `.` no lugar
-    (`indexOf` = −1 → 0), e `ascii-fire-grid.png` de fato não mostra `@`;
-  - a engine mantém o mesmo comportamento por fidelidade;
-  - incluir `@`, `x` e `&` no alfabeto é uma melhoria a decidir com
-    antes/depois.
-- Pendências:
-  - o editor ainda não tem curvas e gradientes gráficos, só o JSON;
-  - forma "superfície de uma parte" e fixação em ossos por nome;
-  - gatilhos por evento (ao bater, ao morrer, ao entrar na água) ainda são
-    chamados pelo código;
-  - som.
-
-## 11/10/2026 — Fase 8: exportação (web e desktop)
-
-- **Modo jogador:** se houver um `game.json` ao lado do `index.html` (título,
-  área ou cenário de partida, estilo, zoom), o editor vira jogador, sem painéis
-  nem seleção. `?player=1` mostra esse modo no editor. O Vite usa
-  `base: './'`, então a pasta exportada funciona em qualquer caminho.
-- **`pnpm export`** (`scripts/export.mjs`):
-  `--title … --area <id> | --scene cenario.json [--zoom] [--desktop] [--bundle deb,appimage]`.
-  Compila o editor, copia para `exports/<jogo>/web` (fora do git) e grava o
-  `game.json` (e o `scene.json`). Com `--desktop`, gera uma configuração do
-  Tauri com nome e identificador do jogo e compila o app.
-- Verificado:
-  - web: a pasta exportada da Floresta servida estaticamente abre como jogo
-    (`exportacao-web-floresta.png`, título "Floresta Sombria", sem painéis);
-  - desktop: o binário release compilou em 2m33s
-    (`apps/editor/src-tauri/target/release/ascii-engine-editor`, sem
-    instalador; `--bundle` gera .deb/AppImage).
-- Não verificado:
-  - a janela do app desktop não foi aberta (evitei abrir janelas no desktop
-    do dono);
-  - Android e iOS: os SDKs não estão instalados (só `adb`); o caminho é
-    `tauri android init/build` e `tauri ios init/build` com a mesma pasta web.
-
-## Conferências gerais pendentes
-
-- **Orca Browser:** a aba existe, mas o painel do navegador está oculto e não
-  desenha quadros (o screenshot expira). Tudo foi validado no Chromium sem
-  janela com GPU (`cdpshot.mjs`, `pnpm compare`).
-- **Fase 7** (o Pomorog usando a engine) espera autorização do dono.
+# Development log
+
+Entries describe the state at each stage. Earlier limitations may have been
+resolved later; START.md and the editor guide describe the current scope.
+Historical filenames, reference IDs and captured interfaces are preserved.
+
+## 2026-10-12 — Public repository and initial publication
+
+The owner explicitly authorized committing and publishing the project as a
+public GitHub repository after the README review.
+
+- Created [joaovrmoraes/ascii-engine](https://github.com/joaovrmoraes/ascii-engine)
+  with public visibility and configured it as the local origin remote.
+- Initial publication targets main, preserving the existing project history.
+  The task branch contains the English editor/documentation, six re-edited
+  feature videos, posters, example scene and local README gallery.
+- Reused the completed validation from the presentation stage: 79 tests,
+  types/build, authoring/composition/API integration, six visual comparisons,
+  Remotion type checks and actual playback of all six videos in Orca.
+- git diff --check passed. No source changes were needed for publication;
+  temporary browser capture profiles are excluded from Git. reference/ and
+  comparison baselines remain unchanged.
+
+## 2026-10-12 — English project and README presentation
+
+The owner chose ASCII Engine, requested a README to review before repository
+creation, and confirmed English throughout the editor and technical docs.
+They subsequently requested re-editing existing videos rather than recording
+again. Owner conversation remains Portuguese.
+
+- Translated menus, inspector, asset labels, terrain tools, effects/atmosphere
+  studios, cameras, accessibility labels, status/error text, API/MCP help and
+  CLI output. Serialized prefab/preset IDs remain stable; user-authored names
+  and the read-only Pomorog archive remain original.
+- Translated README, START, agent instructions, editor/API guides, authoring
+  plan, ADRs, historical audit/capture notes and this log. ADR 0002 records
+  the language decision and the explicit existing-footage exception.
+- README has a final-scene image, six separate feature chapters, setup/export
+  instructions and an honest gameplay status. Gameplay scripting remains
+  future work; existing combat is a programmed demo sequence.
+- Re-edited the existing Living Shore footage with English cards, headings
+  and timed captions. Its recorded historical Portuguese interface remains
+  visible. Original OBS footage and masters are unchanged; no new film was
+  recorded. English copy of the example: examples/living-shore.ascii.json.
+- scripts/preview-readme.mjs renders the root README with six native players
+  and HTTP range support at localhost:4178. scripts/prepare-showcase.mjs
+  prepares MP4s/posters and verifies frame counts and complete decoding.
+- pnpm check passed: **79 tests**, types and build. Authoring, composition and API/MCP
+  integration checks passed in disposable GPU Chromium profiles, including
+  native dragging, persistence, imported assets, camera/effect gizmos and
+  the initial camera in Preview/player. Existing Vite/Zod warnings remain.
+- Evidence: [English editor and checks](captures/english-2026-10-12/README.md),
+  [README/media validation](captures/readme-2026-10-12/README.md).
+- Orca initially returned runtime_unavailable. After the environment restarted,
+  snapshot and screenshots worked. The English editor was inspected without
+  changing its saved draft, and all six gallery videos played/seeking worked
+  in the real Orca Browser. Six-view comparison passed with unchanged
+  baselines: reference .0000, forest .0014, marsh .1096, snow .0063, mine
+  .0163, cathedral .0396 RMSE. No Tauri/mobile launch this stage.
+- Local branch docs/readme-showcase. GitHub repository creation/publication
+  waits for the owner's requested README review; no push or remote created.
+
+## 2026-10-12 — Historical close-up recording: Margem Viva
+
+- Requested closer views of grass wind, water and effects, retaining the
+  six-part Remotion edit. Created Margem Viva (Living Shore) entirely through
+  visible editor controls: terrain, lake/path, objects, layered/lit Brasa Viva
+  effect, Luar da Margem Viva atmosphere, camera, save and export.
+- Working zoom 1.0–1.9, panning to the edited area. Low grass view; 9-second
+  holds on wind/fire/water and 14-second final Preview. Final frame height
+  **6.5 m**, previously 15 m.
+- Native OBS in a separate workspace, PipeWire window capture, 2560×1080/
+  30 fps, I444/Rec.709 from capture, x264 CRF 16, zero dropped frames.
+  4:4:4 master; saturation 1.0. Compatible 4:2:0 still loses fine-stroke color.
+- Original approximately 7:34; edit **13149 frames, 7:18.3**, 2560×1440.
+  Water/grass/fire/camera normal speed; other stages 1.15×–1.30×. Earlier
+  timeline retained in tools/video-edit/src/editions/lago-das-brasas.ts.
+- Files: /home/jonny/Videos/ASCII-Engine-Closeup-2026-10-11/ (OBS originals,
+  silent MP4, editable map, exported document and edicao/).
+- parseScene accepted 10 objects, one water body, one saved effect, one
+  atmosphere and one initial camera. Four sampled 3-second crops each had
+  90 unique frames, without freezing in those samples.
+- pnpm check: **79 tests**, types/build; Remotion types passed. Full film,
+  six chapters and 4:4:4 master passed frame counts/full decoding.
+  [Evidence extracted from video](captures/regravacao-proxima-2026-10-11/README.md).
+- No engine/map changes, narration/audio or Pomorog import test. External
+  Chromium recorded; OBS/browser closed normally and focus returned to Orca.
+
+## 2026-10-11 — Remotion edit and recording color diagnosis
+
+- Independent tools/video-edit project, Remotion 4.0.534: editable six-part
+  timeline, intro/outro, animated chapter cards and synchronized notes.
+- 2560×1440/30 fps, native 2560×1080 footage unscaled. Indicated speeds
+  1.15×–1.40×; **8236 frames**, approximately 4:35. Full film, six parts and
+  gallery in /home/jonny/Videos/ASCII-Engine-2026-10-11/edicao/.
+- Full browser rendering pressured RAM; Remotion produces graphics/bands,
+  FFmpeg composes source with two threads. Headless browser/disk cache.
+- OBS source NV12/4:2:0, correctly tagged limited-range Rec.709. Same-PNG
+  experiment confirmed glyph-color loss through chroma subsampling; gray
+  barely changed. No global gamma/black-level adjustment.
+- Editorial saturation 1.4× via RGB matrix; H.264 4:4:4 master and compatible
+  4:2:0 encoded once, split at exact chapter keyframes. Personal OBS settings
+  untouched. Correction cannot recover discarded chroma information.
+- pnpm check: 79 tests, types/build; Remotion types, exact frame counts and
+  full decode of all outputs passed. No audio or engine/map changes.
+  [Color diagnosis and evidence](captures/edicao-remotion-2026-10-11/README.md).
+
+## 2026-10-11 — Full composition session recorded in OBS
+
+- Owner accepted the preceding water work and requested visible UI creation,
+  native OBS, and care with Omarchy/Hyprland window placement. Editor on
+  workspace 5, OBS on 6, Orca preserved on 3. Disposable demo profile.
+- PipeWire editor-window capture with real cursor. API used only for reading
+  state; the map was assembled through visible controls.
+- Lago das Brasas (Ember Lake): 32 m terrain, elevation/path, calm lake,
+  trees/rocks/ruin/log, layered/lit Brasa da margem effect, Luar do Lago das
+  Brasas atmosphere and initial camera. Assets saved; finished in Preview.
+- Delivery: /home/jonny/Videos/ASCII-Engine-2026-10-11/ with
+  ASCII-Engine-criacao-completa.mp4, Lago-das-Brasas.ascii.json and
+  Lago-das-Brasas.pomorog.json. **5:11**, 2560×1080, 30 fps, H.264, six
+  chapters, no audio. Original MKV remains outside Git.
+- Early XComposite property query aborted OBS; another attempt froze frames.
+  Both takes discarded. PipeWire final take checked; OBS closed normally.
+- MP4 fully decoded, video frames inspected, parseScene accepted 10 objects,
+  one water/effect/atmosphere and valid initial camera. pnpm check passed
+  **79 tests**, types/build, with known Vite chunk/Zod annotation warnings.
+- No engine changes. This covered composition, not all advanced options or
+  model import; exported-scene import into Pomorog untested.
+  [Recording evidence](captures/sessao-gravada-2026-10-11/README.md).
+
+## 2026-10-11 — Calm water and low-angle correction
+
+- Owner requested calm lake, readable reflection and gentle waves, flagging
+  water/grass while orbiting. Inspection found broad dark regions and blocky
+  foam on slopes. Copied scene/depth/current after approximately 11 minutes
+  reproduced the case in an isolated profile.
+- Continuous/slower visual wave fronts, short-phase advection and stepped
+  color; wave amplitude also controls flicker/highlight. Foam follows flow
+  convergence, advects and fades; accumulated depth no longer creates an O grid.
+- Reflection plane follows simulated height in nearby calm regions.
+  Atlas derivatives now come from the continuous grid before fract/glyph
+  selection, reducing green stripes apparently crossing the shore.
+- Boundary pixel test: four rotations/two elevations, projected edge thickness,
+  zero water pixels outside tolerated shoreline in eight views. An infinitely
+  thin plane assumption had produced false positives at low angles.
+- pnpm check: **79 tests**, types/build; verify:water and six-view compare
+  passed. New tests cover stationary deep pools, foam dissipation, 120-second
+  sources and reflection at the current surface.
+- Orca real canvas, isolated multi-angle copies and cdpshot sequence at 60 fps.
+  One Orca timeout and one tiled capture discarded; owner's document preserved.
+  [Captures/logs](captures/agua-calma-2026-10-11/README.md).
+- Limits: shallow flow inside painted masks, planar reflection per water body,
+  no splashes/buoyancy/volumetric fluid. Tauri untested; visual acceptance is
+  separate from these checks.
+
+## 2026-10-11 — 3D orbit, camera thumbnail and shallow water dynamics
+
+- Orbit (O): left drag rotates/elevates; Alt-left and Shift-middle also orbit.
+  Isometric resets orientation. Near-horizon pan uses the view plane.
+- Selected camera has a 12 fps thumbnail with Expand, sharing the renderer
+  and proportional viewport. No second world/context or double simulation.
+- Preview uses the initial camera and exit restores navigation. Visible Orca
+  tab had stalled requestAnimationFrame at time 0; 20 fps fallback restored
+  rendering/navigation. Normal rAF remains preferred; hidden documents pause.
+- Object reflection improved; cylinder appears when its reflected projection
+  lies inside the lake. Slopes no longer receive displaced horizontal mirrors.
+  Moonlight highlight follows main light, camera and surface normal; atmosphere
+  exposes light rotation/elevation in degrees.
+- world/waterDynamics.ts: shallow cell flow, depth, gravity, resistance,
+  stability bound, optional high-edge source, conservation without source and
+  impulse waves. Mesh/current/foam follow state; terrain remains unchanged.
+- waters[].physics persists parameters. Inspector exposes simulation, depth,
+  source, resistance, waves and test impact. Moving objects/engine.setActors
+  disturb water. Transient state resets on open, outside history/files.
+  Custom GLSL boundaries have matching physics distance functions.
+- API/MCP: editor_view.elevation, water_disturb, physics patching; 14 tools.
+  Disturbance does not change revision. Bridge restarted, client settings untouched.
+- pnpm check: **77 tests**, types/build. Composition/water/visual/authoring/API
+  integrations passed, including native orbit/gizmos, pixels and conservation.
+  [Evidence](captures/camera-agua-2026-10-11/README.md).
+- Compare: five initial passes; forest RMSE .0595, then .0095 isolated,
+  without code/baseline change. Known time-integration variability.
+- No expansion beyond painted masks, volumetric fluid, ballistic spray,
+  separate free fall or rigid buoyancy. No sky moon disk; main-light reflection
+  only. Calm-region object mirror excludes separate-pass particles.
+  Perspective/keyframes/Tauri remain unverified or unimplemented.
+
+## 2026-10-11 — Saved cameras and effect-layer positioning
+
+- Create camera captures current view: hierarchy entries, editor-only icon/
+  frustum, W/E gizmos, XYZ/rotation, frame height/aspect, duplicate/delete/history.
+  Camera view preserves pose/aspect; returning restores free navigation.
+- SceneDoc.cameras/activeCamera and applySceneCamera in core; player/export
+  honor initial camera. Helpers never enter world geometry/ASCII pass.
+- Named effect layers, XYZ origin/gizmo in the void, reset and local undo/redo.
+  One drag is one action; drafts do not alter scene history. Saved recipes
+  include origin/name. Heat and trails respect all EmitterDef.offset axes.
+- Ctrl S saves studio assets. Original presets retained; authored copies add
+  Flame/Embers/Sparks/Smoke names. Scene placement has whole-object gizmo.
+- API camera.define/update/remove/activate, editor_view.cameraId and camera
+  object_inspect; export/history preserve cameras and layer positioning.
+- pnpm check: **72 tests**, types/build. Composition, authoring, API and visual
+  passed: native gizmos, history, Ctrl S, placement, reload/player; reflection
+  405 changed pixels and fire lighting 3640. cdpshot and Orca captures.
+  [Evidence](captures/composicao-2026-10-11/README.md).
+- Orthographic only; perspective/keyframes, graphical curves/timeline and
+  global asset library pending. No Tauri launch or game-rules editor.
+
+## 2026-10-11 — Empty effect preview and atmosphere assets
+
+- Separate terrain-free preview engine with orbit/pan/zoom/frame, pause/stop/
+  restart/speed. Map pauses during editing; preview context freed on exit.
+- Fire/Smoke/Sparks/Magic/Explosion/Lightning templates, Basic/Advanced controls,
+  layers and fixed save footer. Both studios support Save/Show in Assets.
+- Named SceneDoc.atmospheres, category, click to apply/double-click to edit,
+  Save copy. Effects reopen on real double-click and update the same asset.
+- Assets survive local draft, file/export and history. API atmosphere.define/
+  apply, catalog and Studio capture. Library remains document-local.
+- pnpm check **61 tests**, types/build; authoring/API passed, cdpshot/Orca
+  checked. Embedded-host animation could stall. Graphical curves/timeline
+  pending; next owner request was layer gizmos and saved composition cameras.
+  [Evidence](captures/studio-assets-2026-10-11/README.md).
+
+## 2026-10-11 — Dedicated studio, terrain water and API/MCP authoring
+
+- Owner confirmed dedicated Effects/Atmosphere workspace, water following
+  mountains and complete visual content creation/editing through AI commands.
+- Large studio canvas/right controls; exit restores layout. Atmosphere exposes
+  exposure/tint/background/main/ambient light/shadow/fog and portable files.
+  Effects expose lights; real placement previews support W/E/R, Enter/Esc.
+- Continuous Water brush, Shift erase, flat/follow-terrain modes. Mesh/ripples
+  follow slopes without flattening terrain. Explicit legacy-water conversion;
+  serialized masks/heights restore on undo/reopen.
+- All visible reflections updated; equal planes share textures. Lit auxiliary
+  materials avoid applying letter loss twice; final water remains glyphs.
+  Local planar approximation on slopes, no separate-pass particle reflection.
+  Physics was not yet implemented at this stage.
+- Up to eight PointLights affect bodies/grass/particles. Studio enables
+  bodySceneLighting/inkFog; historical scenes keep approved lighting. Baselines intact.
+- packages/authoring: atomic validated scene/object/scatter/terrain/water/
+  effects/assets/atmosphere/weather commands; no editor/renderer dependencies.
+  scene.replace/patch expose all visual-contract fields.
+- Editor API: per-tab session/revision, preview without autosave, accept/discard,
+  history, inspect/camera/PNG/import. Direct AI acceptance allowed; manual
+  edits invalidate stale writes. Build failure preserves scene/resources.
+- apps/automation: loopback HTTP/WebSocket on 1442, 13 stdio MCP tools, official
+  SDK v2. Vite starts bridge; pnpm api independent. Explicit import paths,
+  temporary-file portable export, explicit overwrite option. .mcp.example.json
+  provided without changing global owner configuration.
+- START/ADR 0001, [API guide](api-mcp.md), [editor guide](guia-editor-visual.md).
+  **56 tests**, types/build; API/visual/authoring and all compare views passed.
+  Known large-chunk/Zod PURE warnings. Isolated MCP example:
+  [mapa-mcp.pomorog.json](examples/mapa-mcp.pomorog.json).
+- Orca tab/API session available but viewport screenshot timed out with stalled
+  animation. API forced render returned orca-api-canvas.png without changing
+  revision 0. UI captures from GPU Chromium; Vite also started with existing bridge.
+- [API evidence](captures/api-mcp-2026-10-11/README.md),
+  [studio/water/light](captures/studio-agua-2026-10-11/README.md).
+  Tauri connection, owner's MCP client configuration and Pomorog importer
+  pending. This authors visuals, not game logic or a complete RTS.
+
+## 2026-10-11 — Camera correction, movable panels and effects tab
+
+- Fixed reversed vertical pan/arbitrary 1.4 gain using screen-to-ground
+  projection. Right/middle pan follows pointer without Ctrl.
+- Floating/resizable panels, drag handles, docking on three edges, recovery
+  and persistent localStorage layout; canvas uses freed space.
+- Effects tab: emitter/color/shape/motion/duration/loop fields, preview, presets,
+  save/place, import/download and advanced JSON. SceneDoc.effects validates
+  recipes/builds prefabs; isolated runtime definitions do not replace presets.
+  Save/reopen/export/duplicate/insert preserve effects.
+- pnpm check **44 tests**, types/build; authoring passed without page exceptions;
+  six compare views passed unchanged. [Evidence](captures/paineis-efeitos-2026-10-11/README.md).
+- One docked panel per edge, no separate native windows. Graphical timeline/
+  curves and full particle scale/rotation pending. Next request covered water,
+  continuous painting, placement previews, effect lights and atmosphere.
+
+## 2026-10-11 — Unity-inspired editor workspace
+
+- Reorganized confusing placement flow: left hierarchy, central scene, right
+  inspector, bottom library; SVG icons/search/categories/File menu and tabs.
+- Native library drag/drop with ground indicator, or click then place. Shift
+  repeats, Esc cancels; placed object selected in Move. W/E/R gizmos, local/
+  global space, snap and XYZ fields. A drag is one history action. Alt orbit,
+  right/middle/Q pan. Preview disables editing and hides scene helpers.
+- Editor-only TransformControls overlay; no dependencies/core/shader/recipe/
+  document changes. Guide/START updated. pnpm check **41 tests**, types/build;
+  authoring native placement/three gizmos/history/import/export passed.
+  Large-bundle warning remained; no page exceptions.
+- [Before/after evidence](captures/editor-unity-2026-10-11/README.md) from
+  cdpshot, integration CDP and full-page Orca. Five compare passes; forest
+  failed during concurrent execution (.1352), passed isolated (.0096), with
+  code/baseline unchanged. Temporal cause not fully isolated.
+- Fixed panels, single selection/no grouping at this stage; water uses
+  inspector rather than object axes. Pomorog/biome authoring limitations
+  remain. No desktop/mobile check. Branch feat/unity-editor-workspace; no push.
+
+## 2026-10-11 — Portable visual authoring and export
+
+- Owner confirmed terrain/maps/items, excluding game rules/UI. Scope in
+  [authoring plan](plano-autoria-pomorog.md); guide records limitations.
+- Read-only inspection of ~/Documents/pomorog main f79d3c7 (owner local
+  changes) and pearleye visual worktree 27af922; reference matches pearleye.
+- Normalized/validated documents, stable identities/seeds, 3D transforms,
+  visibility/names/global/type/part styles, embedded GLTF/GLB and clip choice.
+  Failed scene builds release resources; editor preserves old scene until ready.
+- Sandbox default, hierarchy/inspectors/transforms/duplicate/delete/focus,
+  per-part selection, maps/terrain-free items, saved-item insertion, per-action/
+  stroke history, IndexedDB draft with visible failures, visual JSON export.
+- Rain/snow and library effects persist. Lake/stream digging uses waterEdge;
+  grass mask respects shoreline. Basic shapes compose items.
+- Removed carpet/particle/rain unregister updates; layers can be re-added
+  when retained; effects cancel immediately; campfire buffers independent.
+  engine.resources supports reload checks.
+- **41 tests**, types/build, real Chromium authoring checks: transforms/parts/
+  history/terrain-free/GLTF+bin/GLB/clips/malformed/build failures/reopen/weather/
+  brushes/lake/reload. No page exceptions. Six compare views unchanged.
+  [Evidence](captures/autoria-2026-10-11/README.md).
+- /tmp/ascii-authoring-export served on 1441: player with three objects/lake/
+  rain captured by cdpshot. Orca snapshot/canvas worked; full-page timed out.
+- Examples/START/README updated. Remaining at this stage: Pomorog importer,
+  full biome fidelity, grouping/gizmos, linked library, chunks/seams, advanced
+  water/brushes/effect editor. Branch feat/scene-authoring, no push/publication/
+  desktop/mobile test, no changes to Pomorog/reference.
+
+## 2026-10-11 — Audit and project resumption
+
+- [Report](relatorio-engine-2026-10-11.md), clean initial ed2d4f3 tree.
+  Functional renderer/five demos; game authoring incomplete. START corrected
+  phase-completion claims; README linked audit.
+- Reproduced missing instance/global JSON styles, prefab-overwritten type,
+  nondeterministic rebuilt tree, removed carpet still updating, terrain-free
+  sandbox crash. Imported models not portable; reload disposed old scene
+  before validating candidate; authoring/chunk/project-asset gaps identified.
+- **25 tests**, types/build and six compares passed without baseline updates.
+  No editor tests yet. Reference/five areas/sandbox/GLTF/effects/web/Orca
+  [captures and probes](captures/auditoria-2026-10-11/README.md).
+- Temporary web export verified over HTTP/player; no desktop/mobile run.
+  Recommended milestone: create, adjust parts, import, save, reopen identically,
+  export. Start with persistence/seeds/validation/disposal before new tools.
+  Documentation/evidence only; findings unresolved then, no reference/push changes.
+
+## 2026-10-11 — Phase 1: extracted core
+
+Ported reference/pomorog/src-visual to packages/engine/src, preserving
+numbers/alphabets/colors/drawing order. Added style resolution global → type →
+type part → node userData → instance → instance part. Declared techniques,
+per-node glyph metadata, cached material variants and preserved original materials.
+Material.clone does not copy onBeforeCompile; copying it fixed gray forest floor.
+CSS-height pixelScale/screen resolution retained for fidelity (DPR 1.5 changes
+body/particle apparent size); later improvements need before/after evidence.
+
+Modules: surfaceAlpha centralizes toFixed(2); independent illumination with
+interior/obstacles/placeable light; removed swamp coupling in favor of hook;
+worldGlyph→surface, glyphBody→body with per-engine uniforms/mesh lists/removal;
+grass→recipe carpet with extent/center; particle cloud buffer; markScreen;
+pomorog light/fog/cell 6/brightness 1/shadow .62 preset, tree/rock/creature/hero/
+prop/ground types, ground/carpet/pomorogSpan; data-based HeatGridSpec fire.
+Engine API: add/style/parts/types/carpet/particles/lights/actors/frame/render
+(dt clamped 0–.08), debug.raw. No game/React/Tauri imports, only Three.
+
+Reference editor scene: forest camp ground/logs/sleeping bag/crate/seat/shelter
+as surface with original pomorogKind classification; body stone ring/boulder/
+pebbles; four trees with surface trunk/body crown; 70000-glyph carpet,
+particle fire, static screen traveler. URL screen/raw/angle/zoom/pause/yaw,
+scene=terrain; drag rotates view. **9 tests**, types/build; no console errors.
+
+Captures: fase1-referencia.png, fase1-referencia-girada.png,
+fase1-referencia-perto.png, fase1-perto-3x.png, fase1-modo-tela-antes.png,
+fase1-relevo.png. GPU Chromium 1600×757/DPR 1. Compare Pomorog forest start,
+close-up and fire references. Ground/props/crowns follow geometry; legacy
+screen-all view is deliberate rejected-style comparison.
+
+Pending then: Orca hidden panel timed out; static hero; 45-degree terrain-grid
+seam/stretch on slopes; water/rain/snow/combat/fireflies/lantern motes; full
+part-cloud rebuild on style changes remained unoptimized.
+
+## 2026-10-11 — Slice 1: Dark Forest
+
+- Water component: stream/pond JS/GLSL waterEdge, data WaterLook/FOREST_WATER,
+  .15×.19 cells, original wave/foam alphabets, .05 reflection threshold and
+  blank row every four; 640² planar glyph mirror. Only nearest water <11 m
+  updates reflection. circuit/chunks distance loading −1..+2 with seeded indices.
+- Ambient fireflies/lantern motes/running dust. remove({dispose}) frees owned
+  geometry/materials/glyphs/water, preserving shared pieces/nested styles.
+- Reflection clipping had recompiled approximately 800 materials twice/frame:
+  27 fps/36 ms CPU. Fixed retained clipping plane restored **60 fps**, versus
+  measured Pomorog 47. Infinite grass spread 26 m/wrapped 36 m created 10 m gap;
+  corrected to full extent at constant density, 90000×(36/26)²≈172600 blades.
+- forestWorld port: 100 m closed trail, 90-second hunt, 30-second camp loop,
+  animated traveler, 64 m ground following in 3.4 m steps, masked carpet,
+  trees/rocks/ruins/logs/stones/mushrooms, lakes/streams/bridges/shore/camp at s=0.
+- Live panel area/mode/size 5–12 px/light 65–140%/zoom/rotation/pause/capture.
+  URL area/ascii/hunt/at/camp/zoom/angle/pause. **13 tests**, types/build.
+- Captures: floresta-fogueira.png, floresta-lago.png, floresta-riacho-ponte.png,
+  floresta-riacho-modo-tela.png, floresta-antes-faixa-sem-grama.png.
+  Owner side-by-side acceptance, combat, raycast occluder clipping and HTML
+  name/health labels remained pending at this slice.
+
+## 2026-10-11 — Slice 2: Rain Marsh
+
+Approved legacy screen water/rain retained; floodplain trees/rocks/reeds/plants/
+shore/walkway/cabin use object glyphs. stormAt/rain with 1 px streaks and
+ASCII lightning, deterministic drops; fixed-step damped rippleField.
+Legacy water data/islands/flood height, IDs water .8/submerged grass .3/
+reflection 0, tangential ASCII rings, steps/rain/body/hit splashes, boot wakes
+and shoulder drips. marshHooks adds submerged-actor blue tint without biome
+imports. addWater/createRainStreaks/setGain/setFlash; ShaderMaterial retains
+its own ID. Fixed ignored LineSegments so rain renders.
+
+Common fixed-area campfire/steam/traveler/lantern/floor; marsh/shoreDetails
+ported swamp environment with catalog §19 node techniques. Captures:
+pantano.png, pantano-perto-chuva-aneis.png, pantano-relampago.png.
+40–49 fps headless versus forest 60; CPU ripple field/always-on mirror costs
+remain. No thunder audio.
+
+## 2026-10-11 — Slice 3: Snow Pines
+
+60 fps; presets/snow: masked ground, camp clearing grows 1.48→1.83 m,
+512² footprint map with toes/heel fading in 110 s, slow . + * flakes excluded
+under crowns/melting at camp, snowAccumulation, body ambient .42.
+Pine body foliage and thickening snow shelves/ramp, boulders/broken fence/
+dry grass/crust carpet. Captures neve.png, neve-perto-pegadas.png.
+
+## 2026-10-11 — Slices 4/5: Old Mine and Sunken Cathedral
+
+Both 60 fps. setObstacles rebuilds exploration/lantern visibility; free water
+boundary via edgeGLSL/crestGLSL/flow/distance supports flooded corridors.
+Near-literal interior assembly: rails/supports/rocks/crystals/lamps/gravel/cart;
+slabs/ribbed columns/pews/arches/altar/glowing stained glass/moss debris.
+createLitFloor, lantern 19, pomorogInterior, gravel/moss carpets.
+Shelter was incorrectly included in marsh/snow; restored procedural-forest-only
+condition and recaptured. mina.png/catedral.png plus updated neve/pantano.
+Five Pomorog areas selectable; owner comparison and visible Orca check pending.
+
+## 2026-10-11 — Creatures and combat effects
+
+presets/combat preserves Pomorog glyph effects at 1.4×: sword crescent/star/
+sparks, red claws, three-column lightning, fireball/trail/explosion, ice spikes,
+engagement/impact rings, lit casting aura lighting grass via carpet.setGlow,
+dissolve and emergence/dash/flight effects. fx.hit accepts game feedback.
+Scripted wolf/larva/spider/wasp/goblin encounters use .155 m body glyphs,
+colored dark occluder, alternating spells/death/screen loot. Forest peaceful=1
+disables encounters; camera 1.25 m ahead, 32% toward opponent.
+Captures floresta-combate-lobo.png, floresta-magias-aura-fogo.png.
+
+## 2026-10-11 — Phase 3: GLTF import
+
+loadGlyphModel(URL/ArrayBuffer) handles glTF/GLB; Blender extras→userData glyph,
+glyph_surface/glyph_size/glyphStyle. Named nodes become parts; mixer plays clips.
+Fallback by name/geometry, never color: skinned/foliage/snow/faceted→body,
+otherwise surface with named bark/wood/stone/earth family. Skinned letters store
+triangle/barycentric weights, updateSkinnedBody follows bones each frame.
+Demo exports/reimports six-bone swimming serpent and tree with marked parts
+through Three GLTFExporter; editor file import/drag-drop. **16 tests**,
+gltf-serpente-arvore.png. No actual Blender-exported GLB fixture yet.
+
+## 2026-10-11 — Phase 4: adjustment editor
+
+Part picking/gold box; second click/Esc selects whole object. Resolved technique/
+family/size with instance, type-part or global scope. pick returns object/node/
+part/type/style; setInstanceStyle/exportStyle/types, glyphResolved, global/type
+re-resolution and nested-object style preservation; no type/parts style leakage.
+JSON presets include global/types/lights/cell/brightness.
+
+pnpm compare uses frozen GPU Chromium views and ImageMagick RMSE against
+captures/baseline; differences in captures/diff (ignored), --update explicit.
+Measured repeatability ≤.014 for reference/forest/snow/mine/cathedral;
+marsh up to .15 due to rain-ring timing. estilo-por-parte-uma-copa.png deliberately
+shows rejected surface crown on one tree; others stay body glyph clouds.
+Full §16 shader/material/ramp/wind controls remained constants; only screen
+cell/brightness/zoom/rotation/part style were editable at this stage.
+
+## 2026-10-11 — Phase 5: scenes, prefabs, chunks and terrain brushes
+
+32 m/129² height grid, raise/lower/smooth/flatten/dig/paint, up to four colored
+layers/grass densities (moss/earth/stone/snow); heightAt/layerAt/grassAt.
+Declared surface terrain follows height. SceneDoc style/terrain/water/carpet/
+prefab transforms/instance/part styles, buildScene/place/remove/addWater/regrow/
+toJSON. Prefab becomes type. generateChunkGrid matches trail/stream/brush
+connectors with weights/biomes/fixed chunks/boundaries/seed/backtracking;
+rotateConnectors and distance streamer.
+
+Sandbox brushes, radius/strength/regrow/save/open/new, browser localStorage;
+tree/boulder/crate/bridge/ruin/standing stones/log/lit fire prefabs.
+**21 tests**; cenario-pincel-lago-ponte-morro.png built using pointer events.
+Pending then: steep-slope carpet alignment, automatic seams/chunk editor,
+generator integration in scene editor and undo/redo.
+
+## 2026-10-11 — Phase 6: effect system
+
+EffectDef duration/loop/emitter timeline: continuous/burst emission; point/
+sphere/cone/ring/box/line spawning; velocity/speed/gravity/drag/noise/attraction/
+spin/ground; lifetime size/color/alpha curves, glow and glyph sequences.
+Particle/ring/zigzag beam/ribbon/heat/decal/ASCII flipbook rendering; flickering/
+fading lights; object/part/bone attachment; per-emitter max/scene budget.
+Lazy engine.fx.play('fogueira', target), data Pomorog presets and flipbook
+image/sprite sheet/animated GIF-WebP ImageDecoder/video sampling.
+Effects demo: loop/once/stop, moving target attachment, live JSON/file, image/
+GIF/video import, glyph/effect/emitter counters. **25 tests**;
+efeitos-presets.png covers fire/lightning/explosion/ice/aura/dissolve/trail/flipbook.
+
+Fidelity finding: Pomorog particle atlas omits @ and x, requested by fire;
+indexOf −1 maps to dot, consistent with ascii-fire-grid.png. Engine preserves
+that behavior; adding @/x/& requires an approved before/after improvement.
+Pending: graphical curves/gradients, mesh-surface spawn/named bones,
+event triggers still invoked from code, sound.
+
+## 2026-10-11 — Phase 8: web and desktop export
+
+Player reads adjacent game.json (title/area/scene/style/zoom), hides panels/
+selection; ?player=1 tests same path. Vite base './' supports relative hosting.
+pnpm export --title … --area id | --scene scene.json [--zoom] [--desktop]
+[--bundle deb,appimage] builds/copies exports/<game>/web, writes game/scene JSON;
+optional Tauri name/identifier config/build.
+
+Web Dark Forest served statically and captured without panels:
+exportacao-web-floresta.png. Release binary built in 2:33 at
+apps/editor/src-tauri/target/release/ascii-engine-editor; no installer.
+Desktop window never opened. Android/iOS SDKs unavailable (adb only);
+future path tauri android init/build and tauri ios init/build with same web folder.
+
+## Remaining general checks from the initial implementation
+
+Hidden Orca panel previously prevented frames/screenshots; GPU Chromium used.
+Phase 7 (Pomorog consuming the engine) requires a separate owner request.

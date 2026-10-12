@@ -208,7 +208,7 @@ function createInterior(engine: AsciiEngine, options: AreaOptions, locationId: '
   })
   engine.setObstacles(lightObstacles(root))
   return {
-    id: locationId, title: locationId === 'old_mine' ? 'Mina Antiga' : 'Catedral Submersa',
+    id: locationId, title: locationId === 'old_mine' ? 'Old Mine' : 'Sunken Cathedral',
     hero: actors.player.root.position,
     state: 'lantern-discovery',
     focus: actors.focus,

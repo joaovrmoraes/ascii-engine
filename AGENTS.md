@@ -1,43 +1,44 @@
-# Instruções para agentes — ASCII Engine
+# Agent instructions — ASCII Engine
 
-Vale para qualquer modelo (Codex, Claude, GPT, outros).
+Applies to every model (Codex, Claude, GPT and others).
 
-## Leia antes de alterar
+## Read before changing anything
 
-1. [`START.md`](START.md): objetivo, princípio visual, técnicas, arquitetura e fases.
-2. [`reference/pomorog/README.md`](reference/pomorog/README.md): o que é a
-   referência e como ler cada documento.
-3. Para qualquer coisa visual, leia a skill `pomorog-ascii-visual` e
-   `reference/pomorog/docs/visual-pipeline.md` (inclusive o catálogo, §19).
-   Abra as imagens em `reference/pomorog/images/`; ler só o texto não basta.
-4. `docs/log.md` (quando existir): o que já foi feito e onde parou.
+1. [`START.md`](START.md): purpose, visual principle, techniques, architecture and phases.
+2. [`reference/pomorog/README.md`](reference/pomorog/README.md): what the reference
+   contains and how to read each document.
+3. For visual work, read the `pomorog-ascii-visual` skill and
+   `reference/pomorog/docs/visual-pipeline.md`, including the catalog in §19.
+   Open the images in `reference/pomorog/images/`; reading text alone is insufficient.
+4. `docs/log.md`, when present: completed work and the current stopping point.
 
-## Regras
+## Rules
 
-- **Letras presas às coisas.** Nunca resolva um visual aplicando filtro de tela
-  ao mundo inteiro, textura de letras sobre 3D liso ou nuvem que vira uma esfera
-  sólida. Essas três abordagens foram rejeitadas pelo dono.
-- **Fidelidade antes de invenção.** Na extração, preserve números, alfabetos,
-  cores e ordem de desenho do Pomorog. Melhorias vêm depois e com antes/depois.
-  Não use skills de design para reinterpretar o estilo.
-- **O núcleo é independente.** `packages/engine` não importa React, Tauri, regras
-  de jogo nem nada de bioma específico. Efeitos de bioma entram por ganchos ou
-  presets.
-- **A técnica é declarada** (`GlyphKind`). Não classifique pela cor.
-- `reference/` é **somente leitura**. Os caminhos citados lá (`src/ui/visual/…`,
-  `docs/…`) são do repositório do Pomorog; o arquivo correspondente está em
-  `reference/pomorog/src-visual/` ou `reference/pomorog/docs/`.
-- **Valide vendo.** Use `pnpm check`, capturas com `cdpshot.mjs` e o **Orca
-  Browser** em `http://localhost:1440`. Declare quando algo não pôde ser verificado.
-- **Git:** confira `git status` antes de editar. Não faça reset, limpeza, push nem
-  publicação por suposição. Commits locais pequenos ao fim de cada etapa
-  validada são permitidos; o push só acontece quando o dono pedir.
-- **Avise antes de reverter** qualquer coisa que o dono já viu ou aprovou.
-- Escreva em português nos documentos e mensagens ao dono. Código e
-  identificadores ficam em inglês.
+- **Letters attached to things.** Never solve a visual problem with a screen
+  filter over the entire world, letters textured over smooth 3D, or a letter
+  cloud that becomes a solid sphere. The owner rejected all three approaches.
+- **Fidelity before invention.** During extraction, preserve Pomorog's numbers,
+  alphabets, colors and drawing order. Improvements come later, with before/after
+  evidence. Do not use design skills to reinterpret the scene's visual style.
+- **The core stays independent.** `packages/engine` imports no React, Tauri,
+  game rules or biome-specific content. Biome effects use hooks or presets.
+- **Declare the technique** (`GlyphKind`). Never classify it by color.
+- `reference/` is **read-only**. Its cited paths (`src/ui/visual/…`, `docs/…`)
+  belong to the Pomorog repository. Corresponding files here live under
+  `reference/pomorog/src-visual/` or `reference/pomorog/docs/`.
+- **Validate visually.** Use `pnpm check`, screenshots with `cdpshot.mjs` and
+  the **Orca Browser** at `http://localhost:1440`. State what could not be verified.
+- **Git:** check `git status` before editing. Never infer authorization for
+  reset, cleanup, push or publication. Small local commits after validated
+  stages are permitted; push only when the owner requests it.
+- **Notify before reverting** anything the owner has seen or approved.
+- **English is the project language.** Write UI, README, technical documentation,
+  API/tool descriptions, presentation captions, code and identifiers in English.
+  Reply to the owner in their preferred conversation language. Preserve the
+  original reference archive and stable IDs in existing scene documents.
 
-## Ao concluir uma etapa
+## At the end of a stage
 
-Atualize `docs/log.md` com o que mudou, as capturas (salve em `docs/captures/`),
-os testes rodados e o que ficou pendente. Atualize `START.md` se a arquitetura
-ou o plano mudarem.
+Update `docs/log.md` with changes, screenshots saved to `docs/captures/`,
+validation and outstanding work. Update `START.md` when the architecture
+or plan changes.

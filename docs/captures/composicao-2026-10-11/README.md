@@ -1,18 +1,21 @@
-# Composição — câmeras e origem de efeitos
+# Composition — cameras and effect origins
 
-Antes: [Studio sem posicionamento](../studio-assets-2026-10-11/efeito-void-salvo.png).
+Before: [Studio without positioning](../studio-assets-2026-10-11/efeito-void-salvo.png).
 
-- [Gizmo e origem da camada](efeito-origem-gizmo.png): Chama deslocada, outras camadas preservadas; receita salva.
-- [Câmera na cena](camera-na-cena.png): gizmo e volume de visão auxiliares, fora do mundo ASCII.
-- [Ver pela câmera](camera-cdpshot.png): captura com `cdpshot.mjs`, proporção 16:9 e inspetor.
-- [Player](camera-player.png): documento reaberto e câmera inicial respeitada, sem auxiliares do editor.
-- [Captura MCP](mcp-camera.png): enquadramento salvo capturado pela API/MCP.
-- [Orca Browser](orca-gizmo.png): Studio com gizmo e campos XYZ, sem salvar conteúdo de teste no documento do dono.
+- [Layer origin/gizmo](efeito-origem-gizmo.png): moved Flame, other layers
+  preserved, recipe saved.
+- [Scene camera](camera-na-cena.png): editor-only gizmo/view volume.
+- [Camera view](camera-cdpshot.png): cdpshot.mjs, 16:9 framing and inspector.
+- [Player](camera-player.png): reopened document honors initial camera;
+  no editor helpers.
+- [MCP capture](mcp-camera.png): saved framing captured through API/MCP.
+- [Orca Browser](orca-gizmo.png): Studio gizmo/XYZ fields, without saving
+  test content into the owner's document.
 
-[Composição](verify-composition.log), [autoria](verify-authoring.log),
-[API/MCP](verify-api.log) e [regressão visual](verify-visual.log) passaram.
+[Composition](verify-composition.log), [authoring](verify-authoring.log),
+[API/MCP](verify-api.log) and [visual regression](verify-visual.log) passed.
 
-A verificação de composição usa mouse nativo no gizmo da câmera e da
-camada. Confere um arrasto por ação de desfazer, separação do histórico do
-efeito, salvamento com Ctrl S, reabertura e câmera inicial no player.
-A câmera suportada é ortográfica; a navegação do editor é independente.
+Composition checks use native mouse input on camera/layer gizmos; verify one
+undo action per drag, independent effect history, Ctrl S, reopening and the
+initial player camera. Orthographic cameras are supported; editor navigation
+is independent. Screenshots show the historical Portuguese interface.

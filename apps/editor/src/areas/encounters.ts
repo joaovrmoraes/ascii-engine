@@ -10,11 +10,11 @@ import { smooth, turn } from '../pomorog/motion'
  * and leaves a pouch. No game rules: the blow list is a fixed script.
  */
 export const DEMO_MONSTERS: { id: string; family: string; name: string }[] = [
-  { id: 'forest_wolf', family: 'beast', name: 'Lobo da Floresta' },
-  { id: 'crimson_grub', family: 'insect', name: 'Larva Carmesim' },
-  { id: 'giant_spider', family: 'insect', name: 'Aranha Gigante' },
-  { id: 'forest_wasp', family: 'insect', name: 'Vespa da Floresta' },
-  { id: 'goblin_scout', family: 'humanoid', name: 'Batedor Goblin' },
+  { id: 'forest_wolf', family: 'beast', name: 'Forest Wolf' },
+  { id: 'crimson_grub', family: 'insect', name: 'Crimson Grub' },
+  { id: 'giant_spider', family: 'insect', name: 'Giant Spider' },
+  { id: 'forest_wasp', family: 'insect', name: 'Forest Wasp' },
+  { id: 'goblin_scout', family: 'humanoid', name: 'Goblin Scout' },
 ]
 /** Blows after the approach, every .85 s (the last one kills, 1.4 s). */
 const SCRIPT: { target: 'hero' | 'foe'; damage: boolean; spell?: boolean }[] = [

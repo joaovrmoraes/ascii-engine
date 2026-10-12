@@ -1,467 +1,391 @@
-# ASCII Engine — ponto de partida
+# ASCII Engine — starting point
 
-Leia este arquivo inteiro antes de qualquer alteração. Ele vale para qualquer
-agente (Claude, Codex, outros) e para pessoas.
+Read this entire file before making changes. It applies to every agent
+(Claude, Codex and others) and to people working on the project.
 
-## 1. O que é
+## 1. Purpose
 
-Uma engine que recebe uma cena 3D (Three.js) e a desenha **feita de letras**. As
-letras ficam presas aos objetos, não a um filtro aplicado à tela. Ela nasce do
-visual do **Pomorog**, um jogo pomodoro com caçada automática em ASCII 3D
-isométrico, aprovado pelo dono em 10–11/10/2026. Todo o conhecimento de lá
-está copiado em [`reference/pomorog/`](reference/pomorog/README.md).
+An engine that receives a 3D scene (Three.js) and renders it **made of letters**.
+Letters stay attached to objects. The visual approach comes from **Pomorog**,
+a pomodoro game with automatic hunting in isometric ASCII 3D, approved by the
+owner on 2026-10-10–11. Its knowledge is copied to
+[`reference/pomorog/`](reference/pomorog/README.md).
 
-Meta de uso, na voz do dono: *"jogar um 3D e converter pra ASCII"*. Um objeto
-entra na cena com uma marcação de técnica e sai com o mesmo acabamento do
-Pomorog. Nada de ajuste à mão em shader para cada caso.
+The owner's intended use, translated: “put a 3D model in and convert it to
+ASCII.” Objects declare their technique and receive Pomorog's finish, without
+hand-tuning shaders for every case.
 
-## 1.1 Critério de sucesso (definido pelo dono em 11/10/2026)
+## 1.1 Success criterion (owner, 2026-10-11)
 
-> *"Se eu conseguir fazer meu game eu acho que já tá bom, todos os mapas que
-> tem lá… pântano e afins, isso aí pra mim é sucesso."*
+> “If I can make my game, I think that's good enough — all its maps,
+> marsh and so on, that's success for me.” (Translated.)
 
-A engine está pronta quando as **5 áreas do Pomorog** podem ser montadas
-nela, pelo editor, com o mesmo nível das capturas aprovadas:
+The engine is ready when all **five Pomorog areas** can be authored through
+the editor with the quality of approved screenshots:
 
-| Área (id no jogo) | O que exige da engine |
+| Area (game id) | Required engine features |
 | --- | --- |
-| Floresta Sombria (`dark_forest`) | chunks em circuito, terreno, lago e riacho com reflexo, ponte, copas `body`, grama `carpet`, fogueira |
-| Pântano da Chuva (`rain_marsh`) | água do pântano antigo, chuva com anéis `\|_____\|`, árvores de várzea, margens |
-| Pinheiros Nevados (`snow_pines`) | chão de neve, neve caindo, neve nos galhos, pinheiros |
-| Mina Antiga (`old_mine`) | interior escuro com descoberta pela luz, trilhos, vigas, veios de cobre, pedras |
-| Catedral Submersa (`sunken_cathedral`) | construção em `surface`, água com reflexo, luz interna |
+| Dark Forest (`dark_forest`) | circuit chunks, terrain, reflected lake/stream, bridge, `body` crowns, `carpet` grass, campfire |
+| Rain Marsh (`rain_marsh`) | legacy marsh water, rain with `\|_____\|` rings, wetland trees, shores |
+| Snow Pines (`snow_pines`) | snowy floor, falling snow, branch snow, pines |
+| Old Mine (`old_mine`) | dark interior revealed by light, tracks, beams, copper veins, rocks |
+| Sunken Cathedral (`sunken_cathedral`) | `surface` construction, reflected water, interior lighting |
 
-Ordem de ataque: **Floresta → Pântano → Neve → Mina → Catedral**. Cada área
-é um marco: só puxa as funções que ela precisa e termina com capturas lado a
-lado (Pomorog × engine) aprovadas pelo dono. Recursos dos §3.1–3.4 que
-nenhuma área exige (mar, cachoeira, erosão, importar vídeo…) ficam para
-depois desse critério estar cumprido.
+Work order: **Forest → Marsh → Snow → Mine → Cathedral**. Each is a milestone
+and pulls only the features it needs. Finish with owner-approved side-by-side
+Pomorog/engine screenshots. Features in §3.1–3.4 unused by these areas — sea,
+waterfalls, erosion, video import and others — follow this criterion.
 
-## 2. Princípio visual (não negociável)
+## 2. Visual principle
 
-- **O mundo é feito de letras presas às coisas.** Quando a câmera gira, a letra
-  acompanha a superfície e não fica parada na tela.
-- O dono rejeitou três abordagens, que não devem voltar:
-  1. **filtro de tela no mundo inteiro**, que "parece filtro na tela, não nas coisas";
-  2. **3D liso com textura de letras**, que "parece 3D com textura ASCII";
-  3. **bola cheia de letras** em copas, pedras e criaturas, quando fica uma esfera sólida pintada.
-- Fonte Courier New regular, cor pelo material, vão escuro entre as letras,
-  6 degraus de sombra e luar legível em exteriores.
-- Detalhes, números e o catálogo objeto por objeto estão em
+- **The world is made of letters attached to things.** Camera rotation follows
+  object surfaces; letters do not stay fixed to screen pixels.
+- The owner rejected three approaches, which must not return:
+  1. a **screen filter over the entire world**;
+  2. **smooth 3D textured with letters**;
+  3. **solid letter-filled spheres** for crowns, rocks and creatures.
+- Courier New regular, material color, dark gaps, six shadow steps and readable
+  outdoor moonlight.
+- Parameters and the per-object catalog are in
   [`reference/pomorog/docs/visual-pipeline.md`](reference/pomorog/docs/visual-pipeline.md).
-  Imagens aprovadas e rejeitadas estão em
+  Approved/rejected images:
   [`reference/pomorog/images/`](reference/pomorog/images/README.md).
 
-## 3. As técnicas (o coração da engine)
+## 3. Techniques
 
-| `GlyphKind` | Técnica | Exemplos no Pomorog | Origem |
+| `GlyphKind` | Technique | Pomorog examples | Origin |
 | --- | --- | --- | --- |
-| `screen` | passe de tela por célula, com alfabeto de ator | herói | `ascii.ts`, `actorInk.ts` |
-| `surface` | grade de letras no espaço local, injetada no material, 6 degraus | chão, ponte, construções, caixa, tronco | `worldGlyph.ts` |
-| `body` | nuvem de sprites de letras, aberta ou sobre um oclusor escuro | copas, pedras, criaturas | `glyphBody.ts` |
-| `carpet` | letras de pé instanciadas, com receita por bioma | grama, cobertura do chão | `grass.ts`, `groundCover.ts` |
-| `particle` | glifos soltos | fogo (grade de calor), faíscas, chuva, neve, golpes | `glyphCloud.ts`, `effects.ts` |
-| `water` | água em letras com o reflexo planar convertido em letras | lagos, riachos | `worldGlyph.ts`, `waterReflection.ts` |
+| `screen` | per-cell screen pass, actor alphabet | hero | `ascii.ts`, `actorInk.ts` |
+| `surface` | local glyph grid injected into materials, six steps | floor, bridge, buildings, crate, trunk | `worldGlyph.ts` |
+| `body` | open glyph sprite cloud or dark occluder | crowns, rocks, creatures | `glyphBody.ts` |
+| `carpet` | upright instanced letters, biome recipes | grass, ground cover | `grass.ts`, `groundCover.ts` |
+| `particle` | free glyphs | heat-grid fire, sparks, rain, snow, hits | `glyphCloud.ts`, `effects.ts` |
+| `water` | glyph water with planar reflections converted to letters | lakes, streams | `worldGlyph.ts`, `waterReflection.ts` |
 
-Base comum: alvo de render fora da tela com profundidade e o **ID do material
-gravado no alpha** (`surface.ts`, `glyph = .85`, sempre `toFixed(2)`).
+Shared foundation: offscreen render target with depth and **material ID in
+alpha** (`surface.ts`, `glyph = .85`, always `toFixed(2)`).
 
-**Regra nova da engine:** a técnica é **declarada** em cada objeto (por exemplo
-`engine.add(mesh, { glyph: 'body' })` ou `userData.glyph` vindo do Blender e do
-GLTF). O Pomorog adivinha pela cor em HSL, o que só funciona porque os modelos
-foram feitos à mão; a engine não pode depender disso.
+**Engine rule:** each object **declares** its technique, e.g.
+`engine.add(mesh, { glyph: 'body' })` or `userData.glyph` from Blender/GLTF.
+Pomorog inferred it from HSL color because its models were handcrafted;
+a general engine cannot depend on color classification.
 
-### 3.1 Estilo por parte (requisito do dono)
+### 3.1 Style per part (owner requirement)
 
-O ajuste é sempre **por parte**, nunca só pelo objeto inteiro. Exemplo do
-dono: *"copa da árvore quero assim, mas o tronco quero assado"*. O próprio
-Pomorog já faz isso: na árvore, a copa é `body` e o tronco é `surface`.
+Style is adjusted **per part**, not only per whole object. The owner wants
+different finishes for a tree's crown and trunk. Pomorog already uses
+`body` for the crown and `surface` for the trunk.
 
-- **Parte** = um nó ou malha do modelo (`Object3D` com nome) ou um slot de
-  material. No GLTF, cada parte nomeada no Blender vira uma parte na engine.
-- Cada parte tem um **estilo de letras**: a técnica (`GlyphKind`) e os
-  parâmetros dela, como alfabeto, tamanho e espaçamento da letra, cor e
-  multiplicador de cor, força, vão escuro, degraus de sombra, aberto ou com
-  oclusor e animação (balanço, cintilação).
-- Os estilos vêm em camadas, e a mais específica vence:
-  `preset global → tipo de objeto (ex.: "árvore") → tipo de parte (ex.: "copa") → instância → parte da instância`.
-  Mudar a "copa" de todas as árvores e mudar só a copa desta árvore são
-  ações diferentes e as duas existem.
-- **API:** `engine.add(obj, { glyph, parts: { copa: { glyph: 'body', … }, tronco: { glyph: 'surface', … } } })`,
-  `engine.setPartStyle(alvo, parte, estilo)` e `userData.glyph`/`userData.glyphStyle`
-  por nó no GLTF.
-- **Editor:** no espaço de autoria, clicar seleciona o objeto; outro clique
-  na mesma parte ou a lista do inspetor seleciona a parte. Nas demonstrações,
-  o primeiro clique seleciona a parte. O painel mostra a técnica e os parâmetros
-  da parte com a escolha de onde salvar ("só esta", "todas desta parte
-  neste tipo de objeto", "estilo global"). Destaque visual da parte selecionada.
-- Na fase 1, desenhe as estruturas de dados já pensando nisso (estilo como
-  objeto de dados resolvido por camadas), mesmo que o editor venha depois.
+- A **part** is a named node/mesh (`Object3D`) or material slot. Named Blender
+  parts become named GLTF parts.
+- Each has a **glyph style**: technique, alphabet, glyph size/spacing, color,
+  color multiplier, strength, dark gap, shadow steps, open/occluded and
+  animation such as sway/flicker.
+- More specific layers win:
+  `global preset → object type → part type → instance → instance part`.
+  Changing every tree crown differs from changing this tree's crown.
+- API: `engine.add(obj, { glyph, parts: { crown: { glyph: 'body', … }, trunk: { glyph: 'surface', … } } })`,
+  `engine.setPartStyle(target, part, style)` and GLTF per-node
+  `userData.glyph`/`userData.glyphStyle`.
+- Authoring: first click selects the object; second click on its part, or
+  the inspector list, selects the part. Demo scenes select the part first.
+  Show technique/parameters and save scope: this instance, every matching
+  part of this object type, or global. Highlight selected parts.
+- Phase 1 data structures must support layered style resolution even
+  before a complete editor exists.
 
-### 3.2 Água como componente (requisito do dono)
+### 3.2 Water as a component (owner requirement)
 
-Água é um objeto que se coloca e ajusta, não um efeito preso a um bioma.
+Water is a placeable/configurable object, not an effect tied to a biome.
 
-- **Tipos:** lago e poça (contorno desenhado), riacho e rio (traçado com
-  largura e direção do fluxo), mar (plano com borda de praia), pântano (o
-  estilo antigo aprovado do Pomorog, com anéis ASCII) e cachoeira (faixa
-  vertical com espuma). Outros tipos podem ser criados a partir destes.
-- **Parâmetros:** alfabeto e densidade das letras da água, cores (raso,
-  fundo, espuma), velocidade e escala das ondas, direção e velocidade do fluxo,
-  reflexo ligado ou desligado com força e quanto ele é convertido em letras,
-  espuma e letras de margem, transparência pela profundidade, e anéis de
-  chuva e de passos (`|_____|`, `-----`, `||----`) com tamanho e tempo de vida.
-- **Interação:** passos, chuva, objetos caindo e efeitos geram anéis; quem
-  está dentro da água tem o reflexo e a linha d'água recortados.
-- Presets iniciais: "floresta" (lago e riacho com reflexo, do Pomorog), "pântano
-  antigo" e "catedral". Cada água pode sobrescrever o preset.
+- Types: painted lakes/puddles; width/flow paths for streams/rivers; sea
+  with shore; approved legacy marsh rings; vertical waterfalls with foam.
+  Additional types may derive from these.
+- Parameters: alphabet/density, shallow/deep/foam colors, wave speed/scale,
+  flow direction/speed, reflection strength/glyph conversion, foam/shore
+  glyphs, depth-based transparency, rain/step rings (`|_____|`, `-----`,
+  `||----`) with size/lifetime.
+- Steps, rain, falling objects and effects generate rings. Actors in water
+  receive reflection/waterline clipping.
+- Initial presets: forest lake/stream, legacy marsh and cathedral, with
+  per-water overrides.
 
-### 3.3 Efeitos como nas engines de mercado (requisito do dono)
+### 3.3 Effects system (owner requirement)
 
-Um sistema de efeitos completo, no espírito do Shuriken ou VFX Graph da Unity e
-do Niagara da Unreal, em que tudo vira **letras**.
+A full effect system inspired by Unity Shuriken/VFX Graph and Unreal Niagara,
+with every visual element represented as **letters**.
 
-- **Efeito** = um ou mais **emissores** com uma linha do tempo, que pode tocar
-  em loop ou uma vez só.
-- **Emissor:** quantas letras nascem (contínuo ou em rajada), quanto tempo
-  cada uma vive, forma de nascimento (ponto, esfera, cone, anel, borda de
-  malha, superfície de uma parte), velocidade, gravidade, arrasto, ruído,
-  atração e colisão com o chão. Ao longo da vida da letra variam tamanho,
-  cor, brilho, giro e **sequência de letras** (ex.: fogo `. : * # @`).
-- **Tipos de render**, todos em letras:
-  - partícula solta;
-  - rastro e fita (corte de espada);
-  - anel e onda de choque;
-  - feixe (raio);
-  - grade de simulação (a grade de calor do fogo, fumaça);
-  - decal no chão (marca de queimado);
-  - malha animada passando pela técnica `body` ou `surface`.
-- **Luz e som:** um emissor pode acender uma luz que pisca e disparar um som.
-- **Fixação e gatilhos:** o efeito pode ser preso a um objeto, a uma parte ou a
-  um osso, ou posto no mundo. Gatilhos disponíveis: ao nascer, ao bater,
-  ao morrer, ao entrar na água, por tempo, ou chamado pelo código
-  (`engine.fx.play('fogo', alvo)`).
-- **Importar animação pronta:**
-  - **sprite sheet, GIF ou vídeo:** cada quadro é convertido em letras por
-    célula (brilho vira a densidade da letra, a cor vem da imagem) e tocado
-    como um flipbook ASCII. O flipbook pode ficar de frente para a câmera ou
-    preso a um plano do mundo e pode ser usado como forma de nascimento das
-    partículas;
-  - **GLTF animado:** toca a animação e passa pela técnica de letras escolhida.
-  - O alfabeto, a escala e a cor da conversão são ajustáveis, e o resultado é
-    salvo como preset.
-- **Editor:** prévia ao vivo com linha do tempo, curvas e gradientes editáveis,
-  orçamento visível (letras e emissores ativos) e presets em JSON.
-- **Desempenho:** um limite de letras por efeito e por cena, menos detalhe com a
-  distância e reaproveitamento de partículas.
+- **Effect:** one or more emitters with a timeline, looping or one-shot.
+- **Emitter:** continuous/burst count, lifetime, birth shape (point, sphere,
+  cone, ring, mesh edge, part surface), velocity, gravity, drag, noise,
+  attraction and ground collision. Lifetime curves affect size, color,
+  glow, rotation and **glyph sequence**, e.g. `. : * # @`.
+- Render types: particles, trails/ribbons, rings/shockwaves, beams,
+  heat/smoke simulation grids, ground decals, animated `body`/`surface` meshes.
+- Emitters may own flickering lights and trigger sound.
+- Attachment: object, part, bone or world position. Triggers: birth, hit,
+  death, water entry, time or code, e.g. `engine.fx.play('fogueira', target)`.
+- Imported animation:
+  - sprite sheets, GIF or video: convert each frame to glyph cells by
+    brightness and source color; camera-facing/world-plane flipbooks can
+    also drive particle birth shapes;
+  - animated GLTF: play clips using the chosen glyph technique;
+  - configurable alphabet, scale and color, saved as presets.
+- Editor goal: live timeline, editable curves/gradients, visible glyph and
+  emitter budgets, JSON presets.
+- Performance: per-effect/per-scene budgets, distance detail reduction and
+  particle reuse.
 
-### 3.4 Terreno com pincéis, como na Unity (requisito do dono)
+### 3.4 Brush terrain (owner requirement)
 
-O terreno é esculpido e pintado com **pincéis**, no espírito do Terrain da
-Unity, e o resultado sai em letras.
+Sculpt and paint terrain with **brushes**, inspired by Unity Terrain,
+producing a world made of letters.
 
-- **Base:** um mapa de alturas por chunk (grade de vértices) com costura
-  automática entre vizinhos, e camadas pintadas de tipo de chão (grama, terra,
-  pedra, areia, neve, lama, folhas). Cada tipo tem seu estilo de letras
-  (`surface`) e seu tapete (`carpet`).
-- **Pincel:** tamanho, força, suavidade da borda e formato (redondo,
-  quadrado ou uma imagem em tons de cinza importada como carimbo). Tem espelho
-  e ajuste para encaixar na grade. `Shift` inverte (subir/descer) e o
-  desfazer funciona traço a traço.
-- **Pincéis de forma:**
-  - **subir/descer** (montanhas, morros, buracos);
-  - **suavizar**;
-  - **achatar** numa altura escolhida ou na altura do clique (platôs, bases de construção);
-  - **ruído** (rugosidade natural);
-  - **terraço** (degraus, encostas em camadas);
-  - **erosão** simples (sulcos de chuva, encostas mais naturais);
-  - **rampa** (de um ponto a outro, para caminhos e estradas).
-- **Pincéis de pintura:**
-  - **tipo de chão**, com mistura nas bordas;
-  - **regra automática por inclinação e altura:** pedra em encosta íngreme,
-    neve no alto, areia na beira da água. Ela pode ser desligada por área.
-- **Pincéis de detalhe:**
-  - **espalhar objetos** (árvores, pedras, arbustos), com densidade,
-    variação de escala e giro, alinhamento ao chão e borracha;
-  - **grama e flores** (densidade do `carpet`).
-- **Pincel de água** (§3.2):
-  - **lago:** pinta a área, que é cavada e enchida até um nível escolhido;
-  - **rio e riacho:** desenha o traçado, que cava o leito, define largura e
-    direção do fluxo e se ajusta ao relevo;
-  - **mar:** nível da água para o mundo todo.
-  O terreno e a água ficam ligados: mexer no relevo atualiza a margem.
-- **Pincel de caminho:** traça a trilha, que achata e pinta o chão por baixo e
-  serve de conector entre chunks.
-- **Montanhas e paredões em letras:** encosta íngreme vira pedra com letras
-  mais densas e degraus de sombra mais marcados. Paredões verticais usam
-  `surface` com a grade alinhada à face, para as letras não esticarem.
-- **Gerar e depois esculpir:** o gerador procedural (§ Fase 5) produz o
-  relevo e a água iniciais, e os pincéis refinam à mão.
+- Base: per-chunk heightmap vertex grids, automatic neighbor seams and
+  painted grass/earth/stone/sand/snow/mud/leaf layers. Each layer has
+  `surface` floor style and `carpet` cover.
+- Brush: size, strength, falloff, round/square/image stamp, mirroring,
+  grid snap, Shift inversion and per-stroke undo.
+- Sculpting: raise/lower, smooth, flatten to a chosen/clicked height,
+  noise, terraces, simple erosion and point-to-point ramps.
+- Painting: ground type with edge blending; optional height/slope rules
+  for steep stone, high snow and shoreline sand.
+- Detail brushes: scatter trees/rocks/shrubs with density, varied transform,
+  ground alignment and eraser; grass/flower carpet density.
+- Water brushes: dig/fill lakes, trace and excavate streams/rivers with
+  width/flow adapted to terrain, global sea level. Terrain edits update shores.
+- Paths flatten/paint beneath trails and connect chunks.
+- Steep mountains/cliffs use denser stone glyphs and stronger shadow steps;
+  vertical `surface` grids align to faces without stretching.
+- Generate first, then sculpt: phase 5 supplies initial terrain/water and
+  brushes provide manual refinement.
 
-## 4. Arquitetura
+## 4. Architecture
 
 ```text
 ascii-engine/
-├── START.md · AGENTS.md · CLAUDE.md   instruções (CLAUDE.md importa AGENTS.md)
-├── packages/engine/        @ascii-engine/core: TS puro + Three.js, sem UI nem Tauri
-├── apps/editor/            editor Vite (porta 1440) + casca Tauri 2 (src-tauri)
-├── reference/pomorog/      cópia de leitura: docs, imagens e src-visual
-└── .claude/skills, .agents/skills   skill pomorog-ascii-visual (referência de construção)
+├── START.md · AGENTS.md · CLAUDE.md
+├── packages/engine/        @ascii-engine/core: pure TS + Three.js
+├── packages/authoring/     atomic SceneDoc commands and schemas
+├── apps/editor/            Vite editor (1440), Tauri 2 shell
+├── apps/automation/        local HTTP/WebSocket bridge (1442), stdio MCP
+├── reference/pomorog/      read-only docs, images and visual source
+├── docs/showcase/          README presentation and feature videos
+└── tools/video-edit/       independent recording/editing project
 ```
 
-- O **núcleo** não conhece jogo, UI nem Tauri. Ele roda em qualquer navegador.
-  Módulos de `packages/engine/src/`:
-  - `engine.ts`: `createAsciiEngine`; `add(obj, { glyph, type, parts })`,
-    `remove`, `setPartStyle`, `setInstanceStyle`, `setTypeStyle`, `setStyle`,
-    `pick`, `render(dt)`; `createCarpet`, `createParticles`, `createWater`,
-    `addWater`, `createRainStreaks`, `fx`.
-  - `surface.ts` (IDs no alpha), `style.ts` (estilo por parte em camadas),
-    `ascii.ts` (passe de tela com ganchos `AsciiPassHook`), `illumination.ts`
-    e `exploration.ts` (luz local e descoberta).
-  - `techniques/`: `screen`, `surface`, `body` (com malhas de esqueleto),
-    `carpet`, `particle` e `water` (componente com reflexo em letras).
-  - `presets/`: `pomorog` (estilo e tipos), `campfire` (`HeatGridSpec`),
-    `ambient` (vagalumes, motas, poeira), `combat`, `marshWater` (pântano
-    antigo) e `snow`.
-  - `weather/`: `rain` e `storm`.
-  - `world/`: `circuit`, `chunks` (carregamento por distância),
-    `rippleField`, `terrain` (pincéis) e `scene` (cenário em JSON, prefabs,
-    gerador de chunks por conectores).
-  - `fx/`: sistema de efeitos em dados, presets do Pomorog e flipbook ASCII.
-  - `import/gltf.ts`: GLTF/GLB com `userData.glyph`.
-- O **editor** é a vitrine e a ferramenta: as 5 áreas do Pomorog
-  (`src/areas/`), a cena de referência, o cenário com pincéis, os efeitos, a
-  importação GLTF, o painel de ajustes, a seleção por parte e os presets. O
-  conteúdo do jogo (modelos, prefabs, ritmo da caçada) fica em
-  `src/pomorog/` e `src/scene/`, nunca no núcleo. Com um `game.json` ao lado
-  do `index.html`, o editor vira o jogador de um jogo exportado.
-- Scripts: `pnpm compare` (comparação de imagens com a base) e
-  `pnpm export -- --title … --area …|--scene … [--desktop]` (web e Tauri).
-- O **Tauri** só entra para o que o navegador não faz: arquivos e empacotamento.
-  Desenvolva e valide primeiro no navegador (`pnpm dev`). No Linux, o WebKitGTK
-  do Tauri tem WebGL mais lento que o Chromium.
+The **core** knows no game, UI or Tauri and runs in a browser:
 
-## 5. Plano em fases
+- `engine.ts`: `createAsciiEngine`; `add`, `remove`, `setPartStyle`,
+  `setInstanceStyle`, `setTypeStyle`, `setStyle`, `pick`, `render(dt)`;
+  carpet, particle, water and rain creation, and `fx`.
+- `surface.ts`: alpha IDs; `style.ts`: layered per-part styles;
+  `ascii.ts`: screen pass with `AsciiPassHook`; `illumination.ts` /
+  `exploration.ts`: local lighting/discovery.
+- `techniques/`: screen, surface, skinned body, carpet, particle and
+  glyph-reflecting water.
+- `presets/`: Pomorog style/types, campfire heat grid, fireflies/lantern
+  motes/running dust, combat, legacy marsh water and snow.
+- `weather/`: rain/storm; `world/`: circuit, distance-loaded chunks,
+  ripples, brush terrain and JSON scene/prefab/connector generation.
+- `fx/`: data-driven effects, Pomorog recipes and ASCII flipbooks.
+- `import/gltf.ts`: GLTF/GLB with `userData.glyph`.
 
-Cada fase termina com `pnpm check` verde, capturas antes/depois e um registro
-em `docs/log.md` (crie-o na fase 1).
+The **editor** is both showcase and authoring tool: five areas in `src/areas/`,
+reference scene, terrain authoring, effects, GLTF import, adjustments, per-part
+selection and presets. Game content such as models, prefabs and hunt pacing
+belongs in `src/pomorog/` / `src/scene/`, never the core. `game.json` next to
+`index.html` turns it into an exported game's visual player.
 
-### Fase 1 — Núcleo extraído (começar aqui)
+Commands: `pnpm compare` compares screenshots with the baseline;
+`pnpm export -- --title … --area …|--scene … [--desktop]` exports web/Tauri.
 
-Porte de `reference/pomorog/src-visual/` para `packages/engine/src/`:
+**Tauri** supplies filesystem/packaging features the browser lacks.
+Develop and validate in the browser first (`pnpm dev`). Linux WebKitGTK
+WebGL is slower than Chromium.
 
-1. `surface.ts` (IDs no alpha), com teste do `toFixed(2)`.
-2. Renderer da engine: alvo de render com `DepthTexture`, ordem de desenho
-   (`visual-pipeline.md` §2 e `recreate-from-zero.md` passo 10) e controle de
-   brilho e tamanho de célula.
-3. `ascii.ts`, o passe de tela, com a passagem direta para os materiais `glyph`.
-   Remova o acoplamento com o pântano (`swampShoreGLSL`); efeitos de bioma
-   entram por um gancho, não por import direto.
-4. `illumination.ts` (luz local) como módulo da engine.
-5. `worldGlyph.ts` → `surface`, `glyphBody.ts` → `body`, `grass.ts` → `carpet`
-   e `glyphCloud.ts` → `particle`.
-6. API inicial: `createAsciiEngine(canvas, options)`, `engine.add(object, { glyph })`,
-   `engine.render(dt)`, `engine.setStyle(preset)` e o preset `pomorog`.
-7. Cena de referência no editor: chão `surface`, uma caixa, uma pedra e uma
-   copa `body`, grama `carpet`, uma fogueira simples `particle` e um boneco
-   `screen`. Compare com `reference/pomorog/images/orca-world-glyph.png` e
+## 5. Phases and current state
+
+Every phase ends with passing `pnpm check`, before/after evidence and an
+entry in `docs/log.md`.
+
+### Phase 1 — Extracted core
+
+Port from `reference/pomorog/src-visual/`:
+
+1. `surface.ts` and a `toFixed(2)` test.
+2. Offscreen renderer with `DepthTexture`, draw order from visual-pipeline §2 /
+   recreate-from-zero step 10, brightness/cell-size controls.
+3. `ascii.ts`, direct pass-through for `glyph` materials. Remove biome imports
+   such as `swampShoreGLSL`; biome features enter through hooks.
+4. Independent local lighting module.
+5. `worldGlyph.ts` → surface; `glyphBody.ts` → body; `grass.ts` → carpet;
+   `glyphCloud.ts` → particle.
+6. Initial engine API and `pomorog` preset.
+7. Reference editor scene: surface floor/crate, body rock/crown, carpet grass,
+   particle campfire and screen actor. Compare `orca-world-glyph.png` and
    `after-world-glyph-closeup.png`.
 
-Pronto quando: a cena do editor fica visualmente equivalente às capturas
-aprovadas e nenhum módulo do núcleo importa nada específico do jogo.
+Complete when the reference scene matches approved captures and the core
+imports no game-specific modules.
 
-### Estado em 11/10/2026
+### State on 2026-10-11, presentation language update on 2026-10-12
 
-**Atualização de autoria visual:** o editor agora inicia no sandbox com
-hierarquia, transformações, partes, duplicação/exclusão, desfazer/refazer,
-rascunho em IndexedDB, modelos GLTF/GLB incorporados e exportação de
-`SceneDoc`. Mapas e itens sem terreno podem ser salvos/reabertos; chuva,
-neve e efeitos da biblioteca podem compor o documento. O pedido atual do
-dono se limita ao visual exportável, sem regras nem interface de jogo.
-Veja o [guia e limites da entrega](docs/guia-editor-visual.md) e os
-[exemplos](docs/examples/). Isso fecha o marco de persistência/autoria
-básica, mas não todos os recursos das fases abaixo.
+**Visual authoring:** sandbox startup, hierarchy, transforms, parts,
+duplicate/delete, undo/redo, IndexedDB draft, embedded GLTF/GLB and `SceneDoc`
+export. Maps/items without terrain can be saved/reopened; library rain,
+snow and effects compose documents. This closes basic persistence/authoring,
+not every feature below. See the [editor guide](docs/guia-editor-visual.md)
+and [examples](docs/examples/). Current scope is exportable visuals without
+game rules/UI.
 
-**Usabilidade:** a pedido do dono, o espaço de trabalho foi reorganizado
-com referência na Unity: hierarquia à esquerda, cena no centro, inspetor
-à direita e biblioteca embaixo. Objetos entram por arrastar e soltar ou
-clique seguido de posicionamento. W/E/R controlam mover/girar/escalar
-pelos eixos, com coordenadas locais/globais e encaixe; Orbitar (O) ou
-Alt + arraste gira e inclina a câmera; botão direito desloca o mapa acompanhando o mouse. Terreno e
-ambiente possuem abas próprias. Hierarquia, Inspetor e Projeto podem ser
-movidos, redimensionados, destacados e encaixados nas bordas. A disposição
-fica em localStorage, separada do documento, e pode ser restaurada.
-`apps/editor/src/editor/` contém o espaço de trabalho, ícones SVG e
-`TransformControls`: estes desenham numa cena de sobreposição exclusiva
-do editor, fora do pipeline ASCII e do documento exportado.
+**Workspace:** Unity-inspired hierarchy left, scene center, inspector right,
+library bottom. Drag/drop or click/place; W/E/R move/rotate/scale with
+local/global axes and snap. O or Alt + drag orbits/tilts; right drag pans
+with the mouse. Terrain/environment tabs are separate. Panels move,
+resize, detach/dock at edges; localStorage stores layout separately from
+scene data. Reset restores it. TransformControls draw in an editor-only
+overlay outside the ASCII pipeline/exported document.
 
-**Estúdio visual:** tela dedicada de Efeitos e Atmosfera, com prévia grande
-à esquerda e controles à direita. Efeitos incluem emissores e luz pontual;
-atmosferas incluem exposição, cor das letras, luzes, direção, sombra e
-névoa. Efeitos usam uma engine de prévia vazia e descartável; a renderização
-do mapa pausa durante essa edição. Controles essenciais e modelos iniciais
-simplificam a criação. `SceneDoc.effects` incorpora receitas,
-`SceneDoc.atmospheres` guarda presets nomeados nos Assets e `SceneDoc.style`
-contém a iluminação aplicada. Ambos os estúdios salvam na biblioteca;
-atmosferas são aplicadas por clique e reabertas por duplo clique.
-Curvas complexas, calor e flipbooks continuam disponíveis pelo JSON avançado.
-Camadas têm nome, origem XYZ, gizmo e histórico próprio no Studio. Calor
-respeita o offset XYZ, assim como partículas e rastros. A posição salva
-entra na receita e é respeitada ao colocar o efeito no mapa.
-Linha do tempo e curvas gráficas ficam pendentes.
+**Visual Studio:** dedicated effects/atmosphere pages with a large preview
+and controls. Effects use disposable empty-space preview engines and pause
+the map. Atmospheres expose exposure, glyph tint, lights/direction, shadows
+and fog. Essential controls and templates simplify creation. Effects live
+in `SceneDoc.effects`; named atmosphere assets in `SceneDoc.atmospheres`;
+current lighting in `SceneDoc.style`. Click atmosphere assets to apply,
+double-click to edit. Advanced JSON exposes heat, curves and flipbooks.
+Layers have name, XYZ origin, gizmo and separate history; heat, particles
+and trails respect saved offsets. Graphical timeline/curves remain pending.
 
-**Dinâmica da água:** `world/waterDynamics.ts` integra fluxo gravitacional,
-profundidade e impulsos numa grade de água rasa. `waters[].physics` salva
-lâmina, resistência, nascente e ondas. A malha, a corrente e a espuma seguem
-essa simulação; objetos/atores em movimento provocam ondas. A grade é
-limitada à máscara, sem fluido volumétrico ou corpos rígidos flutuantes.
-O espelho planar fica nas partes calmas, e o brilho de luz segue a direção
-da iluminação e da câmera. `water.disturb`/MCP `water_disturb` são impulsos
-transitórios; o documento guarda a receita, não o instante simulado.
+**Water dynamics:** `world/waterDynamics.ts` integrates gravity-driven flow,
+depth and impulses on a shallow-water grid. `waters[].physics` stores depth,
+resistance, source and waves. Mesh/current/foam follow simulation; moving
+objects/actors generate waves. Simulation stays inside the mask, without
+volumetric fluid or rigid buoyancy. Planar mirrors cover calm regions;
+highlights follow light/camera direction. `water.disturb` / MCP
+`water_disturb` are transient; documents store recipes, not simulation time.
 
-**Câmeras de composição:** `SceneDoc.cameras` contém poses nomeadas,
-rotação XYZ em radianos, tamanho ortográfico e proporção; `activeCamera`
-escolhe o enquadramento de Prévia, player e exportação. Selecionar uma
-câmera abre uma miniatura ao vivo, renderizada no mesmo contexto sem
-avançar a simulação uma segunda vez. `applySceneCamera`
-aplica essa pose sem depender do editor. No editor, câmeras aparecem na
-hierarquia e em uma cena auxiliar com ícone, volume de visão e gizmo;
-esses auxiliares não entram no mundo ASCII. É possível criar da vista
-atual, mover/girar, enquadrar, duplicar, excluir, desfazer/refazer e ver pela
-câmera com a proporção preservada. A navegação do editor é independente.
-Projeção em perspectiva ainda não faz parte desse contrato.
+**Composition cameras:** named `SceneDoc.cameras` poses include XYZ radians,
+orthographic span and aspect ratio. `activeCamera` selects preview/player/
+export framing. Selection shows a live thumbnail using the same renderer
+without double-stepping simulation. `applySceneCamera` is editor-independent.
+Editor helper icons/view volumes/gizmos are excluded from the ASCII world.
+Create from view, move/rotate, frame, duplicate/delete, undo/redo and
+aspect-preserving camera view are supported. Perspective remains pending.
 
-**Água e colocação:** um pincel de água desenha máscaras contínuas, com
-modo plano ou seguindo relevo. A dinâmica superficial está descrita acima.
-Reflexos de objetos são compartilhados em águas coplanares; o espelho
-horizontal não é aplicado às faces íngremes.
-A colocação mostra o prefab real e permite usar gizmo antes de confirmar.
+**Water/placement:** continuous water masks can stay level or follow terrain.
+Coplanar water shares object reflections; horizontal mirrors are not applied
+to steep faces. Placement previews use actual prefabs and support gizmo
+adjustment before confirmation.
 
-**API/MCP de autoria:** `packages/authoring` aplica comandos atômicos em
-`SceneDoc`, sem editor ou renderer. `apps/editor/src/api` adapta operações
-à cena aberta, com revisão, prévia/aceitar/descartar e histórico único.
-`apps/automation` serve a ponte HTTP/WebSocket local (1442) e o MCP stdio.
-O Vite inicia a ponte em desenvolvimento; `pnpm api` a inicia separadamente.
-A IA acessa o catálogo, objetos/partes, terreno, água, assets, efeitos,
-atmosfera, clima, câmera, captura, importação/exportação e o documento
-completo. O núcleo não depende desses adaptadores. Contrato e configuração
-em [`docs/api-mcp.md`](docs/api-mcp.md); decisão em
-[`docs/decisions/0001-authoring-api.md`](docs/decisions/0001-authoring-api.md).
+**Authoring API/MCP:** `packages/authoring` applies atomic commands to
+`SceneDoc` without editor/renderer. The editor adapter provides revisions,
+preview/accept/discard and shared history. `apps/automation` supplies local
+HTTP/WebSocket on 1442 and stdio MCP. Vite starts the bridge; `pnpm api`
+starts it separately. Catalog, parts, terrain, water, assets, effects,
+atmosphere, weather, cameras, captures, import/export and full documents
+are accessible. The core imports no adapters. See [API/MCP](docs/api-mcp.md)
+and [ADR 0001](docs/decisions/0001-authoring-api.md).
 
-No núcleo, `world/validation.ts` valida documentos, `world/history.ts`
-guarda snapshots limitados, `import/assets.ts` resolve fontes incorporadas
-e `weather/sceneWeather.ts` liga as receitas de precipitação ao documento.
-As receitas de objetos do Pomorog continuam no editor. O futuro importador
-do jogo precisará fornecer uma biblioteca compatível a `buildScene`.
+**English project language:** the owner requested English UI, README,
+technical documentation and presentation on 2026-10-12. Display labels
+are separate from legacy prefab/preset IDs; existing documents remain
+compatible. Preserve user-authored names and the original reference archive.
+See [ADR 0002](docs/decisions/0002-project-language.md). Scripts/gameplay
+components discussed as future work are not part of the current runtime.
 
-**Diagnóstico anterior, preservado como contexto da auditoria:**
+The core validates documents in `world/validation.ts`, stores bounded
+snapshots in `world/history.ts`, resolves embedded assets in `import/assets.ts`
+and applies document precipitation through `weather/sceneWeather.ts`.
+Pomorog object recipes remain in the editor; game consumers must supply
+compatible libraries to `buildScene`.
 
-Existe uma implementação inicial das fases 1 a 6 e 8, com as 5 áreas
-montadas **em código** e selecionáveis no editor. Isso ainda não cumpre o
-critério de montá-las pelas ferramentas do editor. A autoria de cenários,
-a persistência de estilos/assets e a integração entre sistemas estão
-incompletas; não falta apenas aprovação visual.
+**Earlier audit context:** phases 1–6 and 8 had initial implementations and
+five code-built areas. That did not satisfy editor-based authoring. Scene
+creation, asset/style persistence and cross-system integration were incomplete,
+not merely awaiting aesthetic approval. Findings/priorities are in the
+[2026-10-11 audit](docs/relatorio-engine-2026-10-11.md). The recommended milestone
+was create, customize parts, import, save, reopen identically and export;
+first fix persistence, prefab seeds, validation and resource disposal.
 
-Estado conferido, problemas reproduzidos e prioridades estão no
-[`relatório de auditoria de 11/10`](docs/relatorio-engine-2026-10-11.md).
-O próximo marco recomendado é criar uma cena, personalizar partes,
-importar um modelo, salvar, reabrir igual e exportar. Primeiro, corrigir
-persistência, sementes dos prefabs, validação de documentos e descarte de
-camadas; depois completar as ferramentas de autoria já previstas abaixo.
+Historical `pnpm check` and six baseline comparisons passed; sandbox was
+captured in Orca Browser. Full Pomorog equivalence remains pending. Desktop
+has historical build evidence but no validated execution. Phase 7 requires
+authorization in the game repository. See `docs/log.md` for implementation history.
 
-`pnpm check` e as seis comparações com a base da engine passaram. O
-sandbox foi capturado no Orca Browser. A equivalência final com o Pomorog
-continua pendente. Desktop tem compilação histórica, sem execução
-validada; a Fase 7 espera autorização no repositório do jogo. O histórico
-de implementação permanece em `docs/log.md`.
+### Actual order: vertical milestones per area
 
-### Ordem real de trabalho (marcos por área)
+The phases below describe **systems**. Execute per §1.1 area: after phase 1,
+each area is an end-to-end slice with its minimum terrain/brush, water,
+chunks, effects, per-part adjustments and save/load features. Grow systems
+with each area. Dark Forest is the first proof of the workflow.
 
-As fases abaixo descrevem **sistemas**. A ordem de execução segue as áreas
-do §1.1: depois da Fase 1, cada área é uma **fatia vertical**, construída de
-ponta a ponta com o mínimo de cada sistema que ela usa (terreno e pincel,
-água, chunks, efeitos, ajustes por parte, salvar e carregar), e os sistemas
-crescem a cada área. A Floresta Sombria é a primeira fatia e a prova do
-caminho; se algo travar, descobre-se ali e não depois de editores grandes.
+### Phase 2 — Water, reflection, weather and fire
 
-### Fase 2 — Água, reflexo, clima e fogo (porte do Pomorog)
+Faithfully port glyph water/reflection, water shapes, legacy marsh water,
+rain rings, snow, campfire heat grid and combat effects. Water becomes a
+configurable component (§3.2); effects become data (§3.3). Existing Pomorog
+features supply initial presets rather than biome-bound implementations.
 
-Porte fiel do que existe: `water` com reflexo em letras, a forma da água
-(`waterEdge`), a água do pântano, a chuva com anéis `|_____|`, a neve, a
-fogueira em grade de calor e os efeitos de combate. Desde já, a água entra
-como **componente configurável** (§3.2) e os efeitos como **dados de efeito**
-(§3.3), e não como código fixo de um bioma. O que o Pomorog tem vira os
-primeiros presets.
+### Phase 3 — Import
 
-### Fase 3 — Importação
+GLTF/GLB with `userData.glyph` Blender properties, defaults when unmarked,
+and skinned `body` letters sampled from bones. GLTF animations play normally.
+Every named node becomes a styleable part (§3.1).
 
-Leitura de GLTF/GLB com `userData.glyph` (propriedades personalizadas do Blender),
-um padrão razoável quando faltar a marcação, e `body` em malhas com esqueleto
-(amostrar posições a partir dos ossos). Animações do GLTF tocam normalmente.
+### Phase 4 — Adjustment editor
 
-Cada nó nomeado vira uma parte com estilo próprio (§3.1).
+Live controls from visual-pipeline §16, layered per-part selection,
+JSON presets, screenshots and automated image comparison.
 
-### Fase 4 — Editor de ajustes
+### Phase 5 — Scenes and chunks
 
-Painel com os ajustes ao vivo (tabela de ajustes, `visual-pipeline.md` §16),
-**seleção por parte** com estilos em camadas (§3.1), presets salvos em JSON,
-captura de tela e comparação de imagens automática.
+Build worlds from reusable scene **chunks**, as in Pomorog's forest circuit:
 
-### Fase 5 — Cenários e chunks
+1. **Prefab:** reusable saved composition, e.g. campfire with logs/effect/light/
+   sound, or bridge with boards/ropes/water. Editing updates instances;
+   individual copies may override part styles.
+2. **Chunk:** scene prefab with size, terrain, water, cover, objects, lights,
+   effects and edge **connectors** for trails/streams/vegetation. Library
+   metadata includes biome and rarity.
+3. **Scene:** grid or circuit, placed manually or generated by matching
+   connectors, seed, weights and fixed chunks such as the camp. Generated
+   results remain editable/saveable.
+4. **Distance loading:** load nearby chunks, unload distant ones; already
+   used by the forest circuit.
+5. **Chunk/scene editor:** placement, rotation, scale, duplicate, grouping,
+   undo/redo and terrain brushes (§3.4); sculpt, paint, scatter, dig lakes,
+   trace rivers/paths. Automatic neighbor seams for height/ground/water/trails.
+6. **Scene environment:** rain, snow, night/moonlight, fog and local lights.
 
-O mundo é montado a partir de **chunks**, pedaços de cenário reutilizáveis,
-como o circuito da floresta do Pomorog (`forestWorld.ts`, `trailLoop.ts`).
+Save prefab, chunk and scene data as JSON, loadable without the editor.
 
-1. **Prefab:** um conjunto salvo e reutilizável, por exemplo a "fogueira" (lenha,
-   efeito de fogo, luz e som) ou a "ponte" (tábuas, cordas e água por baixo).
-   Ao editar o prefab, todas as cópias mudam; uma cópia pode sobrescrever
-   partes (§3.1).
-2. **Chunk:** um prefab de cenário com tamanho fixo, que traz terreno, tipo de
-   chão, água, objetos, luzes, efeitos e **conectores de borda** (por onde
-   passam a trilha, o riacho e o caminho). Fica numa biblioteca e tem marcações
-   de bioma e raridade.
-3. **Cenário:** uma grade, ou um circuito, de chunks. Pode ser montado à mão
-   (arrastar chunks e girar) ou **gerado** por regras: conectores precisam
-   casar, a semente define a variação, há pesos por bioma e chunks fixos
-   (ex.: o acampamento no início). O resultado gerado pode ser editado e salvo.
-4. **Carregamento por distância:** só os chunks perto da câmera existem;
-   o resto é descarregado. O Pomorog já faz isso no circuito.
-5. **Editor de chunk e de cenário:** posicionar, girar, escalar, duplicar,
-   agrupar, desfazer e refazer, com o **terreno por pincéis** (§3.4):
-   esculpir montanhas e vales, pintar o chão, espalhar objetos e grama,
-   cavar lagos e rios, traçar caminhos. Costuras automáticas entre chunks
-   vizinhos (relevo, chão, água e trilha contínuos).
-6. **Ambiente por cenário:** chuva, neve, noite e luar, neblina e luzes locais.
+### Phase 6 — Effects system
 
-Tudo salvo em JSON (prefab, chunk e cenário), carregável pela engine sem o editor.
+Implement §3.3 with glyph visuals: emitter editing, timeline/live preview,
+imported sprite/GIF/video/animated GLTF, triggers and attachment points.
+Pomorog campfire, hits/claws, lightning, ice, aura, dissolve, dust and spawn
+recipes serve as fidelity tests.
 
-### Fase 6 — Sistema de efeitos
+### Phase 7 — Pomorog consumes the engine
 
-O sistema de efeitos completo (§3.3), como o das engines de mercado, mas
-gerando letras: editor de emissores com linha do tempo e prévia em loop,
-importação de animações prontas (sprite sheet, GIF, vídeo, GLTF animado),
-gatilhos e pontos de fixação. Os efeitos do Pomorog (fogueira, golpe, garras,
-raio, gelo, aura, morte, poeira, entradas em cena) são refeitos como presets e
-servem de teste de fidelidade.
+The game imports `@ascii-engine/core`. Approved screenshots must remain
+identical to prove faithful extraction. Work only with owner authorization
+in the Pomorog repository.
 
-### Fase 7 — O Pomorog volta a usar a engine
+### Phase 8 — Export
 
-O jogo passa a importar `@ascii-engine/core`. Ele precisa ficar idêntico nas
-capturas aprovadas; isso prova que a extração foi fiel. Faça só com o dono
-autorizando, no repositório do Pomorog.
+Package scenes/games for web and Tauri desktop; Android/iOS follow.
 
-### Fase 8 — Exportação
-
-Empacotar uma cena ou jogo pelo Tauri (desktop, depois Android e iOS) e pela web.
-
-## 6. Comandos
+## 6. Commands
 
 ```bash
 pnpm install
-pnpm dev                 # editor em http://localhost:1440
-pnpm check               # typecheck + testes + build
-pnpm tauri dev           # editor como app desktop
+pnpm dev                 # editor: http://localhost:1440
+pnpm check               # typecheck + tests + build
+pnpm tauri dev           # desktop editor
+node scripts/preview-readme.mjs  # local README/video preview: localhost:4178
 ```
 
-Capturas sem interface: `.claude/skills/pomorog-ascii-visual/scripts/cdpshot.mjs`
-(Chromium sem janela com GPU, `--use-angle=gl`). Valide também no **Orca Browser**.
+Headless captures: `.claude/skills/pomorog-ascii-visual/scripts/cdpshot.mjs`
+(Chromium with GPU and `--use-angle=gl`). Validate in **Orca Browser** too.

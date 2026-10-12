@@ -1,5 +1,5 @@
-//! Casca nativa do editor. A engine roda no navegador embutido; o Rust só
-//! cuida do que o navegador não faz (arquivos, exportação, janela).
+//! Native editor shell. The engine runs in the embedded browser; Rust handles
+//! platform features such as files, export and window management.
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {

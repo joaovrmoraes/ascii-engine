@@ -17,8 +17,8 @@ for (const chapter of chapters) {
   const frames = bodyFrames(chapter);
   const args = ['-ss',String(chapter.start),'-t',String(chapter.end-chapter.start),'-i',path.join(project,'public/recording.mp4')];
   for (const j of chapter.notes.keys()) args.push('-i',path.join(output,'previas',`${chapter.id}-faixa-${j}.png`));
-  // Matriz RGB de saturação preserva luminância, como o filtro CSS do Remotion.
-  // Entrar/sair explicitamente de BT.709 evita a interpretação implícita de YUV.
+  // RGB saturation matrix preserves luminance, matching the Remotion CSS filter.
+  // Explicit BT.709 conversion avoids implicit YUV interpretation.
   const color = SATURATION === 1 ? 'format=yuv444p' : 'scale=in_color_matrix=bt709:out_range=pc,format=gbrp,colorchannelmixer=rr=1.31496:rg=-0.28608:rb=-0.02888:gr=-0.08504:gg=1.11392:gb=-0.02888:br=-0.08504:bg=-0.28608:bb=1.37112,scale=out_color_matrix=bt709:out_range=tv,format=yuv444p';
   const graph = [`[0:v]setpts=(PTS-STARTPTS)/${chapter.speed},fps=${FPS},${color},pad=2560:1440:0:180:color=0x0b0e0d,tpad=stop_mode=clone:stop_duration=1,trim=end_frame=${frames+12},setpts=PTS-STARTPTS[v0]`];
   chapter.notes.forEach((note,j) => {
@@ -36,5 +36,5 @@ for (const chapter of chapters) {
   const concat = path.join(intermediate, `${chapter.id}-concat.txt`);
   writeFileSync(concat, `file 'Cartela-${chapter.id}.mp4'\nfile '${chapter.id}-body.mp4'\n`);
   ffmpeg(['-f','concat','-safe','0','-i',concat,'-map','0:v:0','-c:v','copy','-an','-movflags','+faststart',path.join(intermediate,`${chapter.id}.mp4`)]);
-  console.log('Parte montada:', chapter.id);
+  console.log('Chapter assembled:', chapter.id);
 }

@@ -28,9 +28,9 @@ const paths: Record<string, string> = {
 }
 export function icon(name: string) { return `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${paths[name] ?? paths.cube}</svg>` }
 export function assetInfo(key: string) {
-  if (key.startsWith('asset-')) return { category: 'Importados', icon: 'cube', color: '#a899dd' }
-  if (key.startsWith('fx:')) return { category: 'Efeitos', icon: 'spark', color: '#d5ad62' }
-  if (['bloco', 'cilindro', 'esfera'].includes(key)) return { category: 'Formas', icon: key === 'cilindro' ? 'cylinder' : key === 'esfera' ? 'rock' : 'cube', color: '#89accc' }
-  if (['arvore', 'pedregulho', 'tronco-caido', 'pedras-em-pe'].includes(key)) return { category: 'Natureza', icon: key === 'arvore' ? 'tree' : key === 'tronco-caido' ? 'cylinder' : 'rock', color: key === 'arvore' ? '#8bb68d' : '#a6b1a0' }
-  return { category: 'Construções', icon: key === 'ponte' ? 'bridge' : key === 'ruina' ? 'ruin' : key === 'fogueira' ? 'fire' : 'cube', color: '#c9aa81' }
+  if (key.startsWith('asset-')) return { category: 'Imported', icon: 'cube', color: '#a899dd' }
+  if (key.startsWith('fx:')) return { category: 'Effects', icon: 'spark', color: '#d5ad62' }
+  if (['bloco', 'cilindro', 'esfera'].includes(key)) return { category: 'Shapes', icon: key === 'cilindro' ? 'cylinder' : key === 'esfera' ? 'rock' : 'cube', color: '#89accc' }
+  if (['arvore', 'pedregulho', 'tronco-caido', 'pedras-em-pe'].includes(key)) return { category: 'Nature', icon: key === 'arvore' ? 'tree' : key === 'tronco-caido' ? 'cylinder' : 'rock', color: key === 'arvore' ? '#8bb68d' : '#a6b1a0' }
+  return { category: 'Buildings', icon: key === 'ponte' ? 'bridge' : key === 'ruina' ? 'ruin' : key === 'fogueira' ? 'fire' : 'cube', color: '#c9aa81' }
 }

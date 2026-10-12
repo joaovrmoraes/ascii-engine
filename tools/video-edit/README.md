@@ -1,40 +1,44 @@
-# Edição da sessão no Remotion
+# Remotion recording edit
 
-Projeto independente da engine, com Remotion **4.0.534** e React. Usa a
-filmagem do OBS como mídia; os mapas são criados pelos controles do editor.
+Independent project using Remotion **4.0.534** and React. OBS footage is
+its media source; maps were created through visible editor controls.
 
-## Tomada atual: Margem Viva
+## Historical take: Margem Viva (Living Shore)
 
-Saída padrão: `/home/jonny/Videos/ASCII-Engine-Closeup-2026-10-11/edicao/`.
+Default output: `/home/jonny/Videos/ASCII-Engine-Closeup-2026-10-11/edicao/`.
 
-- `index.html`: player local com seis partes e filme completo.
-- `ASCII-Engine-editado-master-444.mp4`: master que preserva melhor a cor das letras.
-- `ASCII-Engine-editado.mp4`: versão H.264 4:2:0 para compatibilidade.
-- `partes/`: terreno, água/vento, objetos, efeito/luz, atmosfera e câmera/exportação.
-- `masters/`: intermediários; `previas/`: gráficos e capturas do Remotion.
+- index.html: local full-film and six-part player.
+- ASCII-Engine-editado-master-444.mp4: master preserving glyph color better.
+- ASCII-Engine-editado.mp4: compatible H.264 4:2:0.
+- partes/: terrain, water/wind, objects, effect/light, atmosphere, camera/export.
+- masters/: intermediates; previas/: Remotion graphics/captures.
 
-**7min18,3**, 2560×1440, 30 fps, sem áudio. A captura 2560×1080 entra sem
-redução, com títulos acima e abaixo. Terreno, objetos e atmosfera usam
-1,15×–1,30×; água, grama, fogo e câmera ficam em velocidade normal.
-A câmera final enquadra 6,5 m de altura, contra 15 m na tomada anterior.
+**7:18.3**, 2560×1440, 30 fps, no audio. Native 2560×1080 capture is not
+scaled, with titles above/below. Terrain/objects/atmosphere run at
+1.15×–1.30×; water/grass/fire/camera stay at normal speed. Final camera
+height is 6.5 m rather than the previous 15 m.
 
-A captura nova usa **I444 desde o OBS**, Rec.709 parcial, x264 CRF 16.
-Não há aumento editorial de saturação (`SATURATION = 1`). A conversão para
-4:2:0 ainda pode reduzir a cor dos traços finos; para avaliar a cor, prefira
-o master em um player com suporte a H.264 4:4:4. Compressão e conversão de
-RGB para YUV continuam tendo perdas; isso não é uma gravação sem perdas.
+Source uses **I444 from OBS**, limited-range Rec.709, x264 CRF 16.
+No saturation boost (SATURATION = 1). 4:2:0 may reduce thin-glyph color;
+assess color using a player supporting the H.264 4:4:4 master. Compression
+and RGB/YUV conversion still have losses; this is not lossless footage.
 
-A filmagem anterior, **Lago das Brasas**, e suas entregas permanecem em
-`/home/jonny/Videos/ASCII-Engine-2026-10-11/`. Sua linha do tempo está em
-`src/editions/lago-das-brasas.ts`. Aquela captura era NV12/4:2:0 e recebeu
-compensação de saturação em 1,4×; a compensação não deve ser aplicada à nova.
-`npm run diagnose-color` mantém o ensaio histórico da captura anterior em
-NV12; o teste da nova fonte está em `cor-teste-444.json`, na pasta da tomada.
+The earlier Lago das Brasas (Ember Lake) take remains at
+`/home/jonny/Videos/ASCII-Engine-2026-10-11/`, with timeline in
+src/editions/lago-das-brasas.ts. It was NV12/4:2:0 with a 1.4× editorial
+saturation correction; do not apply that correction to the newer source.
+`npm run diagnose-color` retains the earlier NV12 experiment; the newer
+source test is cor-teste-444.json in its take folder.
 
-## Reproduzir
+Historical video files show Portuguese UI. They are retained as source
+material. At the owner's request, the README reuses these recordings with
+English cards and captions; it does not claim the captured interface is English.
+The current editor interface is English. See ../../docs/showcase/README.md.
 
-Requer Node com execução nativa de TypeScript (22.18+), npm, Chromium,
-FFmpeg e FFprobe. As dependências são locais, fora do workspace pnpm.
+## Reproduce
+
+Requires Node with native TypeScript execution (22.18+), npm, Chromium,
+FFmpeg and FFprobe. Dependencies are local, outside the pnpm workspace.
 
 ```bash
 cd tools/video-edit
@@ -46,32 +50,32 @@ npm run compose
 npm run finalize
 ```
 
-`src/edit.ts` contém cortes, velocidades, notas, nome da cena, pasta de
-origem e recorte do pôster. `ASCII_VIDEO_SOURCE` substitui a pasta de origem;
-`ASCII_VIDEO_OUTPUT` substitui a saída; `REMOTION_BROWSER` escolhe o Chromium.
-A pasta de origem deve conter `ASCII-Engine-criacao-completa.mp4`, 2560×1080,
-30 fps. `prepare-media` copia a filmagem para `public/` e extrai o pôster.
+src/edit.ts contains cuts, speeds, notes, scene title, source folder and
+poster crop. ASCII_VIDEO_SOURCE overrides input; ASCII_VIDEO_OUTPUT
+overrides output; REMOTION_BROWSER selects Chromium. Input must contain
+ASCII-Engine-criacao-completa.mp4 at 2560×1080/30 fps. prepare-media copies
+it to public/ and extracts the poster.
 
-Para reproduzir a edição antiga, preserve a linha do tempo atual e copie
-o conteúdo de `src/editions/lago-das-brasas.ts` para `src/edit.ts`. Os dois conjuntos
-incluem metadados de mídia e cor. A descrição da galeria em `finalize.mjs`
-refere-se à tomada nova; ajuste-a ao reexportar a edição antiga.
+To reproduce an older edit, preserve the current timeline and copy the
+corresponding file from src/editions/ to src/edit.ts. Both editions include
+media/color metadata. finalize.mjs gallery description targets the newer
+take; adjust it when exporting the older edit.
 
 ```bash
 npm run studio
 ```
 
-Studio em `http://localhost:3456`, sem abrir janela automaticamente.
-Composição `Completo` e seis composições independentes. `Video.tsx` contém
-os títulos e animações, calculados por quadro.
+Studio: http://localhost:3456, without opening a window automatically.
+Completo is the full composition; six individual compositions are also
+available. Video.tsx calculates graphics/animation per frame.
 
-Remotion gera cartelas, abertura, encerramento e faixas transparentes.
-FFmpeg compõe essas faixas com a captura original e concatena os trechos.
-As notas do rodapé trocam diretamente nesse fluxo; o Studio também anima
-sua entrada. Abertura e cartelas mantêm as animações em ambas as formas.
+Remotion creates chapter cards, intro/outro and transparent bands. FFmpeg
+composes them over native footage and concatenates segments. Footer notes
+switch directly in this workflow; Studio also animates their entrance.
+Intro/chapter-card animation is retained by both export approaches.
 
-`npm run render` é a alternativa integral pelo navegador, mais cara em RAM
-e tempo. Aceita `-- --only=Abertura`, por exemplo. `npm run stills` gera cinco
-imagens. Temporários ficam em `.cache/` no disco; vídeos e cache não entram
-no Git. `finalize` valida contagem e decodificação dos sete MP4 compatíveis
-e decodifica o master completo. O áudio silencioso do OBS é removido.
+npm run render performs the entire browser render with higher RAM/time
+cost; supports -- --only=Abertura. npm run stills generates five images.
+Temporary files/cache stay in .cache/; videos/cache do not enter Git.
+finalize checks frame counts and full decoding of seven compatible MP4s
+and the full master. Silent OBS audio is removed.

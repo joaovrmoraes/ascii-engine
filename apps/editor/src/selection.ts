@@ -9,7 +9,7 @@ import type { AsciiEngine, GlyphKind, GlyphStyle, SurfaceKind } from '@ascii-eng
  */
 const KINDS: GlyphKind[] = ['surface', 'body', 'screen']
 const FAMILIES: SurfaceKind[] = ['earth', 'stone', 'wood', 'bark', 'foliage', 'snow', 'wetgrass', 'actor']
-const LABELS: Record<string, string> = { surface: 'Letras na superfície', body: 'Volume de letras', screen: 'Personagem (tela)', earth: 'Terra', stone: 'Pedra', wood: 'Madeira', bark: 'Casca', foliage: 'Folhagem', snow: 'Neve', wetgrass: 'Grama úmida', actor: 'Personagem', crown: 'Copa', trunk: 'Tronco' }
+const LABELS: Record<string, string> = { surface: 'Surface glyphs', body: 'Glyph body', screen: 'Character (screen)', earth: 'Earth', stone: 'Stone', wood: 'Wood', bark: 'Bark', foliage: 'Foliage', snow: 'Snow', wetgrass: 'Wet grass', actor: 'Character', crown: 'Crown', trunk: 'Trunk', copa: 'Crown', tronco: 'Trunk' }
 
 export function createSelection(engine: AsciiEngine, canvas: HTMLCanvasElement, root: HTMLElement, callbacks: { select?: (object?: THREE.Object3D) => void; changed?: () => void; blocked?: () => boolean; objectFirst?: boolean } = {}) {
   let selected: Omit<NonNullable<ReturnType<AsciiEngine['pick']>>, 'node'> & { node: THREE.Object3D; level: 'part' | 'object' } | undefined
@@ -17,17 +17,17 @@ export function createSelection(engine: AsciiEngine, canvas: HTMLCanvasElement, 
   box.userData.editorOnly = true
   box.visible = false; engine.particleScene.add(box)
   root.innerHTML = `
-    <strong>Aparência ASCII</strong><div data-k="what">clique numa parte da cena</div>
-    <label>parte <select data-k="part"></select></label>
-    <label>Técnica <select data-k="glyph">${KINDS.map((k) => `<option value="${k}">${LABELS[k]}</option>`).join('')}</select></label>
-    <label>Material <select data-k="surface"><option value="">Padrão do objeto</option>${FAMILIES.map((k) => `<option value="${k}">${LABELS[k]}</option>`).join('')}</select></label>
-    <label>tamanho <input data-k="size" type="number" min=".08" max=".5" step=".01" placeholder="(herdar)"></label>
-    <label>salvar em <select data-k="scope">
-      <option value="instance">só esta</option>
-      <option value="type">todas desta parte neste tipo</option>
-      <option value="global">estilo global</option>
+    <strong>ASCII appearance</strong><div data-k="what">click a scene part</div>
+    <label>part <select data-k="part"></select></label>
+    <label>Technique <select data-k="glyph">${KINDS.map((k) => `<option value="${k}">${LABELS[k]}</option>`).join('')}</select></label>
+    <label>Material <select data-k="surface"><option value="">Object default</option>${FAMILIES.map((k) => `<option value="${k}">${LABELS[k]}</option>`).join('')}</select></label>
+    <label>size <input data-k="size" type="number" min=".08" max=".5" step=".01" placeholder="(inherit)"></label>
+    <label>save to <select data-k="scope">
+      <option value="instance">this instance</option>
+      <option value="type">this part in every object of this type</option>
+      <option value="global">global style</option>
     </select></label>
-    <button data-k="apply">Aplicar aparência</button>`
+    <button data-k="apply">Apply appearance</button>`
   const el = <T extends HTMLElement>(k: string) => root.querySelector<T>(`[data-k="${k}"]`)!
   const what = el<HTMLDivElement>('what')
   root.hidden = true
@@ -39,12 +39,12 @@ export function createSelection(engine: AsciiEngine, canvas: HTMLCanvasElement, 
     box.box.setFromObject(target); box.visible = true
     const style = selected.style ?? {}
     const parts = el<HTMLSelectElement>('part')
-    parts.replaceChildren(new Option('Objeto inteiro', ''))
+    parts.replaceChildren(new Option('Whole object', ''))
     const names = new Set<string>()
     selected.object.traverse(node => { if (node !== selected!.object && node.name && !node.userData.glyphBodyLetters && !(node instanceof THREE.Points)) names.add(node.name) })
     names.forEach(name => parts.append(new Option(LABELS[name] ?? name, name)))
     parts.value = selected.level === 'part' ? selected.part ?? '' : ''
-    what.textContent = `${selected.type ? `tipo ${selected.type} · ` : ''}${selected.level === 'part' && selected.part ? `parte "${selected.part}"` : `objeto "${selected.object.name || selected.object.type}"`}`
+    what.textContent = `${selected.type ? `type ${selected.type} · ` : ''}${selected.level === 'part' && selected.part ? `part "${selected.part}"` : `object "${selected.object.name || selected.object.type}"`}`
     el<HTMLSelectElement>('glyph').value = style.glyph ?? 'surface'
     el<HTMLSelectElement>('surface').value = style.surface ?? ''
     el<HTMLInputElement>('size').value = style.size ? String(style.size) : ''

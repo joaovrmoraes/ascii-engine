@@ -149,7 +149,7 @@ export function createEffectSystem(cloud: GlyphCloud, scene: THREE.Object3D, opt
 
   function play(source: string | EffectDef, at: THREE.Vector3 | THREE.Object3D, overrides: { loop?: boolean } = {}): EffectInstance {
     const found = typeof source === 'string' ? library.get(source) : source
-    if (!found) throw new Error(`ascii-engine: efeito desconhecido "${source}"`)
+    if (!found) throw new Error(`ascii-engine: unknown effect "${source}"`)
     const name = found.name
     const def: EffectDef = found
     const emitters: EmitterState[] = def.emitters.map((e) => ({ def: e, letters: [], carry: 0, burstsDone: 0, trail: [] }))

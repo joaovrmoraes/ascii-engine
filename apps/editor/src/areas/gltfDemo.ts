@@ -47,11 +47,11 @@ function serpent() {
 
 /** A tree authored like in Blender: parts named, technique as custom properties. */
 function authoredTree() {
-  const root = new THREE.Group(); root.name = 'arvore'
+  const root = new THREE.Group(); root.name = 'tree'
   const trunk = new THREE.Mesh(new THREE.CylinderGeometry(.14, .26, 2.6, 7), new THREE.MeshStandardMaterial({ color: 0x947d59, roughness: .92, flatShading: true }))
-  trunk.name = 'tronco'; trunk.position.y = 1.3
+  trunk.name = 'trunk'; trunk.position.y = 1.3
   trunk.userData = { glyph: 'surface', glyph_surface: 'bark' }
-  const crown = new THREE.Group(); crown.name = 'copa'; crown.position.y = 2.7
+  const crown = new THREE.Group(); crown.name = 'crown'; crown.position.y = 2.7
   crown.userData = { glyph: 'body', glyph_surface: 'foliage', glyph_size: .19 }
   const leaf = new THREE.MeshStandardMaterial({ color: 0x5f8a5f, roughness: 1, flatShading: true })
   for (let i = 0; i < 9; i++) {
@@ -78,7 +78,7 @@ export function createGltfDemo(engine: AsciiEngine, _options: AreaOptions = {}):
   const carpet = engine.createCarpet(forestMeadowCover({ count: 40000, extent: 22 }))
   engine.add(carpet.mesh, { glyph: 'carpet' })
   const models: GlyphModel[] = []
-  let state = 'carregando'
+  let state = 'loading'
   const hero = new THREE.Vector3(100, 0, 100)
   ;(async () => {
     const s = serpent()
@@ -89,10 +89,10 @@ export function createGltfDemo(engine: AsciiEngine, _options: AreaOptions = {}):
     b.model.scene.position.set(1.2, 0, -.6)
     engine.add(b.model.scene)
     models.push(a.model, b.model)
-    state = `glb ${a.bytes}+${b.bytes} B · partes: ${b.model.parts.join(', ')} · clipes: ${a.model.animations.map((c) => c.name).join(', ')}`
-  })().catch((error) => { state = `erro: ${error}`; console.error(error) })
+    state = `glb ${a.bytes}+${b.bytes} B · parts: ${b.model.parts.join(', ')} · clips: ${a.model.animations.map((c) => c.name).join(', ')}`
+  })().catch((error) => { state = `error: ${error}`; console.error(error) })
   return {
-    id: 'gltf', title: 'Importação GLTF (teste)', hero,
+    id: 'gltf', title: 'GLTF import (demo)', hero,
     get state() { return state },
     focus: (_angle, target) => target.set(0, .8, 0),
     update(_time, dt) { for (const model of models) model.update(dt) },

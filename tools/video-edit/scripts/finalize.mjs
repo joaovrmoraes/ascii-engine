@@ -14,7 +14,7 @@ const compositions = JSON.parse(readFileSync(path.join(output, 'composicoes.json
 const parts = compositions.filter(c => /^0[1-6]-/.test(c.id));
 const list = [compositions.find(c => c.id === 'Abertura'), ...parts, compositions.find(c => c.id === 'Encerramento')];
 let start = 0;
-let metadata = `;FFMETADATA1\ntitle=${SCENE_TITLE} — composição completa\n`;
+let metadata = `;FFMETADATA1\ntitle=${SCENE_TITLE} — full composition\n`;
 const chapters = list.map(c => {
   const chapter = {id: c.id, startFrame: start, endFrame: start + c.durationInFrames, seconds: c.durationInFrames/c.fps};
   metadata += `\n[CHAPTER]\nTIMEBASE=1/${c.fps}\nSTART=${chapter.startFrame}\nEND=${chapter.endFrame}\ntitle=${c.id.replaceAll('-', ' ')}\n`;
@@ -24,14 +24,14 @@ const chapters = list.map(c => {
 const meta = path.join(output, 'capitulos.ffmeta');
 writeFileSync(meta, metadata);
 writeFileSync(path.join(output, 'capitulos-editados.json'), JSON.stringify(chapters, null, 2));
-// Caminhos relativos gerados de IDs internos, sem texto do usuário na sintaxe concat.
+// Relative paths use internal IDs, without user text in concat syntax.
 const concat = path.join(output, 'masters/concat.txt');
 writeFileSync(concat, list.map(c => `file '${c.id}.mp4'`).join('\n'));
 const master = path.join(output, 'ASCII-Engine-editado-master-444.mp4');
 ffmpeg(['-f','concat','-safe','0','-i',concat,'-i',meta,'-map','0:v:0','-map_metadata','1','-map_chapters','1','-c:v','copy','-an','-movflags','+faststart', master]);
-console.log('Master completo montado sem recodificar.');
+console.log('Full master assembled without re-encoding.');
 mkdirSync(path.join(output, 'partes'), {recursive: true});
-// Codificar a versão compatível uma vez, com keyframes exatos nas divisões.
+// Encode the compatible output once, with exact chapter keyframes.
 const compatibleDir = path.join(output, 'masters/compat');
 mkdirSync(compatibleDir, {recursive: true});
 const cuts = chapters.slice(1).map(c => (c.startFrame/30).toFixed(9)).join(',');
@@ -50,24 +50,24 @@ const validation = [];
 for (const delivery of deliveries) {
   const file = path.join(output, delivery.file);
   const probe = JSON.parse(run('ffprobe', ['-v','error','-select_streams','v:0','-count_frames','-show_entries','stream=codec_name,width,height,pix_fmt,color_space,color_range,r_frame_rate,nb_read_frames:format=duration,size','-of','json',file]));
-  if (Number(probe.streams[0].nb_read_frames) !== delivery.expectedFrames) throw new Error(`Contagem inesperada: ${delivery.file}`);
-  // Uma leitura completa com verificação de erro, além da contagem de quadros.
+  if (Number(probe.streams[0].nb_read_frames) !== delivery.expectedFrames) throw new Error(`Unexpected frame count: ${delivery.file}`);
+  // Fully decode with fatal errors enabled, in addition to counting frames.
   ffmpeg(['-xerror','-i',file,'-map','0:v:0','-f','null','-']);
   validation.push({file: delivery.file, expectedFrames: delivery.expectedFrames, ...probe, fullDecode: 'passed'});
   writeFileSync(path.join(output, 'validacao-edicao.json'), JSON.stringify(validation, null, 2));
-  console.log('Validado:', delivery.file);
+  console.log('Validated:', delivery.file);
 }
 ffmpeg(['-xerror','-i',master,'-map','0:v:0','-f','null','-']);
-writeFileSync(path.join(output, 'validacao-master.txt'), 'Master 4:4:4: decodificação integral sem erros.\n');
-const names = ['Terreno', 'Água e caminhos', 'Objetos', 'Efeito e luz', 'Atmosfera', 'Câmera e exportação'];
-const playlist = [{file: 'ASCII-Engine-editado.mp4', title: 'Filme completo', length: Math.round(start/30)}, ...parts.map((c,i) => ({file:`partes/${c.id}.mp4`,title:`0${i+1} · ${names[i]}`,length:Math.round(c.durationInFrames/30)}))];
+writeFileSync(path.join(output, 'validacao-master.txt'), '4:4:4 master: full decoding passed.\n');
+const names = ['Terrain', 'Water and paths', 'Objects', 'Effects and lighting', 'Atmosphere', 'Cameras and export'];
+const playlist = [{file: 'ASCII-Engine-editado.mp4', title: 'Full film', length: Math.round(start/30)}, ...parts.map((c,i) => ({file:`partes/${c.id}.mp4`,title:`0${i+1} · ${names[i]}`,length:Math.round(c.durationInFrames/30)}))];
 writeFileSync(path.join(output, 'index.html'), `<!doctype html>
-<html lang="pt-BR"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>${SCENE_TITLE} — ASCII Engine</title>
+<html lang="en"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>${SCENE_TITLE} — ASCII Engine</title>
 <style>*{box-sizing:border-box}body{margin:0;background:#0b0e0d;color:#edf0e6;font:16px system-ui}main{max-width:1440px;margin:auto;padding:36px}h1{font-size:clamp(32px,5vw,60px);letter-spacing:-2px;margin:16px 0}header span{font-family:monospace;color:#b8d591;letter-spacing:3px}p{color:#a7ada6;line-height:1.6}video{width:100%;background:#000;border:1px solid #293129}nav{display:flex;flex-wrap:wrap;gap:8px;margin:24px 0}button,a{color:#edf0e6;background:#151d17;border:1px solid #344336;border-radius:6px;padding:12px 16px;cursor:pointer;text-decoration:none;font:inherit}button.active{background:#b8d591;color:#0b0e0d}footer{display:flex;flex-wrap:wrap;gap:10px;margin-top:24px}.note{font-size:14px;max-width:900px}</style>
-<main><header><span>{·} ASCII ENGINE / 06 PARTES</span><h1>${SCENE_TITLE}.</h1><p>Da primeira pincelada ao enquadramento final. Nova gravação em planos próximos. Edição em Remotion, com grama, água e fogo em tempo real.</p></header>
+<main><header><span>{·} ASCII ENGINE / 06 CHAPTERS</span><h1>${SCENE_TITLE}.</h1><p>From the first brush stroke to the final frame. Close-up source footage edited with Remotion; grass, water and fire move in real time. The historical captured interface is Portuguese.</p></header>
 <video id="player" controls preload="metadata" src="ASCII-Engine-editado.mp4"></video><nav id="chapters"></nav>
-<p id="label">Filme completo · ${Math.floor(start/30/60)}min${String(Math.round(start/30)%60).padStart(2,'0')}</p>
-<footer><a href="ASCII-Engine-editado.mp4" download>Baixar filme</a><a href="ASCII-Engine-editado-master-444.mp4" download>Master 4:4:4</a><a href="../${MAP_FILE}" download>Mapa editável</a></footer>
-<p class="note">2560×1440 · 30 fps · sem áudio. As partes MP4 usam 4:2:0 para compatibilidade. O master mantém 4:4:4 para preservar melhor a cor das letras; use um player compatível. Captura original em 4:4:4, sem aumento artificial de saturação. O master preserva melhor as cores dos traços finos.</p></main>
+<p id="label">Full film · ${Math.floor(start/30/60)}min${String(Math.round(start/30)%60).padStart(2,'0')}</p>
+<footer><a href="ASCII-Engine-editado.mp4" download>Download film</a><a href="ASCII-Engine-editado-master-444.mp4" download>Master 4:4:4</a><a href="../${MAP_FILE}" download>Editable map</a></footer>
+<p class="note">2560×1440 · 30 fps · no audio. Compatible MP4s use 4:2:0. The 4:4:4 master preserves fine-glyph color better and requires a compatible player. Original capture is 4:4:4 without saturation compensation.</p></main>
 <script>const items=${JSON.stringify(playlist)};const player=document.getElementById('player');items.forEach((item,i)=>{const b=document.createElement('button');b.textContent=item.title;b.className=i===0?'active':'';b.onclick=()=>{document.querySelectorAll('button').forEach(n=>n.classList.remove('active'));b.classList.add('active');player.src=item.file;player.play().catch(()=>{});document.getElementById('label').textContent=item.title+' · '+Math.floor(item.length/60)+'min'+String(item.length%60).padStart(2,'0');};document.getElementById('chapters').append(b);});</script></html>`);
-console.log('Galeria local e entregas prontas:', output);
+console.log('Local gallery and deliveries ready:', output);

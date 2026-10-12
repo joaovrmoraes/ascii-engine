@@ -149,7 +149,7 @@ export function createMarsh(engine: AsciiEngine, options: AreaOptions = {}): Are
   let flash = 0
 
   return {
-    id: 'rain_marsh', title: 'Pântano da Chuva',
+    id: 'rain_marsh', title: 'Rain Marsh',
     hero: actors.player.root.position,
     get state() { return `level:${marsh.level.toFixed(3)} fire:${marshWeather(engine.time).fire.toFixed(2)} wakes:${marsh.wakes} flash:${flash.toFixed(2)} wading:${actors.state.wading}` },
     focus: actors.focus,

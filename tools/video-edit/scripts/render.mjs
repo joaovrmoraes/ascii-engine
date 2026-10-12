@@ -9,7 +9,7 @@ const project = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..')
 const output = path.resolve(process.env.ASCII_VIDEO_OUTPUT ?? path.join(SOURCE_DIRECTORY, 'edicao'));
 const cache = path.join(project, '.cache');
 await mkdir(cache, {recursive: true});
-// Não usar o tmpfs do desktop para a sequência de quadros do Remotion.
+// Keep the Remotion frame sequence on disk rather than desktop tmpfs.
 process.env.TMPDIR = cache;
 await mkdir(path.join(output, 'previas'), {recursive: true});
 await mkdir(path.join(output, 'masters'), {recursive: true});
@@ -22,7 +22,7 @@ try {
     for (const [id, frame, name] of [['Abertura', 70, 'abertura'], ['01-Terreno', 30, 'cartela'], ['04-Efeito-e-luz', 500, 'efeito'], ['05-Atmosfera', 700, 'atmosfera'], ['06-Camera-e-exportacao', 1100, 'camera']]) {
       const composition = compositions.find(c => c.id === id);
       await renderStill({serveUrl, composition, puppeteerInstance: browser, frame, imageFormat: 'png', output: path.join(output, 'previas', `${name}.png`), offthreadVideoCacheSizeInBytes: 128 * 1024 * 1024});
-      console.log('Prévia:', name);
+      console.log('Preview:', name);
     }
   } else if (process.argv.includes('--graphics') || process.argv.includes('--overlays')) {
     for (const [index, chapter] of chapters.entries()) {

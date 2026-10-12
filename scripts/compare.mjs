@@ -1,20 +1,13 @@
-// Comparação de imagens automática (fase 4): captura vistas fixas do editor em
-// Chromium sem janela (GPU, --use-angle=gl) e compara com a base salva em
-// docs/captures/baseline/ usando ImageMagick (`magick compare -metric RMSE`).
-//
-// Uso: node scripts/compare.mjs [--update] [nome...]
-//   --update  grava as capturas atuais como nova base
-//   nome      só estas vistas (padrão: todas)
-// Saída: tabela com o erro RMSE normalizado (0 = idêntico) e as imagens de
-// diferença em docs/captures/diff/. Sai com código 1 se alguma passar do limite.
-// Requer o editor rodando (pnpm dev, porta 1440) e o `magick` no PATH.
+// Capture fixed editor views in GPU Chromium and compare normalized RMSE.
+// Usage: pnpm compare [view names] [--update]. Updating baselines is explicit.
+// Results/diffs: docs/captures/diff/. Exits 1 if any view exceeds its limit.
 import { spawn, spawnSync } from 'node:child_process'
 import { existsSync, mkdirSync, writeFileSync, copyFileSync, rmSync } from 'node:fs'
 import { join } from 'node:path'
 import { tmpdir } from 'node:os'
 
 const BASE = process.env.EDITOR_URL ?? 'http://localhost:1440'
-// Cenas congeladas em `pause` segundos: o tempo da engine para e a imagem fica estável.
+// Freeze scenes at `pause` seconds so engine time and captures stay stable.
 // `limit`: largest RMSE accepted. Rain rings start when a drop's phase wraps
 // between two frames, so the marsh varies with the frame rate.
 const VIEWS = {

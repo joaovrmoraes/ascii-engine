@@ -1,6 +1,7 @@
 import * as THREE from 'three'
 import { forestFloorMaterial, forestMeadowCover, gifToFlipbook, spriteSheetToFlipbook, videoToFlipbook, type AsciiEngine, type EffectDef, type EffectInstance, type FlipbookData } from '@ascii-engine/core'
 import type { Area, AreaOptions } from './types'
+import { effectName } from '../editor/names'
 
 /**
  * Effect editor (phase 6): live preview in a loop, JSON editing of the
@@ -14,7 +15,7 @@ export function createEffectsArea(engine: AsciiEngine, _options: AreaOptions = {
   engine.add(floor, { type: 'ground' })
   const carpet = engine.createCarpet(forestMeadowCover({ count: 30000, extent: 18 }))
   engine.add(carpet.mesh, { glyph: 'carpet' })
-  const marker = new THREE.Group(); marker.name = 'alvo'
+  const marker = new THREE.Group(); marker.name = 'target'
   const post = new THREE.Mesh(new THREE.BoxGeometry(.3, 1.2, .3), new THREE.MeshStandardMaterial({ color: 0x8a7a60, roughness: 1, flatShading: true }))
   post.position.y = .6; marker.add(post)
   engine.add(marker, { glyph: 'surface', surface: 'wood' })
@@ -22,18 +23,18 @@ export function createEffectsArea(engine: AsciiEngine, _options: AreaOptions = {
   let current: EffectInstance | undefined, selected = 'fogueira', note = '', follow = false
 
   const box = document.createElement('div'); box.id = 'tools'; document.body.appendChild(box)
-  const list = () => [...fx.library.keys()].map((k) => `<option${k === selected ? ' selected' : ''}>${k}</option>`).join('')
+  const list = () => [...fx.library.keys()].map((k) => `<option value="${k}"${k === selected ? ' selected' : ''}>${effectName(k)}</option>`).join('')
   box.innerHTML = `
-    <div class="title">efeitos</div>
-    <label>efeito <select data-k="name">${list()}</select></label>
-    <label>preso ao alvo <input data-k="follow" type="checkbox"></label>
-    <button data-k="play">[ tocar em loop ]</button>
-    <button data-k="once">[ tocar uma vez ]</button>
-    <button data-k="stop">[ parar ]</button>
+    <div class="title">effects</div>
+    <label>effect <select data-k="name">${list()}</select></label>
+    <label>attached to target <input data-k="follow" type="checkbox"></label>
+    <button data-k="play">[ play in loop ]</button>
+    <button data-k="once">[ play once ]</button>
+    <button data-k="stop">[ stop ]</button>
     <textarea data-k="json" rows="14" spellcheck="false"></textarea>
-    <button data-k="apply">[ aplicar JSON ]</button>
-    <button data-k="save">[ salvar efeito .json ]</button>
-    <label class="file">[ flipbook: imagem/GIF/vídeo ]<input data-k="flip" type="file" accept="image/*,video/*" hidden></label>
+    <button data-k="apply">[ apply JSON ]</button>
+    <button data-k="save">[ save effect .json ]</button>
+    <label class="file">[ flipbook: image/GIF/video ]<input data-k="flip" type="file" accept="image/*,video/*" hidden></label>
     <div data-k="stats"></div>`
   const el = <T extends HTMLElement>(k: string) => box.querySelector<T>(`[data-k="${k}"]`)!
   const json = el<HTMLTextAreaElement>('json')
@@ -49,7 +50,7 @@ export function createEffectsArea(engine: AsciiEngine, _options: AreaOptions = {
   el<HTMLButtonElement>('stop').onclick = () => fx.stopAll()
   el<HTMLButtonElement>('apply').onclick = () => {
     try { const def = JSON.parse(json.value) as EffectDef; fx.register(def); selected = def.name; el<HTMLSelectElement>('name').innerHTML = list(); play(true); note = '' }
-    catch (error) { note = `JSON inválido: ${error}` }
+    catch (error) { note = `Invalid JSON: ${error}` }
   }
   el<HTMLButtonElement>('save').onclick = () => {
     const blob = new Blob([json.value], { type: 'application/json' })
@@ -60,7 +61,7 @@ export function createEffectsArea(engine: AsciiEngine, _options: AreaOptions = {
   picker.onchange = async () => {
     const file = picker.files?.[0]; picker.value = ''
     if (!file) return
-    note = `convertendo ${file.name}…`
+    note = `converting ${file.name}…`
     try {
       const conversion = { cols: 28, rows: 18, gain: 1.15 }
       let book: FlipbookData
@@ -78,14 +79,14 @@ export function createEffectsArea(engine: AsciiEngine, _options: AreaOptions = {
       const name = `flipbook-${file.name.replace(/\.[^.]+$/, '')}`
       fx.register({ name, duration: book.frames.length / book.fps, loop: true, emitters: [{ render: 'flipbook', flipbook: { ...book, cell: .14 }, size: .2, color: [1, 1, 1] }] })
       selected = name; el<HTMLSelectElement>('name').innerHTML = list(); show(); play(true)
-      note = `${name}: ${book.frames.length} quadros`
-    } catch (error) { note = `erro no flipbook: ${error}` }
+      note = `${name}: ${book.frames.length} frames`
+    } catch (error) { note = `flipbook error: ${error}` }
   }
   show(); play(true)
 
   return {
-    id: 'effects', title: 'Efeitos (sistema §3.3)', hero: new THREE.Vector3(100, 0, 100),
-    get state() { const s = fx.stats; return `${selected} · letras ${s.letters}/${s.budget} · efeitos ${s.effects} · emissores ${s.emitters}${note ? ` · ${note}` : ''}` },
+    id: 'effects', title: 'Effects (sistema §3.3)', hero: new THREE.Vector3(100, 0, 100),
+    get state() { const s = fx.stats; return `${effectName(selected)} · glyphs ${s.letters}/${s.budget} · effects ${s.effects} · emitters ${s.emitters}${note ? ` · ${note}` : ''}` },
     focus: (_angle, target) => target.set(0, 1, 0),
     update(time) {
       // The target walks a circle so attached effects (rastro) show their path.

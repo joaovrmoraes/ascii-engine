@@ -67,11 +67,11 @@ export function createPanelLayout(root: HTMLElement) {
   let finish: (() => void) | undefined
   for (const id of panels) {
     const panel = el(id), heading = panel.querySelector<HTMLElement>('.dock-heading')!
-    panel.classList.add('movable-panel'); heading.title = 'Arraste para mover; solte na borda para encaixar. Duplo clique restaura o encaixe.'
-    const grip = document.createElement('span'); grip.className = 'panel-grip'; grip.textContent = '⠿'; grip.title = 'Arraste para mover este painel'; heading.prepend(grip)
-    const button = document.createElement('button'); button.className = 'panel-dock'; button.textContent = 'Encaixar'; button.title = 'Encaixar painel'
+    panel.classList.add('movable-panel'); heading.title = 'Drag to move; drop at an edge to dock. Double-click to restore docking.'
+    const grip = document.createElement('span'); grip.className = 'panel-grip'; grip.textContent = '⠿'; grip.title = 'Drag to move this panel'; heading.prepend(grip)
+    const button = document.createElement('button'); button.className = 'panel-dock'; button.textContent = 'Dock'; button.title = 'Dock panel'
     button.onclick = () => { dock(id, panels.indexOf(id) === 0 ? 'left' : id === 'authoring-sidebar' ? 'right' : 'bottom'); apply(); save() }; heading.append(button)
-    const handle = document.createElement('div'); handle.className = 'panel-resize'; handle.role = 'separator'; handle.title = 'Arraste para redimensionar'; panel.append(handle)
+    const handle = document.createElement('div'); handle.className = 'panel-resize'; handle.role = 'separator'; handle.title = 'Drag to resize'; panel.append(handle)
     panel.addEventListener('pointerdown', () => { if (!slotOf(id)) panel.style.zIndex = String(++z) }, { signal })
     heading.addEventListener('dblclick', event => { if ((event.target as HTMLElement).closest('button,input,label')) return; button.click() }, { signal })
     const start = (event: PointerEvent, resize: boolean) => {
@@ -94,7 +94,7 @@ export function createPanelLayout(root: HTMLElement) {
           panel.style.zIndex = String(++z)
           drop = resize ? undefined : target(e.clientX, e.clientY)
           indicator.hidden = !drop
-          if (drop) { const b = slotBounds(drop); Object.assign(indicator.style, { left: `${b.x}px`, top: `${b.y}px`, width: `${b.width}px`, height: `${b.height}px` }); indicator.textContent = 'Solte para encaixar' }
+          if (drop) { const b = slotBounds(drop); Object.assign(indicator.style, { left: `${b.x}px`, top: `${b.y}px`, width: `${b.width}px`, height: `${b.height}px` }); indicator.textContent = 'Drop to dock' }
         }
         apply()
       }, { signal: interaction.signal })

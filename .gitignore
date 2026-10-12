@@ -5,4 +5,5 @@ apps/editor/src-tauri/gen/
 *.tsbuildinfo
 .DS_Store
 docs/captures/diff/
+docs/captures/**/*-prof/
 exports/

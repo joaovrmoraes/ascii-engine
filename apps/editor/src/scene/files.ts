@@ -17,12 +17,12 @@ function readData(file: Blob): Promise<string> {
 /** Embed every external buffer/image so exported models do not depend on this PC. */
 export async function importModelFiles(files: File[]): Promise<Record<string, { name: string; source: string }>> {
   const models = files.filter(f => /\.(glb|gltf)$/i.test(f.name))
-  if (!models.length) throw new Error('Escolha um .glb ou um .gltf com seus arquivos .bin e imagens.')
+  if (!models.length) throw new Error('Choose a .glb or .gltf with its .bin files and images.')
   const assets: Record<string, { name: string; source: string }> = {}
   const byPath = new Map<string, File>()
   for (const file of files) { byPath.set(file.webkitRelativePath || file.name, file); if (!byPath.has(file.name)) byPath.set(file.name, file) }
   for (const file of models) {
-    if (file.size > 32 * 1024 * 1024) throw new Error(`${file.name}: limite atual de 32 MB por modelo.`)
+    if (file.size > 32 * 1024 * 1024) throw new Error(`${file.name}: current limit is 32 MB per model.`)
     let source: string
     if (/\.glb$/i.test(file.name)) source = await readData(file)
     else {
@@ -32,7 +32,7 @@ export async function importModelFiles(files: File[]): Promise<Record<string, { 
         if (!entry.uri || entry.uri.startsWith('data:')) continue
         const uri = decodeURIComponent(entry.uri)
         const match = byPath.get(dir + uri) ?? byPath.get(uri) ?? byPath.get(uri.split('/').pop()!)
-        if (!match) throw new Error(`${file.name}: falta ${uri}. Selecione também os arquivos acompanhantes.`)
+        if (!match) throw new Error(`${file.name}: falta ${uri}. Also select the companion files.`)
         entry.uri = await readData(match)
       }
       source = await readData(new Blob([JSON.stringify(data)], { type: 'model/gltf+json' }))

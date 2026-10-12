@@ -289,7 +289,7 @@ export function createForest(engine: AsciiEngine, options: AreaOptions = {}): Ar
   updateChunks()
 
   return {
-    id: 'dark_forest', title: 'Floresta Sombria',
+    id: 'dark_forest', title: 'Dark Forest',
     hero: player.root.position,
     get state() { return `${phase} ${encounters.state} ${encounters.name} ${huntProgress.toFixed(0)}/${loop.length} camp:${player.root.position.distanceTo(campSeat).toFixed(1)}` },
     focus(angle, target) {

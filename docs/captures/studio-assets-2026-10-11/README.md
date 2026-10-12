@@ -1,13 +1,18 @@
-# Studio e Assets — 11/10/2026
+# Studio and Assets — 2026-10-11
 
-Antes: [efeitos com mapa na prévia](../studio-agua-2026-10-11/studio-efeitos-luz.png).
+Before: [effect preview over the map](../studio-agua-2026-10-11/studio-efeitos-luz.png).
 
-- [Efeito salvo no espaço vazio](efeito-void-salvo.png): `cdpshot.mjs`, fogo original copiado e nomeado; sem efeito temporário no mapa.
-- [Atmosfera salva](atmosfera-salva.png): nome e botão Salvar nos Assets.
-- [Categoria Atmosferas](assets-atmosfera.png): recurso salvo, pronto para aplicar e editar.
-- [Orca Browser](orca-efeitos.png): tela dedicada em localhost:1440; sem alterar o documento do dono.
-- [Captura MCP](mcp-efeito-void.png): retorna o efeito isolado quando o Studio está aberto.
-- [Integração do editor](verify-authoring.log): reprodução, salvar/editar, slider, duplo clique nativo, histórico, reabertura, templates e descarte de contextos.
-- [Integração API/MCP](verify-api.log): definição/aplicação de atmosfera, catálogo e exportação.
+- [Saved effect in empty space](efeito-void-salvo.png): cdpshot.mjs, original
+  fire copied/named; no temporary map effect.
+- [Saved atmosphere](atmosfera-salva.png): name and Save to Assets control.
+- [Atmospheres category](assets-atmosfera.png): saved asset ready to apply/edit.
+- [Orca Browser](orca-efeitos.png): dedicated page at localhost:1440,
+  without changing the owner's document.
+- [MCP capture](mcp-efeito-void.png): isolated effect returned while Studio is open.
+- [Editor integration](verify-authoring.log): playback, save/edit, slider,
+  native double-click, history, reopen, templates and context disposal.
+- [API/MCP integration](verify-api.log): atmosphere definition/application,
+  catalog and export.
 
-As receitas originais, cores e desenho das letras foram preservados.
+Original recipes, colors and glyph rendering were preserved.
+Images retain the historical Portuguese interface.

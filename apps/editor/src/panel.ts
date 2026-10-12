@@ -13,23 +13,23 @@ interface PanelOptions {
 
 /**
  * Live adjustments (seed of phase 4): area, letter mode, cell size and
- * brightness (the player's "Imagem" controls), zoom and rotation.
+ * brightness (the player's "Image" controls), zoom and rotation.
  * Changing area or mode reloads with the URL, so every view is shareable.
  */
 export function createPanel({ engine, view, areas, areaId, mode, capture, importFiles, changed }: PanelOptions) {
   const root = document.getElementById('panel')!
   const go = (key: string, value: string) => { const p = new URLSearchParams(location.search); p.set(key, value); location.search = p.toString() }
   root.innerHTML = `
-    <label>área <select data-k="area">${Object.entries(areas).map(([id, a]) => `<option value="${id}"${id === areaId ? ' selected' : ''}>${a.title}</option>`).join('')}</select></label>
-    <label>modo <select data-k="mode">${[['letters', 'letras'], ['screen', 'tela (antigo)'], ['raw', 'sem passe de tela']].map(([v, t]) => `<option value="${v}"${v === mode ? ' selected' : ''}>${t}</option>`).join('')}</select></label>
-    <label>tamanho <input data-k="cell" type="range" min="5" max="12" step="1"><output></output></label>
-    <label>luz <input data-k="light" type="range" min=".65" max="1.4" step=".05"><output></output></label>
+    <label>area <select data-k="area">${Object.entries(areas).map(([id, a]) => `<option value="${id}"${id === areaId ? ' selected' : ''}>${a.title}</option>`).join('')}</select></label>
+    <label>mode <select data-k="mode">${[['letters', 'glyphs'], ['screen', 'screen (legacy)'], ['raw', 'without screen pass']].map(([v, t]) => `<option value="${v}"${v === mode ? ' selected' : ''}>${t}</option>`).join('')}</select></label>
+    <label>size <input data-k="cell" type="range" min="5" max="12" step="1"><output></output></label>
+    <label>light <input data-k="light" type="range" min=".65" max="1.4" step=".05"><output></output></label>
     <label>zoom <input data-k="zoom" type="range" min="${areaId === 'sandbox' ? '.18' : '.75'}" max="${areaId === 'sandbox' ? '4' : '1.5'}" step=".05"><output></output></label>
-    <label>giro <input data-k="angle" type="range" min="-3.14" max="3.14" step=".05"><output></output></label>
-    <button data-k="pause">[ pausar ]</button> <button data-k="shot">[ captura ]</button>
-    <label class="file">[ importar modelos e arquivos ]<input data-k="import" type="file" multiple accept=".glb,.gltf,.bin,.png,.jpg,.jpeg,.webp" hidden></label>
-    <button data-k="save">[ salvar preset .json ]</button>
-    <label class="file">[ carregar preset .json ]<input data-k="load" type="file" accept=".json" hidden></label>`
+    <label>rotation <input data-k="angle" type="range" min="-3.14" max="3.14" step=".05"><output></output></label>
+    <button data-k="pause">[ pause ]</button> <button data-k="shot">[ capture ]</button>
+    <label class="file">[ import models and files ]<input data-k="import" type="file" multiple accept=".glb,.gltf,.bin,.png,.jpg,.jpeg,.webp" hidden></label>
+    <button data-k="save">[ save preset .json ]</button>
+    <label class="file">[ load preset .json ]<input data-k="load" type="file" accept=".json" hidden></label>`
   const input = (k: string) => root.querySelector<HTMLInputElement>(`[data-k="${k}"]`)!
   root.querySelector<HTMLSelectElement>('[data-k="area"]')!.onchange = (e) => go('area', (e.target as HTMLSelectElement).value)
   root.querySelector<HTMLSelectElement>('[data-k="mode"]')!.onchange = (e) => go('ascii', (e.target as HTMLSelectElement).value)
@@ -47,7 +47,7 @@ export function createPanel({ engine, view, areas, areaId, mode, capture, import
     bind('angle', () => view.angle, (v) => { view.angle = v }),
   ]
   const pause = root.querySelector<HTMLButtonElement>('[data-k="pause"]')!
-  pause.onclick = () => { view.paused = !view.paused; pause.textContent = view.paused ? '[ continuar ]' : '[ pausar ]' }
+  pause.onclick = () => { view.paused = !view.paused; pause.textContent = view.paused ? '[ resume ]' : '[ pause ]' }
   root.querySelector<HTMLButtonElement>('[data-k="shot"]')!.onclick = capture
   const picker = input('import')
   picker.onchange = () => { importFiles(Array.from(picker.files ?? [])); picker.value = '' }
@@ -61,7 +61,7 @@ export function createPanel({ engine, view, areas, areaId, mode, capture, import
   loader.onchange = async () => {
     const file = loader.files?.[0]; loader.value = ''
     if (!file) return
-    try { const doc = parseScene({ version: 1, objects: [], style: JSON.parse(await file.text()) }); engine.setStyle(doc.style!); refresh(); changed?.() } catch (error) { document.getElementById('status')!.dataset.note = `preset inválido: ${error}` }
+    try { const doc = parseScene({ version: 1, objects: [], style: JSON.parse(await file.text()) }); engine.setStyle(doc.style!); refresh(); changed?.() } catch (error) { document.getElementById('status')!.dataset.note = `invalid preset: ${error}` }
   }
   const refresh = () => shows.forEach((show) => show())
   refresh()

@@ -81,7 +81,7 @@ export function buildReferenceScene(engine: AsciiEngine, screenMode = false, her
 
   return {
     camp, traveller, trees, carpet, crate, boulder, floor,
-    id: 'reference', title: 'Cena de referência (fase 1)', hero: traveller.root.position, state: 'static',
+    id: 'reference', title: 'Reference scene (phase 1)', hero: traveller.root.position, state: 'static',
     focus(angle: number, target: THREE.Vector3) {
       target.copy(traveller.root.position); target.y = 1.05
       target.x -= Math.sin(angle) * 2; target.z -= Math.cos(angle) * 2

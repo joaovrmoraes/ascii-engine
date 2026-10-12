@@ -11,7 +11,7 @@ describe('gltf glyph data', () => {
   })
 
   it('defaults by names and geometry, never by colour', () => {
-    const leaves = new THREE.Mesh(new THREE.BoxGeometry(), new THREE.MeshStandardMaterial({ color: 0xff0000 })); leaves.name = 'Copa'
+    const leaves = new THREE.Mesh(new THREE.BoxGeometry(), new THREE.MeshStandardMaterial({ color: 0xff0000 })); leaves.name = 'Crown'
     expect(defaultGlyphStyle(leaves)).toEqual({ glyph: 'body', surface: 'foliage', size: .19 })
     const crate = new THREE.Mesh(new THREE.BoxGeometry(), new THREE.MeshStandardMaterial({ color: 0x00ff00 })); crate.name = 'crate'
     expect(defaultGlyphStyle(crate)).toEqual({ glyph: 'surface', surface: 'wood' })

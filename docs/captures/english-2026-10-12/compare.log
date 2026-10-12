@@ -1,0 +1,7 @@
+$ node scripts/compare.mjs
+referencia RMSE 0.0000  ok
+floresta   RMSE 0.0014  ok
+pantano    RMSE 0.1096  ok
+neve       RMSE 0.0063  ok
+mina       RMSE 0.0163  ok
+catedral   RMSE 0.0396  ok
