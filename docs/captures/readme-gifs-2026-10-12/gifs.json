@@ -1,0 +1,178 @@
+[
+  {
+    "name": "living-shore",
+    "video": "06-camera",
+    "start": 92,
+    "seconds": 4,
+    "crop": "885:458:484:235",
+    "width": 720,
+    "fps": 8,
+    "loop": "infinite",
+    "file": "docs/showcase/gifs/living-shore.gif",
+    "fullDecode": "passed",
+    "programs": [],
+    "stream_groups": [],
+    "streams": [
+      {
+        "width": 720,
+        "height": 373,
+        "nb_read_frames": "32"
+      }
+    ],
+    "format": {
+      "duration": "4.010000",
+      "size": "4839863"
+    },
+    "uniqueFrames": 32
+  },
+  {
+    "name": "01-terrain",
+    "video": "01-terrain",
+    "start": 24,
+    "seconds": 4,
+    "width": 800,
+    "fps": 8,
+    "loop": "infinite",
+    "file": "docs/showcase/gifs/01-terrain.gif",
+    "fullDecode": "passed",
+    "programs": [],
+    "stream_groups": [],
+    "streams": [
+      {
+        "width": 800,
+        "height": 450,
+        "nb_read_frames": "32"
+      }
+    ],
+    "format": {
+      "duration": "4.010000",
+      "size": "2810729"
+    },
+    "uniqueFrames": 32
+  },
+  {
+    "name": "02-water",
+    "video": "02-water",
+    "start": 67,
+    "seconds": 4,
+    "width": 800,
+    "fps": 8,
+    "loop": "infinite",
+    "file": "docs/showcase/gifs/02-water.gif",
+    "fullDecode": "passed",
+    "programs": [],
+    "stream_groups": [],
+    "streams": [
+      {
+        "width": 800,
+        "height": 450,
+        "nb_read_frames": "32"
+      }
+    ],
+    "format": {
+      "duration": "4.010000",
+      "size": "2620966"
+    },
+    "uniqueFrames": 32
+  },
+  {
+    "name": "03-objects",
+    "video": "03-objects",
+    "start": 13,
+    "seconds": 4,
+    "width": 800,
+    "fps": 8,
+    "loop": "infinite",
+    "file": "docs/showcase/gifs/03-objects.gif",
+    "fullDecode": "passed",
+    "programs": [],
+    "stream_groups": [],
+    "streams": [
+      {
+        "width": 800,
+        "height": 450,
+        "nb_read_frames": "32"
+      }
+    ],
+    "format": {
+      "duration": "4.010000",
+      "size": "2240081"
+    },
+    "uniqueFrames": 32
+  },
+  {
+    "name": "04-effects",
+    "video": "04-effects",
+    "start": 28,
+    "seconds": 4,
+    "width": 800,
+    "fps": 8,
+    "loop": "infinite",
+    "file": "docs/showcase/gifs/04-effects.gif",
+    "fullDecode": "passed",
+    "programs": [],
+    "stream_groups": [],
+    "streams": [
+      {
+        "width": 800,
+        "height": 450,
+        "nb_read_frames": "32"
+      }
+    ],
+    "format": {
+      "duration": "4.010000",
+      "size": "238860"
+    },
+    "uniqueFrames": 32
+  },
+  {
+    "name": "05-atmosphere",
+    "video": "05-atmosphere",
+    "start": 7,
+    "seconds": 4,
+    "width": 800,
+    "fps": 8,
+    "loop": "infinite",
+    "file": "docs/showcase/gifs/05-atmosphere.gif",
+    "fullDecode": "passed",
+    "programs": [],
+    "stream_groups": [],
+    "streams": [
+      {
+        "width": 800,
+        "height": 450,
+        "nb_read_frames": "32"
+      }
+    ],
+    "format": {
+      "duration": "4.010000",
+      "size": "3433440"
+    },
+    "uniqueFrames": 32
+  },
+  {
+    "name": "06-camera",
+    "video": "06-camera",
+    "start": 55,
+    "seconds": 4,
+    "width": 800,
+    "fps": 8,
+    "loop": "infinite",
+    "file": "docs/showcase/gifs/06-camera.gif",
+    "fullDecode": "passed",
+    "programs": [],
+    "stream_groups": [],
+    "streams": [
+      {
+        "width": 800,
+        "height": 450,
+        "nb_read_frames": "32"
+      }
+    ],
+    "format": {
+      "duration": "4.010000",
+      "size": "2417762"
+    },
+    "uniqueFrames": 32
+  }
+]

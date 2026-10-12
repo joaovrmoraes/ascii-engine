@@ -18,6 +18,24 @@ Water, wind, fire and camera footage run at normal speed; other edits use
 reduce the definition and color of thin glyphs. Original 2560×1440 edits,
 4:4:4 masters and native OBS footage remain outside Git and are unmodified.
 
+## GitHub previews and full video gallery
+
+Seven short GIFs in gifs/ animate directly in the GitHub README: a Living
+Shore opening and one excerpt per chapter. Each uses existing footage,
+4 seconds, 8 fps, 128 palette colors and an infinite loop. Hero width is
+720 px; chapter width is 800 px. This compression is a preview; full MP4s
+retain the original edit. Every GIF is below 5 MiB and has 32 distinct frames.
+
+```bash
+node scripts/prepare-showcase-gifs.mjs
+node scripts/preview-readme.mjs --github-pages --generate-only
+```
+
+The public player gallery is docs/watch.html, served by GitHub Pages from
+main:/docs with .nojekyll. Its paths work at the project URL, and each
+chapter GIF links to the corresponding gallery section. Published URL:
+https://joaovrmoraes.github.io/ascii-engine/watch.html.
+
 ## Reproduce the edit
 
 Requires Node with native TypeScript support, FFmpeg, FFprobe and an installed
@@ -45,6 +63,6 @@ Open http://localhost:4178/docs/showcase/index.html. The HTML is generated from
 the root README and provides six native video players. To generate without
 starting a server, use node scripts/preview-readme.mjs --generate-only.
 
-Markdown thumbnails and their links point directly to each MP4. Opening the
-HTML locally or serving it enables playback. The preview is local; no remote
-repository or presentation has been published in this stage.
+Markdown uses animated GIFs and links to the public gallery. Full MP4
+download links remain available. The local gallery has the same six native
+players, with GIF posters. The repository and gallery are public.

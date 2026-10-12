@@ -7,13 +7,15 @@ Sculpt terrain, paint water, arrange objects and bring your world to life
 with wind, particles, lighting and atmosphere. Letters follow the geometry
 and movement of the things they form.
 
-![Living Shore: trees, rocks, water and fire made of letters](docs/showcase/posters/living-shore.png)
+![Living Shore: animated grass, water and fire made of letters](docs/showcase/gifs/living-shore.gif)
 
 ## See it in action
 
-These six videos show what you can create with the editor, from shaping a
-map to framing the finished scene. Click a thumbnail to watch a chapter,
-or open the [six-player gallery](docs/showcase/index.html) locally.
+These animated previews show what you can create with the editor, from
+shaping a map to framing the finished scene. GIFs play directly in this
+README. [Watch the full chapters with video players](https://joaovrmoraes.github.io/ascii-engine/watch.html),
+or download them below. The [local gallery](docs/showcase/index.html)
+also works from a checkout.
 The existing footage is re-edited with English captions; its captured
 historical interface is Portuguese. The current editor uses English.
 
@@ -22,9 +24,9 @@ historical interface is Portuguese. The current editor uses English.
 Create a map, sculpt its elevation and smooth slopes with brushes. Terrain
 and grass coverage follow the shape you build.
 
-[![Watch: terrain creation and sculpting](docs/showcase/posters/01-terrain.png)](docs/showcase/videos/01-terrain.mp4)
+[![Terrain creation and sculpting](docs/showcase/gifs/01-terrain.gif)](https://joaovrmoraes.github.io/ascii-engine/watch.html#01-terrain)
 
-[Watch the video](docs/showcase/videos/01-terrain.mp4)
+[Download the full video](docs/showcase/videos/01-terrain.mp4?raw=true)
 
 ### 02 · Water, paths and wind
 
@@ -32,9 +34,9 @@ Paint a lake, shape its shoreline and clear a path through the grass.
 Move the camera closer to see individual glyphs sway in the wind. Water
 and reflections are drawn in letters too.
 
-[![Watch: lake, paths and grass in the wind](docs/showcase/posters/02-water.png)](docs/showcase/videos/02-water.mp4)
+[![Lake, paths and grass in the wind](docs/showcase/gifs/02-water.gif)](https://joaovrmoraes.github.io/ascii-engine/watch.html#02-water-paths-and-wind)
 
-[Watch the video](docs/showcase/videos/02-water.mp4)
+[Download the full video](docs/showcase/videos/02-water.mp4?raw=true)
 
 ### 03 · Objects and composition
 
@@ -42,9 +44,9 @@ Choose trees, rocks, ruins and logs from the asset library. Preview objects
 in the scene before placing them, then adjust their position, rotation
 and scale with the inspector or transform gizmos.
 
-[![Watch: composing with trees, rocks and ruins](docs/showcase/posters/03-objects.png)](docs/showcase/videos/03-objects.mp4)
+[![Composing with trees, rocks and ruins](docs/showcase/gifs/03-objects.gif)](https://joaovrmoraes.github.io/ascii-engine/watch.html#03-objects-and-composition)
 
-[Watch the video](docs/showcase/videos/03-objects.mp4)
+[Download the full video](docs/showcase/videos/03-objects.mp4?raw=true)
 
 ### 04 · Effects and lighting
 
@@ -52,9 +54,9 @@ Build a fire in the effect studio. Adjust its layers, sparks and light,
 save the effect to the asset library and place it in the scene to illuminate
 the surrounding objects and grass.
 
-[![Watch: fire, particles and lighting](docs/showcase/posters/04-effects.png)](docs/showcase/videos/04-effects.mp4)
+[![Fire, particles and lighting](docs/showcase/gifs/04-effects.gif)](https://joaovrmoraes.github.io/ascii-engine/watch.html#04-effects-and-lighting)
 
-[Watch the video](docs/showcase/videos/04-effects.mp4)
+[Download the full video](docs/showcase/videos/04-effects.mp4?raw=true)
 
 ### 05 · Atmosphere
 
@@ -62,9 +64,9 @@ Explore dusk and moonlight on the same scene. Adjust exposure, color,
 light direction, shadows and fog, then save an atmosphere to reuse
 in other compositions.
 
-[![Watch: lighting, moonlight and atmosphere](docs/showcase/posters/05-atmosphere.png)](docs/showcase/videos/05-atmosphere.mp4)
+[![Lighting, moonlight and atmosphere](docs/showcase/gifs/05-atmosphere.gif)](https://joaovrmoraes.github.io/ascii-engine/watch.html#05-atmosphere)
 
-[Watch the video](docs/showcase/videos/05-atmosphere.mp4)
+[Download the full video](docs/showcase/videos/05-atmosphere.mp4?raw=true)
 
 ### 06 · Cameras, preview and export
 
@@ -72,9 +74,9 @@ Observe animated water, place a camera with a live thumbnail and choose
 the initial framing. Save the editable map, export its scene document
 and preview the composition with animated grass, water and fire.
 
-[![Watch: cameras, animated water and export](docs/showcase/posters/06-camera.png)](docs/showcase/videos/06-camera.mp4)
+[![Cameras, animated water and export](docs/showcase/gifs/06-camera.gif)](https://joaovrmoraes.github.io/ascii-engine/watch.html#06-cameras-preview-and-export)
 
-[Watch the video](docs/showcase/videos/06-camera.mp4)
+[Download the full video](docs/showcase/videos/06-camera.mp4?raw=true)
 
 ## What you can create
 

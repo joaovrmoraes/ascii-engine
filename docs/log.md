@@ -4,6 +4,28 @@ Entries describe the state at each stage. Earlier limitations may have been
 resolved later; START.md and the editor guide describe the current scope.
 Historical filenames, reference IDs and captured interfaces are preserved.
 
+## 2026-10-12 — Animated README previews and public video gallery
+
+The owner reported that repository MP4 links and PNG thumbnails did not show
+motion in the GitHub README. Replaced them with seven GIF previews extracted
+from existing footage: animated opening plus one excerpt per feature.
+
+- Each GIF: 4 seconds, 8 fps, 32 distinct frames, infinite loop; 720 px hero
+  or 800 px chapter width, 128 colors, below 5 MiB. Full MP4s are unchanged.
+- Chapter previews link to a native-player gallery at
+  https://joaovrmoraes.github.io/ascii-engine/watch.html. Generated docs/watch.html
+  has project-relative media paths and a GitHub link; .nojekyll supports
+  branch-based Pages publication from main:/docs.
+- Added scripts/prepare-showcase-gifs.mjs and a GitHub Pages mode to the README
+  renderer. Local preview serves GIF with image/gif and still exposes six
+  native video players. Explicit download links replace misleading watch links.
+- Validated syntax, exact GIF frame counts, unique-frame hashes/full decoding,
+  screenshots and browser loading. GitHub-rendered Markdown includes seven
+  GIF images. Evidence: [readme-gifs captures](captures/readme-gifs-2026-10-12/README.md).
+- Rendering/engine code, shaders, source footage, reference archive and
+  comparison baselines unchanged. Prior 79-test validation remains applicable;
+  verification here targets the new media and presentation paths.
+
 ## 2026-10-12 — Public repository and initial publication
 
 The owner explicitly authorized committing and publishing the project as a
