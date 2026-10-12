@@ -102,7 +102,7 @@ const f = (v: number) => v.toFixed(4)
 const v3 = (c: RGB) => `vec3(${f(c[0])}, ${f(c[1])}, ${f(c[2])})`
 
 /** `waterLetters(p, time, crest, flow, vegetation, weed)` for a look. */
-export function waterLettersGLSL(look: WaterLook = FOREST_WATER, followSlope = false) {
+export function waterLettersGLSL(look: WaterLook = FOREST_WATER, followSlope = false, movingSurface = false) {
   const texture = surfaceAtlas(), slot = (texture.userData.slot as number).toFixed(6)
   const [ws, wc] = SURFACE_RANGES.water, [cs, cc] = SURFACE_RANGES.crest, [rs, rc] = SURFACE_RANGES.actor, [gs, gc] = SURFACE_RANGES.wetgrass
   const r = look.reflection
@@ -112,26 +112,46 @@ export function waterLettersGLSL(look: WaterLook = FOREST_WATER, followSlope = f
     uniform float reflectionOn;
     uniform vec3 waterViewDirection, waterLightDirection, waterLightColor;
     uniform float waterLightPower, waterReflectionLevel;
+    ${movingSurface ? 'uniform float waterWaveStrength;' : ''}
+    ${movingSurface ? 'vec2 waterGlyphDx, waterGlyphDy;' : ''}
     float waterHash(vec2 p) { return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453); }
     float waterGlyph(float index, vec2 inside) {
-      return smoothstep(.1, .45, texture2D(glyphAtlas, vec2((index + .08 + inside.x * .84) * ${slot}, .06 + inside.y * .88)).r);
+      return smoothstep(.1, .45, ${movingSurface ? 'textureGrad' : 'texture2D'}(glyphAtlas, vec2((index + .08 + inside.x * .84) * ${slot}, .06 + inside.y * .88)${movingSurface ? ',waterGlyphDx,waterGlyphDy' : ''}).r);
     }
+    ${movingSurface ? `
+    // Long connected wave fronts, sampled once per glyph. Two short advection
+    // phases avoid flow*time exploding when the simulated current changes.
+    float waveBands(vec2 p, float time) {
+      float bend = sin(p.x*.8 + p.y*.3 + time*.16)*.9;
+      float a = sin(p.y*4.2 + p.x*.8 - time*.7 + bend);
+      float b = sin(p.x*2.2 - p.y*.6 - time*.4)*.3;
+      return smoothstep(-.65,1.1,a+b);
+    }
+    float flowingBands(vec2 p, vec2 flow, float time) {
+      flow *= min(1.,3./max(.001,length(flow)));
+      float a = fract(time/3.), b = fract(time/3.+.5);
+      return mix(waveBands(p-flow*a*3.,time),waveBands(p-flow*b*3.,time),abs(a-.5)*2.);
+    }` : ''}
     // Pure ASCII water: every cell is one letter of one flat colour on a dark
     // gap. The mirror is sampled once per cell (at its centre) and turned into
     // a letter, so reflections are characters, never a continuous image.
     vec3 waterLettersNormal(vec3 p, float time, float crest, vec2 flow, float vegetation, vec3 weed, vec3 normal) {
       vec2 cell = vec2(${f(look.cell[0])}, ${f(look.cell[1])});
-      vec2 plane = p.xz ${followSlope ? '' : '- flow * time'};
+      vec2 plane = p.xz ${followSlope || movingSurface ? '' : '- flow * time'};
       vec2 drift = flow;
       ${followSlope ? 'if (normal.y < .6) { bool side = abs(normal.x) > abs(normal.z); plane = side ? p.zy : p.xy; drift = vec2(side ? flow.y : flow.x, -length(flow)); }' : ''}
+      // Derivatives of the continuous lattice, before fract and glyph selection.
+      // Otherwise adjacent atlas slots look like a huge texture minification:
+      // shallow views smear glyphs into the bank or make entire rows disappear.
+      ${movingSurface ? `waterGlyphDx=dFdx(plane/cell)*vec2(.84*${slot},.88); waterGlyphDy=dFdy(plane/cell)*vec2(.84*${slot},.88);` : ''}
       vec2 grid = floor(plane / cell), inside = fract(plane / cell);
       float grain = waterHash(grid);
-      vec3 centre = vec3((grid + .5) * cell ${followSlope ? '' : '+ flow * time'}, p.y).xzy;
+      vec3 centre = vec3((grid + .5) * cell ${followSlope || movingSurface ? '' : '+ flow * time'}, p.y).xzy;
       centre.x += sin(grid.y * .7 + time * 1.2) * .05;
       vec4 mirror = reflectionMatrix * vec4(centre, 1.);
       vec2 uv = mirror.xy / mirror.w;
       // The mirror trembles row by row, like a reflection on moving water.
-      uv.x += sin(grid.y * 1.3 + time * 2.1) * .002 + sin(grid.y * .41 - time * .9) * .001;
+      uv.x += (sin(grid.y * 1.3 + time * 2.1) * .002 + sin(grid.y * .41 - time * .9) * .001) ${movingSurface ? '* waterWaveStrength' : ''};
       vec4 seen = texture2D(reflection, clamp(uv, vec2(.001), vec2(.999)));
       float object = (1. - step(.96, seen.a)) * step(.0, min(min(uv.x, uv.y), min(1. - uv.x, 1. - uv.y))) * reflectionOn;
       // A horizontal mirror cannot describe the side of a waterfall. Keep it
@@ -149,9 +169,10 @@ export function waterLettersGLSL(look: WaterLook = FOREST_WATER, followSlope = f
         vec3 ink = pow(hue * (.42 + level * .8), vec3(2.2)) * ${v3(r.tint)} * (1.+fresnel*.5);
         return mix(gap, ink, waterGlyph(${rs}.0 + 1. + floor(level * ${rc - 1}.0), inside));
       }
+      ${movingSurface ? 'float bands = mix(.5,flowingBands((grid+.5)*cell,drift,time),min(1.,waterWaveStrength+length(drift)*.15)); crest *= .45 + bands*.55;' : ''}
       // Foam letters where waves break or boots disturb the surface.
       if (crest > .12 && grain < crest * 1.4) {
-        float level = clamp(crest * 1.5 + grain * .3, 0., .999);
+        float level = clamp(crest * ${movingSurface ? '.7 + grain * .18, 0., .65' : '1.5 + grain * .3, 0., .999'});
         return mix(gap, ${v3(look.foam)} * (.4 + crest), waterGlyph(${cs}.0 + 1. + floor(level * ${cc - 1}.0), inside));
       }
       // Submerged weed as sparse green strokes.
@@ -159,15 +180,16 @@ export function waterLettersGLSL(look: WaterLook = FOREST_WATER, followSlope = f
         return mix(gap, weed, waterGlyph(${gs}.0 + 1. + floor(grain * ${gc - 1}.0), inside) * .8);
       }
       // Open water: sparse rows of ~ - = drifting with the current.
-      float swell = .5 + .5 * sin(${followSlope ? 'dot(grid, normalize(drift + vec2(.00001))) * .9 - time * (1.4 + length(drift) * 2.)' : 'grid.y * .9 + grid.x * .15 - time * 1.4'} + grain * 2.);
-      if (grain < ${f(look.sparse)} + swell * ${f(look.sparse)}) return gap;
-      float level = clamp(swell * .75 + grain * .3, 0., .999);
+      float swell = ${movingSurface ? 'bands' : `.5 + .5 * sin(${followSlope ? 'dot(grid, normalize(drift + vec2(.00001))) * .9 - time * (1.4 + length(drift) * 2.)' : 'grid.y * .9 + grid.x * .15 - time * 1.4'} + grain * 2.)`};
+      if (grain < ${f(look.sparse)} + ${movingSurface ? '(1.-swell)' : 'swell'} * ${f(look.sparse)}) return gap;
+      float level = clamp(swell * ${movingSurface ? '.8 + grain * .12' : '.75 + grain * .3'}, 0., .999);
       // Moon sheen drifts across the surface in slow bands.
-      vec3 waveNormal = normalize(normal + vec3(sin(centre.z*2.3+time*1.7)*.1,0.,cos(centre.x*1.9-time*1.2)*.12));
+      vec3 waveNormal = normalize(normal + vec3(sin(centre.z*2.3+time*1.7)*.1,0.,cos(centre.x*1.9-time*1.2)*.12) ${movingSurface ? '* waterWaveStrength' : ''});
       vec3 reflected = reflect(-waterLightDirection, waveNormal);
       float alignment = max(0.,dot(reflected,waterViewDirection));
       float sheen = (pow(alignment,32.)*.7 + pow(alignment,180.)*1.8) * waterLightPower * reflectionOn * max(0.,waterLightDirection.y);
-      vec3 ink = ${v3(look.open)} * (.6 + level * 1.2) + waterLightColor * ${v3(look.sheen)} * sheen * 5.;
+      ${movingSurface ? 'level = min(.999,floor(level*5.)/4.); sheen = floor(min(sheen,2.)*6.)/6.;' : ''}
+      vec3 ink = ${v3(look.open)} * (${movingSurface ? '.32 + level * 1.9' : '.6 + level * 1.2'}) + waterLightColor * ${v3(look.sheen)} * sheen * 5.;
       return mix(gap, ink, waterGlyph(${ws}.0 + 1. + floor(level * ${wc - 1}.0), inside));
     }
     vec3 waterLetters(vec3 p, float time, float crest, vec2 flow, float vegetation, vec3 weed) { return waterLettersNormal(p,time,crest,flow,vegetation,weed,vec3(0.,1.,0.)); }`
@@ -292,6 +314,7 @@ export function createWater(shape: WaterShape, options: WaterOptions = {}) {
     reflectionOn: { value: look.reflection.enabled ? 1 : 0 }, glyphAtlas: { value: surfaceAtlas() },
     waterViewDirection: { value: new THREE.Vector3(0,1,0) }, waterLightDirection: { value: new THREE.Vector3(-5,12,7).normalize() },
     waterLightColor: { value: new THREE.Color(0xe0e7cc) }, waterLightPower: { value: 1 }, waterReflectionLevel: { value: options.level ?? .018 },
+    waterWaveStrength: { value: Math.min(2,physics.waves/.012) },
     waterDynamics: { value: dynamicsTexture }, dynamicsSize: { value: size }, dynamicsOn: { value: physics.enabled ? 1 : 0 },
   }
   const flow = options.flow ? `vec2(${f(options.flow[0])}, ${f(options.flow[1])})` : shape.kind === 'stream'
@@ -316,7 +339,7 @@ export function createWater(shape: WaterShape, options: WaterOptions = {}) {
         float c = texture2D(waterMask, texel + vec2(0.,step)).r, d1 = texture2D(waterMask, texel + vec2(step)).r;
         return mix(mix(a,b,t.x),mix(c,d1,t.x),t.y);
       }` : ''}
-      ${waterLettersGLSL(look, !!mask?.heights)}
+      ${waterLettersGLSL(look, !!mask?.heights, true)}
       void main(){
         ${options.edgeGLSL ?? (mask ? 'float inside=paintedEdge(p.xz);' : 'float inside=waterEdge(p.xz,centre);')}
         if(inside<0.)discard;
@@ -329,7 +352,7 @@ export function createWater(shape: WaterShape, options: WaterOptions = {}) {
         if(dynamicsOn>.5 && dynamics.z<.002) discard;
         current += dynamics.xy * dynamicsOn;
         float turbulence = dynamics.w * dynamicsOn;
-        gl_FragColor=vec4(waterLettersNormal(p,time,max(${options.crestGLSL ?? 'edge*.75'},turbulence),current,0.,vec3(0.),normalize(waterNormalWorld)),${surfaceAlpha('glyph')});
+        gl_FragColor=vec4(waterLettersNormal(p,time,max(${options.crestGLSL ?? 'edge*.28'},turbulence),current,0.,vec3(0.),normalize(waterNormalWorld)),${surfaceAlpha('glyph')});
       }`,
   })
   const geometry = new THREE.PlaneGeometry(size, size, resolution - 1, resolution - 1)
@@ -347,7 +370,7 @@ export function createWater(shape: WaterShape, options: WaterOptions = {}) {
       const vx = (dynamics.flowX[i] + (x ? dynamics.flowX[i-1] : 0)) / Math.max(.015, 2*h)
       const vz = (dynamics.flowZ[i] + (z ? dynamics.flowZ[i-n] : 0)) / Math.max(.015, 2*h)
       data[i*4] = c*vx-s*vz; data[i*4+1] = s*vx+c*vz; data[i*4+2] = h
-      data[i*4+3] = Math.min(.8, Math.hypot(vx,vz)*.14 + Math.abs(h-physics.depth)*1.4)
+      data[i*4+3] = dynamics.foam[i]
     }
     dynamicsTexture.needsUpdate = true
     const position = geometry.attributes.position as THREE.BufferAttribute
@@ -393,18 +416,23 @@ export function createWater(shape: WaterShape, options: WaterOptions = {}) {
       if (contacts.size > 256 && !previous) contacts.delete(contacts.keys().next().value!)
       contacts.set(id,position.clone())
     },
-    /** A slope uses the nearest wet sample as its local mirror plane. */
+    /** Mirror the nearest calm pool at its simulated level, not the original bed. */
     reflectionLevel(x: number, z: number) {
       if (!mask?.heights) return mesh.position.y
-      const n = mask.resolution, c = Math.cos(shape.angle), s = Math.sin(shape.angle)
-      let best = Infinity, level = mesh.position.y
+      const n = dynamicResolution, c = Math.cos(shape.angle), s = Math.sin(shape.angle), dx = size/(n-1)
+      let best = Infinity, level = mesh.position.y, fallback = Infinity, fallbackLevel = level
       for (let iz = 0; iz < n; iz++) for (let ix = 0; ix < n; ix++) {
-        const i = iz * n + ix; if (mask.values[i] <= 0) continue
-        const lx = (ix / (n - 1) - .5) * shape.size * 2, lz = (iz / (n - 1) - .5) * shape.size * 2
+        const i = iz*n+ix; if (!dynamics.wet[i] || physics.enabled && dynamics.depth[i] < .004) continue
+        const lx = (ix/(n-1)-.5)*size, lz = (iz/(n-1)-.5)*size
         const d = (shape.x + c * lx - s * lz - x) ** 2 + (shape.z + s * lx + c * lz - z) ** 2
-        if (d < best) { best = d; level = mask.heights[i] + mesh.position.y }
+        const surface = (j: number) => dynamics.bed[j] + (physics.enabled ? dynamics.depth[j] : .045)
+        const h = surface(i)+mesh.position.y
+        if (d < fallback) { fallback = d; fallbackLevel = h }
+        const sx = ix<n-1 && dynamics.wet[i+1] ? Math.abs(surface(i+1)-surface(i))/dx : 0
+        const sz = iz<n-1 && dynamics.wet[i+n] ? Math.abs(surface(i+n)-surface(i))/dx : 0
+        if (d < best && Math.max(sx,sz) < .25) { best = d; level = h }
       }
-      return level
+      return Number.isFinite(best) ? level : fallbackLevel
     },
     /** Upload a changed paint mask without rebuilding the scene. */
     refresh,

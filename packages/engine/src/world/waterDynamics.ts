@@ -14,6 +14,9 @@ export const DEFAULT_WATER_PHYSICS: WaterPhysics = { enabled: true, depth: .08, 
 export function createWaterDynamics(resolution: number, size: number, bed: Float32Array, wet: Uint8Array, options: Partial<WaterPhysics> = {}) {
   const settings = { ...DEFAULT_WATER_PHYSICS, ...options }, n = resolution, length = n * n, dx = size / (n - 1)
   const depth = new Float32Array(length), flowX = new Float32Array(length), flowZ = new Float32Array(length)
+  // Foam is transported by the current and dies away. Water depth alone does
+  // not make foam: a deep, still pool must eventually have a clear surface.
+  const foam = new Float32Array(length), nextFoam = new Float32Array(length)
   const scale = new Float32Array(length), source = new Uint8Array(length)
   for (let z = 0; z < n; z++) for (let x = 0; x < n; x++) {
     const i = z * n + x; if (!wet[i]) continue
@@ -59,6 +62,17 @@ export function createWaterDynamics(resolution: number, size: number, bed: Float
         depth[i] = Math.max(0, depth[i])
         if (source[i]) depth[i] += Math.min(settings.source * dt, Math.max(0, settings.depth - depth[i]))
       }
+      for (let z = 0; z < n; z++) for (let x = 0; x < n; x++) {
+        const i = z*n+x, h = depth[i]
+        if (!wet[i] || h < .002) { nextFoam[i] = 0; continue }
+        const vx = (flowX[i] + (x ? flowX[i-1] : 0)) / Math.max(.015,2*h)
+        const vz = (flowZ[i] + (z ? flowZ[i-n] : 0)) / Math.max(.015,2*h)
+        const incoming = (x ? flowX[i-1] : 0) + (z ? flowZ[i-n] : 0) - flowX[i] - flowZ[i]
+        const breaking = Math.max(0,incoming/dx-.035) * Math.min(1,Math.hypot(vx,vz)*.5)
+        const moved = sample(foam,(x/(n-1)-.5)*size-vx*dt,(z/(n-1)-.5)*size-vz*dt)
+        nextFoam[i] = Math.min(.65, moved*Math.exp(-dt*1.1) + breaking*dt*3)
+      }
+      foam.set(nextFoam)
     }
   }
   /** Impulse redistributes existing water; it does not create extra volume. */
@@ -77,5 +91,5 @@ export function createWaterDynamics(resolution: number, size: number, bed: Float
     const ix = Math.min(n - 2, Math.floor(fx)), iz = Math.min(n - 2, Math.floor(fz)), tx = fx - ix, tz = fz - iz, i = iz * n + ix
     return (values[i] * (1 - tx) + values[i + 1] * tx) * (1 - tz) + (values[i + n] * (1 - tx) + values[i + n + 1] * tx) * tz
   }
-  return { settings, depth, flowX, flowZ, bed, wet, resolution, size, step, disturb, sample }
+  return { settings, depth, flowX, flowZ, foam, bed, wet, resolution, size, step, disturb, sample }
 }

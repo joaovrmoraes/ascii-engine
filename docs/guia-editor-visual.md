@@ -103,6 +103,12 @@ resistência. A água desce e acumula nas partes baixas da área pintada.
 produz um impacto. Objetos movidos dentro da água e atores informados por
 `engine.setActors` geram ondas e rastros.
 
+O visual padrão privilegia lago calmo, com frentes de onda lentas e
+reflexo legível. **Ondulação** também controla o tremor do reflexo e o
+brilho das pequenas ondas. Espuma aparece com agitação, acompanha a
+corrente e desaparece quando a água para; profundidade sozinha não gera
+espuma. O espelho acompanha a altura simulada das partes calmas.
+
 O reflexo de um objeto depende do ângulo da câmera e de sua posição em
 relação à margem. **Orbitar** permite conferir de todos os lados. Ele não
 fica projetado permanentemente embaixo do objeto. O brilho do luar depende

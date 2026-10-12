@@ -1,5 +1,36 @@
 # Registro de trabalho
 
+## 11/10/2026 — Água calma e correção da vista rasante
+
+- O dono pediu nova inspeção da cena aberta no Orca e escolheu lago calmo,
+  reflexo legível e ondas suaves; alertou para água/grama ao girar a câmera.
+- A inspeção real mostrou áreas escuras extensas e espuma em blocos na
+  encosta. Uma cópia da cena e da profundidade/corrente após cerca de
+  11 minutos permitiu repetir o caso em perfil isolado.
+- Ondas visuais usam frentes contínuas, movimento mais lento, advecção em
+  fases curtas e cor em degraus. Ondulação controla também tremor/brilho.
+- Espuma agora responde à convergência da corrente, é transportada e
+  desaparece. Profundidade acumulada não gera mais uma grade de `O`.
+- O espelho usa a altura simulada de regiões calmas próximas. Um lago
+  que acumulou água continua refletindo na superfície atual.
+- Correção na amostragem do atlas: derivadas da grade contínua, antes de
+  `fract` e da seleção da letra. A comparação na câmera rasante mostrou
+  redução das faixas verdes que pareciam atravessar a margem.
+- Teste de contorno compara pixels com/sem água em quatro giros e duas
+  inclinações, projetando também a espessura da borda: zero pixels fora
+  da margem tolerada nas oito vistas. Não considera a borda uma lâmina
+  infinitamente plana, que dava falso positivo em câmera baixa.
+- `pnpm check`: **79 testes**, tipos e build; `verify:water` e as seis
+  vistas de `pnpm compare` passaram. Testes novos cobrem poça profunda
+  parada, dissipação de espuma, nascente por 120 s e espelho na altura atual.
+- Validação visual: Orca (aba e canvas real), cópia isolada em múltiplos
+  ângulos e sequência `cdpshot.mjs` a 60 fps. Uma captura inteira do Orca
+  deu timeout e outra mosaico; foram descartadas. O documento do dono
+  não foi substituído. [Capturas e logs](captures/agua-calma-2026-10-11/README.md).
+- Limites anteriores continuam: fluido superficial na pintura, espelho
+  planar por corpo, sem respingos/flutuação/água volumétrica. Tauri não
+  executado; aprovação estética final permanece com o dono.
+
 ## 11/10/2026 — Órbita 3D, miniatura da câmera e dinâmica superficial da água
 
 - Pedidos: câmera funcionando em Prévia; girar/inclinar a cena sem depender

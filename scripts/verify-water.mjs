@@ -54,6 +54,9 @@ try {
   await evaluate('engine.waters[0].look.reflection.enabled=false');await capture('cilindro-vista-oposta-sem-reflexo')
   if(changedPixels('cilindro-vista-oposta','cilindro-vista-oposta-sem-reflexo')>100)throw new Error('Reflection should fall outside the lake from the opposite bank')
   console.log('PASS reflected cylinder changes with view direction and disappears outside the wet footprint')
+  await evaluate(`const w=engine.waters[0];w.look.reflection.enabled=true;for(let i=0;i<w.dynamics.depth.length;i++)if(w.dynamics.wet[i])w.dynamics.depth[i]=.6;w.updateDynamics(.000001,engine.time)`)
+  await capture('lago-profundo-calmo')
+  await check('a deep still pool remains clear and its mirror follows the simulated surface',`Math.abs(engine.waters[0].mesh.userData.waterReflectionLevel-.6)<.001 && engine.waters[0].dynamics.foam.every(f=>f<.001)`)
   await action(`const doc=area.document();doc.objects=[];await area.openDocument(doc);view.angle=-Math.PI/7;view.elevation=Math.atan2(6,12);engine.setStyle({moon:{...engine.style.moon,position:[0,6,-12]}})`)
   await capture('luar-alinhado')
   await evaluate('engine.setStyle({moon:{...engine.style.moon,position:[12,6,0]}})');await capture('luar-rotacionado')
@@ -65,6 +68,34 @@ try {
   await capture('agua-rastro-do-objeto')
   difference('agua-antes-impacto','agua-rastro-do-objeto',60)
   await check('water simulation never writes transient state into the document',`JSON.stringify(area.document())===beforeImpact`)
+  await action(`const doc=area.document();doc.objects=[];doc.carpet={count:40000,seed:42};await area.openDocument(doc);area.authoring.view([0,.3,0]);view.zoom=1;view.paused=true`)
+  for (const elevation of [.12,.55]) for (const angle of [0,Math.PI/2,Math.PI,Math.PI*1.5]) {
+    await action(`view.elevation=${elevation};view.angle=${angle}`)
+    const bank = await evaluate(`(()=>{
+      const w=engine.waters[0],canvas=engine.renderer.domElement,c=document.createElement('canvas');c.width=canvas.width;c.height=canvas.height;const ctx=c.getContext('2d');
+      w.mesh.visible=true;engine.render(0,{redraw:true});ctx.drawImage(canvas,0,0);const on=ctx.getImageData(0,0,c.width,c.height).data;
+      w.mesh.visible=false;engine.render(0,{redraw:true});ctx.drawImage(canvas,0,0);const off=ctx.getImageData(0,0,c.width,c.height).data;w.mesh.visible=true;
+      const camera=engine.camera,point=camera.position.clone(),direction=camera.getWorldDirection(point.clone());
+      const origin=point.clone().set(-1+1/c.width,1-1/c.height,-1).applyMatrix4(camera.projectionMatrixInverse).applyMatrix4(camera.matrixWorld);
+      const stepX=point.clone().set(2/c.width,0,0).transformDirection(camera.matrixWorld).multiplyScalar((camera.right-camera.left)/camera.zoom/c.width);
+      const stepY=point.clone().set(0,-2/c.height,0).transformDirection(camera.matrixWorld).multiplyScalar((camera.top-camera.bottom)/camera.zoom/c.height);
+      let changed=0,escaped=0;
+      for(let y=0;y<c.height;y++)for(let x=0;x<c.width;x++){
+        const i=(y*c.width+x)*4;if(Math.max(Math.abs(on[i]-off[i]),Math.abs(on[i+1]-off[i+1]),Math.abs(on[i+2]-off[i+2]))<=8)continue;
+        changed++;point.copy(origin).addScaledVector(stepX,x).addScaledVector(stepY,y);point.addScaledVector(direction,(.08-point.y)/direction.y);
+        // The bank interpolates between wet and dry mesh vertices. Its
+        // visible rim can be anywhere between bed=0 and the .08 m surface.
+        // Project that whole thin column, not just an infinite top plane.
+        let edge=-Infinity;
+        for(let step=0;step<=16;step++){const distance=(-.08*step/16)/direction.y;edge=Math.max(edge,core.waterEdge(w.shape,point.x+direction.x*distance,point.z+direction.z*distance))}
+        if(edge<-.04)escaped++;
+      }
+      engine.render(0,{redraw:true});return {changed,escaped};
+    })()`)
+    console.log(`bank elevation=${elevation} orbit=${angle.toFixed(2)}: ${JSON.stringify(bank)}`)
+    if(!(bank.changed>100&&bank.escaped<6))throw new Error('Water crossed its bank')
+    if(elevation===.12&&angle===0)await capture('margem-camera-baixa')
+  }
   await action(`const terrain=core.createTerrainData(20,81);terrain.heights=terrain.heights.map((_,i)=>4*Math.exp(-(((i%81)/80*20-10+3)**2)/7));const shape=core.createWaterPaint(20,81);core.paintWater(shape,{x:-3,z:0},{x:5,z:0},1.1);shape.mask.heights=terrain.heights.map(h=>h+.045);await area.openDocument({version:1,terrain,carpet:{count:20000,seed:1},objects:[],waters:[{shape,level:0,physics:{source:.04}}]});area.authoring.view([-1,1.5,0]);view.zoom=.8;view.angle=.5;view.elevation=.6;view.paused=true`)
   await capture('encosta-inicio')
   await evaluate(`window.beforeFlow=JSON.stringify(area.document());for(let i=0;i<240;i++)engine.waters[0].updateDynamics(1/60,engine.time+i/60)`)
