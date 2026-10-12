@@ -1,0 +1,10 @@
+{
+  "name": "Lago das Brasas",
+  "terrain": 32,
+  "objects": 10,
+  "waters": 1,
+  "effects": 1,
+  "atmospheres": 1,
+  "cameras": 1,
+  "activeCamera": true
+}

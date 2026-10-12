@@ -1,0 +1,48 @@
+{
+  "programs": [],
+  "stream_groups": [],
+  "streams": [
+    {
+      "codec_name": "h264",
+      "width": 2560,
+      "height": 1080,
+      "r_frame_rate": "30/1",
+      "avg_frame_rate": "30/1"
+    },
+    {
+      "codec_name": "bin_data",
+      "r_frame_rate": "0/0",
+      "avg_frame_rate": "0/0"
+    }
+  ],
+  "chapters": [
+    {
+      "start_time": "0.000000",
+      "end_time": "43.000000"
+    },
+    {
+      "start_time": "43.000000",
+      "end_time": "79.099000"
+    },
+    {
+      "start_time": "79.099000",
+      "end_time": "136.433000"
+    },
+    {
+      "start_time": "136.433000",
+      "end_time": "191.066000"
+    },
+    {
+      "start_time": "191.066000",
+      "end_time": "244.199000"
+    },
+    {
+      "start_time": "244.199000",
+      "end_time": "310.600000"
+    }
+  ],
+  "format": {
+    "duration": "310.600000",
+    "size": "135329908"
+  }
+}

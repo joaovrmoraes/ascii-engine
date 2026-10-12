@@ -1,5 +1,64 @@
 # Registro de trabalho
 
+## 11/10/2026 — Edição Remotion e diagnóstico de cor da gravação
+
+- Pedido: dividir a gravação em partes com Remotion e corrigir a cor desbotada.
+- Projeto independente em `tools/video-edit`, Remotion 4.0.534, com linha do
+  tempo editável: terreno, água, objetos, efeito/luz, atmosfera e câmera/exportação.
+  Abertura, cartelas animadas, explicações sincronizadas e encerramento.
+- Quadro 2560×1440 a 30 fps, mantendo a captura 2560×1080 sem redução.
+  Velocidades 1,15×–1,40× indicadas; duração 8236 quadros, cerca de 4min35.
+  Filme completo, seis arquivos e player local em
+  `/home/jonny/Videos/ASCII-Engine-2026-10-11/edicao/`.
+- Render integral no navegador pressionou a RAM. Remotion passou a gerar as
+  animações e faixas; FFmpeg compõe a captura e exporta com dois threads.
+  Navegador sem janela e cache no disco; desktop do dono preservado.
+- Diagnóstico: OBS em NV12/4:2:0, Rec.709 parcial identificado corretamente.
+  Ensaio com o mesmo PNG confirma perda de cor dos glifos por subamostragem.
+  Os cinzas quase não mudam; não se aplicou correção global de gamma/preto.
+- Saturação compensada em 1,4× por matriz RGB; master H.264 4:4:4 e versão
+  compatível 4:2:0. A versão compatível é codificada uma vez e dividida com
+  keyframes nos capítulos. Nenhuma configuração pessoal do OBS foi alterada.
+- `pnpm check`: 79 testes, tipos e build passaram; tipos do projeto Remotion
+  também passaram. Filme e seis partes passaram na contagem de quadros e
+  decodificação integral; master 4:4:4 também decodificado sem erros.
+  [Capturas, diagnóstico e verificações](captures/edicao-remotion-2026-10-11/README.md).
+- Limites: sem áudio; compensação não recupera informação perdida no original.
+  4:2:0 ainda perde cor nos traços finos. Sem alteração na engine ou nos mapas.
+
+## 11/10/2026 — Sessão completa de composição gravada no OBS
+
+- O dono aprovou a água da etapa anterior e pediu uma gravação pela interface:
+  mapa, terreno, água, objetos, efeito, luz, atmosfera e câmera. Confirmou OBS
+  nativo e pediu cuidado com o mosaico de janelas do Omarchy/Hyprland.
+- Editor em tela cheia na área 5, OBS separado na área 6 e Orca preservado na
+  área 3. Perfil de demonstração isolado; o mapa aberto no Orca não foi trocado.
+- Gravação final com OBS e captura da janela pelo portal PipeWire, incluindo
+  cursor real. Criação feita pelos controles visíveis do editor. O mapa não
+  foi montado pela API; leitura de estado ajudou a localizar os controles.
+- Criado **Lago das Brasas**: terreno de 32 m com relevo e caminho, lago calmo,
+  árvores, pedras, ruína, tronco, efeito **Brasa da margem** com camadas e luz,
+  atmosfera **Luar do Lago das Brasas** e câmera inicial. Efeito e atmosfera
+  foram salvos nos Assets; a sessão termina na Prévia após salvar e exportar.
+- Entrega em `/home/jonny/Videos/ASCII-Engine-2026-10-11/`:
+  `ASCII-Engine-criacao-completa.mp4`, `Lago-das-Brasas.ascii.json` e
+  `Lago-das-Brasas.pomorog.json`. Vídeo de **5min11**, 2560×1080, 30 fps,
+  H.264, sem áudio, com seis capítulos. Master MKV preservado fora do Git.
+- Uma consulta às propriedades XComposite abortou o OBS no início; a captura
+  XComposite também congelou quadros em uma tentativa posterior. Essas tomadas
+  foram descartadas da entrega. A sessão foi repetida com PipeWire e conferida
+  no arquivo final. OBS encerrado normalmente depois de finalizar a gravação.
+- Validação: decodificação integral do MP4 por FFmpeg sem erros, inspeção de
+  quadros do vídeo e leitura do arquivo salvo com `parseScene`: 10 objetos,
+  uma água, um efeito, uma atmosfera e uma câmera inicial válida.
+  `pnpm check` passou: **79 testes**, tipos e build. Permanecem os avisos do
+  Vite sobre tamanho de chunks e comentários de anotação do Zod.
+- [Quadros da gravação e verificações](captures/sessao-gravada-2026-10-11/README.md).
+  Nenhuma alteração no código da engine. A gravação cobre o fluxo de composição
+  solicitado; não é uma demonstração de todas as opções avançadas ou de
+  importação de modelos. Compatibilidade da exportação dentro do Pomorog não
+  foi testada nesta sessão.
+
 ## 11/10/2026 — Água calma e correção da vista rasante
 
 - O dono pediu nova inspeção da cena aberta no Orca e escolheu lago calmo,

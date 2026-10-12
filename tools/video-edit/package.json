@@ -1,0 +1,28 @@
+{
+  "name": "ascii-engine-video-edit",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "studio": "remotion studio src/index.tsx --port=3456 --no-open",
+    "prepare-media": "node scripts/prepare.mjs",
+    "stills": "node scripts/render.mjs --stills",
+    "render": "node scripts/render.mjs",
+    "graphics": "node scripts/render.mjs --graphics",
+    "compose": "node scripts/compose.mjs",
+    "finalize": "node scripts/finalize.mjs",
+    "diagnose-color": "node scripts/diagnose-color.mjs",
+    "check": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@remotion/bundler": "4.0.534",
+    "@remotion/cli": "4.0.534",
+    "@remotion/renderer": "4.0.534",
+    "react": "19.2.0",
+    "react-dom": "19.2.0",
+    "remotion": "4.0.534"
+  },
+  "devDependencies": {
+    "@types/react": "19.2.0",
+    "typescript": "5.9.3"
+  }
+}

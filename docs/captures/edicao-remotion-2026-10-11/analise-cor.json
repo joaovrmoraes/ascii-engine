@@ -1,0 +1,47 @@
+{
+  "recording": {
+    "pix_fmt": "yuv420p",
+    "color_range": "tv",
+    "color_space": "bt709",
+    "color_transfer": "bt709",
+    "color_primaries": "bt709"
+  },
+  "method": "Screenshot original versus roundtrip controlado do mesmo PNG em H.264 CRF 0. Mesma matriz BT.709/faixa TV; somente a amostragem de crominância muda. A gravação real usa outro instante animado: comparar distribuição, não RMSE contra ela.",
+  "originalScreenshot": {
+    "pixels": 121088,
+    "meanSaturationHSV": 0.4167263475688558,
+    "meanChromaRGB": 36.45031712473573
+  },
+  "originalRecording": {
+    "pixels": 114071,
+    "meanSaturationHSV": 0.16562156164068376,
+    "meanChromaRGB": 13.355497891663964
+  },
+  "controlled": {
+    "yuv420p": {
+      "rmseRGB": 5.197864315975692,
+      "pixels": 117633,
+      "meanSaturationHSV": 0.27426999288732057,
+      "meanChromaRGB": 22.561483597289875
+    },
+    "yuv444p": {
+      "rmseRGB": 0.7560110492266012,
+      "pixels": 121074,
+      "meanSaturationHSV": 0.41666927566851986,
+      "meanChromaRGB": 36.449072468077375
+    }
+  },
+  "flatUIPatch": {
+    "original": [
+      48,
+      50,
+      56
+    ],
+    "recorded": [
+      48,
+      49,
+      56
+    ]
+  },
+  "correction": "Remotion: saturate(1.4), sem alterar brilho/gamma. Exportação master 4:4:4, Rec.709. Compensação editorial, não restauração dos dados perdidos."
+}

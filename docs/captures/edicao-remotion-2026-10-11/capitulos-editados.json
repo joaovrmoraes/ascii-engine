@@ -1,0 +1,50 @@
+[
+  {
+    "id": "Abertura",
+    "startFrame": 0,
+    "endFrame": 120,
+    "seconds": 4
+  },
+  {
+    "id": "01-Terreno",
+    "startFrame": 120,
+    "endFrame": 1180,
+    "seconds": 35.333333333333336
+  },
+  {
+    "id": "02-Agua",
+    "startFrame": 1180,
+    "endFrame": 2188,
+    "seconds": 33.6
+  },
+  {
+    "id": "03-Objetos",
+    "startFrame": 2188,
+    "endFrame": 3483,
+    "seconds": 43.166666666666664
+  },
+  {
+    "id": "04-Efeito-e-luz",
+    "startFrame": 3483,
+    "endFrame": 4975,
+    "seconds": 49.733333333333334
+  },
+  {
+    "id": "05-Atmosfera",
+    "startFrame": 4975,
+    "endFrame": 6317,
+    "seconds": 44.733333333333334
+  },
+  {
+    "id": "06-Camera-e-exportacao",
+    "startFrame": 6317,
+    "endFrame": 8116,
+    "seconds": 59.96666666666667
+  },
+  {
+    "id": "Encerramento",
+    "startFrame": 8116,
+    "endFrame": 8236,
+    "seconds": 4
+  }
+]
