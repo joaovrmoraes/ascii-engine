@@ -41,8 +41,10 @@ export interface WaterSource {
   /** Distance (m) from a point to the water, 0 inside. */
   distance(x: number, z: number): number
   reflectionLevel?(x: number, z: number): number
+  updateDynamics?(dt: number, time: number): void
+  interact?(id: string, position: THREE.Vector3, radius?: number): void
   look: { reflection: { enabled: boolean } }
-  uniforms: { time: { value: number }; reflection?: THREE.IUniform<THREE.Texture | null>; reflectionMatrix?: THREE.IUniform<THREE.Matrix4>; reflectionOn?: THREE.IUniform<number> }
+  uniforms: { time: { value: number }; reflection?: THREE.IUniform<THREE.Texture | null>; reflectionMatrix?: THREE.IUniform<THREE.Matrix4>; reflectionOn?: THREE.IUniform<number>; waterViewDirection?: THREE.IUniform<THREE.Vector3>; waterLightDirection?: THREE.IUniform<THREE.Vector3>; waterLightColor?: THREE.IUniform<THREE.Color>; waterLightPower?: THREE.IUniform<number>; waterReflectionLevel?: THREE.IUniform<number> }
   dispose(): void
 }
 
@@ -433,11 +435,13 @@ export function createAsciiEngine(canvas: HTMLCanvasElement, options: AsciiEngin
       if (next.foeHeight !== undefined) actors.foeHeight = next.foeHeight
     },
     /** Isometric framing: `focus + (sin a·15, 18, cos a·15)`, `a = π/7` by default. */
-    frame(target: THREE.Vector3, span: number, angle = Math.PI / 7) {
+    frame(target: THREE.Vector3, span: number, angle = Math.PI / 7, elevation = Math.atan2(18, 15)) {
       focus.copy(target)
       const aspect = width / height
       camera.left = -span * aspect; camera.right = span * aspect; camera.top = span; camera.bottom = -span
-      camera.position.set(target.x + Math.sin(angle) * 15, target.y + 18, target.z + Math.cos(angle) * 15)
+      const distance = Math.hypot(15, 18), horizontal = Math.cos(elevation) * distance
+      camera.zoom = 1; camera.near = .1; camera.far = 90
+      camera.position.set(target.x + Math.sin(angle) * horizontal, target.y + Math.sin(elevation) * distance, target.z + Math.cos(angle) * horizontal)
       camera.lookAt(target); camera.updateProjectionMatrix(); camera.updateMatrixWorld()
     },
     /** A water body (§3.2); add `water.mesh` with `{ glyph: 'water' }`. */
@@ -478,9 +482,9 @@ export function createAsciiEngine(canvas: HTMLCanvasElement, options: AsciiEngin
     resize,
 
     /** One frame. `dt` is clamped to [0, .08] (a negative step once blew up poses). */
-    render(dt: number) {
+    render(dt: number, options: { redraw?: boolean } = {}) {
       if (canvas.clientWidth !== width || canvas.clientHeight !== height) resize()
-      dt = THREE.MathUtils.clamp(dt, 0, .08)
+      dt = options.redraw ? 0 : THREE.MathUtils.clamp(dt, 0, .08)
       time += dt
       camera.updateMatrixWorld()
       illumination.place(lantern.on ? lantern.position : null, hearth.on ? hearth.position : null)
@@ -502,7 +506,7 @@ export function createAsciiEngine(canvas: HTMLCanvasElement, options: AsciiEngin
       updateGlyphBodies(bodies, camera, height, lantern.position, lantern.on ? style.bodyLantern : 0, hearth.position, hearth.on ? hearth.power : 0, style.bodyAmbient)
       const hero = actors.hero ?? new THREE.Vector3(100, 0, 100)
       for (const carpet of carpets) carpet.update(time, hero, actors.foe, camera, focus, style.inkTint ? 'moon' : style.atmosphere, style.brightness)
-      if (effects && effectLetters) { effectLetters.clear(); effects.update(dt, time, camera) }
+      if (effects && effectLetters) { effectLetters.clear(); effects.update(dt, time, camera, options.redraw) }
       // Effects update their PointLights first. Sharing these uniforms makes
       // their colour/reach work on bodies, carpets, surfaces and particles.
       const ink = illumination.uniforms
@@ -539,7 +543,16 @@ export function createAsciiEngine(canvas: HTMLCanvasElement, options: AsciiEngin
       const frustum = new THREE.Frustum().setFromProjectionMatrix(new THREE.Matrix4().multiplyMatrices(camera.projectionMatrix, camera.matrixWorldInverse))
       renderer.autoClear = true
       for (const water of waters) {
+        if (!options.redraw) {
+          if (actors.hero) water.interact?.('hero', actors.hero)
+          if (actors.foe) water.interact?.('foe', actors.foe)
+          water.updateDynamics?.(dt, time)
+        }
         water.uniforms.time.value = time
+        if (water.uniforms.waterViewDirection) camera.getWorldDirection(water.uniforms.waterViewDirection.value).negate()
+        if (water.uniforms.waterLightDirection) { moon.getWorldPosition(water.uniforms.waterLightDirection.value); moon.target.getWorldPosition(lightPosition); water.uniforms.waterLightDirection.value.sub(lightPosition).normalize() }
+        water.uniforms.waterLightColor?.value.copy(moon.color)
+        if (water.uniforms.waterLightPower) water.uniforms.waterLightPower.value = moon.intensity / 2.2
         if (water.uniforms.reflectionOn) water.uniforms.reflectionOn.value = 0
         if (!water.mesh.parent || !water.mesh.visible || !water.look.reflection.enabled) continue
         water.mesh.updateWorldMatrix(true, false)
@@ -547,6 +560,7 @@ export function createAsciiEngine(canvas: HTMLCanvasElement, options: AsciiEngin
         if (water.distance(near.x, near.z) > reflectionRange + (camera.right - camera.left) / camera.zoom) continue
         const level = water.reflectionLevel?.(near.x, near.z) ?? water.mesh.getWorldPosition(lightPosition).y
         water.mesh.userData.waterReflectionLevel = level
+        if (water.uniforms.waterReflectionLevel) water.uniforms.waterReflectionLevel.value = level
         const previous = mirrors.get(level)
         if (previous?.uniforms.reflection && previous.uniforms.reflectionMatrix && water.uniforms.reflection && water.uniforms.reflectionMatrix) {
           water.uniforms.reflection.value = previous.uniforms.reflection.value

@@ -8,6 +8,12 @@ export function createSceneCameras(engine: AsciiEngine, callbacks: { viewChanged
   const bar = document.createElement('div'); bar.id = 'camera-view-bar'; bar.hidden = true
   const label = document.createElement('span'), exit = document.createElement('button'); exit.textContent = 'Voltar à navegação'; exit.onclick = () => view(null); bar.append(label, exit)
   document.getElementById('app')!.append(bar)
+  const preview = document.createElement('section'); preview.id = 'camera-preview'; preview.hidden = true; preview.setAttribute('aria-label', 'Prévia da câmera selecionada')
+  const previewTitle = document.createElement('strong'), previewCanvas = document.createElement('canvas'), previewOpen = document.createElement('button')
+  previewOpen.textContent = 'Ampliar'; previewOpen.onclick = () => { if (selected) { view(selected); callbacks.select(handles.get(selected)!.object) } }
+  const header = document.createElement('header'); header.append(previewTitle, previewOpen); preview.append(header, previewCanvas); document.getElementById('app')!.append(preview)
+  const previewContext = previewCanvas.getContext('2d')!, savedCamera = new THREE.OrthographicCamera()
+  let lastPreview = -Infinity
   const ray = new THREE.Raycaster()
   function release() {
     for (const { object, helper } of handles.values()) {
@@ -97,11 +103,40 @@ export function createSceneCameras(engine: AsciiEngine, callbacks: { viewChanged
     add, load, inspector, duplicate, remove, syncSelected, view,
     get viewed() { return viewed },
     get selected() { return selected },
+    activeCamera() { return active ? definitions[active] : undefined },
     isCamera(object?: THREE.Object3D) { return !!object && handles.get(object.userData.cameraId)?.object === object },
     select(object?: THREE.Object3D) { selected = object && handles.get(object.userData.cameraId)?.object === object ? object.userData.cameraId : undefined },
     entries() { return [...handles].map(([id, handle]) => ({ id, object: handle.object, active: id === active })) },
     document(): Pick<SceneDoc, 'cameras' | 'activeCamera'> { return { cameras: Object.keys(definitions).length ? structuredClone(definitions) : undefined, activeCamera: active } },
     current() { return viewed ? definitions[viewed] : undefined },
+    renderPreview(playing: boolean) {
+      preview.hidden = !selected || !!viewed || playing || document.body.classList.contains('studio-mode')
+      if (preview.hidden) return
+      const def = definitions[selected!], now = performance.now()
+      previewTitle.textContent = def.name
+      // One shared renderer, at most 12 previews/sec. No second world or context.
+      if (now - lastPreview < 1000 / 12) return
+      lastPreview = now
+      const canvas = engine.renderer.domElement, aspect = engine.size.width / engine.size.height
+      savedCamera.copy(engine.camera)
+      const hidden: THREE.Object3D[] = []
+      for (const scene of [engine.scene, engine.particleScene]) scene.traverseVisible(node => { if (node.userData.editorOnly || node.userData.editorPreview) { hidden.push(node); node.visible = false } })
+      try {
+        applySceneCamera(engine.camera, def)
+        // Render a larger frame with the viewport's aspect, then crop to the
+        // saved frame. This preserves point glyph proportions without resizing
+        // GPU buffers twice every preview or changing the editor navigation.
+        const span = def.span * Math.max(1, def.aspect / aspect)
+        engine.camera.top = span; engine.camera.bottom = -span; engine.camera.left = -span * aspect; engine.camera.right = span * aspect; engine.camera.updateProjectionMatrix()
+        engine.render(0, { redraw: true })
+        const w = Math.min(canvas.width, canvas.height * def.aspect), h = w / def.aspect
+        const outputWidth = Math.min(480, 280 * def.aspect), outputHeight = outputWidth / def.aspect
+        if (previewCanvas.width !== Math.round(outputWidth) || previewCanvas.height !== Math.round(outputHeight)) { previewCanvas.width = Math.round(outputWidth); previewCanvas.height = Math.round(outputHeight) }
+        previewCanvas.style.aspectRatio = String(def.aspect)
+        previewContext.drawImage(canvas, (canvas.width - w) / 2, (canvas.height - h) / 2, w, h, 0, 0, previewCanvas.width, previewCanvas.height)
+        previewCanvas.dataset.previewCamera = selected; previewCanvas.dataset.pose = JSON.stringify(def); previewCanvas.dataset.frame = String(now)
+      } finally { engine.camera.copy(savedCamera); engine.camera.updateMatrixWorld(); for (const node of hidden) node.visible = true }
+    },
     pick(event: {clientX:number;clientY:number}) {
       if (viewed) return
       const r = engine.renderer.domElement.getBoundingClientRect(); ray.setFromCamera(new THREE.Vector2((event.clientX-r.x)/r.width*2-1, -(event.clientY-r.y)/r.height*2+1), engine.camera)
@@ -114,6 +149,6 @@ export function createSceneCameras(engine: AsciiEngine, callbacks: { viewChanged
       for (const [id, handle] of handles) handle.helper.visible = id === selected
       engine.renderer.autoClear = false; engine.renderer.clearDepth(); engine.renderer.render(overlay, engine.camera); engine.renderer.autoClear = true
     },
-    dispose() { release(); bar.remove() },
+    dispose() { release(); bar.remove(); preview.remove() },
   }
 }

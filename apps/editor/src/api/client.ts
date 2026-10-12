@@ -1,9 +1,9 @@
 import { applyCommands, assertSafeJson, commandJsonSchema, requestSchema, summarizeScene, type AuthoringRequest } from '@ascii-engine/authoring'
-import { pomorog, FOREST_WATER, POMOROG_EFFECTS, SURFACE_ALPHA, parseScene, type AsciiEngine, type SceneDoc } from '@ascii-engine/core'
+import { pomorog, FOREST_WATER, DEFAULT_WATER_PHYSICS, POMOROG_EFFECTS, SURFACE_ALPHA, parseScene, type AsciiEngine, type SceneDoc } from '@ascii-engine/core'
 import { importModelFiles } from '../scene/files'
 import type { Area } from '../areas/types'
 
-export function connectAuthoring(engine: AsciiEngine, area: Area, view: { angle: number; zoom: number; paused: boolean }, capture: () => string) {
+export function connectAuthoring(engine: AsciiEngine, area: Area, view: { angle: number; elevation: number; zoom: number; paused: boolean }, capture: () => string) {
   if (!area.authoring || !area.document) return
   const editor = area.authoring, snapshot = area.document, canvas = engine.renderer.domElement
   const sessionId = crypto.randomUUID()
@@ -44,19 +44,20 @@ export function connectAuthoring(engine: AsciiEngine, area: Area, view: { angle:
         case 'commands': return { commands: commandJsonSchema(), coordinates: 'Metros, Y para cima; rotação em radianos; cores inteiras RGB ou triplas conforme o campo. Leia a revisão antes de alterar. Prévia não grava; accept grava um passo de desfazer.', limits: { objects: 20000, effects: 256, atmospheres: 256, cameras: 128, terrainResolution: 513, pointLights: 8 } }
         case 'catalog': return editor.catalog()
         case 'style': return { defaults: pomorog, glyphKinds: ['surface','body','carpet','water','particle','screen'], surfaceFamilies: Object.keys(SURFACE_ALPHA), studioFields: { bodySceneLighting: true, inkFog: true, inkTint: [1, 1, 1] }, note: 'atmosphere.set faz merge recursivo e habilita luz/fog nas letras. options e options.parts por objeto; style.types para todas as cópias. surface/body são técnicas de malhas; water/carpet/particle exigem a geometria correspondente, não atribua essas técnicas a uma malha comum.' }
-        case 'water': return { defaults: FOREST_WATER, modes: ['terrain: acompanha encosta, ondulação desce conforme a normal', 'level: nível plano, escava leito'], limitation: 'Reflexo planar; aproximação local nas encostas. Não é simulação física de fluidos.' }
+        case 'water': return { defaults: FOREST_WATER, physics: DEFAULT_WATER_PHYSICS, modes: ['terrain: escoamento por gravidade na área pintada', 'level: lago plano, escava leito'], interaction: 'water.disturb dispara impulsos transitórios; objetos e atores em movimento geram ondas.', limitation: 'Simulação de água rasa em heightfield: não tem volumes 3D, respingos balísticos, flutuação rígida ou expansão além da máscara. Reflexo de objetos é planar nas partes calmas; encostas refletem a luz direcional.' }
         case 'effects': return { presets: POMOROG_EFFECTS, definition: 'EffectDef: name, duration (s), loop, emitters[]; light: {color,intensity,distance,decay,flicker,offset,fade}. Copie um preset e modifique; id fx:custom-NOME.', emitterFields: ['name','render','rate','bursts','start','duration','life','shape','offset','speed','velocity','gravity','drag','noise','attract','ground','spin','glyphs','size','color','alpha','glow','ring','beam','ribbon','heat','flipbook','max'] }
         case 'documents': return { version: 1, fields: ['name','style','terrain','waters','carpet','objects','assets','effects','atmospheres','cameras','activeCamera','environment'], example: { version: 1, name: 'Mapa', objects: [{ id: 'pedra-1', prefab: 'pedregulho', position: [0,0,0], rotation3: [0,0,0], scale3: [1,1,1], options: { glyph: 'body' } }] }, note: 'scene.read full=true retorna todo o documento; scene.replace/patch cobrem todos os campos suportados. assets contêm GLTF/GLB incorporado como data URI. atmospheres: {id:{name,style}} salva iluminação nos Assets; atmosphere.define salva e atmosphere.apply aplica pelo id. Exportação = este documento, sem regras do jogo.' }
       }
     }
     if (req.method === 'object.inspect') return editor.inspect(req.id)
+    if (req.method === 'water.disturb') { editor.disturbWater(req.index,req.x,req.z,req.strength,req.radius); return state() }
     if (req.method === 'scene.validate') {
       const doc = applyCommands(snapshot(), req.commands)
       const known = new Set([...editor.catalog().filter(p => p.kind === 'builtin').map(p => p.id), ...Object.keys(doc.assets ?? {}), ...Object.keys(doc.effects ?? {})])
       for (const obj of doc.objects) if (!known.has(obj.prefab)) throw new Error('Prefab inexistente: ' + obj.prefab)
       return { valid: true, scene: summarizeScene(doc), note: 'Dados e referências válidos; arquivos de modelo são decodificados ao aplicar.' }
     }
-    if (req.method === 'editor.view') { editor.view(req.focus, req.studio, req.cameraId); if (req.angle !== undefined) view.angle = req.angle; if (req.zoom !== undefined) view.zoom = req.zoom; if (req.paused !== undefined) view.paused = req.paused; return state() }
+    if (req.method === 'editor.view') { editor.view(req.focus, req.studio, req.cameraId); if (req.angle !== undefined) view.angle = req.angle; if (req.elevation !== undefined) view.elevation = req.elevation; if (req.zoom !== undefined) view.zoom = req.zoom; if (req.paused !== undefined) view.paused = req.paused; return state() }
     if (req.method === 'editor.capture') return { sessionId, revision, mimeType: 'image/png', data: capture() }
     if (original && !req.method.startsWith('preview.')) throw new Error('Há uma prévia pendente. Aplique ou descarte antes de outra alteração.')
     applying = true; lock(true)

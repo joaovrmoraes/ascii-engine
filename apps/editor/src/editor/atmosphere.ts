@@ -49,8 +49,16 @@ export function createAtmosphereStudio(root: HTMLElement, engine: AsciiEngine, c
     const sun = group('Luz principal')
     field(sun, 'Cor principal', hex(s.moon.color), color => ({ moon: { ...engine.style.moon, color } }), 'color')
     field(sun, 'Intensidade principal', s.moon.intensity, intensity => ({ moon: { ...engine.style.moon, intensity } }), 'number', 0, 10)
+    const [lx,ly,lz] = s.moon.position, horizontal = Math.hypot(lx,lz)
+    function direction(azimuth: number, elevation: number) {
+      const distance = Math.max(1,Math.hypot(...engine.style.moon.position)), a=azimuth*Math.PI/180, e=elevation*Math.PI/180
+      return { moon: { ...engine.style.moon, position: [Math.sin(a)*Math.cos(e)*distance,Math.sin(e)*distance,Math.cos(a)*Math.cos(e)*distance] as [number,number,number] } }
+    }
+    field(sun,'Rotação da luz (graus)',Math.atan2(lx,lz)*180/Math.PI,angle=>{const p=engine.style.moon.position;return direction(angle,Math.atan2(p[1],Math.hypot(p[0],p[2]))*180/Math.PI)},'number',-180,180,5)
+    field(sun,'Altura da luz (graus)',Math.atan2(ly,horizontal)*180/Math.PI,angle=>{const p=engine.style.moon.position;return direction(Math.atan2(p[0],p[2])*180/Math.PI,angle)},'number',1,90,2)
     for (const [i, axis] of ['X','Y','Z'].entries()) field(sun, `Direção ${axis}`, s.moon.position[i], n => { const position = [...engine.style.moon.position] as [number,number,number]; position[i] = n; return { moon: { ...engine.style.moon, position } } }, 'number', -50, 50, .5)
     field(sun, 'Sombra', s.moon.shadowIntensity, shadowIntensity => ({ moon: { ...engine.style.moon, shadowIntensity } }), 'number', 0, 1)
+    const reflectionHint=document.createElement('p');reflectionHint.className='empty-note';reflectionHint.textContent='O brilho de lua na água segue esta direção e o ângulo da câmera. Gire a vista para encontrar o reflexo.';sun.append(reflectionHint)
     const ambient = group('Luz ambiente')
     field(ambient, 'Cor do céu', hex(s.hemisphere.sky), sky => ({ hemisphere: { ...engine.style.hemisphere, sky } }), 'color')
     field(ambient, 'Cor do chão', hex(s.hemisphere.ground), ground => ({ hemisphere: { ...engine.style.hemisphere, ground } }), 'color')

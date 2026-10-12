@@ -17,7 +17,8 @@
     "verify:api": "node scripts/verify-api.mjs",
     "verify:composition": "node scripts/verify-composition.mjs",
     "verify:authoring": "node scripts/verify-authoring.mjs",
-    "export": "node scripts/export.mjs"
+    "export": "node scripts/export.mjs",
+    "verify:water": "node scripts/verify-water.mjs"
   },
   "packageManager": "pnpm@11.9.0"
 }

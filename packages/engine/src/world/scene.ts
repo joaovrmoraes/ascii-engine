@@ -36,7 +36,7 @@ export interface PlacedObject {
   options?: AddOptions
 }
 
-export interface SceneWater { shape: WaterShape; look?: Partial<WaterLook>; level?: number }
+export interface SceneWater { shape: WaterShape; look?: Partial<WaterLook>; level?: number; physics?: Partial<import('./waterDynamics').WaterPhysics> }
 
 export interface SceneDoc {
   version: 1
@@ -114,7 +114,7 @@ export function buildScene(engine: AsciiEngine, source: SceneDoc, library: Prefa
     terrain = doc.terrain ? createTerrain(doc.terrain) : undefined
     if (terrain) engine.add(terrain.mesh)
     for (const entry of doc.waters ?? []) {
-      const water = engine.createWater(entry.shape, { look: entry.look, level: entry.level })
+      const water = engine.createWater(entry.shape, { look: entry.look, level: entry.level, physics: entry.physics })
       waters.push(water)
       engine.add(water.mesh, { glyph: 'water' })
     }
@@ -162,7 +162,7 @@ export function buildScene(engine: AsciiEngine, source: SceneDoc, library: Prefa
     /** Adds a water body (e.g. dug by the lake brush). */
     addWater(entry: SceneWater) {
       parseScene({ version: 1, objects: [], waters: [entry] })
-      const water = engine.createWater(entry.shape, { look: entry.look, level: entry.level })
+      const water = engine.createWater(entry.shape, { look: entry.look, level: entry.level, physics: entry.physics })
       engine.add(water.mesh, { glyph: 'water' }); waters.push(water)
       doc.waters = [...doc.waters ?? [], entry]
       return water
@@ -175,7 +175,13 @@ export function buildScene(engine: AsciiEngine, source: SceneDoc, library: Prefa
       carpet = engine.createCarpet(terrainCover(terrain, count, doc.waters ?? []), doc.carpet.seed)
       engine.add(carpet.mesh, { glyph: 'carpet' })
     },
-    update(time: number) { weather?.update(time); for (const p of placed) library[p.doc.prefab]?.update?.(p.object, time) },
+    update(time: number) {
+      weather?.update(time)
+      for (const p of placed) {
+        library[p.doc.prefab]?.update?.(p.object, time)
+        if (p.object.visible) for (const water of waters) water.interact(p.object.uuid, p.object.position)
+      }
+    },
     /** The document, with the terrain as edited. */
     toJSON(): SceneDoc {
       return JSON.parse(JSON.stringify({

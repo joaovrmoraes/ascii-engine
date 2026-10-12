@@ -244,3 +244,11 @@ body.effect-studio-active #app > canvas { visibility: hidden; }
 .camera-actions { display: grid; gap: 6px; }
 
 body.effect-studio-active #camera-view-bar { display: none; }
+
+#camera-preview { position: absolute; right: 14px; bottom: 16px; z-index: 3; width: min(310px, 40%); padding: 5px; border: 1px solid #65748a; border-radius: 5px; background: #171b22f5; box-shadow: 0 4px 20px #0008; }
+#camera-preview[hidden] { display: none; }
+#camera-preview header { display: flex; align-items: center; justify-content: space-between; gap: 6px; padding: 3px 4px 7px; font: 11px system-ui; }
+#camera-preview strong { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+#camera-preview button { background: #303e50; color: #e4edff; border: 1px solid #536580; border-radius: 3px; padding: 4px 7px; cursor: pointer; }
+#camera-preview canvas { display: block; width: 100%; max-height: 250px; object-fit: contain; background: #000; }
+body.previewing #camera-view-bar, body.studio-mode #camera-preview { display: none; }

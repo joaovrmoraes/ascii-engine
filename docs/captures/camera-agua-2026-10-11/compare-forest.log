@@ -1,0 +1,2 @@
+$ node scripts/compare.mjs floresta
+floresta   RMSE 0.0095  ok

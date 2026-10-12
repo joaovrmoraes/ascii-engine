@@ -14,6 +14,16 @@ function fakeCloud() {
 }
 
 describe('effect system', () => {
+  it('redraws a secondary camera without advancing particles or their random stream', () => {
+    function simulate(preview: boolean) {
+      const points: number[][]=[],cloud={push:(x:number,y:number,z:number)=>points.push([x,y,z])}
+      const fx=createEffectSystem(cloud as never,new THREE.Scene()),camera=new THREE.PerspectiveCamera()
+      fx.play({name:'teste',duration:3,emitters:[{rate:12,life:2,noise:2}]},new THREE.Vector3())
+      for(let i=0;i<30;i++){ if(preview)fx.update(0,i/60,camera,true);points.length=0;fx.update(1/60,i/60,camera) }
+      fx.dispose();return points
+    }
+    expect(simulate(true)).toEqual(simulate(false))
+  })
   it.each(['heat', 'ribbon'] as const)('preserves XYZ layer offsets for %s', render => {
     function sample(offset: [number,number,number]) {
       const points: number[][] = [], cloud = { push: (x:number,y:number,z:number) => points.push([x,y,z]) }

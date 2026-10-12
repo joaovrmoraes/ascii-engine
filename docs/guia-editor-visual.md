@@ -29,7 +29,8 @@ eixos; **Encaixar** usa passos de 0,5 m, 15° e 0,1 na escala. Um arraste
 inteiro conta como uma ação de desfazer. Os controles de transformação
 valem para objetos; água continua sendo ajustada pelos campos do inspetor.
 
-**Prévia** oculta os controles de seleção na cena e desativa os painéis
+**Prévia** usa a câmera inicial salva (ou a vista atual, se não houver uma),
+oculta os controles de seleção na cena e desativa os painéis
 de edição até clicar em **Voltar à edição**. O botão ao lado pausa as
 animações. Esta prévia é visual, sem regras de jogo.
 
@@ -75,7 +76,10 @@ separadas. A barra superior e a cena permanecem na estrutura principal.
    abre a tela dedicada de iluminação, cor e névoa. Os ajustes ficam no mapa;
    não convertem seus objetos ou terreno automaticamente em outro bioma.
 
-**Alt + arraste esquerdo** gira a câmera; botão direito/meio, ferramenta
+**Orbitar (O)** permite girar em 3D arrastando com o botão esquerdo,
+incluindo inclinar para cima/baixo. **Alt + arraste esquerdo** e
+**Shift + botão do meio** também orbitam. **Isométrica** restaura o ângulo
+original. Botão direito/meio, ferramenta
 **Q** ou Shift + arraste em modo de seleção deslocam o centro; roda
 aproxima/afasta. **F** foca o objeto. **Ctrl D** duplica,
 **Delete** exclui, **Ctrl Z** desfaz e **Ctrl Shift Z** refaz. **Ctrl S**
@@ -87,6 +91,36 @@ o movimento vertical, independentemente do giro ou zoom.
 Os objetos mantêm a altura definida no inspetor quando o terreno muda.
 Ao colocá-los, a altura inicial vem do chão. A grama é regerada ao terminar
 um traço. A máscara de água é local ao seu contorno.
+
+## Água: escoamento, reflexos e interação
+
+Selecione **Água** na hierarquia. **Simular água** ativa a simulação de
+água rasa: profundidade por célula, fluxo entre vizinhos, gravidade e
+resistência. A água desce e acumula nas partes baixas da área pintada.
+**Lâmina inicial** define a quantidade inicial; **Vazão na nascente** repõe
+água nas extremidades altas. Com vazão zero, o domínio conserva volume.
+**Ondulação** controla pequenas ondas de superfície; **Testar ondulação**
+produz um impacto. Objetos movidos dentro da água e atores informados por
+`engine.setActors` geram ondas e rastros.
+
+O reflexo de um objeto depende do ângulo da câmera e de sua posição em
+relação à margem. **Orbitar** permite conferir de todos os lados. Ele não
+fica projetado permanentemente embaixo do objeto. O brilho do luar depende
+da câmera, da normal da superfície e da luz principal em
+**Estúdio → Atmosfera → Rotação/Altura da luz**. Cor e intensidade dessa
+luz também afetam o brilho da água.
+
+A simulação usa uma grade de altura limitada à área pintada, com até
+129 × 129 células. Não é um fluido volumétrico: expansão automática para
+fora da pintura, respingos balísticos, água sob saliências e flutuação de
+corpos rígidos ainda não existem. Quedas acompanham o relevo; não há cortina
+livre separada do terreno. Partes calmas têm reflexo planar de objetos;
+as encostas recebem o reflexo da luz, evitando copiar um espelho horizontal
+sobre a queda. Partículas do passe separado ainda não entram no espelho.
+
+O arquivo salva `waters[].physics` e a superfície inicial; as ondas e o
+escoamento reiniciam ao abrir. A simulação não altera o terreno nem grava
+cada quadro no histórico. Pausar congela o movimento.
 
 ## Criar e reutilizar itens
 
@@ -124,7 +158,9 @@ não foram validados; prefira GLB incorporado ou GLTF com acompanhantes.
 
 **Criar câmera**, na barra superior, captura o enquadramento atual e cria
 um objeto na hierarquia. Se for a primeira câmera, ela se torna a câmera
-inicial do documento. Selecione-a para editar:
+inicial do documento. Ao selecioná-la, uma **prévia pequena no canto**
+mostra o enquadramento ao vivo, inclusive enquanto arrasta o gizmo.
+**Ampliar** abre essa vista na cena. Selecione-a para editar:
 
 - **Posição / Rotação** no inspetor, ou **W / E** com o gizmo na cena.
 - **Altura enquadrada** aproxima ou afasta a composição ortográfica.
@@ -133,7 +169,7 @@ inicial do documento. Selecione-a para editar:
   retorna à câmera livre do editor; o enquadramento salvo não muda.
 - **Capturar enquadramento atual** substitui a pose pela vista do editor.
 - **Apontar para o centro da vista** orienta a câmera para o foco atual.
-- **Usar como câmera inicial** escolhe a vista do player/exportação.
+- **Usar como câmera inicial** escolhe a vista de **Prévia**, player e exportação.
 - **Duplicar câmera** permite testar outro plano sem perder o anterior.
 
 Câmeras podem ser removidas e desfeitas/refeitas. Nome, pose, tamanho e

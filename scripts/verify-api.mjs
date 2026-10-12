@@ -59,7 +59,7 @@ try {
   }
   const assert=(condition,title)=>{if(!condition)throw new Error('FAIL '+title);console.log('PASS '+title)}
   const tools=await client.listTools()
-  assert(tools.tools.length===13,'official MCP handshake and all 13 tools discoverable')
+  assert(tools.tools.length===14,'official MCP handshake and all 14 tools discoverable')
   const sessions=await invoke('engine_sessions')
   assert(sessions.some(s=>s.sessionId===sessionId),'isolated browser registered, session selected explicitly')
   const catalog=await invoke('engine_reference',{topic:'catalog'})
@@ -90,7 +90,8 @@ try {
   state=await invoke('scene_apply',{revision:state.revision,commands,preview:true})
   assert(state.preview&&state.scene.objects.length===11,'MCP creates terrain, continuous slope water, objects, custom effect, atmosphere and weather')
   await check('pending preview visibly locks editing and offers accept/cancel', 'document.querySelector("#editor-workspace").inert && !document.querySelector("#ai-preview").hidden')
-  await invoke('editor_view',{focus:[0,1,-1],zoom:.55,angle:0,paused:false})
+  await invoke('editor_view',{focus:[0,1,-1],zoom:.55,angle:0,elevation:.65,paused:false})
+  const impact=await invoke('water_disturb',{index:0,x:0,z:0,strength:.2,radius:.8});assert(impact.revision===state.revision,'MCP water impact is transient and preserves document revision')
   await shot('mcp-previa')
   await invoke('scene_apply',{revision:state.revision-1,commands:[{op:'scene.patch',patch:{name:'Stale'}}],preview:false},true)
   assert((await invoke('scene_read')).scene.name==='Ambiente criado pelo MCP','stale revision rejected without overwriting scene')

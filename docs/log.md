@@ -1,5 +1,51 @@
 # Registro de trabalho
 
+## 11/10/2026 — Órbita 3D, miniatura da câmera e dinâmica superficial da água
+
+- Pedidos: câmera funcionando em Prévia; girar/inclinar a cena sem depender
+  de Alt; enquadramento pequeno enquanto posiciona a câmera; reflexo lateral
+  do cilindro/luar; água descendo e reagindo a movimento.
+- **Orbitar (O)**: arrasto esquerdo gira e inclina; Alt esquerdo e Shift meio
+  também orbitam. **Isométrica** restaura a orientação. Pan perto do horizonte
+  usa o plano da vista para evitar deslocamentos enormes.
+- Selecionar câmera mostra miniatura a 12 fps, atualizada pelo gizmo/campos,
+  com botão Ampliar. Usa o renderer existente e recorte proporcional; não
+  cria segunda cena/contexto nem avança água/partículas duas vezes.
+- **Prévia** agora usa a câmera inicial; sair restaura a navegação. A aba
+  real do Orca estava visível sem receber `requestAnimationFrame` (tempo 0).
+  Renderização alternativa a 20 fps destravou câmera/animação nessa condição;
+  rAF normal continua prioritário e documento oculto não anima.
+- Reflexo de objetos ganhou legibilidade e fileiras vazias corretas. O caso
+  do cilindro foi reproduzido: ele aparece quando a projeção refletida cai
+  dentro do lago, conforme a câmera. Encostas não recebem mais o espelho
+  horizontal deslocado; o brilho da lua usa luz, câmera e normal da superfície.
+  Atmosfera ganhou controles de rotação/altura da luz em graus.
+- `world/waterDynamics.ts`: fluxo de água rasa entre células, profundidade,
+  gravidade, resistência, limite de estabilidade e nascente opcional nas
+  extremidades altas. Volume conservado sem nascente; ondas por impulsos.
+  A malha, corrente e espuma seguem o estado; o terreno não é alterado.
+- `waters[].physics` guarda parâmetros. Inspetor: simular, lâmina inicial,
+  vazão, resistência, ondulação e impacto de teste. Objetos em movimento e
+  atores via `engine.setActors` produzem ondas. Estado transitório reinicia
+  ao abrir e não infla arquivo/histórico. Contornos customizados com GLSL
+  usam a função de distância correspondente na grade física.
+- API/MCP: `editor_view.elevation`, `water_disturb` (14 ferramentas), referência
+  de física e `water.update.patch.physics`. Impulso não muda revisão. Ponte
+  local reiniciada com o novo esquema, sem mudar configuração do cliente.
+- Validação: **77 testes**, tipos e build em `pnpm check`;
+  `verify:composition`, `verify:water`, `verify:visual`, `verify:authoring`
+  e `verify:api` passaram. Órbita/gizmos usam eventos nativos; água tem
+  comparação real de pixels, teste de interação e conservação de volume.
+  Capturas por cdpshot e Orca; [evidências](captures/camera-agua-2026-10-11/README.md).
+  `pnpm compare`: cinco vistas passaram na primeira execução; floresta
+  teve RMSE 0,0595 e passou isoladamente com 0,0095, sem mudar código/base.
+  É a oscilação de integração temporal já observada nessa cena.
+- Limites: simulação superficial dentro da máscara; sem fluido volumétrico,
+  expansão fora da pintura, respingos balísticos, queda livre separada do
+  relevo ou flutuação rígida. Sem disco de lua no céu; há brilho refletido da
+  luz principal. Espelho de objetos nas partes calmas, sem partículas do
+  passe separado. Perspectiva/keyframes seguem pendentes; Tauri não aberto.
+
 ## 11/10/2026 — Composição: câmeras salvas e posicionamento de efeitos
 
 - Pedido ampliado pelo dono: posicionar efeitos, posicionar câmeras na

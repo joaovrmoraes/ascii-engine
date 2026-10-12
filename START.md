@@ -286,8 +286,8 @@ básica, mas não todos os recursos das fases abaixo.
 com referência na Unity: hierarquia à esquerda, cena no centro, inspetor
 à direita e biblioteca embaixo. Objetos entram por arrastar e soltar ou
 clique seguido de posicionamento. W/E/R controlam mover/girar/escalar
-pelos eixos, com coordenadas locais/globais e encaixe; Alt + arraste gira
-a câmera; botão direito desloca o mapa acompanhando o mouse. Terreno e
+pelos eixos, com coordenadas locais/globais e encaixe; Orbitar (O) ou
+Alt + arraste gira e inclina a câmera; botão direito desloca o mapa acompanhando o mouse. Terreno e
 ambiente possuem abas próprias. Hierarquia, Inspetor e Projeto podem ser
 movidos, redimensionados, destacados e encaixados nas bordas. A disposição
 fica em localStorage, separada do documento, e pode ser restaurada.
@@ -310,9 +310,20 @@ respeita o offset XYZ, assim como partículas e rastros. A posição salva
 entra na receita e é respeitada ao colocar o efeito no mapa.
 Linha do tempo e curvas gráficas ficam pendentes.
 
+**Dinâmica da água:** `world/waterDynamics.ts` integra fluxo gravitacional,
+profundidade e impulsos numa grade de água rasa. `waters[].physics` salva
+lâmina, resistência, nascente e ondas. A malha, a corrente e a espuma seguem
+essa simulação; objetos/atores em movimento provocam ondas. A grade é
+limitada à máscara, sem fluido volumétrico ou corpos rígidos flutuantes.
+O espelho planar fica nas partes calmas, e o brilho de luz segue a direção
+da iluminação e da câmera. `water.disturb`/MCP `water_disturb` são impulsos
+transitórios; o documento guarda a receita, não o instante simulado.
+
 **Câmeras de composição:** `SceneDoc.cameras` contém poses nomeadas,
 rotação XYZ em radianos, tamanho ortográfico e proporção; `activeCamera`
-escolhe o enquadramento inicial do player/exportação. `applySceneCamera`
+escolhe o enquadramento de Prévia, player e exportação. Selecionar uma
+câmera abre uma miniatura ao vivo, renderizada no mesmo contexto sem
+avançar a simulação uma segunda vez. `applySceneCamera`
 aplica essa pose sem depender do editor. No editor, câmeras aparecem na
 hierarquia e em uma cena auxiliar com ícone, volume de visão e gizmo;
 esses auxiliares não entram no mundo ASCII. É possível criar da vista
@@ -321,9 +332,9 @@ câmera com a proporção preservada. A navegação do editor é independente.
 Projeção em perspectiva ainda não faz parte desse contrato.
 
 **Água e colocação:** um pincel de água desenha máscaras contínuas, com
-modo plano ou seguindo relevo. Malha e ondulação seguem a encosta; não é
-simulação física de fluidos. Reflexos visíveis são atualizados por nível,
-compartilhados em águas coplanares; encostas usam aproximação planar local.
+modo plano ou seguindo relevo. A dinâmica superficial está descrita acima.
+Reflexos de objetos são compartilhados em águas coplanares; o espelho
+horizontal não é aplicado às faces íngremes.
 A colocação mostra o prefab real e permite usar gizmo antes de confirmar.
 
 **API/MCP de autoria:** `packages/authoring` aplica comandos atômicos em

@@ -57,7 +57,8 @@ locais do Tauri. API HTTP não habilita CORS para sites externos.
 | `scene_preview` | `accept` grava a prévia; `cancel` restaura a cena anterior. |
 | `scene_history` | `undo`/`redo` no mesmo histórico usado pela interface. |
 | `object_inspect` | Documento do objeto, partes, opções ASCII e clipes de animação. |
-| `editor_view` | Foco XYZ, ângulo, zoom, pausa e tela do Estúdio. |
+| `editor_view` | Foco XYZ, ângulo horizontal, `elevation` em radianos (0,02–π/2−0,01), zoom, pausa, câmera salva e tela do Estúdio. |
+| `water_disturb` | Impulso transitório: `index`, `x`, `z`, `strength` (−1–1) e `radius` (0,05–8 m). Não altera revisão/histórico. |
 | `editor_capture` | Retorna imagem PNG da cena renderizada como conteúdo de imagem MCP. |
 | `assets_import` | Importa GLB ou GLTF e acompanhantes de caminhos locais explícitos. |
 | `scene_open` | Abre documento visual local, com prévia ou aplicação direta. |
@@ -200,6 +201,26 @@ await api.request({
 O pacote `@ascii-engine/authoring` também exporta `applyCommands(doc, batch)`
 para gerar/validar documentos sem editor nem GPU. Prefabs do catálogo e
 decodificação de modelos são verificados pelo editor ao materializar a cena.
+
+## Física superficial da água
+
+`water.update` aceita `patch.physics`, por exemplo:
+
+```json
+{"op":"water.update","index":0,"patch":{"physics":{"enabled":true,"depth":0.08,"gravity":9.81,"damping":2,"source":0.04,"waves":0.012}}}
+```
+
+Os valores são metros/segundos; `source` repõe profundidade nas extremidades
+altas. Zero fecha a nascente. A simulação conserva volume sem fonte e
+produz ondas com movimento de objetos ou atores. Use `water_disturb` para
+injetar um impacto, com `editor_view.paused: false` para propagá-lo. Na API
+HTTP, o método correspondente é `water.disturb`.
+
+A grade de simulação tem no máximo 129 × 129 células e fica dentro da
+máscara. Não inclui fluido volumétrico, expansão da margem, cortina de
+cachoeira livre, respingos balísticos nem flutuação rígida. Reflexos de
+objetos são planares nas partes calmas; o luar nas encostas segue as
+normais, a câmera e `style.moon`. Estado transitório não entra no arquivo.
 
 ## Limites e validação
 

@@ -54,7 +54,8 @@ export const requestSchema = z.discriminatedUnion('method', [
   z.object({ method: z.literal('history.redo'), revision: z.number().int().nonnegative() }).strict(),
   z.object({ method: z.literal('assets.import'), revision: z.number().int().nonnegative(), files: z.array(z.object({ name: z.string().min(1), data: z.string().describe('Bytes em base64'), mime: z.string().optional() }).strict()).min(1).max(100), preview: z.boolean().default(true) }).strict(),
   z.object({ method: z.literal('object.inspect'), id: key }).strict(),
-  z.object({ method: z.literal('editor.view'), focus: vec3.optional(), angle: z.number().optional(), zoom: z.number().min(.18).max(4).optional(), paused: z.boolean().optional(), studio: z.enum(['scene', 'effects', 'atmosphere']).optional(), cameraId: key.nullable().optional() }).strict(),
+  z.object({ method: z.literal('editor.view'), focus: vec3.optional(), angle: z.number().optional(), elevation: z.number().min(.02).max(Math.PI/2-.01).optional(), zoom: z.number().min(.18).max(4).optional(), paused: z.boolean().optional(), studio: z.enum(['scene', 'effects', 'atmosphere']).optional(), cameraId: key.nullable().optional() }).strict(),
+  z.object({ method: z.literal('water.disturb'), index: z.number().int().nonnegative(), x: coordinate, z: coordinate, strength: z.number().min(-1).max(1).default(.18), radius: z.number().min(.05).max(8).default(.6) }).strict(),
   z.object({ method: z.literal('editor.capture') }).strict(),
 ])
 export type AuthoringRequest = z.infer<typeof requestSchema>

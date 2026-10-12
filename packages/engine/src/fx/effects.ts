@@ -141,7 +141,7 @@ const right = new THREE.Vector3(), up = new THREE.Vector3(), toward = new THREE.
  */
 export function createEffectSystem(cloud: GlyphCloud, scene: THREE.Object3D, options: { budget?: number } = {}) {
   const library = new Map<string, EffectDef>()
-  const playing: (EffectInstance & { emitterCount: number; tick(dt: number, time: number, camera: THREE.Camera): void; dispose(): void })[] = []
+  const playing: (EffectInstance & { emitterCount: number; tick(dt: number, time: number, camera: THREE.Camera, redraw?: boolean): void; dispose(): void })[] = []
   const budget = options.budget ?? 6000
   let seed = 4242
   const random = () => { seed = (Math.imul(seed, 1664525) + 1013904223) >>> 0; return seed / 4294967296 }
@@ -175,9 +175,9 @@ export function createEffectSystem(cloud: GlyphCloud, scene: THREE.Object3D, opt
         instance.dispose()
       },
       dispose() { if (light) { light.removeFromParent(); light.dispose() } },
-      tick(dt: number, time: number, camera: THREE.Camera) {
-        t += dt
-        if (t > def.duration) { if (loop && !stopped) { t -= def.duration; for (const e of emitters) e.burstsDone = 0 } else stopped = true }
+      tick(dt: number, time: number, camera: THREE.Camera, redraw = false) {
+        if (!redraw) t += dt
+        if (!redraw && t > def.duration) { if (loop && !stopped) { t -= def.duration; for (const e of emitters) e.burstsDone = 0 } else stopped = true }
         if (target) target.getWorldPosition(position)
         origin.copy(position)
         right.setFromMatrixColumn(camera.matrixWorld, 0); up.setFromMatrixColumn(camera.matrixWorld, 1)
@@ -188,7 +188,7 @@ export function createEffectSystem(cloud: GlyphCloud, scene: THREE.Object3D, opt
           light.intensity = stopped ? 0 : def.light.intensity * fade * flicker
           light.position.copy(origin).add(tmp.set(...(def.light.offset ?? [0, 1, 0])))
         }
-        for (const state of emitters) emit(state, dt, time, camera)
+        for (const state of emitters) emit(state, dt, time, camera, redraw)
       },
     }
     function spawn(state: EmitterState) {
@@ -240,7 +240,7 @@ export function createEffectSystem(cloud: GlyphCloud, scene: THREE.Object3D, opt
       const alpha = isCurve(e.alpha) ? sampleCurve(e.alpha, life) : e.alpha ?? 1
       return { glyph, size, color: [color[0] * glow, color[1] * glow, color[2] * glow] as RGB, alpha }
     }
-    function emit(state: EmitterState, dt: number, time: number, camera: THREE.Camera) {
+    function emit(state: EmitterState, dt: number, time: number, camera: THREE.Camera, redraw: boolean) {
       const e = state.def, start = e.start ?? 0, end = start + (e.duration ?? def.duration)
       const active = !stopped && t >= start && t <= end
       const render = e.render ?? 'particle'
@@ -248,17 +248,17 @@ export function createEffectSystem(cloud: GlyphCloud, scene: THREE.Object3D, opt
       if (render === 'heat') { if (active) heatGrid(e, time, camera); return }
       if (render === 'beam') { if (active) beam(e, time); return }
       if (render === 'flipbook') { if (active) flipbook(e, t - start); return }
-      if (render === 'ribbon') { ribbon(state, e, active); return }
-      if (active) {
+      if (render === 'ribbon') { ribbon(state, e, active, !redraw); return }
+      if (active && !redraw) {
         if (e.rate) { state.carry += e.rate * dt; while (state.carry >= 1) { state.carry--; spawn(state) } }
         if (e.bursts) while (state.burstsDone < e.bursts.length && t - start >= e.bursts[state.burstsDone].at) { for (let i = 0; i < e.bursts[state.burstsDone].count; i++) spawn(state); state.burstsDone++ }
       }
       const gravity = e.gravity ?? 0, drag = e.drag ?? 0, noise = e.noise ?? 0, attract = e.attract ?? 0, spin = e.spin ?? 0
       for (let i = state.letters.length - 1; i >= 0; i--) {
         const p = state.letters[i]
-        p.age += dt
-        if (p.age >= p.life) { state.letters.splice(i, 1); live--; continue }
-        if (!p.settled) {
+        if (!redraw) p.age += dt
+        if (!redraw && p.age >= p.life) { state.letters.splice(i, 1); live--; continue }
+        if (!p.settled && !redraw) {
           p.vy -= gravity * dt
           if (noise) { p.vx += (random() - .5) * noise * dt; p.vy += (random() - .5) * noise * dt; p.vz += (random() - .5) * noise * dt }
           if (attract) { tmp.set(origin.x - p.x, origin.y - p.y, origin.z - p.z); const d = Math.max(.1, tmp.length()); p.vx += tmp.x / d * attract * dt; p.vy += tmp.y / d * attract * dt; p.vz += tmp.z / d * attract * dt }
@@ -299,11 +299,11 @@ export function createEffectSystem(cloud: GlyphCloud, scene: THREE.Object3D, opt
         cloud.push(origin.x + ox + tx * k + jx, origin.y + oy + ty * k, origin.z + oz + tz * k + jz, l.size, glyph, l.color, l.alpha)
       }
     }
-    function ribbon(state: EmitterState, e: EmitterDef, active: boolean) {
+    function ribbon(state: EmitterState, e: EmitterDef, active: boolean, advance: boolean) {
       const spec = e.ribbon ?? { length: 2, spacing: .15 }
       const last = state.trail[0]
-      if (active && (!last || last.distanceTo(origin) >= spec.spacing)) state.trail.unshift(origin.clone())
-      if (!active && state.trail.length) state.trail.pop()
+      if (advance && active && (!last || last.distanceTo(origin) >= spec.spacing)) state.trail.unshift(origin.clone())
+      if (advance && !active && state.trail.length) state.trail.pop()
       while (state.trail.length * spec.spacing > spec.length) state.trail.pop()
       state.trail.forEach((p, i) => {
         const l = look(e, i / Math.max(1, state.trail.length - 1), .5)
@@ -359,11 +359,11 @@ export function createEffectSystem(cloud: GlyphCloud, scene: THREE.Object3D, opt
     get stats() { return { letters: live, effects: playing.length, emitters: playing.reduce((n, p) => n + p.emitterCount, 0), budget } },
     get playing() { return playing as readonly EffectInstance[] },
     /** Advances every effect and pushes its letters; call between `cloud.clear()` and the render. */
-    update(dt: number, time: number, camera: THREE.Camera) {
+    update(dt: number, time: number, camera: THREE.Camera, redraw = false) {
       for (let i = playing.length - 1; i >= 0; i--) {
         const p = playing[i]
-        p.tick(dt, time, camera)
-        if (p.done) { live -= p.letters; p.dispose(); playing.splice(i, 1) }
+        p.tick(dt, time, camera, redraw)
+        if (!redraw && p.done) { live -= p.letters; p.dispose(); playing.splice(i, 1) }
       }
     },
     stopAll() { for (const p of playing) p.stop() },

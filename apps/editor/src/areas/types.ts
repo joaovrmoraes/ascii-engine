@@ -29,13 +29,14 @@ export interface Area {
   importFiles?(files: File[]): Promise<void>
   select?(object?: THREE.Object3D): void
   changed?(): void
-  pan?(x: number, z: number): void
+  pan?(x: number, z: number, y?: number): void
   document?(): import('@ascii-engine/core').SceneDoc
   openDocument?(doc: unknown): Promise<void>
   authoring?: import('../api/types').AuthoringEditor
   navigation?(event: PointerEvent): 'pan' | 'orbit' | false
   blocksSelection?(): boolean
   renderOverlay?(): void
+  renderCameraPreview?(): void
   cameraView?(): import('@ascii-engine/core').SceneCamera | undefined
   renderPreview?(dt: number): boolean
   capturePreview?(): string | undefined

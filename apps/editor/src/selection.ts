@@ -14,6 +14,7 @@ const LABELS: Record<string, string> = { surface: 'Letras na superfície', body:
 export function createSelection(engine: AsciiEngine, canvas: HTMLCanvasElement, root: HTMLElement, callbacks: { select?: (object?: THREE.Object3D) => void; changed?: () => void; blocked?: () => boolean; objectFirst?: boolean } = {}) {
   let selected: Omit<NonNullable<ReturnType<AsciiEngine['pick']>>, 'node'> & { node: THREE.Object3D; level: 'part' | 'object' } | undefined
   const box = new THREE.Box3Helper(new THREE.Box3(), 0xd3b27c)
+  box.userData.editorOnly = true
   box.visible = false; engine.particleScene.add(box)
   root.innerHTML = `
     <strong>Aparência ASCII</strong><div data-k="what">clique numa parte da cena</div>

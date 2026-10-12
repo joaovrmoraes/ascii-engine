@@ -37,6 +37,7 @@ export function createWorkspace() {
     <div id="scene-toolbar">
       <div class="scene-tab"><span class="active">${icon('cube')} Cena</span><span class="scene-description">Vista do editor</span></div>
       <div class="scene-tools" role="toolbar" aria-label="Ferramentas da cena">
+        <button data-mode="orbit" title="Orbitar em 3D (O): arraste na cena">${icon('rotate')}<span>Orbitar</span></button>
         <button data-mode="hand" title="Navegar (Q)">${icon('hand')}<span>Q</span></button>
         <button data-mode="translate" title="Mover (W)">${icon('move')}<span>W</span></button>
         <button data-mode="rotate" title="Girar (E)">${icon('rotate')}<span>E</span></button>
@@ -45,6 +46,7 @@ export function createWorkspace() {
         <select data-k="space" aria-label="Espaço das transformações"><option value="world">Global</option><option value="local">Local</option></select>
         <button data-k="snap" aria-pressed="false" title="Encaixe: 0,5 m / 15° / escala 0,1">${icon('grid')} Encaixar</button>
         <button data-k="frame" title="Focar seleção (F)">${icon('focus')}</button>
+        <button data-k="reset-view" title="Restaurar ângulo isométrico">Isométrica</button>
         <button data-k="view" class="view-action">Exibição ▾</button>
       </div>
     </div>

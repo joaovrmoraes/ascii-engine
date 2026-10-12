@@ -172,6 +172,11 @@ export function parseScene(input: unknown, library?: PrefabLibrary): SceneDoc {
       values.forEach((value, j) => number(value, `waters[${i}].shape.mask.values[${j}]`, -1e6, 1e6))
     }
     if (w.level !== undefined) number(w.level, `waters[${i}].level`)
+    if (w.physics !== undefined) {
+      const physics = record(w.physics, `waters[${i}].physics`)
+      if (physics.enabled !== undefined && typeof physics.enabled !== 'boolean') fail('physics.enabled', 'deve ser booleano')
+      for (const [key,min,max] of [['depth',.005,5],['gravity',.1,30],['damping',0,20],['source',0,5],['waves',0,.3]] as const) if (physics[key] !== undefined) number(physics[key], `waters[${i}].physics.${key}`, min, max)
+    }
     if (w.look !== undefined) {
       const look = record(w.look, `waters[${i}].look`)
       for (const [k, value] of Object.entries(look)) {

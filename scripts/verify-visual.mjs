@@ -33,7 +33,7 @@ try {
     if (response.exceptionDetails) throw new Error(response.exceptionDetails.exception?.description ?? response.exceptionDetails.text)
     return response.result?.value
   }
-  const until = async expression => { for (let i = 0; i < 150; i++) { if (await evaluate(expression)) return; await sleep(100) }; throw new Error(`Timed out: ${expression}`) }
+  const until = async expression => { for (let i = 0; i < 150; i++) { try { if (await evaluate(expression)) return } catch(error) { if(!/Inspected target navigated|Execution context was destroyed|Cannot find context/.test(error.message)) throw error }; await sleep(100) }; throw new Error(`Timed out: ${expression}`) }
   const action = async expression => { await evaluate(`(async () => { ${expression} })()`); await until('window.area && !area.state.includes("abrindo")'); await sleep(200) }
   const check = async (title, expression) => { if (!await evaluate(expression)) throw new Error(`FAIL: ${title}`); console.log(`PASS ${title}`) }
   const shot = async name => { await sleep(500); const result = await send('Page.captureScreenshot', { format: 'png' }); await writeFile(join(output, name + '.png'), Buffer.from(result.data, 'base64')) }

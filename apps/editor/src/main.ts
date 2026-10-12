@@ -68,18 +68,19 @@ const area = await Promise.resolve().then(() => entry.create(engine, { screen: m
 })
 const view = {
   angle: Number(params.get('angle') ?? 0), zoom: Number(params.get('zoom') ?? game?.zoom ?? (area.id === 'sandbox' && !player ? .8 : .9)),
+  elevation: THREE.MathUtils.clamp(Number(params.get('elevation') ?? Math.atan2(18, 15)), .02, Math.PI / 2 - .01),
   paused: false, pauseAt: params.has('pause') ? Number(params.get('pause')) : Infinity,
 }
 if (params.has('cell')) engine.setStyle({ cellSize: Number(params.get('cell')) })
 if (params.has('light')) engine.setStyle({ brightness: Number(params.get('light')) })
 
-let drag = 0, dragX = 0, dragging = false, panning = false, lastX = 0, lastY = 0
+let dragging = false, panning = false, lastX = 0, lastY = 0
 const panDelta = new THREE.Vector3(), panUp = new THREE.Vector3(), panForward = new THREE.Vector3()
 canvas.addEventListener('contextmenu', e => e.preventDefault())
 canvas.addEventListener('pointerdown', (e) => {
   const navigation = area.navigation ? area.navigation(e) : (e.button !== 0 || e.shiftKey ? 'pan' : 'orbit')
-  if (!navigation) return
-  dragging = true; panning = navigation === 'pan'; lastX = e.clientX; lastY = e.clientY; dragX = e.clientX - drag / .006; canvas.setPointerCapture(e.pointerId)
+  if (!navigation || area.cameraView?.()) return
+  dragging = true; panning = navigation === 'pan'; lastX = e.clientX; lastY = e.clientY; canvas.setPointerCapture(e.pointerId)
 })
 canvas.addEventListener('pointermove', (e) => {
   if (!dragging) return
@@ -93,15 +94,19 @@ canvas.addEventListener('pointermove', (e) => {
     // Project screen movement onto the ground, keeping the grabbed point
     // under the pointer regardless of the camera's angle or zoom.
     camera.getWorldDirection(panForward)
-    if (Math.abs(panForward.y) > 1e-6) {
+    if (Math.abs(panForward.y) > .15) {
       panDelta.addScaledVector(panForward, -panDelta.y / panForward.y)
       area.pan(panDelta.x, panDelta.z)
-    }
-    lastX = e.clientX; lastY = e.clientY
-  } else drag = (e.clientX - dragX) * .006
+    } else area.pan(panDelta.x, panDelta.z, panDelta.y)
+  } else {
+    view.angle += (e.clientX - lastX) * .006
+    view.elevation = THREE.MathUtils.clamp(view.elevation + (e.clientY - lastY) * .006, .02, Math.PI / 2 - .01)
+  }
+  lastX = e.clientX; lastY = e.clientY
 })
 canvas.addEventListener('pointerup', () => { dragging = false })
 canvas.addEventListener('pointercancel', () => { dragging = false })
+canvas.addEventListener('editor-view-reset', () => { view.angle = 0; view.elevation = Math.atan2(18, 15) })
 canvas.addEventListener('wheel', (e) => { e.preventDefault(); if (area.cameraView?.()) return; view.zoom = THREE.MathUtils.clamp(view.zoom * Math.exp(-e.deltaY * .001), area.id === 'sandbox' ? .18 : .75, area.id === 'sandbox' ? 4 : 1.5) }, { passive: false })
 
 const imported: GlyphModel[] = []
@@ -136,7 +141,6 @@ function compositionCamera() {
   return false
 }
 function frame(now: number) {
-  requestAnimationFrame(frame)
   if (document.hidden) { last = now; return }
   const real = last ? (now - last) / 1000 : 0; last = now
   if (area.renderPreview?.(Math.max(0, real))) {
@@ -147,9 +151,10 @@ function frame(now: number) {
   if (engine.time + dt > view.pauseAt) dt = Math.max(0, view.pauseAt - engine.time)
   const composed = compositionCamera()
   const { width, height } = engine.size
-  angle += (Math.PI / 7 + view.angle + drag - angle) * (1 - Math.exp(-6 * Math.min(real, .1)))
+  angle = Math.PI / 7 + view.angle
   if (dt > 0) { area.update(engine.time + dt, dt); for (const model of imported) model.update(dt) }
-  if (!composed) engine.frame(area.focus(angle, focus), pomorogSpan(height, width / height, view.zoom), angle)
+  if (!composed) engine.frame(area.focus(angle, focus), pomorogSpan(height, width / height, view.zoom), angle, view.elevation)
+  area.renderCameraPreview?.()
   selection.refresh()
   engine.render(dt)
   area.renderOverlay?.()
@@ -159,7 +164,14 @@ function frame(now: number) {
   if (!player) status.textContent = `ascii-engine ${ENGINE_VERSION} · ${area.title}${mode !== 'letters' ? ` (${mode})` : ''} · ${fps} fps · ${area.state}${status.dataset.note ? ` · ${status.dataset.note}` : ''}`
   canvas.dataset.ready = 'true'; canvas.dataset.state = area.state; canvas.dataset.fps = String(fps)
 }
-requestAnimationFrame(frame)
+// Embedded webviews can stay visible while their compositor suspends rAF.
+// Keep interaction/preview alive at 20 fps there; stop the fallback as soon as
+// native animation frames return, and never animate a hidden document.
+let lastAnimationFrame = performance.now()
+function animationFrame(now: number) { lastAnimationFrame = now; frame(now); requestAnimationFrame(animationFrame) }
+requestAnimationFrame(animationFrame)
+const frameFallback = setInterval(() => { const now = performance.now(); if (!document.hidden && now - lastAnimationFrame > 150) frame(now) }, 50)
+addEventListener('pagehide', () => clearInterval(frameFallback), { once: true })
 function download(url: string) {
   const a = document.createElement('a'); a.href = url; a.download = `${area.id}-${Date.now()}.png`; a.click()
 }
@@ -171,9 +183,10 @@ if (!player) {
     if (preview) return preview
     // A tool capture must work even when the host suspends animation frames.
     const composed = compositionCamera()
-    const captureAngle = Math.PI / 7 + view.angle + drag, { width, height } = engine.size
+    const captureAngle = Math.PI / 7 + view.angle, { width, height } = engine.size
     area.update(engine.time, 0)
-    if (!composed) engine.frame(area.focus(captureAngle, focus), pomorogSpan(height, width / height, view.zoom), captureAngle)
+    if (!composed) engine.frame(area.focus(captureAngle, focus), pomorogSpan(height, width / height, view.zoom), captureAngle, view.elevation)
+    area.renderCameraPreview?.()
     engine.render(0); area.renderOverlay?.()
     return canvas.toDataURL('image/png').split(',')[1]
   })
