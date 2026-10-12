@@ -1,6 +1,6 @@
 import React from 'react';
 import {AbsoluteFill, Easing, Freeze, Img, OffthreadVideo, Sequence, interpolate, staticFile, useCurrentFrame} from 'remotion';
-import {CARD, Chapter, COLOR_FILTER, FPS, INTRO, OUTRO, bodyFrames, chapterFrames, chapters} from './edit';
+import {CARD, Chapter, COLOR_FILTER, FPS, INTRO, OUTRO, SCENE_TITLE, SCENE_LINES, bodyFrames, chapterFrames, chapters} from './edit';
 
 const ink = '#edf0e6';
 const muted = '#a7ada6';
@@ -35,7 +35,7 @@ const Card: React.FC<{chapter: Chapter; index: number}> = ({chapter, index}) => 
       <div style={{fontSize: 36, color: muted, marginTop: 30}}>{chapter.subtitle}</div>
       <div style={{height: 4, width: 130 * motion(f, 6, 26), background: chapter.color, marginTop: 58}}/>
     </div>
-    <div style={{position: 'absolute', bottom: 100, left: 160, ...mono, fontSize: 22, color: muted}}>LAGO DAS BRASAS  /  COMPOSIÇÃO 3D EM ASCII</div>
+    <div style={{position: 'absolute', bottom: 100, left: 160, ...mono, fontSize: 22, color: muted}}>{SCENE_TITLE.toUpperCase()}  /  COMPOSIÇÃO 3D EM ASCII</div>
   </AbsoluteFill>;
 };
 
@@ -90,7 +90,7 @@ export const Bookend: React.FC<{outro?: boolean}> = ({outro = false}) => {
     <div style={{position: 'absolute', top: 72, left: 96}}><Brand/></div>
     <div style={{position: 'absolute', left: 125, top: 450, opacity: enter, transform: `translateY(${(1-enter)*28}px)`}}>
       <div style={{...mono, color:'#b8d591', fontSize:25, letterSpacing:5}}>{outro ? 'MAPA SALVO · CENA EXPORTADA' : 'UMA CENA, DO INÍCIO AO FIM'}</div>
-      <div style={{fontSize: 112, fontWeight: 700, letterSpacing: -5, lineHeight: 1.07, marginTop: 36}}>Lago das<br/>Brasas<span style={{color: '#b8d591'}}>.</span></div>
+      <div style={{fontSize: 112, fontWeight: 700, letterSpacing: -5, lineHeight: 1.07, marginTop: 36}}>{SCENE_LINES[0]}<br/>{SCENE_LINES[1]}<span style={{color: '#b8d591'}}>.</span></div>
       <div style={{fontSize: 33, color: muted, marginTop: 40, maxWidth: 800, lineHeight: 1.5, whiteSpace: 'pre-line'}}>{outro ? 'Terreno, água, efeitos e atmosfera.\nTudo no mesmo projeto.' : 'Da primeira pincelada ao enquadramento final.'}</div>
     </div>
     <div style={{position: 'absolute', left: 125, bottom: 95, ...mono, color: muted, fontSize: 21}}>COMPOSIÇÃO 3D EM LETRAS  /  {outro ? 'ASCII ENGINE' : '06 PARTES'}</div>

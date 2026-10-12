@@ -3,10 +3,10 @@ import {getCompositions, openBrowser, renderMedia, renderStill} from '@remotion/
 import {mkdir, writeFile} from 'node:fs/promises';
 import path from 'node:path';
 import {fileURLToPath} from 'node:url';
-import {chapters, bodyFrames, CARD, FPS} from '../src/edit.ts';
+import {chapters, bodyFrames, CARD, FPS, SOURCE_DIRECTORY} from '../src/edit.ts';
 
 const project = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
-const output = path.resolve(process.env.ASCII_VIDEO_OUTPUT ?? '/home/jonny/Videos/ASCII-Engine-2026-10-11/edicao');
+const output = path.resolve(process.env.ASCII_VIDEO_OUTPUT ?? path.join(SOURCE_DIRECTORY, 'edicao'));
 const cache = path.join(project, '.cache');
 await mkdir(cache, {recursive: true});
 // Não usar o tmpfs do desktop para a sequência de quadros do Remotion.

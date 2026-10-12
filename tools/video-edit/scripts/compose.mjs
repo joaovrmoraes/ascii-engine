@@ -2,10 +2,10 @@ import {spawnSync} from 'node:child_process';
 import {mkdirSync, writeFileSync} from 'node:fs';
 import {fileURLToPath} from 'node:url';
 import path from 'node:path';
-import {chapters, bodyFrames, FPS} from '../src/edit.ts';
+import {chapters, bodyFrames, FPS, SOURCE_DIRECTORY, SATURATION} from '../src/edit.ts';
 
 const project = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
-const output = path.resolve(process.env.ASCII_VIDEO_OUTPUT ?? '/home/jonny/Videos/ASCII-Engine-2026-10-11/edicao');
+const output = path.resolve(process.env.ASCII_VIDEO_OUTPUT ?? path.join(SOURCE_DIRECTORY, 'edicao'));
 const intermediate = path.join(output, 'masters');
 mkdirSync(intermediate, {recursive: true});
 const ffmpeg = args => {
@@ -19,7 +19,7 @@ for (const chapter of chapters) {
   for (const j of chapter.notes.keys()) args.push('-i',path.join(output,'previas',`${chapter.id}-faixa-${j}.png`));
   // Matriz RGB de saturação preserva luminância, como o filtro CSS do Remotion.
   // Entrar/sair explicitamente de BT.709 evita a interpretação implícita de YUV.
-  const color = 'scale=in_color_matrix=bt709:out_range=pc,format=gbrp,colorchannelmixer=rr=1.31496:rg=-0.28608:rb=-0.02888:gr=-0.08504:gg=1.11392:gb=-0.02888:br=-0.08504:bg=-0.28608:bb=1.37112,scale=out_color_matrix=bt709:out_range=tv,format=yuv444p';
+  const color = SATURATION === 1 ? 'format=yuv444p' : 'scale=in_color_matrix=bt709:out_range=pc,format=gbrp,colorchannelmixer=rr=1.31496:rg=-0.28608:rb=-0.02888:gr=-0.08504:gg=1.11392:gb=-0.02888:br=-0.08504:bg=-0.28608:bb=1.37112,scale=out_color_matrix=bt709:out_range=tv,format=yuv444p';
   const graph = [`[0:v]setpts=(PTS-STARTPTS)/${chapter.speed},fps=${FPS},${color},pad=2560:1440:0:180:color=0x0b0e0d,tpad=stop_mode=clone:stop_duration=1,trim=end_frame=${frames+12},setpts=PTS-STARTPTS[v0]`];
   chapter.notes.forEach((note,j) => {
     const start = Math.max(0,(note.at-chapter.start)/chapter.speed);

@@ -1,5 +1,36 @@
 # Registro de trabalho
 
+## 12/10/2026 — Regravação próxima: Margem Viva
+
+- Pedido: refazer a sessão com a câmera mais perto para perceber vento na
+  grama e o movimento da água/efeitos. Mantida a edição Remotion em seis partes.
+- Nova composição **Margem Viva**, feita pelos controles visíveis do editor:
+  terreno, lago e caminho, objetos, efeito **Brasa Viva** com camadas/luz,
+  atmosfera **Luar da Margem Viva**, câmera, salvar e exportar.
+- Zoom 1,0–1,9, deslocando a vista para a área de trabalho. Vista baixa da
+  grama e pausas de 9 s no vento/fogo/água; Prévia final por 14 s. Altura da
+  câmera final reduzida de 15 m para **6,5 m**.
+- OBS nativo em espaço separado, captura PipeWire da janela, 2560×1080/30 fps.
+  Fonte **I444/Rec.709** desde a gravação, x264 CRF 16, zero quadros perdidos.
+  Master preserva 4:4:4; nova edição sem compensação de saturação. Versão
+  compatível 4:2:0 ainda pode perder cor nos traços finos.
+- Filmagem original de cerca de 7min34; edição de 13149 quadros, **7min18,3**,
+  2560×1440. Água, grama, fogo e câmera ficam em velocidade normal; demais
+  etapas 1,15×–1,30×. Timeline antiga preservada em
+  `tools/video-edit/src/editions/lago-das-brasas.ts`.
+- Arquivos em `/home/jonny/Videos/ASCII-Engine-Closeup-2026-10-11/`:
+  originais OBS, MP4 sem áudio, mapa editável, exportação e `edicao/`.
+- `parseScene` aceitou o mapa: 10 objetos, uma água, um efeito, uma atmosfera
+  e uma câmera inicial. Quatro trechos do vídeo (grama/fogo/água/prévia)
+  conferidos com 90 quadros únicos por trecho, sem congelamento nos recortes.
+- `pnpm check`: **79 testes**, tipos e build passaram. Tipos do Remotion
+  passaram. [Capturas extraídas do vídeo e evidências](captures/regravacao-proxima-2026-10-11/README.md).
+- Filme completo e seis partes passaram na contagem exata de quadros e
+  decodificação integral; master 4:4:4 também decodificado sem erros.
+- Sem mudança na engine ou no mapa do dono aberto no Orca. Sem áudio/narração
+  e sem teste de importação no Pomorog. Captura feita no Chromium externo;
+  OBS/navegador encerrados normalmente e foco devolvido ao Orca.
+
 ## 11/10/2026 — Edição Remotion e diagnóstico de cor da gravação
 
 - Pedido: dividir a gravação em partes com Remotion e corrigir a cor desbotada.
