@@ -21,3 +21,21 @@ and advanced at 1920×1080 in the real Orca Browser, without video errors.
 [gallery-local.png](gallery-local.png): actual GPU Chromium/cdpshot capture.
 Orca's viewport screenshot timed out; its player checks used page evaluation.
 GitHub's Markdown rendering API returned seven GIF image tags.
+
+Public verification after publication:
+
+- [github-images.json](github-images.json): all seven GIFs loaded in the real
+  GitHub README. [github-readme.png](github-readme.png): its actual rendering.
+- [rendered-motion.json](rendered-motion.json): both local and GitHub screenshot
+  pairs changed after 500 ms, confirming visible animation.
+- [public-playback.json](public-playback.json): all six chapters advanced
+  without errors at 1920×1080 from the public Pages URL, checked in isolated
+  GPU Chromium with software video decoding. Initial hardware decode failed
+  in that headless environment; software playback passed all chapters.
+- [gallery-public.png](gallery-public.png): public page screenshot.
+- Pages build succeeded. HTML responds 200; MP4 responds video/mp4 and byte
+  range GET responds 206, allowing streaming/seeking.
+
+Orca verified image loading on GitHub and local player playback. Its public
+player check lost the runtime connection; public playback was verified in
+Chromium instead. No system browser settings were changed.

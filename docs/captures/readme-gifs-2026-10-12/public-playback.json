@@ -1,0 +1,48 @@
+{
+  "url": "https://joaovrmoraes.github.io/ascii-engine/watch.html",
+  "browser": "GPU Chromium",
+  "videos": [
+    {
+      "src": "showcase/videos/01-terrain.mp4",
+      "width": 1920,
+      "height": 1080,
+      "advanced": true,
+      "error": null
+    },
+    {
+      "src": "showcase/videos/02-water.mp4",
+      "width": 1920,
+      "height": 1080,
+      "advanced": true,
+      "error": null
+    },
+    {
+      "src": "showcase/videos/03-objects.mp4",
+      "width": 1920,
+      "height": 1080,
+      "advanced": true,
+      "error": null
+    },
+    {
+      "src": "showcase/videos/04-effects.mp4",
+      "width": 1920,
+      "height": 1080,
+      "advanced": true,
+      "error": null
+    },
+    {
+      "src": "showcase/videos/05-atmosphere.mp4",
+      "width": 1920,
+      "height": 1080,
+      "advanced": true,
+      "error": null
+    },
+    {
+      "src": "showcase/videos/06-camera.mp4",
+      "width": 1920,
+      "height": 1080,
+      "advanced": true,
+      "error": null
+    }
+  ]
+}

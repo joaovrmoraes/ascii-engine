@@ -22,6 +22,11 @@ from existing footage: animated opening plus one excerpt per feature.
 - Validated syntax, exact GIF frame counts, unique-frame hashes/full decoding,
   screenshots and browser loading. GitHub-rendered Markdown includes seven
   GIF images. Evidence: [readme-gifs captures](captures/readme-gifs-2026-10-12/README.md).
+- Publication verified: seven GIFs loaded in the actual GitHub README,
+  rendered screenshot pairs changed, Pages build succeeded, and all six full
+  videos played at 1920×1080 from the public URL. Streaming responds 206 for
+  byte-range GET. Public playback used isolated Chromium software decoding
+  after headless hardware decoding failed; no system settings changed.
 - Rendering/engine code, shaders, source footage, reference archive and
   comparison baselines unchanged. Prior 79-test validation remains applicable;
   verification here targets the new media and presentation paths.

@@ -1,0 +1,47 @@
+{
+  "images": [
+    {
+      "alt": "Living Shore: animated grass, water and fire made of letters",
+      "loaded": true,
+      "src": "/joaovrmoraes/ascii-engine/raw/main/docs/showcase/gifs/living-shore.gif",
+      "width": 720
+    },
+    {
+      "alt": "Terrain creation and sculpting",
+      "loaded": true,
+      "src": "/joaovrmoraes/ascii-engine/raw/main/docs/showcase/gifs/01-terrain.gif",
+      "width": 800
+    },
+    {
+      "alt": "Lake, paths and grass in the wind",
+      "loaded": true,
+      "src": "/joaovrmoraes/ascii-engine/raw/main/docs/showcase/gifs/02-water.gif",
+      "width": 800
+    },
+    {
+      "alt": "Composing with trees, rocks and ruins",
+      "loaded": true,
+      "src": "/joaovrmoraes/ascii-engine/raw/main/docs/showcase/gifs/03-objects.gif",
+      "width": 800
+    },
+    {
+      "alt": "Fire, particles and lighting",
+      "loaded": true,
+      "src": "/joaovrmoraes/ascii-engine/raw/main/docs/showcase/gifs/04-effects.gif",
+      "width": 800
+    },
+    {
+      "alt": "Lighting, moonlight and atmosphere",
+      "loaded": true,
+      "src": "/joaovrmoraes/ascii-engine/raw/main/docs/showcase/gifs/05-atmosphere.gif",
+      "width": 800
+    },
+    {
+      "alt": "Cameras, animated water and export",
+      "loaded": true,
+      "src": "/joaovrmoraes/ascii-engine/raw/main/docs/showcase/gifs/06-camera.gif",
+      "width": 800
+    }
+  ],
+  "url": "https://github.com/joaovrmoraes/ascii-engine"
+}
