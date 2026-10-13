@@ -1,5 +1,6 @@
 import * as THREE from 'three'
 import type { AsciiEngine, GlyphKind, GlyphStyle, SurfaceKind } from '@ascii-engine/core'
+import { SURFACE_CELL, SURFACE_ALPHABETS, BODY_RAMPS } from '@ascii-engine/core'
 
 /**
  * Part selection (§3.1, phase 4): a click selects the part under the cursor,
@@ -13,43 +14,94 @@ const LABELS: Record<string, string> = { surface: 'Surface glyphs', body: 'Glyph
 
 export function createSelection(engine: AsciiEngine, canvas: HTMLCanvasElement, root: HTMLElement, callbacks: { select?: (object?: THREE.Object3D) => void; changed?: () => void; blocked?: () => boolean; objectFirst?: boolean } = {}) {
   let selected: Omit<NonNullable<ReturnType<AsciiEngine['pick']>>, 'node'> & { node: THREE.Object3D; level: 'part' | 'object' } | undefined
+  const edited = new Set<keyof GlyphStyle>()
+  let inheritColor = true
   const box = new THREE.Box3Helper(new THREE.Box3(), 0xd3b27c)
   box.userData.editorOnly = true
   box.visible = false; engine.particleScene.add(box)
   root.innerHTML = `
     <strong>ASCII appearance</strong><div data-k="what">click a scene part</div>
     <label>part <select data-k="part"></select></label>
-    <label>Technique <select data-k="glyph">${KINDS.map((k) => `<option value="${k}">${LABELS[k]}</option>`).join('')}</select></label>
-    <label>Material <select data-k="surface"><option value="">Object default</option>${FAMILIES.map((k) => `<option value="${k}">${LABELS[k]}</option>`).join('')}</select></label>
-    <label>size <input data-k="size" type="number" min=".08" max=".5" step=".01" placeholder="(inherit)"></label>
+    <label>Technique <select data-k="glyph"><option value="">Mixed / inherit</option>${KINDS.map((k) => `<option value="${k}">${LABELS[k]}</option>`).join('')}</select></label>
+    <label>Glyph family <select data-k="surface"><option value="">Model default / mixed</option>${FAMILIES.map((k) => `<option value="${k}">${LABELS[k]}</option>`).join('')}</select></label>
+    <div data-k="letters" class="glyph-letters"></div>
+    <label>Size (m) <input data-k="size" type="number" min=".01" max="10" step=".01" placeholder="(inherit)"></label>
+    <label>Color <span class="glyph-color"><input data-k="color" type="color" aria-label="Glyph color"><button data-k="inherit-color" title="Use the original model color">Model color</button></span></label>
     <label>save to <select data-k="scope">
       <option value="instance">this instance</option>
       <option value="type">this part in every object of this type</option>
       <option value="global">global style</option>
     </select></label>
-    <button data-k="apply">Apply appearance</button>`
+    <button data-k="apply">Apply appearance</button>
+    <div data-k="help" class="glyph-help">Family changes the letters. Color changes their color.</div>`
   const el = <T extends HTMLElement>(k: string) => root.querySelector<T>(`[data-k="${k}"]`)!
   const what = el<HTMLDivElement>('what')
   root.hidden = true
 
+  function appearance(target: THREE.Object3D) {
+    const styles: GlyphStyle[] = []
+    target.traverse(node => {
+      if (node instanceof THREE.Mesh && node.userData.glyphResolved) styles.push(node.userData.glyphResolved as GlyphStyle)
+    })
+    if (!styles.length) styles.push(selected?.style ?? {})
+    const common: GlyphStyle = {}
+    for (const key of ['glyph', 'surface', 'size', 'color'] as const) {
+      const value = styles[0][key]
+      if (styles.every(style => style[key] === value)) Object.assign(common, { [key]: value })
+    }
+    return { common, mixedSize: styles.some(style => style.size !== styles[0].size) }
+  }
+
+  function hints() {
+    const glyph = el<HTMLSelectElement>('glyph').value
+    const family = el<HTMLSelectElement>('surface').value
+    const ramp = family === 'wood' ? 'bark' : family
+    el('letters').textContent = glyph === 'body' ? BODY_RAMPS[ramp as keyof typeof BODY_RAMPS] ?? BODY_RAMPS.actor : SURFACE_ALPHABETS[family || 'generic'] ?? ''
+    el<HTMLInputElement>('size').disabled = glyph === 'screen'
+    el('help').textContent = glyph === 'screen' ? 'Screen letter size is controlled by Display. Family changes the letters.' : 'Size is in world meters. Family changes the letters; Color changes their color.'
+  }
+
   function show() {
+    edited.clear()
     if (!selected) { box.visible = false; root.hidden = true; return }
     root.hidden = false
     const target = selected.level === 'part' ? selected.node : selected.object
     box.box.setFromObject(target); box.visible = true
-    const style = selected.style ?? {}
+    const { common: style, mixedSize } = appearance(target)
+    selected.style = style
     const parts = el<HTMLSelectElement>('part')
     parts.replaceChildren(new Option('Whole object', ''))
     const names = new Set<string>()
-    selected.object.traverse(node => { if (node !== selected!.object && node.name && !node.userData.glyphBodyLetters && !(node instanceof THREE.Points)) names.add(node.name) })
+    selected.object.traverse(node => {
+      if (node === selected!.object || !node.name || node instanceof THREE.Bone || node.userData.glyphBodyOf || node.userData.editorOnly) return
+      let containsMesh = false
+      node.traverse(child => { if (child instanceof THREE.Mesh) containsMesh = true })
+      if (containsMesh) names.add(node.name)
+    })
     names.forEach(name => parts.append(new Option(LABELS[name] ?? name, name)))
     parts.value = selected.level === 'part' ? selected.part ?? '' : ''
-    what.textContent = `${selected.type ? `type ${selected.type} · ` : ''}${selected.level === 'part' && selected.part ? `part "${selected.part}"` : `object "${selected.object.name || selected.object.type}"`}`
-    el<HTMLSelectElement>('glyph').value = style.glyph ?? 'surface'
+    what.textContent = selected.level === 'part' && selected.part ? `part "${selected.part}" · ${selected.object.name}` : `object "${selected.object.name || selected.object.type}"`
+    el<HTMLSelectElement>('glyph').value = style.glyph ?? ''
     el<HTMLSelectElement>('surface').value = style.surface ?? ''
     el<HTMLInputElement>('size').value = style.size ? String(style.size) : ''
+    const defaultSize = style.glyph === 'surface' ? SURFACE_CELL[style.surface ?? 'generic'] ?? .18 : style.surface && ['stone', 'foliage', 'snow', 'bark', 'wood'].includes(style.surface) ? .19 : .155
+    el<HTMLInputElement>('size').placeholder = mixedSize ? 'Mixed sizes' : `${defaultSize} (inherit)`
+    inheritColor = style.color === undefined
+    let modelColor = 0xffffff
+    target.traverse(node => {
+      if (!(node instanceof THREE.Mesh)) return
+      const material = node.userData.glyphBodyMaterial ?? node.userData.asciiOriginal ?? node.material
+      const first = [material].flat()[0]
+      if (first instanceof THREE.MeshStandardMaterial) modelColor = first.color.getHex()
+    })
+    el<HTMLInputElement>('color').value = '#' + (style.color ?? modelColor).toString(16).padStart(6, '0')
+    el<HTMLButtonElement>('inherit-color').disabled = inheritColor
     el<HTMLSelectElement>('scope').querySelector<HTMLOptionElement>('[value="type"]')!.disabled = !selected.type
+    hints()
   }
+  for (const key of ['glyph', 'surface', 'size'] as const) el<HTMLInputElement | HTMLSelectElement>(key).onchange = () => { edited.add(key); hints() }
+  el<HTMLInputElement>('color').onchange = () => { inheritColor = false; edited.add('color'); el<HTMLButtonElement>('inherit-color').disabled = false }
+  el<HTMLButtonElement>('inherit-color').onclick = () => { inheritColor = true; edited.add('color'); el<HTMLButtonElement>('inherit-color').disabled = true }
   el<HTMLSelectElement>('part').onchange = e => {
     if (!selected) return
     const name = (e.target as HTMLSelectElement).value
@@ -68,9 +120,14 @@ export function createSelection(engine: AsciiEngine, canvas: HTMLCanvasElement, 
     const rect = canvas.getBoundingClientRect()
     const hit = engine.pick((e.clientX - rect.left) / rect.width * 2 - 1, -((e.clientY - rect.top) / rect.height) * 2 + 1)
     if (!hit) { selected = undefined; show(); callbacks.select?.(); return }
-    // Second click on the same part climbs to the whole object.
-    const same = selected && selected.object === hit.object && (selected.part === hit.part)
-    selected = { ...hit, level: callbacks.objectFirst ? (same && selected!.level === 'object' && hit.part ? 'part' : 'object') : (same && selected!.level === 'part' || !hit.part ? 'object' : 'part') }
+    // Authoring selects the object first; the next click enters the hit part.
+    const sameObject = selected?.object === hit.object
+    const samePart = sameObject && selected?.part === hit.part
+    const level = callbacks.objectFirst
+      ? !sameObject || !hit.part || samePart && selected!.level === 'part' ? 'object' : 'part'
+      : samePart && selected!.level === 'part' || !hit.part ? 'object' : 'part'
+    const node = hit.part ? hit.object.getObjectByName(hit.part) ?? hit.node : hit.node
+    selected = { ...hit, node, level }
     show(); callbacks.select?.(hit.object)
   })
   canvas.addEventListener('scene-replaced', () => { selected = undefined; show() })
@@ -89,13 +146,16 @@ export function createSelection(engine: AsciiEngine, canvas: HTMLCanvasElement, 
     show(); if (!selected) callbacks.select?.()
   })
   el<HTMLButtonElement>('apply').onclick = () => {
-    if (!selected) return
-    const size = Number(el<HTMLInputElement>('size').value)
-    const style: GlyphStyle = {
-      glyph: el<HTMLSelectElement>('glyph').value as GlyphKind,
-      surface: (el<HTMLSelectElement>('surface').value || undefined) as SurfaceKind | undefined,
-      size: size > 0 ? size : undefined,
-    }
+    if (!selected || !edited.size) return
+    const sizeInput = el<HTMLInputElement>('size')
+    if (edited.has('size') && !sizeInput.reportValidity()) return
+    // Write only edited fields: changing the whole tree's size must preserve
+    // the crown's body technique and the trunk's surface technique.
+    const style: GlyphStyle = {}
+    if (edited.has('glyph')) style.glyph = (el<HTMLSelectElement>('glyph').value || undefined) as GlyphKind | undefined
+    if (edited.has('surface')) style.surface = (el<HTMLSelectElement>('surface').value || undefined) as SurfaceKind | undefined
+    if (edited.has('size') && !sizeInput.disabled) style.size = sizeInput.value ? Number(sizeInput.value) : undefined
+    if (edited.has('color')) style.color = inheritColor ? undefined : Number.parseInt(el<HTMLInputElement>('color').value.slice(1), 16)
     const part = selected.level === 'part' ? selected.part : undefined
     const scope = el<HTMLSelectElement>('scope').value
     if (scope === 'instance') part ? engine.setPartStyle(selected.object, part, style) : engine.setInstanceStyle(selected.object, style)

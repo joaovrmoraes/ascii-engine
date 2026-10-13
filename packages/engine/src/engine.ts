@@ -174,15 +174,16 @@ export function createAsciiEngine(canvas: HTMLCanvasElement, options: AsciiEngin
     const missing: string[] = []
     // The instance layer is the style fields only (not `type` and `parts`).
     const { type: _type, parts: _parts, ...instanceStyle } = instance
-    const visit = (node: THREE.Object3D, part: string | undefined, nodeStyle: GlyphStyle | undefined) => {
+    const visit = (node: THREE.Object3D, part: string | undefined, nodeStyle: GlyphStyle | undefined, defaults: GlyphStyle | undefined) => {
       if (node.userData.glyphBodyOf) return
       // An object added on its own keeps its own styles (a tree inside a chunk).
       if (node !== object && entries.has(node)) return
       if (node.name && partNames.has(node.name)) part = node.name
       const own = nodeGlyphStyle(node.userData)
-      if (own && node !== object) nodeStyle = { ...nodeStyle, ...own }
+      if (own && node.userData.glyphDefault) defaults = { ...defaults, ...own }
+      else if (own) nodeStyle = { ...nodeStyle, ...own }
       if (node instanceof THREE.Mesh || node instanceof THREE.Points || node instanceof THREE.LineSegments) {
-        const style_ = resolveGlyphStyle({ global: style.glyphs, type, part, node: node === object ? own : nodeStyle, instance: instanceStyle, instanceParts: instance.parts })
+        const style_ = resolveGlyphStyle({ defaults, global: style.glyphs, type, part, node: nodeStyle, instance: instanceStyle, instanceParts: instance.parts })
         if (!style_.glyph) missing.push(node.name || node.type)
         else {
           node.userData.glyphResolved = style_; node.userData.glyphPart = part
@@ -193,9 +194,9 @@ export function createAsciiEngine(canvas: HTMLCanvasElement, options: AsciiEngin
           group.meshes.push(node)
         }
       }
-      for (const child of [...node.children]) visit(child, part, nodeStyle)
+      for (const child of [...node.children]) visit(child, part, nodeStyle, defaults)
     }
-    visit(object, undefined, undefined)
+    visit(object, undefined, undefined, undefined)
     if (missing.length) throw new Error(`ascii-engine: no declared technique (glyph) on ${missing.slice(0, 5).join(', ')}`)
     for (const { style: s, meshes } of groups.values()) applyTechnique(s, meshes)
   }
@@ -204,18 +205,24 @@ export function createAsciiEngine(canvas: HTMLCanvasElement, options: AsciiEngin
   const standardLike = (mesh: THREE.Mesh) => ![mesh.material].flat().some((m) => m instanceof THREE.ShaderMaterial)
   function applyTechnique(s: GlyphStyle, nodes: THREE.Object3D[]) {
     const meshes = nodes.filter((n): n is THREE.Mesh => n instanceof THREE.Mesh)
+    const tint = (copy: THREE.Material) => {
+      if (s.color !== undefined && copy instanceof THREE.MeshStandardMaterial) copy.color.setHex(s.color)
+      return copy
+    }
     switch (s.glyph) {
       case 'surface':
-        for (const mesh of meshes.filter(standardLike)) swapMaterials(mesh, `surface:${s.surface ?? ''}`, (copy) => {
+        for (const mesh of meshes.filter(standardLike)) swapMaterials(mesh, `surface:${s.surface ?? ''}:${s.size ?? ''}:${s.color ?? ''}`, (copy) => {
           if (!(copy instanceof THREE.MeshStandardMaterial)) return copy
+          tint(copy)
           if (s.surface) copy.userData.asciiSurface = s.surface
-          return surfaceMaterial(copy)
+          return surfaceMaterial(copy, 'generic', s)
         })
         return
       case 'screen':
-        for (const mesh of meshes.filter(standardLike)) swapMaterials(mesh, `screen:${s.surface ?? 'actor'}`, (copy) => markScreen(copy, s.surface ?? 'actor'))
+        for (const mesh of meshes.filter(standardLike)) swapMaterials(mesh, `screen:${s.surface ?? 'actor'}:${s.color ?? ''}`, (copy) => markScreen(tint(copy), s.surface ?? 'actor'))
         return
       case 'body': {
+        if (s.color !== undefined) for (const mesh of meshes.filter(standardLike)) swapMaterials(mesh, `body-color:${s.color}`, tint)
         const ramp = s.surface ? BODY_RAMPS[s.surface] : undefined
         const scenery = ramp && ramp !== 'actor'
         skinnedLetters.push(...glyphBody(meshes, bodies, s.size ?? (scenery ? .19 : .155), 'actor', ramp))

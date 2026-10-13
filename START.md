@@ -94,6 +94,13 @@ different finishes for a tree's crown and trunk. Pomorog already uses
 - Phase 1 data structures must support layered style resolution even
   before a complete editor exists.
 
+Imported model appearances are editable defaults, including Blender custom
+properties. Editor global/type/instance styles can override them. Named
+groups and meshes are part boundaries; an undivided mesh is not automatically
+segmented into semantic parts. `GlyphStyle.size` controls surface cells and
+body base size in metres; `color` optionally overrides the model's RGB colour.
+The inspector writes only changed fields, preserving mixed part techniques.
+
 ### 3.2 Water as a component (owner requirement)
 
 Water is a placeable/configurable object, not an effect tied to a biome.

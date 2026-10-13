@@ -26,6 +26,11 @@ describe('portable scene validation', () => {
     expect(doc.objects[0].options?.parts?.crown.size).toBe(.22)
     expect(parseScene(JSON.parse(JSON.stringify(doc)))).toEqual(doc)
   })
+  it('preserves surface letter size and RGB colour overrides and rejects invalid colours', () => {
+    const doc = parseScene({ ...legacy, objects: [{ ...legacy.objects[0], options: { glyph: 'surface', size: .4, color: 0x15aa55, parts: { crown: { color: 0x000000 } } } }] })
+    expect(parseScene(JSON.parse(JSON.stringify(doc)))).toEqual(doc)
+    for (const color of [-1, 0x1000000, .5, 'red']) expect(() => parseScene({ ...legacy, objects: [{ ...legacy.objects[0], options: { color } }] })).toThrow('Invalid scene')
+  })
   it('round-trips named atmosphere assets without applying them to the scene', () => {
     const input = { ...legacy, atmospheres: { sunset: { name: 'Sunset', style: { background: 0x221100, fog: null, inkTint: [1,.7,.5] } } } }
     const doc = parseScene(input, library)

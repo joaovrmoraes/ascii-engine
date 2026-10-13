@@ -12,15 +12,17 @@ export type GlyphKind =
 /**
  * Letter style of one part: plain data, resolved by layers. Phase 1 covers the
  * technique, the letter family (alphabet, cell, ink of that material kind) and
- * the body letter size; more parameters join here (alphabet, spacing, tint,
+ * the letter size and colour; more parameters join here (alphabet, spacing,
  * strength, gap, steps, open/occluder, sway).
  */
 export interface GlyphStyle {
   glyph?: GlyphKind
   /** Letter family: alphabet, cell and ink of a material kind (`stone`, `foliage`, …). */
   surface?: SurfaceKind
-  /** `body`: letter size in metres (Pomorog: creatures .155, scenery .19). */
+  /** Letter size in metres: surface cell width or body base size. Screen uses cellSize. */
   size?: number
+  /** Optional sRGB colour override. Omitted preserves the model's material colour. */
+  color?: number
 }
 
 /** Styles for a type of object ("tree") and its types of part ("crown", "trunk"). */
@@ -40,6 +42,8 @@ export function mergeGlyphStyles(...layers: (GlyphStyle | undefined)[]): GlyphSt
 }
 
 export interface StyleLayers {
+  /** Inferred import defaults, below every authored style layer. */
+  defaults?: GlyphStyle
   global?: GlyphStyle
   type?: ObjectTypeStyle
   /** Style carried by the node itself (`userData.glyph` / `userData.glyphStyle`, e.g. from GLTF). */
@@ -57,6 +61,7 @@ export interface StyleLayers {
 export function resolveGlyphStyle(layers: StyleLayers): GlyphStyle {
   const part = layers.part
   return mergeGlyphStyles(
+    layers.defaults,
     layers.global,
     layers.type?.style,
     part ? layers.type?.parts?.[part] : undefined,

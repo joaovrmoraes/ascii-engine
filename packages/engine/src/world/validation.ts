@@ -28,6 +28,10 @@ function style(value: unknown, path: string) {
   if (s.glyph !== undefined && !glyphs.includes(String(s.glyph))) fail(path, 'contains an unknown technique')
   if (s.surface !== undefined && !Object.hasOwn(SURFACE_ALPHA, String(s.surface))) fail(path, 'contains an unknown family')
   if (s.size !== undefined) number(s.size, `${path}.size`, .01, 10)
+  if (s.color !== undefined) {
+    number(s.color, `${path}.color`, 0, 0xffffff)
+    if (!Number.isInteger(s.color)) fail(`${path}.color`, 'must be an integer RGB colour')
+  }
   if (s.type !== undefined && typeof s.type !== 'string') fail(`${path}.type`, 'must be text')
   if (s.body !== undefined) {
     const body = record(s.body, `${path}.body`)

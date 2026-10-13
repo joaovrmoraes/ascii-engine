@@ -4,6 +4,60 @@ Entries describe the state at each stage. Earlier limitations may have been
 resolved later; START.md and the editor guide describe the current scope.
 Historical filenames, reference IDs and captured interfaces are preserved.
 
+## 2026-10-13 — Imported model appearance and named parts
+
+The owner reported that imported GLTF appearance/letter-size controls did not
+work and asked whether a tree's crown and trunk must be separated in the file.
+Reproduced with pretzel.gltf, piramide.gltf and esfera.gltf from Downloads.
+Each contains one mesh and material. The surface size field saved .12/.40 but
+produced identical pixels; letter family and technique changes already worked
+after Apply. Imported models had no editable shared type.
+
+- Surface shaders and their material/program caches now include world cell
+  size. Body sizes retain the original Pomorog multipliers/defaults.
+- Added optional GlyphStyle.color, with RGB validation and a color picker/model
+  color reset. Renamed Material to Glyph family and show the selected letters:
+  selecting Wood changes letters, while Color recolors the model's ink.
+- Inspector reads resolved descendant styles, shows mixed techniques, and
+  applies only edited fields. Whole-tree size/color edits preserve separate
+  crown/body and trunk/surface techniques. Clicking a part selects its named
+  group rather than just the hit leaf mesh.
+- Imported assets register a shared editable type. Their inferred and Blender
+  authored appearance is an initial default below editor layers; type/global
+  changes reach imports, while instance/part overrides remain more specific.
+- Import assigns unique IDs. Previously, after deleting objects, a newly
+  imported object could collide with a retained object-N ID and be rejected.
+- Updated START, editor guide and live API/style descriptions. Named groups
+  and meshes are the supported part boundaries. No semantic face segmentation
+  is inferred from an undivided mesh; Blender glyph extras are optional.
+
+Validation: pnpm check passed (**81 tests**, types/build), full
+pnpm verify:authoring passed, and pnpm verify:gltf passed with all three real
+files plus a generated GLTF tree with two leaves under a named crown group.
+Checks cover changed rendered pixels, family/body/color/reset, shared types,
+instance isolation, undo/redo, reopen, named-group mouse selection and import
+after deletion. No runtime/shader errors. Orca imported and exercised the real
+files in an isolated profile and verified both crown leaves separately from
+the trunk. The owner's normal browser draft was preserved.
+
+Evidence: [GLTF appearance captures](captures/gltf-appearance-2026-10-13/README.md),
+including Orca before/after, Chromium interaction captures, cdpshot and logs.
+Later Orca screenshots timed out because the embedded page did not draw a
+frame; DOM/runtime checks still succeeded. Tree screenshot evidence is from
+GPU Chromium, with a separate Orca runtime result.
+
+Historical pnpm compare exceeds .04 for reference/forest/snow/cathedral in
+this environment. A separate read-only HEAD snapshot reproduced those failures.
+Controlled before/after differences are below .01 for all six default scenes
+(reference exactly zero); the initial forest capture under concurrent GPU
+load was repeated sequentially. Historical baselines were not updated.
+
+Outstanding: custom per-part alphabets, independent spacing, ink/gap/shadow
+controls and semantic face splitting remain outside this inspector. Material
+slot-specific editing and arbitrary external/decoder-dependent GLTFs have not
+been validated. Native desktop execution remains unverified. The owner
+subsequently authorized committing this validated stage and pushing it to main.
+
 ## 2026-10-12 — Animated README previews and public video gallery
 
 The owner reported that repository MP4 links and PNG thumbnails did not show

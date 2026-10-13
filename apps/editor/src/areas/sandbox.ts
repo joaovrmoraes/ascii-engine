@@ -564,7 +564,7 @@ export async function createSandbox(engine: AsciiEngine, options: AreaOptions = 
       message('Importando modelos…')
       const imported = await importModelFiles(files), doc = snapshot()
       doc.assets = { ...doc.assets, ...imported }
-      for (const [prefab, asset] of Object.entries(imported)) doc.objects.push({ prefab, name: asset.name, position: [focus.x, scene.terrain?.heightAt(focus.x, focus.z) ?? 0, focus.z] })
+      for (const [prefab, asset] of Object.entries(imported)) doc.objects.push({ id: crypto.randomUUID(), prefab, name: asset.name, position: [focus.x, scene.terrain?.heightAt(focus.x, focus.z) ?? 0, focus.z] })
       await replace(doc); choose(scene.placed.at(-1)?.object); changed()
     },
     update(time) { scene.update(time); placement.update(time) },

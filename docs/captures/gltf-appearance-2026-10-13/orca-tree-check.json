@@ -1,0 +1,21 @@
+{
+  "crown": {
+    "color": 7851059,
+    "glyph": "body",
+    "size": 0.12,
+    "surface": "foliage"
+  },
+  "file": "tree-parts.gltf",
+  "leaf2": {
+    "color": 7851059,
+    "glyph": "body",
+    "size": 0.12,
+    "surface": "foliage"
+  },
+  "part": "crown",
+  "trunk": {
+    "glyph": "surface",
+    "size": 0.28,
+    "surface": "bark"
+  }
+}

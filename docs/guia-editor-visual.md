@@ -68,7 +68,7 @@ native windows. The toolbar and scene remain in the main layout.
    scale, duplicate or delete them in the inspector.
 6. The first scene click selects an object. Click the same part again,
    or select it from **part** under **ASCII appearance**, to adjust
-   technique, glyph family and size. Scope can be instance, type or
+   technique, glyph family, size and color. Scope can be instance, type or
    global; all layers are saved in the document.
 7. **Environment → Weather** selects rain/snow. **Studio → Atmosphere**
    opens lighting, color and fog controls. Settings are saved with the
@@ -154,6 +154,40 @@ Use **Import model** above the library or drop files onto the editor:
 After import, there is no dependency on the machine's original file path.
 External GLB textures and formats requiring additional decoders have not
 been validated; prefer embedded GLB or GLTF with explicit companions.
+
+### Edit imported appearance and parts
+
+Select the model in **Hierarchy**, then use **ASCII appearance**:
+
+- **Glyph family** chooses the letter ramp (Wood, Bark, Stone, Foliage, etc.).
+  It preserves the original material color; it does not replace image textures.
+- **Size (m)** changes surface cell width or body base letter size in world
+  meters. Blank inherits the default shown in the placeholder. For **Character
+  (screen)**, use the pixel-size control under **Display** instead.
+- **Color** overrides the model color. **Model color**, followed by Apply,
+  restores the inherited material color for the selected style layer.
+- **Apply appearance** saves changed fields. Adjusting only the whole object's
+  size or color preserves different techniques on its parts. Mixed values
+  are shown without choosing one technique for every part.
+- **save to** chooses this instance, all matching parts of this model's type,
+  or the global style. More specific instance/part overrides still win.
+  Imported files now have a shared type, so the all-copy scope is available.
+
+For a tree, export a parent object with named **crown** and **trunk** objects
+or groups from Blender. A crown group may contain several leaf meshes.
+These names appear in **part**, alongside **Whole object**. Use **Glyph body /
+Foliage** for the crown and **Surface glyphs / Bark** for the trunk. The editor
+can change those choices after import; glyph custom properties are optional.
+If supplied, export Blender custom properties as glTF `extras` to carry the
+initial appearance. Editor styles override those imported defaults.
+
+A single mesh with one material has one editable part. The engine does not
+infer which faces are a crown, trunk, handle or blade, and has no face-selection
+tool for splitting them. Separate the desired parts in the source model before
+export. Transform controls still move the placed object as a whole.
+
+Custom per-part alphabets, independent spacing, ink/gap controls and shadow
+steps remain outside this inspector. Family presets retain the Pomorog ramps.
 
 ## Composition cameras
 

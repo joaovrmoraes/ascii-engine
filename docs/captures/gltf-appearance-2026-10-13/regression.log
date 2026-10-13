@@ -1,0 +1,31 @@
+$ node scripts/verify-gltf-appearance.mjs docs/captures/gltf-appearance-2026-10-13 /home/joao/Downloads/pretzel.gltf /home/joao/Downloads/piramide.gltf /home/joao/Downloads/esfera.gltf
+PASS f9e2161f-7964-4730-bf2b-13cc1e3ee216: surface size changes the rendered pixels
+PASS f9e2161f-7964-4730-bf2b-13cc1e3ee216: family changes the letters
+PASS f9e2161f-7964-4730-bf2b-13cc1e3ee216: color overrides the original material
+PASS f9e2161f-7964-4730-bf2b-13cc1e3ee216: model color can be restored
+PASS f9e2161f-7964-4730-bf2b-13cc1e3ee216: body size and color affect glyph sprites
+PASS f9e2161f-7964-4730-bf2b-13cc1e3ee216: imported model supports the type scope
+PASS c84f0829-22be-4877-97a0-9f5481ab0b6b: surface size changes the rendered pixels
+PASS c84f0829-22be-4877-97a0-9f5481ab0b6b: family changes the letters
+PASS c84f0829-22be-4877-97a0-9f5481ab0b6b: color overrides the original material
+PASS c84f0829-22be-4877-97a0-9f5481ab0b6b: model color can be restored
+PASS c84f0829-22be-4877-97a0-9f5481ab0b6b: body size and color affect glyph sprites
+PASS c84f0829-22be-4877-97a0-9f5481ab0b6b: imported model supports the type scope
+PASS c2cea5de-c41c-495c-bbde-36c7d7649b1e: surface size changes the rendered pixels
+PASS c2cea5de-c41c-495c-bbde-36c7d7649b1e: family changes the letters
+PASS c2cea5de-c41c-495c-bbde-36c7d7649b1e: color overrides the original material
+PASS c2cea5de-c41c-495c-bbde-36c7d7649b1e: model color can be restored
+PASS c2cea5de-c41c-495c-bbde-36c7d7649b1e: body size and color affect glyph sprites
+PASS c2cea5de-c41c-495c-bbde-36c7d7649b1e: imported model supports the type scope
+PASS type changes reach both imported copies
+PASS instance override affects only its copy
+PASS save/reopen preserves model, type and instance appearance
+PASS undo/redo restores imported appearance
+PASS whole-tree size preserves separate crown and trunk techniques
+PASS named crown group edits its descendants without changing the trunk
+PASS trunk size and family change independently
+PASS nested imported part appearance survives save/reopen
+PASS clicking a crown selects its named group after hierarchy selection
+PASS all-copy crown edits override Blender defaults and leave every trunk unchanged
+PASS import after deletion preserves existing IDs and allocates a unique new ID
+PASS no runtime or shader errors

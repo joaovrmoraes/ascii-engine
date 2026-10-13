@@ -86,6 +86,11 @@ body.authoring #selection, body.authoring #tools, body.authoring #panel { positi
 body.authoring #selection { border-top: 1px solid #1e2024; }
 body.authoring #selection label { grid-template-columns: 75px 1fr; }
 body.authoring #selection [data-k="what"] { color: #bccbe0; font-size: 11px; margin-bottom: 2px; overflow-wrap: anywhere; }
+#selection .glyph-letters { font: 13px "Courier New", monospace; white-space: pre-wrap; }
+#selection .glyph-help { color: #989faa; font-size: 10px; line-height: 1.5; }
+#selection .glyph-color { display: flex; align-items: center; gap: 6px; }
+#selection .glyph-color input { flex: 1; min-width: 0; }
+#selection .glyph-color button { flex-shrink: 0; font-size: 10px; }
 body.authoring #panel label { grid-template-columns: 62px 1fr 35px; }
 body.authoring #panel output { color: #aeb9c9; }
 body.authoring #panel button, body.authoring #selection button, body.authoring #tools button { color: var(--text); }

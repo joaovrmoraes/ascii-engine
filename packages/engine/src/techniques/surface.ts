@@ -1,5 +1,6 @@
 import * as THREE from 'three'
 import { SURFACE_ALPHA, type SurfaceKind } from '../surface'
+import type { GlyphStyle } from '../style'
 
 /**
  * Technique `surface` (Pomorog `worldGlyph.ts`).
@@ -53,9 +54,10 @@ function kindOf(material: THREE.Material, fallback: string) {
 }
 
 /** Rewrites one standard material so its fragments are letters on its own surface. */
-export function surfaceMaterial(material: THREE.MeshStandardMaterial, fallback = 'generic') {
+export function surfaceMaterial(material: THREE.MeshStandardMaterial, fallback = 'generic', style: GlyphStyle = {}) {
   if (material.userData.worldGlyph) return material
   const kind = kindOf(material, fallback)
+  const cellSize = style.size ?? SURFACE_CELL[kind]
   const [start, count] = SURFACE_RANGES[kind], [gain, paper] = SURFACE_INK[kind]
   const texture = surfaceAtlas()
   material.userData.worldGlyph = kind
@@ -86,7 +88,7 @@ export function surfaceMaterial(material: THREE.MeshStandardMaterial, fallback =
           // Project the lattice on the face's dominant axis, letters upright on walls.
           vec3 n = abs(normalize(vGlyphNormal));
           vec2 plane = n.y > max(n.x, n.z) ? vGlyphPos.xz : n.x > n.z ? vGlyphPos.zy : vGlyphPos.xy;
-          vec2 cell = vec2(${SURFACE_CELL[kind].toFixed(3)}, ${(SURFACE_CELL[kind] * 1.25).toFixed(3)});
+          vec2 cell = vec2(${cellSize.toFixed(3)}, ${(cellSize * 1.25).toFixed(3)});
           vec2 grid = floor(plane / cell), inside = fract(plane / cell);
           float face = n.y > max(n.x, n.z) ? 1. : n.x > n.z ? 2. : 3.;
           float grain = glyphHash(vec3(grid, face));
@@ -114,7 +116,7 @@ export function surfaceMaterial(material: THREE.MeshStandardMaterial, fallback =
         }`)
   }
   const previousKey = material.customProgramCacheKey.call(material)
-  material.customProgramCacheKey = () => `world-glyph-${kind}-${previousKey}`
+  material.customProgramCacheKey = () => `world-glyph-${kind}-${cellSize.toFixed(3)}-${previousKey}`
   material.needsUpdate = true
   return material
 }

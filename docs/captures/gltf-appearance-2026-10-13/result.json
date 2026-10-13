@@ -1,0 +1,9 @@
+{
+  "models": [
+    "pretzel.gltf",
+    "piramide.gltf",
+    "esfera.gltf"
+  ],
+  "errors": [],
+  "passed": true
+}

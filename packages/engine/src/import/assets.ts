@@ -22,12 +22,19 @@ export async function loadSceneAssets(doc: SceneDoc): Promise<{ library: PrefabL
       source.mixer.stopAllAction(); sources.push(source)
       library[id] = {
         title: asset.name,
+        // Register an editable type for all copies while retaining per-node import defaults.
+        style: {},
         create({ item }) {
           const root = clone(source.scene) as THREE.Group
-          root.traverse(node => { if (node instanceof THREE.Mesh) {
-            node.geometry = node.geometry.clone()
-            node.material = Array.isArray(node.material) ? node.material.map(m => m.clone()) : node.material.clone()
-          } })
+          root.traverse(node => {
+            // An asset's Blender declarations are its initial appearance. The
+            // editor's type, global and instance layers may override them.
+            if (node.userData.glyph || node.userData.glyphStyle) node.userData.glyphDefault = true
+            if (node instanceof THREE.Mesh) {
+              node.geometry = node.geometry.clone()
+              node.material = Array.isArray(node.material) ? node.material.map(m => m.clone()) : node.material.clone()
+            }
+          })
           const model = prepareGlyphModel(root, source.animations)
           model.mixer.stopAllAction()
           const clip = item.animation === null ? undefined : source.animations.find(c => c.name === item.animation) ?? source.animations[0]

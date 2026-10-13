@@ -32,4 +32,11 @@ describe('glyph style layers', () => {
     expect(nodeGlyphStyle({ glyph: 'body', glyphStyle: { size: .2 } })).toEqual({ size: .2, glyph: 'body' })
     expect(nodeGlyphStyle({})).toBeUndefined()
   })
+
+  it('lets authored styles override inferred import defaults while keeping explicit node declarations', () => {
+    const defaults = { glyph: 'surface' as const, surface: 'wood' as const }
+    expect(resolveGlyphStyle({ defaults, global: { size: .3 }, type: tree, part: 'crown' })).toEqual({ glyph: 'body', surface: 'foliage', size: .3 })
+    expect(resolveGlyphStyle({ defaults, type: tree, part: 'crown', node: { glyph: 'screen' } }).glyph).toBe('screen')
+    expect(resolveGlyphStyle({ defaults, instance: { color: 0x00ff00 } })).toEqual({ ...defaults, color: 0x00ff00 })
+  })
 })
