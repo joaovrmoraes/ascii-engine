@@ -292,3 +292,6 @@ body.texture-studio-active #app > canvas { visibility: hidden; }
 
 .texture-controls-nav { position: sticky; top: -10px; z-index: 3; display: flex; flex-wrap: wrap; gap: 5px; padding: 8px 0; margin-bottom: 8px; background: #30343c; border-bottom: 1px solid #4d5560; }
 .texture-fields fieldset { scroll-margin-top: 78px; }
+
+[data-k="terrain-letters"] fieldset, #object-inspector fieldset { border: 1px solid #484f5b; margin: 16px 0; padding: 10px; min-width: 0; }
+[data-k="terrain-letters"] legend, #object-inspector legend { color: #b7c1d1; font-size: 11px; }

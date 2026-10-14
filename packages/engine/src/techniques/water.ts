@@ -1,7 +1,8 @@
 import * as THREE from 'three'
 import { waterMaskEdge, type WaterMask } from '../world/waterPaint'
 import { surfaceAlpha } from '../surface'
-import { surfaceAtlas, SURFACE_RANGES } from './surface'
+import { surfaceAtlas, SURFACE_ALPHABETS, SURFACE_RANGES } from './surface'
+import { createGlyphGrid } from './glyphGrid'
 import { createWaterDynamics, DEFAULT_WATER_PHYSICS, type WaterPhysics } from '../world/waterDynamics'
 
 /**
@@ -68,6 +69,17 @@ export const waterEdgeGLSL = `
 type RGB = [number, number, number]
 /** Look of the water letters in lakes and streams. */
 export interface WaterLook {
+  /** Optional custom ramps; omission keeps the exact legacy shared atlas. */
+  alphabet?: string
+  foamAlphabet?: string
+  reflectionAlphabet?: string
+  font?: string
+  fontWeight?: 400 | 700
+  shallow?: RGB
+  deep?: RGB
+  /** Depth in metres that reaches the deep color (default .5). */
+  depthScale?: number
+  rings?: { enabled: boolean; alphabet?: string; color?: RGB; size?: number; lifetime?: number }
   /** Cell on the water plane (m). */
   cell: [number, number]
   /** Flow speed along a stream; ponds drift by `pondDrift`. */
@@ -88,6 +100,7 @@ export interface WaterLook {
     /** One empty row in every `rows`. */
     rows: number
     tint: RGB
+    strength?: number
   }
 }
 
@@ -102,10 +115,25 @@ export const DEFAULT_WATER_LOOK: WaterLook = {
 const f = (v: number) => v.toFixed(4)
 const v3 = (c: RGB) => `vec3(${f(c[0])}, ${f(c[1])}, ${f(c[2])})`
 
+export function waterAlphabetLayout(look: WaterLook) {
+  const custom = !!(look.alphabet || look.foamAlphabet || look.reflectionAlphabet || look.font || look.fontWeight || look.rings?.enabled)
+  const slots: string[] = [], ranges: Record<string, [number, number]> = {}
+  for (const [kind, alphabet] of Object.entries({ water: look.alphabet, crest: look.foamAlphabet, actor: look.reflectionAlphabet, wetgrass: undefined, rings: look.rings?.alphabet ?? '|_-' })) {
+    const characters = Array.from(alphabet ?? SURFACE_ALPHABETS[kind])
+    const skip = alphabet === undefined && kind !== 'rings' ? 1 : 0
+    ranges[kind] = [slots.length + skip, characters.length - skip]; slots.push(...characters)
+  }
+  return { custom, slots, ranges, columns: Math.min(128, slots.length), rows: Math.ceil(slots.length / 128) }
+}
+
 /** `waterLetters(p, time, crest, flow, vegetation, weed)` for a look. */
 export function waterLettersGLSL(look: WaterLook = DEFAULT_WATER_LOOK, followSlope = false, movingSurface = false) {
   const texture = surfaceAtlas(), slot = (texture.userData.slot as number).toFixed(6)
+  const layout = waterAlphabetLayout(look)
   const [ws, wc] = SURFACE_RANGES.water, [cs, cc] = SURFACE_RANGES.crest, [rs, rc] = SURFACE_RANGES.actor, [gs, gc] = SURFACE_RANGES.wetgrass
+  const index = (kind: string, level: string, start: number, count: number) => layout.custom
+    ? `${layout.ranges[kind][0]}.0 + floor(${level} * ${layout.ranges[kind][1]}.0)`
+    : `${start}.0 + 1. + floor(${level} * ${count - 1}.0)`
   const r = look.reflection
   return `
     uniform sampler2D glyphAtlas, reflection;
@@ -113,11 +141,13 @@ export function waterLettersGLSL(look: WaterLook = DEFAULT_WATER_LOOK, followSlo
     uniform float reflectionOn;
     uniform vec3 waterViewDirection, waterLightDirection, waterLightColor;
     uniform float waterLightPower, waterReflectionLevel;
+    ${look.shallow || look.deep ? 'float waterInkDepth = 0.;' : ''}
+    ${look.rings?.enabled ? 'uniform vec4 waterRings[16];' : ''}
     ${movingSurface ? 'uniform float waterWaveStrength;' : ''}
     ${movingSurface ? 'vec2 waterGlyphDx, waterGlyphDy;' : ''}
     float waterHash(vec2 p) { return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453); }
     float waterGlyph(float index, vec2 inside) {
-      return smoothstep(.1, .45, ${movingSurface ? 'textureGrad' : 'texture2D'}(glyphAtlas, vec2((index + .08 + inside.x * .84) * ${slot}, .06 + inside.y * .88)${movingSurface ? ',waterGlyphDx,waterGlyphDy' : ''}).r);
+      return smoothstep(.1, .45, ${movingSurface ? 'textureGrad' : 'texture2D'}(glyphAtlas, ${layout.custom ? `vec2((mod(index,${layout.columns}.0)+.08+inside.x*.84)/${layout.columns}.0, (float(${layout.rows})-1.-floor(index/${layout.columns}.0)+.06+inside.y*.88)/${layout.rows}.0)` : `vec2((index + .08 + inside.x * .84) * ${slot}, .06 + inside.y * .88)`}${movingSurface ? ',waterGlyphDx,waterGlyphDy' : ''}).r);
     }
     ${movingSurface ? `
     // Long connected wave fronts, sampled once per glyph. Two short advection
@@ -144,7 +174,7 @@ export function waterLettersGLSL(look: WaterLook = DEFAULT_WATER_LOOK, followSlo
       // Derivatives of the continuous lattice, before fract and glyph selection.
       // Otherwise adjacent atlas slots look like a huge texture minification:
       // shallow views smear glyphs into the bank or make entire rows disappear.
-      ${movingSurface ? `waterGlyphDx=dFdx(plane/cell)*vec2(.84*${slot},.88); waterGlyphDy=dFdy(plane/cell)*vec2(.84*${slot},.88);` : ''}
+      ${movingSurface ? `waterGlyphDx=dFdx(plane/cell)*vec2(${layout.custom ? `.84/${layout.columns}.0,.88/${layout.rows}.0` : `.84*${slot},.88`}); waterGlyphDy=dFdy(plane/cell)*vec2(${layout.custom ? `.84/${layout.columns}.0,.88/${layout.rows}.0` : `.84*${slot},.88`});` : ''}
       vec2 grid = floor(plane / cell), inside = fract(plane / cell);
       float grain = waterHash(grid);
       vec3 centre = vec3((grid + .5) * cell ${followSlope || movingSurface ? '' : '+ flow * time'}, p.y).xzy;
@@ -161,24 +191,32 @@ export function waterLettersGLSL(look: WaterLook = DEFAULT_WATER_LOOK, followSlo
       vec3 shown = pow(max(seen.rgb, vec3(0.)), vec3(.4545));
       float lum = dot(shown, vec3(.2126, .7152, .0722));
       vec3 gap = vec3(0.);
+      ${look.rings?.enabled ? `for(int i=0;i<16;i++) {
+        float age=time-waterRings[i].z, life=${f(look.rings.lifetime ?? 1.2)};
+        float radius=age/life*${f(look.rings.size ?? 1.5)};
+        if(age>=0. && age<life && abs(waterRings[i].w)>0. && abs(length(centre.xz-waterRings[i].xy)-radius)<min(cell.x,cell.y)*.7) {
+          float letter=mod(floor(atan(centre.z-waterRings[i].y,centre.x-waterRings[i].x)*3.+20.),${layout.ranges.rings[1]}.0);
+          return ${v3(look.rings.color ?? look.foam)}*(1.-age/life)*min(1.,abs(waterRings[i].w)*6.)*waterGlyph(${layout.ranges.rings[0]}.0+letter,inside);
+        }
+      }` : ''}
       // Reflection: drop rows so it reads as a broken mirror on water.
       float row = step(.5, mod(grid.y, ${f(r.rows)}));
-      if (object > .5 && lum > ${f(r.threshold)} && row > .5) {
+      if (object > .5 && lum > ${f(r.threshold)} && row > .5 ${r.strength === 0 ? '&& false' : ''}) {
         float level = clamp(lum * 1.4, 0., .999);
         vec3 hue = shown / max(lum, .01);
         float fresnel = pow(1.-max(0.,dot(normal,waterViewDirection)),3.);
         vec3 ink = pow(hue * (.42 + level * .8), vec3(2.2)) * ${v3(r.tint)} * (1.+fresnel*.5);
-        return mix(gap, ink, waterGlyph(${rs}.0 + 1. + floor(level * ${rc - 1}.0), inside));
+        return mix(gap, ink${r.strength === undefined ? '' : `*${f(r.strength)}`}, waterGlyph(${index('actor', 'level', rs, rc)}, inside));
       }
       ${movingSurface ? 'float bands = mix(.5,flowingBands((grid+.5)*cell,drift,time),min(1.,waterWaveStrength+length(drift)*.15)); crest *= .45 + bands*.55;' : ''}
       // Foam letters where waves break or boots disturb the surface.
       if (crest > .12 && grain < crest * 1.4) {
         float level = clamp(crest * ${movingSurface ? '.7 + grain * .18, 0., .65' : '1.5 + grain * .3, 0., .999'});
-        return mix(gap, ${v3(look.foam)} * (.4 + crest), waterGlyph(${cs}.0 + 1. + floor(level * ${cc - 1}.0), inside));
+        return mix(gap, ${v3(look.foam)} * (.4 + crest), waterGlyph(${index('crest', 'level', cs, cc)}, inside));
       }
       // Submerged weed as sparse green strokes.
       if (vegetation > .3 && grain > .55) {
-        return mix(gap, weed, waterGlyph(${gs}.0 + 1. + floor(grain * ${gc - 1}.0), inside) * .8);
+        return mix(gap, weed, waterGlyph(${index('wetgrass', 'grain', gs, gc)}, inside) * .8);
       }
       // Open water: sparse rows of ~ - = drifting with the current.
       float swell = ${movingSurface ? 'bands' : `.5 + .5 * sin(${followSlope ? 'dot(grid, normalize(drift + vec2(.00001))) * .9 - time * (1.4 + length(drift) * 2.)' : 'grid.y * .9 + grid.x * .15 - time * 1.4'} + grain * 2.)`};
@@ -190,8 +228,8 @@ export function waterLettersGLSL(look: WaterLook = DEFAULT_WATER_LOOK, followSlo
       float alignment = max(0.,dot(reflected,waterViewDirection));
       float sheen = (pow(alignment,32.)*.7 + pow(alignment,180.)*1.8) * waterLightPower * reflectionOn * max(0.,waterLightDirection.y);
       ${movingSurface ? 'level = min(.999,floor(level*5.)/4.); sheen = floor(min(sheen,2.)*6.)/6.;' : ''}
-      vec3 ink = ${v3(look.open)} * (${movingSurface ? '.32 + level * 1.9' : '.6 + level * 1.2'}) + waterLightColor * ${v3(look.sheen)} * sheen * 5.;
-      return mix(gap, ink, waterGlyph(${ws}.0 + 1. + floor(level * ${wc - 1}.0), inside));
+      vec3 ink = ${look.shallow || look.deep ? `mix(${v3(look.shallow ?? look.open)},${v3(look.deep ?? look.open)},clamp(waterInkDepth/${f(look.depthScale ?? .5)},0.,1.))` : v3(look.open)} * (${movingSurface ? '.32 + level * 1.9' : '.6 + level * 1.2'}) + waterLightColor * ${v3(look.sheen)} * sheen ${r.strength===undefined ? '' : `* ${f(r.strength)} `}* 5.;
+      return mix(gap, ink, waterGlyph(${index('water', 'level', ws, wc)}, inside));
     }
     vec3 waterLetters(vec3 p, float time, float crest, vec2 flow, float vegetation, vec3 weed) { return waterLettersNormal(p,time,crest,flow,vegetation,weed,vec3(0.,1.,0.)); }`
 }
@@ -297,6 +335,10 @@ export interface WaterOptions {
 /** One water body: add `water.mesh` with `{ glyph: 'water' }`. */
 export function createWater(shape: WaterShape, options: WaterOptions = {}) {
   const look: WaterLook = { ...DEFAULT_WATER_LOOK, ...options.look, reflection: { ...DEFAULT_WATER_LOOK.reflection, ...options.look?.reflection } }
+  const layout = waterAlphabetLayout(look)
+  const glyphAtlas = layout.custom ? createGlyphGrid(layout.slots.map(glyph => ({ glyph, font: look.font, fontWeight: look.fontWeight })), 48, 64, 46, 34) : surfaceAtlas()
+  const rings = Array.from({ length: 16 }, () => new THREE.Vector4(1e6, 1e6, -100, 0))
+  let ringIndex = 0, rainTick = -1
   const mask = shape.kind === 'paint' ? shape.mask : undefined
   const physics = { ...DEFAULT_WATER_PHYSICS, enabled: !options.edgeGLSL || !!options.distance, ...options.physics }
   const size = mask ? shape.size * 2 : options.size ?? (shape.kind === 'stream' ? 38 : shape.size * 2.8 + 2)
@@ -312,7 +354,7 @@ export function createWater(shape: WaterShape, options: WaterOptions = {}) {
     waterMask: { value: maskTexture ?? null }, maskResolution: { value: mask?.resolution ?? 1 },
     time: { value: 0 }, centre: { value: waterVec4(shape) },
     reflection: { value: null as THREE.Texture | null }, reflectionMatrix: { value: new THREE.Matrix4() },
-    reflectionOn: { value: look.reflection.enabled ? 1 : 0 }, glyphAtlas: { value: surfaceAtlas() },
+    reflectionOn: { value: look.reflection.enabled ? 1 : 0 }, glyphAtlas: { value: glyphAtlas }, waterRings: { value: rings },
     waterViewDirection: { value: new THREE.Vector3(0,1,0) }, waterLightDirection: { value: new THREE.Vector3(-5,12,7).normalize() },
     waterLightColor: { value: new THREE.Color(0xe0e7cc) }, waterLightPower: { value: 1 }, waterReflectionLevel: { value: options.level ?? .018 },
     waterWaveStrength: { value: Math.min(2,physics.waves/.012) },
@@ -350,6 +392,7 @@ export function createWater(shape: WaterShape, options: WaterOptions = {}) {
         vec2 d=p.xz-centre.xy;
         vec2 local=vec2(cos(centre.z)*d.x+sin(centre.z)*d.y,-sin(centre.z)*d.x+cos(centre.z)*d.y);
         vec4 dynamics=texture2D(waterDynamics,local/dynamicsSize+.5);
+        ${look.shallow || look.deep ? 'waterInkDepth=dynamics.z;' : ''}
         if(dynamicsOn>.5 && dynamics.z<.002) discard;
         current += dynamics.xy * dynamicsOn;
         float turbulence = dynamics.w * dynamicsOn;
@@ -404,7 +447,23 @@ export function createWater(shape: WaterShape, options: WaterOptions = {}) {
       const [lx,lz] = localOf(x,z)
       return mesh.position.y + (physics.enabled ? dynamics.sample(dynamics.bed,lx,lz) + dynamics.sample(dynamics.depth,lx,lz) : mask?.heights ? waterMaskEdge(shape,x,z,mask.heights) : 0)
     },
-    disturb(x: number, z: number, strength = .18, radius = .6) { if ((options.distance ? options.distance(x,z)>0 : waterEdge(shape,x,z)<0) || !physics.enabled) return; const [lx,lz] = localOf(x,z); dynamics.disturb(lx,lz,strength,radius) },
+    disturb(x: number, z: number, strength = .18, radius = .6) {
+      if ((options.distance ? options.distance(x,z)>0 : waterEdge(shape,x,z)<0)) return
+      if (look.rings?.enabled) { rings[ringIndex].set(x,z,uniforms.time.value,strength); ringIndex = (ringIndex+1)%rings.length }
+      if (physics.enabled) { const [lx,lz] = localOf(x,z); dynamics.disturb(lx,lz,strength,radius) }
+    },
+    /** Opt-in glyph rings for scene rain; impacts remain transient. */
+    rain(time: number, intensity: number) {
+      if (!look.rings?.enabled || intensity <= 0) return
+      const tick = Math.floor(time*10*intensity)
+      if (tick === rainTick) return; rainTick = tick
+      const wet: number[] = []; dynamics.wet.forEach((value,index) => { if (value) wet.push(index) })
+      if (!wet.length) return
+      const index = wet[Math.floor((Math.sin(tick*127.1+shape.x*3.7)*43758.5453 % 1 + 1) % 1 * wet.length)]
+      const x=(index%dynamicResolution/(dynamicResolution-1)-.5)*size,z=(Math.floor(index/dynamicResolution)/(dynamicResolution-1)-.5)*size
+      const c=Math.cos(shape.angle),s=Math.sin(shape.angle)
+      this.disturb(shape.x+c*x-s*z,shape.z+s*x+c*z,.1,.2)
+    },
     interact(id: string, position: THREE.Vector3, radius = .45) {
       const previous = contacts.get(id), distance = previous?.distanceTo(position) ?? 0
       if (distance > .015 && distance < 4) {
@@ -439,7 +498,7 @@ export function createWater(shape: WaterShape, options: WaterOptions = {}) {
     refresh,
     /** Distance (m) from a point to this water, 0 inside. */
     distance(x: number, z: number) { return options.distance ? options.distance(x, z) : Math.max(0, -waterEdge(shape, x, z)) },
-    dispose() { dynamicsTexture.dispose(); maskTexture?.dispose(); reflection.dispose(); material.dispose(); mesh.geometry.dispose() },
+    dispose() { if (layout.custom) glyphAtlas.dispose(); dynamicsTexture.dispose(); maskTexture?.dispose(); reflection.dispose(); material.dispose(); mesh.geometry.dispose() },
   }
 }
 

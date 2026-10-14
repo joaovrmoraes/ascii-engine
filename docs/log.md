@@ -4,6 +4,35 @@ Entries describe the state at each stage. Earlier limitations may have been
 resolved later; START.md and the editor guide describe the current scope.
 Historical filenames, reference IDs and captured interfaces are preserved.
 
+## 2026-10-14 — Editor consolidation stage 6: component letters
+
+Added optional WaterLook alphabets for water/foam/reflections, fonts/weight,
+initial/simulated depth colors and scale, reflection strength and glyph impact/
+rain rings. Existing controls now also expose cell size, row sparsity, base/sheen/
+foam colors, bank and reflection tint/threshold/rows. Rings are transient, bounded
+and clipped to water. Legacy marsh visuals are unchanged. New water fields were
+missing from the plan's assumed format, so the extension was reported explicitly.
+
+Terrain layers own optional surface look and standing-letter cover recipes.
+Floor alphabets, fonts, dimensions, colors/palettes, ink and lighting follow the
+dominant painted triangle while vertex colors still blend. Four material groups
+bound draw calls. Cover controls include glyphs/fonts, colors/palettes, dimensions,
+amount/density and wind. Color/font-only edits preserve default distribution and
+sizes. Old documents keep their original atlases/shaders/seeded recipes.
+
+Extracted waterInspector and shared letterControls; Texture Studio shares alphabet
+validation/input construction. Sandbox keeps document/history coordination. Added
+core format validation, atomic terrain.layer, water.update descriptions, MCP
+references/descriptions, API docs and meaningful validation/recipe/geometry tests.
+Stable musgo/terra/pedra/neve IDs are preserved under English display labels.
+
+Validation: pnpm check 139 tests; water 25 checks plus eight bank views, textures
+103, authoring 73, actual stdio MCP/API 35, with dev running. Pinned Orca tested
+terrain fields and actual water alphabet edits; owner document restored unchanged.
+Old terrain/grass/water world RMSE 0. [Captures/logs](captures/consolidation-stage6-2026-10-14/README.md).
+No push. Stage 7 panels/files remains. Orca images unavailable; inspected GPU
+Chromium captures. Native desktop unverified; no baseline regeneration.
+
 ## 2026-10-14 — Editor consolidation stage 5: one lighting home
 
 Extracted one built-in/saved atmosphere catalog for Environment, Atmosphere

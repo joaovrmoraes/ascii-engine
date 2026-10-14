@@ -1,4 +1,6 @@
 import * as THREE from 'three'
+import type { GlyphStyle } from '../style'
+import type { CarpetLook } from '../techniques/carpet'
 
 /**
  * Terrain with brushes (§3.4): a height map on a grid, sculpted and painted
@@ -12,6 +14,8 @@ export interface GroundLayer {
   color: number
   /** Carpet density on this layer (0 = bare). */
   grass: number
+  look?: GlyphStyle
+  cover?: CarpetLook
 }
 
 /** Pomorog palette: forest moss, trail earth, stone, snow. */
@@ -65,6 +69,19 @@ export function createTerrain(data: TerrainData = createTerrainData()) {
   geometry.setAttribute('color', new THREE.BufferAttribute(colors, 3))
   const material = new THREE.MeshStandardMaterial({ vertexColors: true, roughness: 1, color: 0xffffff })
   const mesh = new THREE.Mesh(geometry, material)
+  const originalIndices = geometry.index!.array.slice()
+  let layerMaterials: THREE.MeshStandardMaterial[] | undefined
+  function prepareLooks() {
+    if (!layerMaterials && !data.layers.some(layer => layer.look)) return
+    layerMaterials?.forEach(material => material.dispose())
+    layerMaterials = data.layers.some(layer => layer.look) ? data.layers.map(layer => {
+      const copy = material.clone(); copy.userData.glyphStyle = { glyph: 'surface', ...layer.look }; return copy
+    }) : undefined
+    mesh.material = (layerMaterials ?? material) as typeof material
+    mesh.userData.terrainLooks = !!layerMaterials
+    delete mesh.userData.asciiOriginal
+  }
+  prepareLooks()
   mesh.receiveShadow = true; mesh.castShadow = true; mesh.name = 'terrain'
   mesh.userData.glyph = 'surface'; mesh.userData.glyphStyle = { surface: 'earth' }
   const layerColors = () => data.layers.map((l) => new THREE.Color(l.color))
@@ -90,6 +107,21 @@ export function createTerrain(data: TerrainData = createTerrainData()) {
     position.needsUpdate = true
     ;(geometry.attributes.color as THREE.BufferAttribute).needsUpdate = true
     geometry.computeVertexNormals(); geometry.computeBoundingSphere(); geometry.computeBoundingBox()
+    if (layerMaterials) {
+      const buckets = data.layers.map(() => [] as number[])
+      for (let i=0;i<originalIndices.length;i+=3) {
+        let best=0, weight=-1
+        for(let k=0;k<data.layers.length;k++) {
+          const sum=data.paint[originalIndices[i]*4+k]+data.paint[originalIndices[i+1]*4+k]+data.paint[originalIndices[i+2]*4+k]
+          if(sum>weight) { weight=sum; best=k }
+        }
+        buckets[best].push(originalIndices[i],originalIndices[i+1],originalIndices[i+2])
+      }
+      geometry.clearGroups(); let offset=0
+      const indices = geometry.index!.array
+      buckets.forEach((bucket,index)=>{ indices.set(bucket,offset); geometry.addGroup(offset,bucket.length,index); offset+=bucket.length })
+      geometry.index!.needsUpdate=true
+    }
   }
   refresh()
 
@@ -154,14 +186,14 @@ export function createTerrain(data: TerrainData = createTerrainData()) {
   return {
     mesh, data, heightAt, layerAt, apply, refresh,
     /** Re-reads `data.layers` (colours changed). */
-    setLayers(layers: GroundLayer[]) { data.layers = layers.map((l) => ({ ...l })); palette = layerColors(); refresh() },
+    setLayers(layers: GroundLayer[]) { data.layers = structuredClone(layers); palette = layerColors(); prepareLooks(); refresh() },
     /** Carpet density for a recipe: the painted layer's `grass`, zero under water. */
     grassAt(x: number, z: number, waterLevel = -Infinity) {
       if (heightAt(x, z) < waterLevel + .02) return 0
       return data.layers[layerAt(x, z)]?.grass ?? 0
     },
     toJSON(): TerrainData { return { ...data, heights: data.heights.map((h) => Math.round(h * 1000) / 1000), paint: [...data.paint] } },
-    dispose() { geometry.dispose(); material.dispose() },
+    dispose() { layerMaterials?.forEach(material=>material.dispose()); geometry.dispose(); material.dispose() },
   }
 }
 export type Terrain = ReturnType<typeof createTerrain>

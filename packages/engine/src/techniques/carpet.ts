@@ -1,5 +1,19 @@
 import * as THREE from 'three'
 import { illuminationGLSL, illuminationUniforms } from '../illumination'
+import { createGlyphGrid, type GlyphSlot } from './glyphGrid'
+
+/** Supported per-layer standing-letter controls. Omitted fields keep the recipe. */
+export interface CarpetLook {
+  alphabet?: string
+  font?: string
+  fontWeight?: 400 | 700
+  color?: number
+  palette?: number[]
+  height?: number
+  width?: number
+  density?: number
+  wind?: number
+}
 
 /**
  * Technique `carpet` (Pomorog `grass.ts`). Each blade is a character in world
@@ -11,7 +25,9 @@ export interface GroundCover {
   density: (x: number, z: number) => number
   y: (x: number, z: number) => number
   /** Glyph indices into | / \\ v Y ! * o . , and a colour for each blade. */
-  pick: (random: () => number, x: number, z: number) => { glyph: number; height: number; color: [number, number, number] }
+  pick: (random: () => number, x: number, z: number) => { glyph: number; height: number; color: [number, number, number]; width?: number; wind?: number; absoluteHeight?: boolean }
+  glyphs?: GlyphSlot[]
+  variableWind?: boolean
   /** Endless ground: blades wrap around the hero and a GLSL soil mask clears trail/banks. */
   infinite?: { glsl: string; uniforms: Record<string, { value: unknown }>; span: number }
   /** Side of the square where blades are scattered, centred on `center` (Pomorog: 26 m). */
@@ -28,9 +44,9 @@ export function createCarpet(random: () => number, cover: GroundCover) {
   const ctx = atlas.getContext('2d')!
   ctx.fillStyle = '#fff'; ctx.font = '34px monospace'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle'
   glyphs.forEach((glyph, i) => ctx.fillText(glyph, i * 32 + 16, 24))
-  const texture = new THREE.CanvasTexture(atlas)
+  const texture = cover.glyphs ? createGlyphGrid(cover.glyphs, 32, 48, 34, 24, true) : new THREE.CanvasTexture(atlas)
   texture.minFilter = THREE.LinearMipmapLinearFilter; texture.magFilter = THREE.LinearFilter; texture.generateMipmaps = true
-  const offsets: number[] = [], shapes: number[] = [], colors: number[] = []
+  const offsets: number[] = [], shapes: number[] = [], colors: number[] = [], winds: number[] = []
   // An endless carpet must fill the whole wrap span: Pomorog scattered 26 m
   // and wrapped 36 m, leaving a 10 m bare band that travelled with the hero.
   const extent = cover.extent ?? cover.infinite?.span ?? 26, cx = cover.center?.x ?? 0, cz = cover.center?.z ?? 0
@@ -39,7 +55,8 @@ export function createCarpet(random: () => number, cover: GroundCover) {
     if (random() > cover.density(x, z)) continue
     const blade = cover.pick(random, x, z)
     offsets.push(x, cover.y(x, z), z)
-    shapes.push(blade.glyph, blade.glyph >= 6 ? .16 + blade.height * .3 : blade.height * .4, blade.glyph >= 6 ? .1 + blade.height * .5 : blade.height, random() * 6.28)
+    shapes.push(blade.glyph, blade.width ?? (blade.glyph >= 6 ? .16 + blade.height * .3 : blade.height * .4), blade.absoluteHeight ? blade.height : blade.glyph >= 6 ? .1 + blade.height * .5 : blade.height, random() * 6.28)
+    winds.push(blade.wind ?? 1)
     colors.push(...blade.color)
   }
   const base = new THREE.PlaneGeometry(1, 1, 1, 3)
@@ -51,6 +68,7 @@ export function createCarpet(random: () => number, cover: GroundCover) {
   geometry.setAttribute('offset', new THREE.InstancedBufferAttribute(new Float32Array(offsets), 3))
   geometry.setAttribute('shape', new THREE.InstancedBufferAttribute(new Float32Array(shapes), 4))
   geometry.setAttribute('bladeColor', new THREE.InstancedBufferAttribute(new Float32Array(colors), 3))
+  if (cover.variableWind) geometry.setAttribute('windGain', new THREE.InstancedBufferAttribute(new Float32Array(winds), 1))
   geometry.instanceCount = offsets.length / 3
   const trail = Array.from({ length: 12 }, () => new THREE.Vector4(100, 100, -100, 0))
   const material = new THREE.ShaderMaterial({
@@ -67,6 +85,7 @@ export function createCarpet(random: () => number, cover: GroundCover) {
       ${cover.infinite ? `#define INFINITE_GROUND\n#define GROUND_SPAN ${cover.infinite.span.toFixed(1)}\n${cover.infinite.glsl}` : ''}
       attribute vec3 offset, bladeColor;
       attribute vec4 shape;
+      ${cover.variableWind ? 'attribute float windGain;' : ''}
       uniform float time;
       uniform vec3 right, hero, enemy, focus;
       uniform vec4 trail[12];
@@ -97,6 +116,7 @@ export function createCarpet(random: () => number, cover: GroundCover) {
         }
         float wind = sin(time * 1.65 + base.x * .65 + base.z * .35) * .11;
         wind += sin(time * 2.6 + shape.w) * .035;
+        ${cover.variableWind ? 'wind *= windGain;' : ''}
         float tip = position.y * position.y;
         vec3 point = base + right * position.x * shape.y;
         point.y += position.y * shape.z * (1. - min(length(force) * .55, .78));
@@ -120,7 +140,7 @@ export function createCarpet(random: () => number, cover: GroundCover) {
       ${illuminationGLSL}
       varying float vGlyph, vFog;
       void main() {
-        float ink = texture2D(atlas, vec2((vGlyph + vUv.x) / 10., vUv.y)).a;
+        float ink = texture2D(atlas, ${cover.glyphs ? `vec2((mod(vGlyph,${texture.userData.columns}.0)+vUv.x)/${texture.userData.columns}.0, (${texture.userData.rows}.0-1.-floor(vGlyph/${texture.userData.columns}.0)+vUv.y)/${texture.userData.rows}.0)` : 'vec2((vGlyph + vUv.x) / 10., vUv.y)'}).a;
         if (ink < .22) discard;
         vec3 color = vColor * tint * (.55 + .75 * vUv.y) * brightness;
         // Spell and aura lights spill over the blades, like the reference pools.

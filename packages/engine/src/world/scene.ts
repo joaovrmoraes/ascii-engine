@@ -2,7 +2,8 @@ import * as THREE from 'three'
 import type { AddOptions, AsciiEngine } from '../engine'
 import type { AsciiStyle } from '../config'
 import type { ObjectTypeStyle } from '../style'
-import type { GroundCover } from '../techniques/carpet'
+import { CARPET_GLYPHS, type GroundCover } from '../techniques/carpet'
+import type { GlyphSlot } from '../techniques/glyphGrid'
 import { waterHeightAt } from './waterPaint'
 import { waterEdge, type Water, type WaterLook, type WaterShape } from '../techniques/water'
 import { createTerrain, type Terrain, type TerrainData } from './terrain'
@@ -82,14 +83,31 @@ export function seededRandom(seed: number) {
 const pickOf = (list: number[], random: () => number) => list[Math.floor(random() * list.length)]
 /** Meadow blades over a terrain: density from the painted layer, height from the relief. */
 export function terrainCover(terrain: Terrain, count: number, waterLevel: number | SceneWater[] = -Infinity): GroundCover {
+  const custom = terrain.data.layers.some(layer => layer.cover)
+  const slots: GlyphSlot[] = CARPET_GLYPHS.map(glyph => ({glyph,font:'monospace'})), layerSlots = new Map<number, number[]>()
+  terrain.data.layers.forEach((layer,index) => {
+    if (!layer.cover) return
+    const look = layer.cover, chars = Array.from(look.alphabet ?? CARPET_GLYPHS.join(''))
+    layerSlots.set(index, chars.map(glyph => {
+      const slot = {glyph,font:look.font ?? 'monospace',fontWeight:look.fontWeight ?? 400}, found = slots.findIndex(item => item.glyph===slot.glyph && item.font===slot.font && (item.fontWeight ?? 400)===slot.fontWeight)
+      if(found>=0) return found; slots.push(slot); return slots.length-1
+    }))
+  })
   return {
-    count, extent: terrain.data.size, y: (x, z) => terrain.heightAt(x, z) - .06,
-    density: (x, z) => terrain.grassAt(x, z, typeof waterLevel === 'number' ? waterLevel : Math.max(-Infinity, ...waterLevel.filter(w => waterEdge(w.shape, x, z) > 0).map(w => waterHeightAt(w.shape, x, z, w.level ?? 0)))),
-    pick(random) {
+    count, ...(custom ? {glyphs:slots,variableWind:true} : {}), extent: terrain.data.size, y: (x, z) => terrain.heightAt(x, z) - .06,
+    density: (x, z) => (terrain.data.layers[terrain.layerAt(x,z)]?.cover?.density ?? 1) * terrain.grassAt(x, z, typeof waterLevel === 'number' ? waterLevel : Math.max(-Infinity, ...waterLevel.filter(w => waterEdge(w.shape, x, z) > 0).map(w => waterHeightAt(w.shape, x, z, w.level ?? 0)))),
+    pick(random,x,z) {
       const flower = random() < .012, shade = .55 + random() * .6, warm = random()
-      return flower
+      const legacy = flower
         ? { glyph: 6 + Math.floor(random() * 2), height: .2, color: [.62 * shade, .66 * shade, .5 * shade] }
         : { glyph: pickOf([0, 0, 1, 2, 5, 5, 3], random), height: .12 + random() * .16, color: [(.2 + warm * .14) * shade, (.46 + warm * .06) * shade, (.26 - warm * .1) * shade] }
+      const layer = terrain.layerAt(x,z), look = terrain.data.layers[layer]?.cover
+      if (!look) return { ...legacy, color:legacy.color as [number,number,number] }
+      const glyphs=layerSlots.get(layer)!, glyph=look.alphabet ? glyphs[Math.floor(random()*glyphs.length)] : glyphs[legacy.glyph]
+      const height=look.height ?? (legacy.glyph>=6 ? .1+legacy.height*.5 : legacy.height)
+      const width=look.width ?? (legacy.glyph>=6 ? .16+legacy.height*.3 : legacy.height*.4)
+      const color=look.palette?.[Math.floor(random()*look.palette.length)] ?? look.color
+      return {glyph,height,width,absoluteHeight:true,wind:look.wind ?? 1,color:color===undefined ? legacy.color as [number,number,number] : new THREE.Color(color).toArray() as [number,number,number]}
     },
   }
 }
@@ -182,6 +200,7 @@ export function buildScene(engine: AsciiEngine, source: SceneDoc, library: Prefa
     },
     update(time: number) {
       weather?.update(time)
+      if (doc.environment?.weather === 'rain') for (const water of waters) water.rain(time, doc.environment.intensity ?? 1)
       for (const p of placed) {
         library[p.doc.prefab]?.update?.(p.object, time)
         if (p.object.visible) for (const water of waters) water.interact(p.object.uuid, p.object.position)

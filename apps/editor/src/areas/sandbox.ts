@@ -16,6 +16,8 @@ import { createPlacementPreview } from '../editor/placement'
 import { createSceneCameras } from '../editor/cameras'
 import { createEffectEditor } from '../editor/effects'
 import { createTextureStudio } from '../editor/textures'
+import { renderWaterInspector } from '../editor/waterInspector'
+import { terrainLetterFields } from '../editor/letterControls'
 import { downloadStylePreset, loadStylePreset } from '../editor/stylePresets'
 
 type Tool = 'select' | Brush | 'water' | 'place' | 'erase'
@@ -236,6 +238,10 @@ export async function createSandbox(engine: AsciiEngine, options: AreaOptions = 
     ui.get('[data-k="no-terrain"]').hidden = !!scene.terrain
     ui.get<HTMLSelectElement>('[data-k="weather"]').value = snapshot().environment?.weather ?? 'none'
     fillAtmosphereSelect(ui.get<HTMLSelectElement>('[data-k="atmosphere"]'), snapshot(), matchingAtmosphere(snapshot(), engine.style) ?? 'current')
+    const root=box.querySelector<HTMLElement>('[data-k=terrain-letters]')!
+    const layer=scene.terrain?.data.layers[tool.layer]
+    root.hidden=!layer
+    if(layer) terrainLetterFields(root,layer,patch=>run(async()=>{const doc=snapshot();doc.terrain!.layers[tool.layer]={...doc.terrain!.layers[tool.layer],...patch};await replace(doc);changed()}))
     refreshLibrary()
   }
   function syncTransformFields() {
@@ -272,7 +278,7 @@ export async function createSandbox(engine: AsciiEngine, options: AreaOptions = 
       const title = `${water.shape.kind === 'paint' ? 'Water' : water.shape.kind === 'pond' ? 'Lake' : 'Stream'} ${i + 1}`
       if (!normalized(title).includes(normalized(hierarchyQuery))) return
       const button = document.createElement('button'); button.innerHTML = icon('water') + `<span>${title}</span>`
-      button.className = `hierarchy-object${selectedWater === i ? ' active' : ''}`; button.onclick = () => { choose(); selectedWater = i; ui!.selectPane('object'); refreshHierarchy() }; list.append(button)
+      button.dataset.waterIndex=String(i); button.className = `hierarchy-object${selectedWater === i ? ' active' : ''}`; button.onclick = () => { choose(); selectedWater = i; ui!.selectPane('object'); refreshHierarchy() }; list.append(button)
     })
     const inspector = ui!.inspector; inspector.replaceChildren()
     const field = (label: string, value: string, change: (value: string) => void, type = 'number') => {
@@ -317,45 +323,11 @@ export async function createSandbox(engine: AsciiEngine, options: AreaOptions = 
       button('Focus [F]', () => { focus.copy(object.position); focus.y += .8 })
       button('Duplicate [Ctrl D]', duplicate); button('Export this item', exportItem)
     } else if (selectedWater >= 0) {
-      const index = selectedWater, entry = snapshot().waters![index]
-      for (const [key, label, value] of [['x', 'Position x', entry.shape.x], ['z', 'Position z', entry.shape.z], ['size', 'Size', entry.shape.size], ['angle', 'Direction (degrees)', entry.shape.angle * 180 / Math.PI], ['level', 'Level', entry.level ?? 0], ['flow', 'Flow', entry.look?.flow ?? (entry.shape.kind === 'stream' ? .35 : .025)]] as const) {
-        field(label, String(value), value => { void waterChange(key, Number(value)) })
-      }
-      const row = document.createElement('label'), reflect = document.createElement('input'); row.textContent = 'Reflection'; reflect.type = 'checkbox'; reflect.checked = scene.waters[index].look.reflection.enabled
-      reflect.onchange = () => run(async () => { const doc = snapshot(); doc.waters![index].look = { ...doc.waters![index].look, reflection: { ...scene.waters[index].look.reflection, enabled: reflect.checked } }; await replace(doc); selectedWater = index; changed() }); row.append(reflect); inspector.append(row)
-      const physics = scene.waters[index].physics
-      const physicalRow = document.createElement('label'), physical = document.createElement('input'); physicalRow.textContent = 'Simulate water'; physical.type = 'checkbox'; physical.checked = physics.enabled
-      async function changePhysics(patch: Partial<typeof physics>) { await run(async () => { const doc = snapshot(); doc.waters![index].physics = { ...physics, ...patch }; await replace(doc); selectedWater = index; changed() }) }
-      physical.onchange = () => { void changePhysics({ enabled: physical.checked }) }; physicalRow.append(physical); inspector.append(physicalRow)
-      for (const [key,label] of [['depth','Initial depth (m)'],['source','Source rate (m/s)'],['damping','Flow resistance'],['waves','Wave amplitude (m)']] as const) field(label,String(physics[key]),value=>{ void changePhysics({[key]:Number(value)}) })
-      button('Test waves', () => {
-        const water = scene.waters[index], d = water.dynamics, c = Math.cos(water.shape.angle), s = Math.sin(water.shape.angle)
-        let best = Infinity, point = [0,0]
-        for (let i=0;i<d.wet.length;i++) if(d.wet[i]) {
-          const x=(i%d.resolution/(d.resolution-1)-.5)*d.size,z=(Math.floor(i/d.resolution)/(d.resolution-1)-.5)*d.size
-          const wx=water.shape.x+c*x-s*z,wz=water.shape.z+s*x+c*z,distance=(wx-focus.x)**2+(wz-focus.z)**2
-          if(distance<best){best=distance;point=[wx,wz]}
-        }
-        water.disturb(point[0],point[1],.28,1)
+      const indexOfWater = selectedWater
+      renderWaterInspector(inspector, {index:selectedWater,scene,snapshot,replace,changed,run,field,button,focus,message,
+        reselect:()=>{selectedWater=indexOfWater},
+        paint:()=>{tool.kind='water';gizmos?.attach();ui?.selectPane('terrain');refreshTools();refreshHint()},
       })
-      const waterHint=document.createElement('p');waterHint.className='empty-note';waterHint.textContent='Gravity moves water downhill within the painted area. A zero source rate closes the inlet; moving objects in water generates waves. The Atmosphere main light controls the reflected highlight.';inspector.append(waterHint)
-      if (!entry.shape.mask?.heights && scene.terrain) button('Fit to terrain', async () => {
-        const doc = snapshot(), terrain = scene.terrain!, { size, resolution } = terrain.data
-        const shape = createWaterPaint(size, resolution)
-        for (let z = 0; z < resolution; z++) for (let x = 0; x < resolution; x++) shape.mask!.values[z * resolution + x] = waterEdge(entry.shape, x / (resolution - 1) * size - size / 2, z / (resolution - 1) * size - size / 2)
-        shape.mask!.heights = terrain.data.heights.map(height => height + .045)
-        doc.waters![index] = { ...entry, shape, level: 0 }; await replace(doc); selectedWater = index; changed()
-      })
-      if (entry.shape.kind === 'paint') button('Continue painting water', () => { tool.kind = 'water'; gizmos?.attach(); ui?.selectPane('terrain'); refreshTools(); refreshHint() })
-      async function waterChange(key: string, value: number) {
-        try {
-          const doc = snapshot(), water = doc.waters![index]
-          if (key === 'level') water.level = value
-          else if (key === 'flow') water.look = { ...water.look, flow: value, pondDrift: [Math.cos(water.shape.angle) * value, Math.sin(water.shape.angle) * value] }
-          else Object.assign(water.shape, { [key]: key === 'angle' ? value * Math.PI / 180 : value })
-          await replace(doc); selectedWater = index; changed()
-        } catch (error) { message(String(error)) }
-      }
     } else { const hint = document.createElement('p'); hint.className = 'inspector-empty'; hint.innerHTML = icon('cursor') + '<strong>No object selected</strong><span>Click an object in the scene to edit its properties.</span><span>To add an object, drag an asset from the library below onto the map.</span>'; inspector.append(hint) }
     if (selected || selectedWater >= 0) button('Delete [Delete]', removeSelected)
   }
@@ -476,11 +448,11 @@ export async function createSandbox(engine: AsciiEngine, options: AreaOptions = 
       if (file) run(async () => { await loadStylePreset(engine, file); atmosphereStudio?.refresh(); changed() })
     }
     const brushes: [Tool, string, string][] = [['raise', 'Raise', 'terrain'], ['lower', 'Lower', 'terrain'], ['smooth', 'Smooth', 'rock'], ['flatten', 'Flatten', 'grid'], ['paint', 'Paint', 'cursor'], ['water', 'Water', 'water'], ['erase', 'Erase object', 'cube']]
-    box.innerHTML = `<div class="component-title">${icon('terrain')} Terrain tools</div><p data-k="no-terrain" class="empty-note" hidden>This item has no terrain. Use File → New map.</p><div class="brush-grid">${brushes.map(([key, title, symbol]) => `<button data-brush="${key}">${icon(symbol)}${title}</button>`).join('')}</div><label>Radius<input data-k="radius" type="range" min=".5" max="8" step=".25"></label><label>Water<select data-k="water-mode"><option value="terrain">Follow terrain</option><option value="level">Flat level (lake)</option></select></label><label>Strength<input data-k="strength" type="range" min=".01" max=".4" step=".01"></label><label>Layer<select data-k="layer"></select></label><button data-k="grow">Regrow grass</button><p class="empty-note">Drag over the terrain. Undo each stroke with Ctrl Z.</p>`
+    box.innerHTML = `<div class="component-title">${icon('terrain')} Terrain tools</div><p data-k="no-terrain" class="empty-note" hidden>This item has no terrain. Use File → New map.</p><div class="brush-grid">${brushes.map(([key, title, symbol]) => `<button data-brush="${key}">${icon(symbol)}${title}</button>`).join('')}</div><label>Radius<input data-k="radius" type="range" min=".5" max="8" step=".25"></label><label>Water<select data-k="water-mode"><option value="terrain">Follow terrain</option><option value="level">Flat level (lake)</option></select></label><label>Strength<input data-k="strength" type="range" min=".01" max=".4" step=".01"></label><label>Layer<select data-k="layer"></select></label><button data-k="grow">Regrow grass</button><p class="empty-note">Drag over the terrain. Undo each stroke with Ctrl Z.</p><div data-k="terrain-letters"></div>`
     box.querySelectorAll<HTMLButtonElement>('[data-brush]').forEach(button => { button.onclick = () => { placement.clear(); tool.kind = button.dataset.brush as Tool; gizmos!.attach(); refreshTools(); refreshHint() } })
     for (const key of ['radius', 'strength'] as const) { const input = el<HTMLInputElement>(key); input.value = String(tool[key]); input.oninput = () => { tool[key] = Number(input.value) } }
     el<HTMLSelectElement>('water-mode').onchange = e => { tool.waterMode = (e.target as HTMLSelectElement).value as 'terrain' | 'level'; selectedWater = -1 }
-    el<HTMLSelectElement>('layer').onchange = e => { tool.layer = Number((e.target as HTMLSelectElement).value) }
+    el<HTMLSelectElement>('layer').onchange = e => { tool.layer = Number((e.target as HTMLSelectElement).value); refreshTools() }
     el('grow').onclick = () => run(() => { scene.regrow(); changed() })
     ui.environment.innerHTML = `<div class="component-title">${icon('spark')} Scene environment</div><label>Weather<select data-k="weather"><option value="none">No precipitation</option><option value="rain">Rain</option><option value="snow">Snow</option></select></label><label>Atmosphere<select data-k="atmosphere"><option value="moon">Moonlight</option><option value="dusk">Dusk</option><option value="ember">Ember</option></select></label><button data-k="open-studio">Open atmosphere studio</button><p class="empty-note">Settings saved with the map.</p>`
     el<HTMLSelectElement>('weather').onchange = e => run(async () => { const doc = snapshot(); doc.environment = { weather: (e.target as HTMLSelectElement).value as 'none' | 'rain' | 'snow' }; await replace(doc); changed() })

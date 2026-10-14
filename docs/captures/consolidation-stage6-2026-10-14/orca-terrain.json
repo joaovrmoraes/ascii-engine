@@ -1,0 +1,11 @@
+{
+  "id": "3b3c0110-96d4-4453-8de3-d3135b6cf6bf",
+  "ok": true,
+  "result": {
+    "result": "{\"floor\":true,\"grass\":true,\"layers\":[\"Moss\",\"Earth\",\"Stone\",\"Snow\"],\"unchanged\":true}",
+    "origin": "http://localhost:1440/?area=sandbox"
+  },
+  "_meta": {
+    "runtimeId": "327bd229-b588-4def-b562-15b9bd27a70c"
+  }
+}

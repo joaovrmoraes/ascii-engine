@@ -1,0 +1,11 @@
+{
+  "id": "c62613c2-8344-422a-aea4-9e26e5994037",
+  "ok": true,
+  "result": {
+    "result": "{\"alphabet\":\"~=\",\"ownerRestored\":true,\"reflection\":true,\"rings\":true}",
+    "origin": "http://localhost:1440/?area=sandbox"
+  },
+  "_meta": {
+    "runtimeId": "327bd229-b588-4def-b562-15b9bd27a70c"
+  }
+}

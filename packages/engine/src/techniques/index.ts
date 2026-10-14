@@ -53,6 +53,7 @@ export {
   createCarpet,
   CARPET_GLYPHS,
   type Carpet,
+  type CarpetLook,
   type GroundCover,
 } from './carpet'
 export {

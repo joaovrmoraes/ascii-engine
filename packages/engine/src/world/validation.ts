@@ -203,7 +203,23 @@ export function parseScene(input: unknown, library?: PrefabLibrary): SceneDoc {
     heights.forEach((h) => number(h, 'terrain.heights', -4096, 4096))
     paint.forEach((p) => number(p, 'terrain.paint', 0, 255))
     if (!layers.length || layers.length > 4) fail('terrain.layers', 'needs 1 to 4 layers')
-    layers.forEach((raw) => { const l = record(raw, 'terrain.layers'); number(l.color, 'layer.color', 0, 0xffffff); number(l.grass, 'layer.grass', 0, 1); if (typeof l.name !== 'string') fail('layer.name', 'must be text') })
+    layers.forEach((raw, index) => {
+      const path = `terrain.layers[${index}]`, l = record(raw, path)
+      number(l.color, `${path}.color`, 0, 0xffffff); number(l.grass, `${path}.grass`, 0, 1)
+      if (typeof l.name !== 'string') fail(`${path}.name`, 'must be text')
+      if (l.look !== undefined) {
+        style(l.look, `${path}.look`)
+        const look = record(l.look, `${path}.look`)
+        for (const key of Object.keys(look)) if (!(GLYPH_STYLE_KEYS as readonly string[]).includes(key)) fail(`${path}.look.${key}`, 'not a glyph field')
+        if (look.glyph !== undefined && look.glyph !== 'surface') fail(`${path}.look.glyph`, 'floor uses surface glyphs')
+      }
+      if (l.cover !== undefined) {
+        const cover = record(l.cover, `${path}.cover`)
+        for (const key of Object.keys(cover)) if (!['alphabet','font','fontWeight','color','palette','height','width','density','wind'].includes(key)) fail(`${path}.cover.${key}`, 'not a carpet field')
+        style({ alphabet:cover.alphabet, font:cover.font, fontWeight:cover.fontWeight, color:cover.color, palette:cover.palette }, `${path}.cover`)
+        for (const [key,min,max] of [['height',.01,5],['width',.005,5],['density',0,1],['wind',0,4]] as const) if (cover[key] !== undefined) number(cover[key], `${path}.cover.${key}`, min,max)
+      }
+    })
   }
   if (root.carpet !== undefined) {
     const c = record(root.carpet, 'carpet'); number(c.count, 'carpet.count', 0, 300000)
@@ -231,11 +247,28 @@ export function parseScene(input: unknown, library?: PrefabLibrary): SceneDoc {
     }
     if (w.look !== undefined) {
       const look = record(w.look, `waters[${i}].look`)
+      const path = `waters[${i}].look`
       for (const [k, value] of Object.entries(look)) {
         if (k in DEFAULT_WATER_LOOK) sameShape(value, DEFAULT_WATER_LOOK[k as keyof typeof DEFAULT_WATER_LOOK], `waters[${i}].look.${k}`)
       }
       if (look.cell) vector(look.cell, `waters[${i}].look.cell`, 2, .001)
       if (look.reflection) number(record(look.reflection, 'reflection').rows, 'reflection.rows', 1, 10000)
+      for (const key of ['alphabet','foamAlphabet','reflectionAlphabet']) if (look[key] !== undefined && !validGlyphAlphabet(look[key])) fail(`${path}.${key}`, 'must contain 1–128 visible single characters')
+      style({font:look.font,fontWeight:look.fontWeight},path)
+      const rgb = (value: unknown, path: string) => { vector(value,path,3,0); (value as number[]).forEach(channel=>number(channel,path,0,4)) }
+      if (look.shallow !== undefined) rgb(look.shallow,`${path}.shallow`)
+      if (look.deep !== undefined) rgb(look.deep,`${path}.deep`)
+      if (look.depthScale !== undefined) number(look.depthScale,`${path}.depthScale`,.005,10)
+      const reflection = look.reflection as Record<string,unknown> | undefined
+      if (reflection?.strength !== undefined) number(reflection.strength,`${path}.reflection.strength`,0,4)
+      if (look.rings !== undefined) {
+        const rings=record(look.rings,`${path}.rings`)
+        if(typeof rings.enabled!=='boolean') fail(`${path}.rings.enabled`,'must be a boolean')
+        if(rings.alphabet!==undefined && !validGlyphAlphabet(rings.alphabet)) fail(`${path}.rings.alphabet`,'must contain 1–128 visible single characters')
+        if(rings.color!==undefined) rgb(rings.color,`${path}.rings.color`)
+        if(rings.size!==undefined) number(rings.size,`${path}.rings.size`,.05,20)
+        if(rings.lifetime!==undefined) number(rings.lifetime,`${path}.rings.lifetime`,.1,20)
+      }
     }
   })
   // Independent snapshot. Legacy documents receive deterministic identities/seeds.

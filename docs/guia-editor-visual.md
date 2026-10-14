@@ -88,6 +88,21 @@ Objects keep their inspector-defined height when terrain changes.
 Initial placement height comes from the ground. Grass regrows after a
 stroke. A water mask is local to its shape.
 
+## Terrain and grass letters
+
+In **Terrain**, choose a stable **Layer**, then edit its **floor letters** and
+**standing letters**. The floor supports surface families, custom alphabets,
+fonts/weight, size/spacing/density, visibility, color/palette, ink, shadows and
+lighting response. Painted colors still blend; glyph styles follow the dominant
+painted layer of each triangle. Other layers keep their own looks.
+
+Standing letters expose alphabet/font, color/palette, height/width, density and
+wind. **Layer cover amount** controls whether this layer grows anything; zero
+keeps it bare. Omitted fields use the original recipe. Color-only edits preserve
+its original distribution and dimensions. Edits rebuild the map with undo and
+persist in terrain.layers[].look / cover. Moss/Earth/Stone/Snow are labels;
+existing IDs remain unchanged.
+
 ## Water: flow, reflections and interaction
 
 Select **Water** in the hierarchy. **Simulate water** enables shallow-water
@@ -98,6 +113,14 @@ water at high edges. With zero source rate, the domain conserves volume.
 **Wave amplitude** controls small surface waves; **Test waves** creates
 an impact. Moving objects in water and actors supplied through
 `engine.setActors` produce waves and trails.
+
+**Water letters** edits water/foam/reflection alphabets, font/weight, cell size,
+row sparsity, base/shallow/deep/foam/sheen colors, bank width and reflection
+strength/tint/threshold/row interval. Depth colors use initial/simulated depth;
+**Deep color at** sets the depth that reaches the deep color. **Impact and rain
+rings** enables optional letter rings with alphabet, color, radius and lifetime.
+Test waves, moving objects and rain produce transient rings. These opt-in looks
+leave old water recipes unchanged. Blank optional fields inherit defaults.
 
 The default favors a calm lake, slow wave fronts and readable reflections.
 Wave amplitude also controls reflection jitter and small-wave highlights.

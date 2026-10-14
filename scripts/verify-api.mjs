@@ -74,9 +74,11 @@ try {
   const commands=[
     {op:'scene.replace',document:{version:1,name:'MCP-authored clearing',objects:[]}},
     {op:'terrain.create',size:24,resolution:65},
+    {op:'terrain.layer',index:0,patch:{look:{alphabet:'XZ',size:.23},cover:{alphabet:'v*',height:.35,color:0x55aa88}}},
     {op:'terrain.stroke',strokes:[{brush:'raise',x:1,z:-2,radius:5,strength:2},{brush:'paint',x:-3,z:0,radius:2,strength:1,layer:1}]},
     {op:'scene.patch',patch:{carpet:{count:35000,seed:48}}},
     {op:'water.paint',points:[{x:1,z:-2},{x:0,z:0},{x:-3,z:2}],radius:1,mode:'terrain'},
+    {op:'water.update',index:0,patch:{look:{alphabet:'~=',foamAlphabet:'*+',reflectionAlphabet:'A#',shallow:[.1,.3,.4],deep:[.02,.05,.12],rings:{enabled:true,alphabet:'|_-',size:1.4,lifetime:1},reflection:{strength:.6}}}},
     {op:'object.add',object:{id:'fire',prefab:'fogueira',position:[-3,0,-1]}},
     {op:'object.add',object:{id:'rock',prefab:'pedregulho',position:[0,1.2,-3]}},
     {op:'scene.patch',patch:{style:{types:{pedregulho:{style:{size:.21},authored:{style:['size']}}}}}},
@@ -107,6 +109,7 @@ try {
   state=await invoke('scene_apply',{revision:canceled.revision,commands,preview:true})
   state=await invoke('scene_preview',{revision:state.revision,action:'accept'})
   const committed=(await invoke('scene_read',{full:true})).document
+  assert(committed.terrain.layers[0].name==='musgo'&&committed.terrain.layers[0].look.alphabet==='XZ'&&committed.terrain.layers[0].cover.height===.35&&committed.waters[0].look.rings.enabled,'actual MCP authors floor, standing letters and water looks with stable layer IDs')
   const texture=committed.textures['mcp-symbols'],rock=committed.objects.find(object=>object.id==='rock')
   assert(texture.style.alphabet.includes('↑')&&texture.style.fontWeight===700&&texture.style.open&&texture.style.palette.length===2&&rock.options.alphabet===texture.style.alphabet,'real MCP defines and applies Unicode, font, visibility and palette texture controls')
   assert(texture.previewLighting.brightness===1.1&&committed.style.brightness!==1.1,'MCP saves texture preview lights without applying them to scene lighting')

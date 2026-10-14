@@ -315,3 +315,34 @@ when parent overrides compete with part recipes. `resource.remove` rejects
 textures still in use. Define an updated recipe under the same ID to update its
 users; preview/accept/undo retain their normal atomic behavior. Applying a texture
 never transfers preview lighting into the scene.
+
+### Water, floor and standing-letter looks
+
+These optional SceneDoc v1 extensions do not rewrite legacy recipes:
+
+- `waters[].look`: custom `alphabet`, `foamAlphabet`, `reflectionAlphabet`
+  (1–128 single characters each), `font`, `fontWeight` (400/700), `shallow`,
+  `deep` (linear RGB triples), `depthScale` (.005–10 m), optional
+  `reflection.strength` (0–4), and `rings: {enabled, alphabet?, color?, size?,
+  lifetime?}`. Ring radius is .05–20 m; lifetime .1–20 seconds. Depth colors
+  use initial/simulated depth, reaching deep at depthScale (default .5 m). Existing
+  cell/flow/pondDrift/open/sheen/sparse/foam/bank/reflection fields retain their
+  original meanings. Row sparsity controls empty water cells. Opt-in glyph
+  rings respond to water_disturb, moving contacts and scene rain; impacts and
+  simulation time are transient. Legacy marsh effects are preserved.
+- `terrain.layers[index].look`: a surface GlyphStyle, including family, custom
+  alphabet, font, world size, spacing, density, ink/gap/contrast, palette,
+  lighting and self light. Floors use surface glyphs. Painted vertex colors
+  still blend; optional glyph recipes follow each triangle's dominant layer.
+- `terrain.layers[index].cover`: `alphabet`, `font`, `fontWeight`, integer RGB
+  `color` or `palette` (2–8 colors), `height` (.01–5 m), `width` (.005–5 m),
+  `density` (0–1 multiplier) and `wind` (0–4). Layer `grass` remains the cover
+  amount. Color/font-only edits preserve the original glyph distribution and
+  dimensions; omitted fields retain the recipe. Letters stand in world space.
+
+Use `terrain.layer {index, patch}` for atomic layer edits and `water.update`
+for water looks. Stable layer names such as musgo/terra/pedra/neve are IDs;
+editor labels remain Moss/Earth/Stone/Snow. To clear an optional look/cover via
+MCP, replace the layers array with the desired fields omitted (scene.patch),
+or replace the complete document. No automatic conversion of old documents.
+Custom component atlases use bounded 2D grids; font files are not embedded.

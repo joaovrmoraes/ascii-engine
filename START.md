@@ -331,6 +331,18 @@ volumetric fluid or rigid buoyancy. Planar mirrors cover calm regions;
 highlights follow light/camera direction. `water.disturb` / MCP
 `water_disturb` are transient; documents store recipes, not simulation time.
 
+**Component letters (consolidation stage 6):** water inspector exposes custom
+water/foam/reflection alphabets/fonts, density through row sparsity, depth colors,
+bank and reflection controls, and optional transient impact/rain glyph rings.
+Terrain layers own optional surface `look` and standing-letter `cover` recipes;
+Terrain edits alphabets/fonts, size, colors, palettes, ink and wind. Floor glyphs
+follow dominant painted triangles in at most four material groups; vertex colors
+still blend. Cover color/font edits preserve legacy distribution and dimensions.
+Omitted looks keep original shaders/atlases and seeded recipes exactly. Stable
+layer IDs remain unchanged. Water inspector and shared letter controls live in
+editor modules; sandbox retains document/history coordination. `terrain.layer`
+and `water.update` expose the same fields through authoring/MCP.
+
 **Composition cameras:** named `SceneDoc.cameras` poses include XYZ radians,
 orthographic span and aspect ratio. `activeCamera` selects preview/player/
 export framing. Selection shows a live thumbnail using the same renderer

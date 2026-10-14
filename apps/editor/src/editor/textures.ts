@@ -1,6 +1,7 @@
 import * as THREE from 'three'
-import { textureUsers, GLYPH_STYLE_KEYS, createHistory, parseScene, textureStyle, validGlyphAlphabet, type AtmosphereStyle, type GlyphStyle, type SceneDoc, type TextureAsset } from '@ascii-engine/core'
+import { textureUsers, GLYPH_STYLE_KEYS, createHistory, parseScene, textureStyle, type AtmosphereStyle, type GlyphStyle, type SceneDoc, type TextureAsset } from '@ascii-engine/core'
 import { createTexturePreview } from './texturePreview'
+import { alphabetInput, validateAlphabetInput } from './letterControls'
 import { atmosphereChoices, fillAtmosphereSelect, matchingAtmosphere } from './atmospheres'
 import { GLYPH_FAMILIES, defaultGlyphSize, glyphAlphabet, glyphLabel, modelGlyphColor } from './glyphCatalog'
 
@@ -157,10 +158,10 @@ export function createTextureStudio(root: HTMLElement, callbacks: {
     select(letters, 'Technique', 'glyph', ['surface', 'body', 'screen'].map(key => [key, glyphLabel(key)]))
     select(letters, 'Glyph family', 'surface', GLYPH_FAMILIES.map(key => [key, glyphLabel(key)]))
     const alphabetRow = document.createElement('label'); alphabetRow.textContent = 'Custom alphabet'
-    const alphabet = document.createElement('input'); alphabet.type = 'text'; alphabet.maxLength = 256; alphabet.dataset.textureField = 'alphabet'; alphabet.setAttribute('aria-label', 'Custom alphabet')
+    const alphabet = alphabetInput(effective.alphabet, 'Use family letters'); alphabet.dataset.textureField = 'alphabet'; alphabet.setAttribute('aria-label', 'Custom alphabet')
     alphabet.value = effective.alphabet ?? ''; alphabet.placeholder = 'Use family letters'; alphabet.spellcheck = false
     alphabet.oninput = () => {
-      alphabet.setCustomValidity(alphabet.value && !validGlyphAlphabet(alphabet.value) ? 'Use 1–128 single characters, including a visible character. Control and combining sequences are unsupported.' : '')
+      validateAlphabetInput(alphabet)
       if (!alphabet.checkValidity()) { status(alphabet.validationMessage); return }
       if (alphabet.value) { retain('alphabet'); draft.style.alphabet = alphabet.value } else clear('alphabet')
       edited(false); updateRamp()

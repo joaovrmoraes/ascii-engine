@@ -3,7 +3,7 @@ import { createAsciiPass, type AsciiPassHook } from './ascii'
 import { ABSENT, createIllumination, MAX_INK_LIGHTS } from './illumination'
 import type { LightObstacle } from './exploration'
 import { DEFAULT_ASCII_STYLE, engineStyle, type AsciiStyle } from './config'
-import { glyphStyleSources, nodeGlyphStyle, resolveGlyphStyle, type GlyphStyle, type LinkedGlyphStyle, type ObjectTypeStyle } from './style'
+import { glyphStyleSources, mergeGlyphStyles, nodeGlyphStyle, resolveGlyphStyle, type GlyphStyle, type LinkedGlyphStyle, type ObjectTypeStyle } from './style'
 import type { TextureAsset } from './world/texture'
 import type { SurfaceKind } from './surface'
 import { bodyUniforms, glyphBody, removeGlyphBody, updateGlyphBodies, updateSkinnedBody, type BodyRamp } from './techniques/body'
@@ -215,12 +215,12 @@ export function createAsciiEngine(canvas: HTMLCanvasElement, options: AsciiEngin
   const standardLike = (mesh: THREE.Mesh) => ![mesh.material].flat().some((m) => m instanceof THREE.ShaderMaterial)
   function applyTechnique(s: GlyphStyle, nodes: THREE.Object3D[]) {
     const meshes = nodes.filter((n): n is THREE.Mesh => n instanceof THREE.Mesh)
-    const tint = (copy: THREE.Material) => {
+    const tint = (copy: THREE.Material, appearance: GlyphStyle = s) => {
       if (copy instanceof THREE.MeshStandardMaterial) {
-        if (s.palette) copy.color.setHex(0xffffff)
-        else if (s.color !== undefined) copy.color.setHex(s.color)
-        if (s.emissive !== undefined) copy.emissive.setHex(s.emissive)
-        if (s.emissiveIntensity !== undefined) copy.emissiveIntensity = s.emissiveIntensity
+        if (appearance.palette) copy.color.setHex(0xffffff)
+        else if (appearance.color !== undefined) copy.color.setHex(appearance.color)
+        if (appearance.emissive !== undefined) copy.emissive.setHex(appearance.emissive)
+        if (appearance.emissiveIntensity !== undefined) copy.emissiveIntensity = appearance.emissiveIntensity
       }
       return copy
     }
@@ -228,16 +228,19 @@ export function createAsciiEngine(canvas: HTMLCanvasElement, options: AsciiEngin
       case 'surface':
         for (const mesh of meshes.filter(standardLike)) swapMaterials(mesh, `surface:${JSON.stringify(s)}`, (copy) => {
           if (!(copy instanceof THREE.MeshStandardMaterial)) return copy
-          tint(copy)
-          if (s.surface) copy.userData.asciiSurface = s.surface
-          return surfaceMaterial(copy, 'generic', s)
+          const appearance = mesh.userData.terrainLooks ? mergeGlyphStyles(s, copy.userData.glyphStyle) : s
+          tint(copy, appearance)
+          if (mesh.userData.terrainLooks && appearance.color !== undefined) copy.vertexColors = false
+          if (appearance.surface) copy.userData.asciiSurface = appearance.surface
+          copy.userData.glyphResolved = appearance
+          return surfaceMaterial(copy, 'generic', appearance)
         })
         return
       case 'screen':
         for (const mesh of meshes.filter(standardLike)) swapMaterials(mesh, `screen:${s.surface ?? 'actor'}:${s.color ?? ''}`, (copy) => markScreen(tint(copy), s.surface ?? 'actor'))
         return
       case 'body': {
-        if (s.color !== undefined || s.palette || s.emissive !== undefined || s.emissiveIntensity !== undefined) for (const mesh of meshes.filter(standardLike)) swapMaterials(mesh, `body-color:${s.color}:${!!s.palette}:${s.emissive}:${s.emissiveIntensity}`, tint)
+        if (s.color !== undefined || s.palette || s.emissive !== undefined || s.emissiveIntensity !== undefined) for (const mesh of meshes.filter(standardLike)) swapMaterials(mesh, `body-color:${s.color}:${!!s.palette}:${s.emissive}:${s.emissiveIntensity}`, copy => tint(copy))
         const ramp = s.surface ? BODY_RAMPS[s.surface] : undefined
         const scenery = ramp && ramp !== 'actor'
         skinnedLetters.push(...glyphBody(meshes, bodies, s.size ?? (scenery ? .19 : .155), 'actor', ramp, s))

@@ -101,6 +101,7 @@ export function applyCommands(source: SceneDoc, input: unknown): SceneDoc {
         doc.waters![cmd.index] = mergeJson({ ...entry, look: mergeJson(DEFAULT_WATER_LOOK, entry.look ?? {}) }, cmd.patch) as SceneWater
         followTerrain(doc); break
       }
+      case 'terrain.layer': { if (!doc.terrain?.layers[cmd.index]) throw new Error('Terrain layer not found: ' + cmd.index); doc.terrain.layers[cmd.index] = mergeJson(doc.terrain.layers[cmd.index], cmd.patch) as NonNullable<SceneDoc['terrain']>['layers'][number]; break }
       case 'water.remove': water(cmd.index); doc.waters!.splice(cmd.index, 1); break
       case 'effect.define': (doc.effects ??= {})[cmd.id] = structuredClone(cmd.effect) as unknown as EffectDef; break
       case 'asset.define': (doc.assets ??= {})[cmd.id] = { name: cmd.name, source: cmd.source }; break

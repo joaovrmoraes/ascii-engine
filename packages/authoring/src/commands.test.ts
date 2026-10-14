@@ -4,6 +4,16 @@ import { applyCommands } from './commands'
 
 const initial = () => parseScene({ version: 1, name: 'Original', terrain: createTerrainData(16, 33), objects: [{ id: 'rock', prefab: 'pedregulho', position: [0,0,0] }] })
 describe('atomic authoring', () => {
+  it('authors component looks atomically without rewriting stable layer IDs', () => {
+    const source=initial(), before=JSON.stringify(source)
+    const doc=applyCommands(source,[{op:'terrain.layer',index:0,patch:{look:{alphabet:'XZ',size:.25},cover:{alphabet:'v*',height:.4,color:0x55aa88}}},{op:'water.paint',points:[{x:0,z:0}],radius:2},{op:'water.update',index:0,patch:{look:{alphabet:'~=',shallow:[.1,.2,.3],deep:[.02,.04,.1],rings:{enabled:true,alphabet:'|_-',size:1.5,lifetime:1},reflection:{strength:.6}}}}])
+    expect(JSON.stringify(source)).toBe(before)
+    expect(doc.terrain!.layers[0].name).toBe('musgo')
+    expect(doc.terrain!.layers[0].cover?.alphabet).toBe('v*')
+    expect(doc.waters![0].look?.rings?.enabled).toBe(true)
+    expect(parseScene(JSON.parse(JSON.stringify(doc)))).toEqual(doc)
+    expect(()=>applyCommands(source,[{op:'terrain.layer',index:0,patch:{cover:{height:-1}}}])).toThrow()
+  })
   it('links assets, prevents dangling references and detaches without changing resolved appearance', () => {
     const source = parseScene({ version: 1, objects: [{ id: 'tree', prefab: 'tree', position: [0,0,0], options: { size: .5, parts: { crown: { color: 777 } } } }], textures: { whole: { name: 'Whole', style: { alphabet: 'AB', color: 123 } }, leaves: { name: 'Leaves', style: { alphabet: 'XY', size: .3, color: 456 } } } })
     const linked = applyCommands(source, [{ op: 'texture.apply', id: 'whole', objectId: 'tree', link: true }, { op: 'texture.apply', id: 'leaves', objectId: 'tree', part: 'crown', link: true }])
