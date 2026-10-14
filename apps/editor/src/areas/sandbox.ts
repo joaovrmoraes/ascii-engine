@@ -15,6 +15,7 @@ import { createPlacementPreview } from '../editor/placement'
 import { createSceneCameras } from '../editor/cameras'
 import { createEffectEditor } from '../editor/effects'
 import { createTextureStudio } from '../editor/textures'
+import { downloadStylePreset, loadStylePreset } from '../editor/stylePresets'
 
 type Tool = 'select' | Brush | 'water' | 'place' | 'erase'
 export function defaultScene(): SceneDoc {
@@ -430,7 +431,14 @@ export async function createSandbox(engine: AsciiEngine, options: AreaOptions = 
       for (const panel of [hierarchy, sidebar, ui!.assets, ui!.get('.scene-tools')]) panel.inert = preview
       gizmos!.cursor(); canvas.dispatchEvent(new CustomEvent('editor-preview', { detail: preview })); refreshHint()
     }
-    el('pause').onclick = () => { document.querySelector<HTMLButtonElement>('#panel [data-k="pause"]')?.click(); el('pause').classList.toggle('active') }
+    el('pause').onclick = () => options.viewControls?.toggle()
+    const unsubscribePause = options.viewControls?.subscribe(paused => { el('pause').classList.toggle('active', paused); el('pause').setAttribute('aria-pressed', String(paused)) })
+    signal.signal.addEventListener('abort', () => unsubscribePause?.(), { once: true })
+    el('save-style').onclick = () => downloadStylePreset(engine)
+    el<HTMLInputElement>('load-style').onchange = e => {
+      const input = e.target as HTMLInputElement, file = input.files?.[0]; input.value = ''
+      if (file) run(async () => { await loadStylePreset(engine, file); atmosphereStudio?.refresh(); changed() })
+    }
     const brushes: [Tool, string, string][] = [['raise', 'Raise', 'terrain'], ['lower', 'Lower', 'terrain'], ['smooth', 'Smooth', 'rock'], ['flatten', 'Flatten', 'grid'], ['paint', 'Paint', 'cursor'], ['water', 'Water', 'water'], ['erase', 'Erase object', 'cube']]
     box.innerHTML = `<div class="component-title">${icon('terrain')} Terrain tools</div><p data-k="no-terrain" class="empty-note" hidden>This item has no terrain. Use File → New map.</p><div class="brush-grid">${brushes.map(([key, title, symbol]) => `<button data-brush="${key}">${icon(symbol)}${title}</button>`).join('')}</div><label>Radius<input data-k="radius" type="range" min=".5" max="8" step=".25"></label><label>Water<select data-k="water-mode"><option value="terrain">Follow terrain</option><option value="level">Flat level (lake)</option></select></label><label>Strength<input data-k="strength" type="range" min=".01" max=".4" step=".01"></label><label>Layer<select data-k="layer"></select></label><button data-k="grow">Regrow grass</button><p class="empty-note">Drag over the terrain. Undo each stroke with Ctrl Z.</p>`
     box.querySelectorAll<HTMLButtonElement>('[data-brush]').forEach(button => { button.onclick = () => { placement.clear(); tool.kind = button.dataset.brush as Tool; gizmos!.attach(); refreshTools(); refreshHint() } })

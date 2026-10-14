@@ -309,6 +309,12 @@ legacy scene identifiers stay unchanged. This stage changes no document format
 or renderer defaults. The appearance controls and lighting/file workflows remain
 available until their later consolidation stages.
 
+**View-only Display (consolidation stage 2):** zoom, rotation, live debug
+post-pass mode, pause and PNG capture are session state. Exposure and screen
+cell size are edited in Atmosphere; style preset files use the File menu.
+The toolbar and Display share a pause controller. Screen grid is explicitly
+a debug post-pass, never an authored style or exported document setting.
+
 
 **Water dynamics:** `world/waterDynamics.ts` integrates gravity-driven flow,
 depth and impulses on a shallow-water grid. `waters[].physics` stores depth,

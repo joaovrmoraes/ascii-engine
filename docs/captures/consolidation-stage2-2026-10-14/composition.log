@@ -1,0 +1,28 @@
+$ node scripts/verify-composition.mjs .cache/consolidation-stage2-composition
+PASS orbit button rotates both azimuth and elevation without modifying the scene
+PASS create camera captures the current view and adds a hierarchy object
+PASS camera inspector saves pose, name, span and aspect
+PASS selecting a camera opens its live corner preview
+PASS camera edits update the mini view
+PASS play preview uses the active saved camera and hides helpers
+PASS returning from play restores editor navigation
+PASS viewing a camera preserves its exact pose and aspect ratio
+PASS native gizmo moves the saved camera while the editor camera stays still
+PASS gizmo movement updates the saved preview pose
+PASS camera gizmo is one undo action
+PASS camera rotation is portable in radians
+PASS camera duplicates independently
+PASS camera removal leaves the active composition intact
+PASS camera authoring does not add world geometry or engine resources
+PASS effect layers expose named origins and show their transform gizmo
+PASS local undo restores effect origin without undoing the scene
+PASS native gizmo moves only the selected effect layer
+PASS a full layer drag is one local undo action
+PASS saved effect includes layer names and positioned heat grid
+PASS placing a composed effect gives the whole object a scene gizmo
+PASS the composed effect is placed with its saved recipe
+PASS scene reload keeps composition cameras and positioned effect assets
+PASS player honours initial composition camera without editor UI
+PASS visible embedded pages animate even when requestAnimationFrame is suspended
+PASS fallback renderer also updates camera navigation
+PASS no uncaught page exceptions

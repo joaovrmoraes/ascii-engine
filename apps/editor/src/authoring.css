@@ -93,6 +93,8 @@ body.authoring #selection [data-k="what"] { color: #bccbe0; font-size: 11px; mar
 #selection .glyph-color button { flex-shrink: 0; font-size: 10px; }
 body.authoring #panel label { grid-template-columns: 62px 1fr 35px; }
 body.authoring #panel output { color: #aeb9c9; }
+body.authoring #panel.authoring-display label:has(select) { grid-template-columns: 85px minmax(0, 1fr); }
+body.authoring #panel.authoring-display select { min-width: 0; }
 body.authoring #panel button, body.authoring #selection button, body.authoring #tools button { color: var(--text); }
 #environment-settings { display: grid; gap: 12px; padding: 10px; }
 .brush-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 5px; margin: 5px 0 9px; }

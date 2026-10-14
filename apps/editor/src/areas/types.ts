@@ -1,6 +1,7 @@
 import type * as THREE from 'three'
 
 export interface AreaOptions {
+  viewControls?: import('../editor/viewControls').ViewControls
   /** Everything in the old screen pass (before/after comparisons). */
   screen?: boolean
   /** Stay at the bonfire. */

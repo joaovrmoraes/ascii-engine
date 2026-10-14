@@ -274,11 +274,16 @@ export function createAsciiEngine(canvas: HTMLCanvasElement, options: AsciiEngin
   // The effect system is created on first use (`engine.fx`).
   let effects: EffectSystem | undefined, effectLetters: GlyphCloud | undefined
   let lastDt = 0
-  const debug = { raw: false }
+  const debug = { raw: false, screen: false }
   const raycaster = new THREE.Raycaster()
   const engine = {
     /** `raw`: draw the 3D scene without letters, to separate geometry from shader. */
     debug,
+    /** Debug post-pass override. Does not change authored object techniques or style. */
+    setRenderMode(mode: 'glyphs' | 'screen' | 'raw') {
+      debug.raw = mode === 'raw'; debug.screen = mode === 'screen'
+    },
+    get renderMode(): 'glyphs' | 'screen' | 'raw' { return debug.raw ? 'raw' : debug.screen ? 'screen' : 'glyphs' },
     renderer, scene, camera, carpetScene, waterScene, particleScene,
     lights: { hemisphere, moon, fill },
     get style() { return style },
@@ -585,6 +590,7 @@ export function createAsciiEngine(canvas: HTMLCanvasElement, options: AsciiEngin
         }
         if (water.uniforms.reflectionOn) water.uniforms.reflectionOn.value = 1
       }
+      ascii.material.uniforms.debugScreen.value = debug.screen ? 1 : 0
       if (debug.raw) { renderer.setRenderTarget(null); renderer.render(scene, camera); return }
       renderer.setRenderTarget(target); renderer.render(scene, camera)
       renderer.setRenderTarget(null); renderer.render(ascii.scene, ascii.camera)

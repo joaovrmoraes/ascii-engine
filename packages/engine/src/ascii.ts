@@ -43,7 +43,7 @@ export function createAsciiPass(hooks: AsciiPassHook[] = []) {
     uniforms: {
       ...illuminationUniforms(),
       sceneTexture: { value: null }, sceneDepth: { value: null }, glyphTexture: { value: texture },
-      resolution: { value: new THREE.Vector2(1, 1) }, cellSize: { value: 6 }, brightness: { value: 1 },
+      resolution: { value: new THREE.Vector2(1, 1) }, cellSize: { value: 6 }, brightness: { value: 1 }, debugScreen: { value: 0 },
       inverseProjection: { value: new THREE.Matrix4() }, cameraWorld: { value: new THREE.Matrix4() },
       contacts: { value: [new THREE.Vector4(100, 100, 0, 0), new THREE.Vector4(100, 100, 0, 0)] },
       ...Object.assign({}, ...hooks.map((hook) => hook.uniforms ?? {})),
@@ -53,7 +53,7 @@ export function createAsciiPass(hooks: AsciiPassHook[] = []) {
       uniform sampler2D sceneTexture, sceneDepth, glyphTexture;
       uniform vec2 resolution;
       uniform vec4 contacts[2];
-      uniform float cellSize, brightness;
+      uniform float cellSize, brightness, debugScreen;
       uniform mat4 inverseProjection, cameraWorld;
       varying vec2 vUv;
       ${illuminationGLSL}
@@ -70,7 +70,7 @@ export function createAsciiPass(hooks: AsciiPassHook[] = []) {
       }
       void main() {
         vec4 direct = texture2D(sceneTexture, vUv);
-        if (isKind(direct.a, ${WORLD_GLYPH_ALPHA.toFixed(2)}) > .5) {
+        if (debugScreen < .5 && isKind(direct.a, ${WORLD_GLYPH_ALPHA.toFixed(2)}) > .5) {
           // Letters already live on the object's surface: keep them crisp and
           // only apply the shared light treatment, never the screen lattice.
           float d = texture2D(sceneDepth, vUv).r;

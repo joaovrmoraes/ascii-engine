@@ -48,6 +48,27 @@ try {
       JSON.stringify(['Moss', 'Earth', 'Stone', 'Snow']) &&
     JSON.stringify(area.document().terrain.layers.map(layer => layer.name)) ===
       JSON.stringify(['musgo', 'terra', 'pedra', 'neve'])`)
+  await evaluate(`window.beforeDisplay = JSON.stringify(area.document()); window.displayURL = location.href;
+    ui('[data-tab=view]'); ui('#authoring-toolbar [data-k=pause]')`)
+  await check('Display is view-only and keeps style presets in File', `
+    !document.querySelector('#panel [data-k=area], #panel [data-k=cell], #panel [data-k=light], #panel [data-k=import], #panel [data-k=save], #panel [data-k=load]') &&
+    !!document.querySelector('[data-k=save-style]') && !!document.querySelector('[data-k=load-style]')`)
+  await check('toolbar and Display share pause state without a DOM proxy', `
+    view.paused && document.querySelector('#panel [data-k=pause]').getAttribute('aria-pressed') === 'true'`)
+  await evaluate(`window.debugFrames = ['letters', 'screen', 'raw'].map(mode => {
+    ui('#panel [data-k=mode]', mode); engine.render(0, {redraw:true}); return engine.renderer.domElement.toDataURL();
+  }); ui('#panel [data-k=mode]', 'letters'); ui('#panel [data-k=zoom]', '1'); ui('#panel [data-k=angle]', '.5')`)
+  await check('debug views change rendering live without saving styles or reloading', `
+    new Set(debugFrames).size === 3 && location.href === displayURL &&
+    engine.renderMode === 'glyphs' && JSON.stringify(area.document()) === beforeDisplay`)
+  await evaluate(`ui('#panel [data-k=pause]'); ui('#panel [data-k=zoom]', '.8'); ui('#panel [data-k=angle]', '0'); ui('[data-tab=object]')`)
+  await check('Display pause also updates the toolbar', `
+    !view.paused && document.querySelector('#authoring-toolbar [data-k=pause]').getAttribute('aria-pressed') === 'false'`)
+  await evaluate(`ui('[data-studio-page=atmosphere]')`)
+  await check('Atmosphere owns exposure and screen cell size', `
+    Number(document.querySelector('[data-studio-field="Exposure"]').value) === engine.style.brightness &&
+    Number(document.querySelector('[data-studio-field="Screen cell size (px)"]').value) === engine.style.cellSize`)
+  await evaluate(`ui('[data-k=close-studio]')`)
 
   // Real mouse drag from a library card into the viewport, using the browser's
   // native DataTransfer payload (not a scene API call).

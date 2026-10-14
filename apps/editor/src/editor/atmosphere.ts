@@ -42,6 +42,7 @@ export function createAtmosphereStudio(root: HTMLElement, engine: AsciiEngine, c
       row.append(input); box.append(row)
     }
     const scene = group('Scene and glyphs')
+    field(scene, 'Screen cell size (px)', s.cellSize, cellSize => ({ cellSize }), 'number', 5, 12, 1)
     field(scene, 'Exposure', s.brightness, brightness => ({ brightness }), 'number', 0, 4)
     const tint = s.inkTint ?? (s.atmosphere === 'dusk' ? [1.25,.8,.65] : s.atmosphere === 'ember' ? [1.5,.65,.36] : [1,1,1])
     field(scene, 'Glyph color', '#' + tint.map(v => Math.round(Math.min(1,v)*255).toString(16).padStart(2,'0')).join(''), c => ({ inkTint: [(c >> 16)/255, ((c >> 8)&255)/255, (c&255)/255] }), 'color')

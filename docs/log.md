@@ -4,6 +4,29 @@ Entries describe the state at each stage. Earlier limitations may have been
 resolved later; START.md and the editor guide describe the current scope.
 Historical filenames, reference IDs and captured interfaces are preserved.
 
+## 2026-10-14 — Editor consolidation stage 2: view-only Display
+
+Display now contains zoom, rotation, pause, PNG capture and live debug render
+mode only. Exposure and screen cell size live in Atmosphere's Scene and glyphs
+group; cell size remains a scene field, outside reusable lighting-only assets.
+Style preset save/load was moved to File without removing the feature. Demo
+area menus/import/presets retain their existing behavior. Added a Display tab.
+
+Extracted session pause controls and preset file helpers from DOM wiring.
+Toolbar and Display call the same pause controller. The core's setRenderMode
+provides a debug post-pass override without touching techniques or exportStyle;
+Screen grid is an analysis view of the already-rendered world, not a scene
+style or a conversion back to the original smooth model. Legacy code-built
+demo screen recipes are preserved. Sandbox decomposition stays incremental.
+
+Validation: pnpm check passed (114 tests), verify:authoring passed 72 checks
+and verify:composition passed 27, with pnpm dev running. Orca with its explicit
+editor page ID confirmed live modes and unchanged document. The historical
+item-roundtrip viewport remains identical (RMSE 0). Captures and logs:
+[stage 2 evidence](captures/consolidation-stage2-2026-10-14/README.md).
+Local commit only; stage 3 follows under the owner's request to execute all
+remaining stages. Native desktop remains unverified.
+
 ## 2026-10-14 — Editor consolidation stage 1: shared glyph catalog
 
 Created `apps/editor/src/editor/glyphCatalog.ts` and reused it in selection,

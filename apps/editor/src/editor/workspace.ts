@@ -13,6 +13,7 @@ export function createWorkspace() {
           <button data-k="new">New map <kbd>terrain</kbd></button><button data-k="item">New item <kbd>empty</kbd></button>
           <label class="file">Open document…<input data-k="open" type="file" accept=".json" hidden></label>
           <button data-k="save">Save file <kbd>Ctrl S</kbd></button><button data-k="export">Export for Pomorog…</button><button data-k="reset-layout">Reset panels</button>
+          <button data-k="save-style">Save style preset…</button><label class="file">Load style preset…<input data-k="load-style" type="file" accept=".json" hidden></label>
         </div></details>
         <button data-k="undo" title="Undo (Ctrl Z)" aria-label="Undo">↶</button><button data-k="redo" title="Redo (Ctrl Shift Z)" aria-label="Redo">↷</button>
         <span class="document-title"><input data-k="name" aria-label="Document name"><span class="document-kind">Visual scene</span></span>
@@ -55,7 +56,7 @@ export function createWorkspace() {
     <div id="placement-label" hidden></div>
     <aside id="authoring-sidebar" aria-label="Inspector">
       <div class="dock-heading">Inspector</div>
-      <nav class="inspector-tabs" aria-label="Inspector panels"><button data-tab="object">Object</button><button data-tab="terrain">Terrain</button><button data-tab="environment">Environment</button></nav>
+      <nav class="inspector-tabs" aria-label="Inspector panels"><button data-tab="object">Object</button><button data-tab="terrain">Terrain</button><button data-tab="environment">Environment</button><button data-tab="view">Display</button></nav>
       <section data-pane="object"><div id="object-inspector" data-k="inspector"></div><div data-mount="selection"></div></section>
       <section data-pane="terrain" hidden><div id="tools"></div></section>
       <section data-pane="environment" hidden><div id="environment-settings"></div></section>

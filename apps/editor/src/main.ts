@@ -23,6 +23,7 @@ export interface AreaEntry {
   hooks?: AsciiPassHook[]
 }
 import { createPanel } from './panel'
+import { createViewControls } from './editor/viewControls'
 import { createSelection } from './selection'
 
 /**
@@ -74,15 +75,17 @@ const entry = AREAS[areaId] ?? AREAS.dark_forest
 const engine = createAsciiEngine(canvas, { hooks: entry.hooks, style: game?.style })
 const mode = params.get('ascii') ?? 'letters'
 engine.debug.raw = mode === 'raw'
-const area = await Promise.resolve().then(() => entry.create(engine, { screen: mode === 'screen', camp: params.has('camp'), hunt: params.has('hunt') ? Number(params.get('hunt')) : undefined, at: params.has('at') ? Number(params.get('at')) : undefined, peaceful: params.has('peaceful'), scene: sceneDoc })).catch(error => {
-  const message = document.createElement('p'); message.textContent = `Could not open the scene: ${error}`; message.style.cssText = 'position:fixed;inset:20px;z-index:10;background:#141219;padding:20px'; document.body.append(message)
-  throw error
-})
 const view = {
-  angle: Number(params.get('angle') ?? 0), zoom: Number(params.get('zoom') ?? game?.zoom ?? (area.id === 'sandbox' && !player ? .8 : .9)),
+  angle: Number(params.get('angle') ?? 0), zoom: Number(params.get('zoom') ?? game?.zoom ?? (areaId === 'sandbox' && !player ? .8 : .9)),
   elevation: THREE.MathUtils.clamp(Number(params.get('elevation') ?? Math.atan2(18, 15)), .02, Math.PI / 2 - .01),
   paused: false, pauseAt: params.has('pause') ? Number(params.get('pause')) : Infinity,
 }
+const viewControls = createViewControls(view)
+const area = await Promise.resolve().then(() => entry.create(engine, { viewControls, screen: mode === 'screen', camp: params.has('camp'), hunt: params.has('hunt') ? Number(params.get('hunt')) : undefined, at: params.has('at') ? Number(params.get('at')) : undefined, peaceful: params.has('peaceful'), scene: sceneDoc })).catch(error => {
+  const message = document.createElement('p'); message.textContent = `Could not open the scene: ${error}`; message.style.cssText = 'position:fixed;inset:20px;z-index:10;background:#141219;padding:20px'; document.body.append(message)
+  throw error
+})
+if (area.id === 'sandbox' && !player) engine.setRenderMode(mode === 'letters' ? 'glyphs' : mode === 'raw' ? 'raw' : 'screen')
 if (params.has('cell')) engine.setStyle({ cellSize: Number(params.get('cell')) })
 if (params.has('light')) engine.setStyle({ brightness: Number(params.get('light')) })
 
@@ -133,7 +136,7 @@ const importFiles = (files: File[]) => {
 }
 addEventListener('drop', (e) => { e.preventDefault(); const files = Array.from(e.dataTransfer?.files ?? []); if (files.length) importFiles(files) })
 canvas.addEventListener('editor-import-files', e => importFiles((e as CustomEvent<File[]>).detail))
-const panel = createPanel({ engine, view, areas: AREAS, areaId, mode, viewer: publicDemo, hideArea: publicDemo && params.has('embed'), capture: () => captureNext = true, importFiles, changed: area.changed })
+const panel = createPanel({ engine, view, viewControls, areas: AREAS, areaId, mode, viewer: publicDemo, hideArea: publicDemo && params.has('embed'), capture: () => captureNext = true, importFiles, changed: area.changed })
 const selection = player || publicDemo ? { refresh() {} } : createSelection(engine, canvas, document.getElementById('selection')!, { select: area.select, changed: area.changed, blocked: area.blocksSelection, objectFirst: area.id === 'sandbox' })
 const status = document.getElementById('status')!
 const focus = new THREE.Vector3()

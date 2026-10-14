@@ -1,0 +1,11 @@
+{
+  "id": "64f7cd4d-562c-4f98-a66e-3128016dbe9a",
+  "ok": true,
+  "result": {
+    "result": "{\"url\":\"http://localhost:1440/?area=sandbox\",\"modes\":[\"glyphs\",\"screen\",\"raw\"],\"documentUnchanged\":true,\"onlyView\":true,\"presetInFile\":true}",
+    "origin": "http://localhost:1440/?area=sandbox"
+  },
+  "_meta": {
+    "runtimeId": "327bd229-b588-4def-b562-15b9bd27a70c"
+  }
+}
