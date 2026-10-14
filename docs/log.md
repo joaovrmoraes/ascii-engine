@@ -4,6 +4,27 @@ Entries describe the state at each stage. Earlier limitations may have been
 resolved later; START.md and the editor guide describe the current scope.
 Historical filenames, reference IDs and captured interfaces are preserved.
 
+## 2026-10-14 — Editor consolidation stage 5: one lighting home
+
+Extracted one built-in/saved atmosphere catalog for Environment, Atmosphere
+Studio and texture previews. Environment can apply saved assets; texture preview
+selects Current scene, a built-in or a saved atmosphere. Its duplicated light
+fields and Apply lighting to scene were removed after explicit owner approval.
+Atmosphere Studio remains live; the shared header says Editing the live map,
+while Textures/Effects say Isolated preview / map paused.
+
+Old TextureAsset.previewLighting snapshots still open/export unchanged. An
+unmatched rig offers Save as atmosphere; conversion adds an asset, selects it
+and stops offering conversion. Selecting a preview rig never changes map light.
+The existing snapshot field also stores selected presets; no format migration.
+
+Validation: pnpm check passed 120 tests; verify:textures 103 and authoring 73
+with dev running. A CDP target interruption required a clean authoring rerun;
+all final checks passed. Pinned Orca validated selectors/migration/headers,
+removed controls and unchanged map. Old item world RMSE 0. [Evidence](captures/consolidation-stage5-2026-10-14/README.md).
+No push; component letters and file/panel consolidation remain stages 6/7.
+Orca image capture remains unavailable; native desktop unverified.
+
 ## 2026-10-14 — Editor consolidation stage 4: linked texture resources
 
 Objects and named parts can reference SceneDoc.textures by ID. Core layering

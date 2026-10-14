@@ -1,4 +1,4 @@
-import { pomorog } from '@ascii-engine/core/pomorog'
+import { ATMOSPHERE_PRESETS, fillAtmosphereSelect, matchingAtmosphere } from './atmospheres'
 import { parseScene, atmosphereStyle, type AtmosphereAsset, type AsciiEngine, type AsciiStyle } from '@ascii-engine/core'
 
 /** Lighting authoring shares the scene's portable style, including undo/export. */
@@ -8,12 +8,7 @@ export function createAtmosphereStudio(root: HTMLElement, engine: AsciiEngine, c
   save(key: string, asset: AtmosphereAsset): Promise<void>
 }) {
   let selectedKey: string | undefined, saving = false
-  const presets: Record<AsciiStyle['atmosphere'], Partial<AsciiStyle>> = {
-    moon: { atmosphere: 'moon', inkTint: [1,1,1], background: pomorog.background, fog: pomorog.fog, hemisphere: pomorog.hemisphere, moon: pomorog.moon, fill: pomorog.fill, bodyAmbient: pomorog.bodyAmbient, brightness: 1 },
-    dusk: { atmosphere: 'dusk', inkTint: [1,.86,.74], background: 0x100b16, fog: { color: 0x100b16, density: .018 }, hemisphere: { sky: 0xc5acce, ground: 0x433025, intensity: 1.15 }, moon: { ...pomorog.moon, color: 0xffbd83, intensity: 1.65, position: [-10,7,6] }, fill: { ...pomorog.fill, color: 0x7c97c2, intensity: .4 }, bodyAmbient: .27, brightness: 1 },
-    ember: { atmosphere: 'ember', inkTint: [1,.7,.43], background: 0x140702, fog: { color: 0x140702, density: .022 }, hemisphere: { sky: 0xdca177, ground: 0x472015, intensity: 1 }, moon: { ...pomorog.moon, color: 0xff9555, intensity: 1.8 }, fill: { ...pomorog.fill, color: 0xc1694c, intensity: .25 }, bodyAmbient: .24, brightness: 1 },
-  }
-  root.innerHTML = `<div class="fx-heading"><h2>Create atmosphere</h2><p>Adjust lighting on the map and save it for reuse.</p></div>
+  root.innerHTML = `<div class="fx-heading"><h2>Create atmosphere</h2><p>Editing the live map. Adjust lighting here and save it for reuse.</p></div>
     <div class="fx-toolbar"><select data-studio="preset" aria-label="Atmosphere preset"><option value="moon">Moonlight</option><option value="dusk">Dusk</option><option value="ember">Ember</option></select><button data-studio="reset">Reset preset</button></div>
     <label class="fx-name">Atmosphere name<input data-studio="name" aria-label="Atmosphere name" value="My atmosphere"></label>
     <p class="fx-status" role="status">Changes appear in the scene. Ctrl Z undoes them. Save to Assets to reuse.</p><div class="fx-fields studio-fields"></div>
@@ -30,9 +25,9 @@ export function createAtmosphereStudio(root: HTMLElement, engine: AsciiEngine, c
     get('saved-note').textContent = same ? 'Saved in Assets → Atmospheres' : 'Changes not yet saved to Assets'
   }
   function apply(patch: Partial<AsciiStyle>, commit = true) { engine.setStyle({ bodySceneLighting: true, inkFog: true, ...patch }); if (commit) changed(); savedNote() }
-  function setPreset(value: AsciiStyle['atmosphere']) { selectedKey = undefined; get<HTMLInputElement>('name').value = { moon: 'My moonlight', dusk: 'My dusk', ember: 'My ember' }[value]; apply(structuredClone(presets[value])); refresh() }
+  function setPreset(value: AsciiStyle['atmosphere']) { selectedKey = undefined; get<HTMLInputElement>('name').value = { moon: 'My moonlight', dusk: 'My dusk', ember: 'My ember' }[value]; apply(structuredClone(ATMOSPHERE_PRESETS[value])); refresh() }
   function refresh() {
-    const s = engine.style; get<HTMLSelectElement>('preset').value = s.atmosphere; fields.replaceChildren(); if (selectedKey && !callbacks.definitions()[selectedKey]) selectedKey = undefined; savedNote()
+    const s = engine.style; fillAtmosphereSelect(get<HTMLSelectElement>('preset'), {version:1, objects:[], style:engine.exportStyle(), atmospheres: callbacks.definitions()}, matchingAtmosphere({version:1, objects:[], atmospheres:callbacks.definitions()}, atmosphereStyle(s)) ?? 'current'); fields.replaceChildren(); if (selectedKey && !callbacks.definitions()[selectedKey]) selectedKey = undefined; savedNote()
     function group(title: string) { const box = document.createElement('fieldset'), legend = document.createElement('legend'); legend.textContent = title; box.append(legend); fields.append(box); return box }
     function field(box: HTMLElement, label: string, value: number | string, patch: (value: number) => Partial<AsciiStyle>, type = 'number', min = 0, max = 10, step = .05) {
       const row = document.createElement('label'); row.textContent = label
@@ -73,7 +68,7 @@ export function createAtmosphereStudio(root: HTMLElement, engine: AsciiEngine, c
     field(fog, 'Density', s.fog?.density ?? 0, density => ({ fog: density ? { color: engine.style.fog?.color ?? engine.style.background, density } : null }), 'number', 0, .15, .002)
     const hint = document.createElement('p'); hint.className = 'empty-note'; hint.textContent = 'Zero density disables fog.'; fog.append(hint)
   }
-  get<HTMLSelectElement>('preset').onchange = e => setPreset((e.target as HTMLSelectElement).value as AsciiStyle['atmosphere'])
+  get<HTMLSelectElement>('preset').onchange = e => { const value = (e.target as HTMLSelectElement).value; if (value.startsWith('asset:')) applyAsset(value.slice(6)); else if (value !== 'current') setPreset(value as AsciiStyle['atmosphere']) }
   get('reset').onclick = () => setPreset(engine.style.atmosphere)
   function portable() { return atmosphereStyle(engine.exportStyle()) }
   function applyAsset(key: string) {
@@ -89,7 +84,7 @@ export function createAtmosphereStudio(root: HTMLElement, engine: AsciiEngine, c
     try {
       const key = !copy && selectedKey ? selectedKey : `atmosphere-${crypto.randomUUID()}`
       await callbacks.save(key, { name, style: portable() }); selectedKey = key; savedNote()
-      status.textContent = 'Saved to Assets → Atmospheres. Click it in the library to apply; double-click to edit.'
+      status.textContent = 'Saved to Assets → Atmospheres. Select it in the library and choose Apply; double-click to edit.'
     } catch (error) { status.textContent = String(error) }
     finally { saving = false; get<HTMLButtonElement>('save').disabled = false; get<HTMLButtonElement>('copy').disabled = false }
   }

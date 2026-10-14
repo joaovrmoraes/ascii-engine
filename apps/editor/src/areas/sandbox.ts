@@ -10,6 +10,7 @@ import '../authoring.css'
 import { createWorkspace, type Workspace } from '../editor/workspace'
 import { createGizmos, type Gizmos } from '../editor/gizmos'
 import { assetInfo, icon } from '../editor/icons'
+import { fillAtmosphereSelect, matchingAtmosphere } from '../editor/atmospheres'
 import { createAtmosphereStudio } from '../editor/atmosphere'
 import { createPlacementPreview } from '../editor/placement'
 import { createSceneCameras } from '../editor/cameras'
@@ -234,7 +235,7 @@ export async function createSandbox(engine: AsciiEngine, options: AreaOptions = 
     box.querySelectorAll<HTMLButtonElement>('[data-brush]').forEach(button => { button.disabled = !scene.terrain; const active = tool.kind === button.dataset.brush; button.classList.toggle('active', active); button.setAttribute('aria-pressed', String(active)) })
     ui.get('[data-k="no-terrain"]').hidden = !!scene.terrain
     ui.get<HTMLSelectElement>('[data-k="weather"]').value = snapshot().environment?.weather ?? 'none'
-    ui.get<HTMLSelectElement>('[data-k="atmosphere"]').value = engine.style.atmosphere
+    fillAtmosphereSelect(ui.get<HTMLSelectElement>('[data-k="atmosphere"]'), snapshot(), matchingAtmosphere(snapshot(), engine.style) ?? 'current')
     refreshLibrary()
   }
   function syncTransformFields() {
@@ -382,7 +383,6 @@ export async function createSandbox(engine: AsciiEngine, options: AreaOptions = 
       typeName: id => { const object = scene.placed.find(item => item.doc.id === id)?.object, type = object && (engine.instanceStyle(object)?.type ?? object.userData.prefab); return type ? library[type]?.title ?? type : undefined },
       select: id => choose(scene.placed.find(item => item.doc.id === id)?.object),
       reveal: () => revealAssets('Textures'),
-      async applyLighting(style) { engine.setStyle({ ...structuredClone(style), bodySceneLighting: true, inkFog: true }); changed() },
       async saveLighting(name, style) {
         const chosen = selected?.userData.sceneId, doc = snapshot()
         doc.atmospheres = { ...doc.atmospheres, [`atmosphere-${crypto.randomUUID()}`]: { name, style: structuredClone(style) } }
@@ -484,7 +484,7 @@ export async function createSandbox(engine: AsciiEngine, options: AreaOptions = 
     el('grow').onclick = () => run(() => { scene.regrow(); changed() })
     ui.environment.innerHTML = `<div class="component-title">${icon('spark')} Scene environment</div><label>Weather<select data-k="weather"><option value="none">No precipitation</option><option value="rain">Rain</option><option value="snow">Snow</option></select></label><label>Atmosphere<select data-k="atmosphere"><option value="moon">Moonlight</option><option value="dusk">Dusk</option><option value="ember">Ember</option></select></label><button data-k="open-studio">Open atmosphere studio</button><p class="empty-note">Settings saved with the map.</p>`
     el<HTMLSelectElement>('weather').onchange = e => run(async () => { const doc = snapshot(); doc.environment = { weather: (e.target as HTMLSelectElement).value as 'none' | 'rain' | 'snow' }; await replace(doc); changed() })
-    el<HTMLSelectElement>('atmosphere').onchange = e => { atmosphereStudio!.setPreset((e.target as HTMLSelectElement).value as 'moon' | 'dusk' | 'ember') }
+    el<HTMLSelectElement>('atmosphere').onchange = e => { const value = (e.target as HTMLSelectElement).value; if (value.startsWith('asset:')) atmosphereStudio!.applyAsset(value.slice(6)); else if (value !== 'current') atmosphereStudio!.setPreset(value as 'moon' | 'dusk' | 'ember') }
     el('open-studio').onclick = () => { atmosphereStudio!.refresh(); ui!.showStudio('atmosphere') }
     ui.root.addEventListener('project-tab', event => { const pane = (event as CustomEvent).detail; if (pane !== 'assets') { placement.clear(); gizmos?.attach(); gizmos?.cursor() } else gizmos?.attach(selected); if (pane === 'atmosphere') atmosphereStudio!.refresh() }, { signal: signal.signal })
     const modelImport = el<HTMLInputElement>('model-import')

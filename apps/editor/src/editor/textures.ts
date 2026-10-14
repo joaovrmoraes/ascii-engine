@@ -1,7 +1,7 @@
 import * as THREE from 'three'
-import { textureUsers, GLYPH_STYLE_KEYS, atmosphereStyle, createHistory, parseScene, textureStyle, validGlyphAlphabet, type AtmosphereStyle, type GlyphStyle, type SceneDoc, type TextureAsset } from '@ascii-engine/core'
-import { pomorog } from '@ascii-engine/core/pomorog'
+import { textureUsers, GLYPH_STYLE_KEYS, createHistory, parseScene, textureStyle, validGlyphAlphabet, type AtmosphereStyle, type GlyphStyle, type SceneDoc, type TextureAsset } from '@ascii-engine/core'
 import { createTexturePreview } from './texturePreview'
+import { atmosphereChoices, fillAtmosphereSelect, matchingAtmosphere } from './atmospheres'
 import { GLYPH_FAMILIES, defaultGlyphSize, glyphAlphabet, glyphLabel, modelGlyphColor } from './glyphCatalog'
 
 interface TextureDraft extends TextureAsset { cleared?: (keyof GlyphStyle)[] }
@@ -18,7 +18,6 @@ export function createTextureStudio(root: HTMLElement, callbacks: {
   remove(id: string): Promise<void>
   type(id: string): string | undefined
   typeName(id: string): string | undefined
-  applyLighting(style: AtmosphereStyle): Promise<void>
   saveLighting(name: string, style: AtmosphereStyle): Promise<void>
   reveal(): void
 }) {
@@ -233,7 +232,7 @@ export function createTextureStudio(root: HTMLElement, callbacks: {
     const glow = document.createElement('input'); glow.type = 'color'; glow.dataset.textureField = 'emissive'; glow.value = '#' + (effective.emissive ?? 0).toString(16).padStart(6, '0'); glow.setAttribute('aria-label', 'Self light color')
     glow.oninput = () => { retain('emissive'); draft.style.emissive = parseInt(glow.value.slice(1), 16); edited(false) }; glow.onchange = () => edited(); glowRow.append(glow); response.append(glowRow)
     slider(response, 'emissiveIntensity', 'Self light intensity', 1, 0, 4, .05)
-    renderLighting(group('Preview lighting', 'Studio lights are saved with this texture for previewing. Apply lighting to scene is a separate action.'))
+    renderLighting(group('Preview lighting', 'Choose current scene lighting, a built-in preset or a saved atmosphere. The map stays unchanged.'))
     if (effective.glyph === 'screen') {
       fields.querySelectorAll<HTMLInputElement | HTMLSelectElement>('[data-texture-field]').forEach(input => {
         if (!['glyph', 'surface', 'color', 'emissive', 'emissiveIntensity'].includes(input.dataset.textureField!)) input.disabled = true
@@ -243,53 +242,21 @@ export function createTextureStudio(root: HTMLElement, callbacks: {
     }
   }
   function renderLighting(box: HTMLElement) {
-    const toggleRow = document.createElement('label'); toggleRow.textContent = 'Customize preview lighting'
-    const toggle = document.createElement('input'); toggle.type = 'checkbox'; toggle.dataset.texture = 'custom-lighting'; toggle.checked = !!draft.previewLighting
-    toggle.onchange = () => { if (toggle.checked) draft.previewLighting = atmosphereStyle({ ...structuredClone(pomorog), ...callbacks.document().style, bodySceneLighting: true, inkFog: true }); else delete draft.previewLighting; edited(); render() }
-    toggleRow.append(toggle); box.append(toggleRow)
-    if (!draft.previewLighting) return
-    const settings = { ...structuredClone(pomorog), ...callbacks.document().style, ...draft.previewLighting }
-    const fields = document.createElement('div'); fields.className = 'texture-lighting-fields'; box.append(fields)
-    function field(key: string, label: string, value: number, patch: (n: number) => AtmosphereStyle, color = false, min = 0, max = 10, step = .05) {
-      const row = document.createElement('label'); row.textContent = label
-      const input = document.createElement('input'); input.type = color ? 'color' : 'number'; input.dataset.textureLight = key; input.setAttribute('aria-label', label)
-      input.min = String(min); input.max = String(max); input.step = String(step); input.value = color ? '#' + value.toString(16).padStart(6, '0') : String(Number(value.toFixed(4)))
-      function update(commit: boolean) {
-        const n = color ? parseInt(input.value.slice(1), 16) : input.valueAsNumber
-        if (!Number.isFinite(n) || !color && (n < min || n > max)) return
-        draft.previewLighting = { ...draft.previewLighting, ...patch(n) }; edited(commit)
-      }
-      input.oninput = () => update(false); input.onchange = () => update(true); row.append(input); fields.append(row)
+    const row = document.createElement('label'); row.textContent = 'Preview atmosphere'
+    const select = document.createElement('select'); select.dataset.texture = 'preview-atmosphere'
+    const doc = callbacks.document(), value = draft.previewLighting ? matchingAtmosphere(doc, draft.previewLighting) ?? 'legacy' : 'current'
+    fillAtmosphereSelect(select, doc, value, value === 'legacy')
+    select.onchange = () => { if (select.value === 'legacy') return; const choice = atmosphereChoices(doc).find(choice => choice.id === select.value); if (choice) draft.previewLighting = structuredClone(choice.style); else delete draft.previewLighting; edited(); render() }
+    row.append(select); box.append(row)
+    if (value === 'legacy') {
+      const convert = document.createElement('button'); convert.textContent = 'Save as atmosphere'; convert.dataset.texture = 'convert-lighting'
+      convert.onclick = async () => { convert.disabled = true; try { await callbacks.saveLighting(draft.name.trim() + ' lighting', draft.previewLighting!); render(); status('Preview lighting saved as an atmosphere. Edit its lights in Atmosphere Studio.') } catch (error) { status(String(error)); convert.disabled = false } }
+      box.append(convert)
     }
-    const current = () => ({ ...structuredClone(pomorog), ...callbacks.document().style, ...draft.previewLighting })
-    field('exposure', 'Exposure', settings.brightness, brightness => ({ brightness }), false, 0, 4)
-    field('background', 'Preview background', settings.background, background => ({ background }), true)
-    field('main-color', 'Main light color', settings.moon.color, color => ({ moon: { ...current().moon, color } }), true)
-    field('main-intensity', 'Main light intensity', settings.moon.intensity, intensity => ({ moon: { ...current().moon, intensity } }), false, 0, 10)
-    const [x, y, z] = settings.moon.position
-    function direction(azimuth: number, elevation: number): AtmosphereStyle {
-      const distance = Math.max(1, Math.hypot(...current().moon.position)), a = azimuth * Math.PI / 180, e = elevation * Math.PI / 180
-      return { moon: { ...current().moon, position: [Math.sin(a) * Math.cos(e) * distance, Math.sin(e) * distance, Math.cos(a) * Math.cos(e) * distance] } }
-    }
-    field('azimuth', 'Light rotation (degrees)', Math.atan2(x, z) * 180 / Math.PI, angle => { const p = current().moon.position; return direction(angle, Math.atan2(p[1], Math.hypot(p[0], p[2])) * 180 / Math.PI) }, false, -180, 180, 1)
-    field('elevation', 'Light elevation (degrees)', Math.atan2(y, Math.hypot(x, z)) * 180 / Math.PI, angle => { const p = current().moon.position; return direction(Math.atan2(p[0], p[2]) * 180 / Math.PI, angle) }, false, 1, 90, 1)
-    field('shadow', 'Shadow strength', settings.moon.shadowIntensity, shadowIntensity => ({ moon: { ...current().moon, shadowIntensity } }), false, 0, 1)
-    field('sky-color', 'Ambient sky color', settings.hemisphere.sky, sky => ({ hemisphere: { ...current().hemisphere, sky } }), true)
-    field('ground-color', 'Ambient ground color', settings.hemisphere.ground, ground => ({ hemisphere: { ...current().hemisphere, ground } }), true)
-    field('ambient-intensity', 'Ambient intensity', settings.hemisphere.intensity, intensity => ({ hemisphere: { ...current().hemisphere, intensity }, bodyAmbient: .3 * intensity / 1.25 }), false, 0, 5)
-    field('fill-color', 'Fill light color', settings.fill.color, color => ({ fill: { ...current().fill, color } }), true)
-    field('fill-intensity', 'Fill intensity', settings.fill.intensity, intensity => ({ fill: { ...current().fill, intensity } }), false, 0, 5)
-    field('fog-color', 'Fog color', settings.fog?.color ?? settings.background, color => ({ fog: { color, density: current().fog?.density ?? 0 } }), true)
-    field('fog-density', 'Fog density', settings.fog?.density ?? 0, density => ({ fog: density ? { color: current().fog?.color ?? current().background, density } : null }), false, 0, .15, .002)
-    const actions = document.createElement('div'); actions.className = 'texture-lighting-actions'
-    for (const [key, name, run] of [
-      ['apply-lighting', 'Apply lighting to scene', () => callbacks.applyLighting(draft.previewLighting!)],
-      ['save-lighting', 'Save lighting as atmosphere', () => callbacks.saveLighting(draft.name.trim() + ' lighting', draft.previewLighting!)],
-    ] as const) {
-      const button = document.createElement('button'); button.textContent = name; button.dataset.texture = key
-      button.onclick = async () => { button.disabled = true; try { await run(); status(key === 'apply-lighting' ? 'Lighting applied to the scene. Scene undo restores it.' : 'Lighting saved to Assets → Atmospheres.') } catch (error) { status(String(error)) } finally { button.disabled = false } }; actions.append(button)
-    }
-    box.append(actions)
+
+    const hint = document.createElement('p'); hint.className = 'empty-note'
+    hint.textContent = 'Preview only. Edit lights in Atmosphere Studio; apply scene lighting from Environment.'
+    box.append(hint)
   }
   async function showObject(id: string, nextPart = '') {
     assetOnly = false; recipeDraft = false; objectId = id; part = nextPart; scope = part ? 'part' : 'object'; baseline = appearance(); beginEdits(); draft = { name: 'My texture', style: startingStyle() }

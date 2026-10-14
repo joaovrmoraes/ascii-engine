@@ -1,0 +1,11 @@
+{
+  "id": "0a9a5943-d781-4b80-989e-ce89d0433fae",
+  "ok": true,
+  "result": {
+    "result": "{\"duplicateLightFields\":false,\"mode\":\"Isolated preview · map paused\",\"oldApply\":false,\"selector\":true,\"unchanged\":true}",
+    "origin": "http://localhost:1440/?area=sandbox"
+  },
+  "_meta": {
+    "runtimeId": "327bd229-b588-4def-b562-15b9bd27a70c"
+  }
+}

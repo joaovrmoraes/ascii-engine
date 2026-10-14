@@ -60,7 +60,10 @@ try {
     window.tx = (key,value) => ui('#texture-studio [data-texture="'+key+'"]',value);
     window.object = id => engine.scene.children.find(o=>o.userData.sceneId===id);
     window.select = id => ui('#hierarchy [data-object-id="'+id+'"]');
-    await area.openDocument({version:1,name:'Texture studio validation',objects:[
+    const base=core.atmosphereStyle({...engine.style,bodySceneLighting:true,inkFog:true});
+    const rig=(name,color,intensity=2.2,background=0x080a10)=>({name,style:{...base,background,moon:{...base.moon,color,intensity}}});
+    window.testAtmospheres={'preview-backdrop':rig('Backdrop',0xffffff,2.2,0x303040),'preview-white':rig('White light',0xffffff),'preview-red':rig('Red light',0xff5566),'preview-dim':rig('Dim red',0xff5566,.2),'preview-green':rig('Green light',0x33ff88)};
+    await area.openDocument({version:1,name:'Texture studio validation',atmospheres:testAtmospheres,objects:[
       {id:'block',prefab:'bloco',name:'Sample block',position:[0,0,0],scale:3},
       {id:'tree',prefab:'arvore',name:'Tree',position:[4,0,0]},
       {id:'import',prefab:'asset:tree',name:'Imported tree',position:[-4,0,0]}],assets:{'asset:tree':{name:'Imported tree',source:${JSON.stringify(treeSource)}}}});
@@ -184,7 +187,6 @@ try {
   await evaluate(`window.ui=(selector,value)=>{const el=document.querySelector(selector);if(!el)throw new Error(selector);if(value===undefined)el.click();else{el.value=value;el.dispatchEvent(new Event('input'));el.dispatchEvent(new Event('change'));}};
     window.tf=(key,value)=>ui('#texture-studio [data-texture-field="'+key+'"]',value);
     window.tx=(key,value)=>ui('#texture-studio [data-texture="'+key+'"]',value);
-    window.tl=(key,value)=>ui('#texture-studio [data-texture-light="'+key+'"]',value);
     window.object=id=>engine.scene.children.find(o=>o.userData.sceneId===id);
     window.originalLightSource=JSON.stringify(area.document());`);
   for(const [id,part] of [['block',''],['import','crown']]) {
@@ -201,20 +203,20 @@ try {
     if(oneColor===await capture())throw new Error('Palette has no rendered effect: '+id);
     const paletteColor=await capture();await action(`ui('[data-texture-palette="1"]','#ff3355')`);
     if(paletteColor===await capture())throw new Error('Palette stops have no rendered effect: '+id);console.log('PASS expanded rendered '+id+' palette stops');
-    await action(`tx('reset');tx('custom-lighting');tl('background','#303040');tf('open','false')`);const filled=await capture();await action(`tf('open','true')`);
+    await action(`tx('reset');tx('preview-atmosphere','asset:preview-backdrop');tf('open','false')`);const filled=await capture();await action(`tf('open','true')`);
     if(filled===await capture())throw new Error('Letters-only does not remove occluder: '+id);console.log('PASS expanded rendered '+id+' letters only');
     if(part){const front=await capture();await action(`tf('faces','both')`);if(front===await capture())throw new Error('Body back faces have no effect');console.log('PASS rendered body back-face visibility');}
-    await action(`tx('reset');tl('background','#080a10');tl('main-color','#ffffff');tl('main-intensity','2.2')`);
-    const whiteLight=await capture();await action(`tl('main-color','#ff5566')`);
+    await action(`tx('reset');tx('preview-atmosphere','asset:preview-white')`);
+    const whiteLight=await capture();await action(`tx('preview-atmosphere','asset:preview-red')`);
     if(whiteLight===await capture())throw new Error('Colored preview light has no rendered effect: '+id);console.log('PASS colored preview light '+id);
-    const bright=await capture();await action(`tl('main-intensity','.2')`);if(bright===await capture())throw new Error('Preview light intensity has no effect: '+id);console.log('PASS preview light intensity '+id);
+    const bright=await capture();await action(`tx('preview-atmosphere','asset:preview-dim')`);if(bright===await capture())throw new Error('Preview light intensity has no effect: '+id);console.log('PASS preview light intensity '+id);
     if(part)await action(`tx('part','')`);
-    await action(`tl('main-intensity','2');tf('lighting','unlit')`);const unlit=await capture();await action(`tl('main-color','#33ff88')`);
+    await action(`tx('preview-atmosphere','asset:preview-white');tf('lighting','unlit')`);const unlit=await capture();await action(`tx('preview-atmosphere','asset:preview-green')`);
     if(unlit!==await capture())throw new Error('Uniform local shading still reacts to main light color: '+id);console.log('PASS uniform local shading ignores main light color '+id);
     if(part)await action(`tx('part','${part}')`);
     await action(`tf('lighting','scene');tf('alphabet',' ↑↗→↘↓↙←↖');tf('font','"DejaVu Sans", sans-serif');tf('fontWeight','700');tf('open','true');tf('emissive','#000000');tf('size','.25');tf('spacing','1.4')`);
     await evaluate(`document.querySelector('[data-texture-field=open]').closest('fieldset').scrollIntoView({block:'start'})`);await shot('06-letters-only-'+id);
-    await evaluate(`document.querySelector('[data-texture-light=main-color]').closest('fieldset').scrollIntoView({block:'start'})`);await shot('07-preview-lighting-'+id);
+    await evaluate(`document.querySelector('[data-texture=preview-atmosphere]').closest('fieldset').scrollIntoView({block:'start'})`);await shot('07-preview-lighting-'+id);
   }
   await check('font/palette/visibility/light editing preserves the source document','JSON.stringify(area.document())===originalLightSource');
   await action(`tx('name','Emerald symbols');tx('save')`);await until('Object.values(area.document().textures).some(t=>t.name===\"Emerald symbols\")');
@@ -230,10 +232,8 @@ try {
   console.log('PASS extended file import/export preserves fonts, Unicode, visibility and lighting');
   await action(`tx('apply')`);await check('applying the texture preserves scene lights','area.document().style.moon.color!==0x33ff88');
   await evaluate('window.sceneLightBefore=area.document().style.moon.color;window.symbolsDoc=area.document()');
-  await action(`tx('save-lighting')`);await until('Object.values(area.document().atmospheres??{}).some(a=>a.name===\"Emerald symbols lighting\")');
-  await check('studio lights can be saved separately as an atmosphere','Object.values(area.document().atmospheres).some(a=>a.style.moon.color===0x33ff88)&&area.document().style.moon.color===sceneLightBefore');
-  await action(`tx('apply-lighting')`);await until('area.document().style.moon.color===0x33ff88');console.log('PASS explicit apply transfers preview lighting to scene');
-  await action(`ui('[data-k="close-studio"]');ui('[data-k="undo"]')`);await until('area.document().style.moon.color===sceneLightBefore');console.log('PASS scene undo restores applied preview lights');
+  await action(`ui('[data-k=close-studio]');ui('#environment-settings [data-k=atmosphere]','asset:preview-green')`);await until('area.document().style.moon.color===0x33ff88');console.log('PASS Environment applies preview atmosphere explicitly');
+  await action(`ui('[data-k=undo]')`);await until('area.document().style.moon.color===sceneLightBefore');console.log('PASS scene undo restores the selected atmosphere');
   await action(`await area.openDocument(symbolsDoc)`);await check('expanded texture survives project reopen','Object.values(area.document().textures).some(t=>t.name===\"Emerald symbols\"&&t.style.open&&t.previewLighting.moon.color===0x33ff88)');
 
   await action(`window.select = id => ui('#hierarchy [data-object-id="'+id+'"]'); ui('[data-k=close-studio]'); await area.openDocument({version:1,name:'Appearance scopes',objects:[
@@ -290,6 +290,22 @@ try {
   await check('dragging a library texture links the hierarchy object through its UI handler', `area.document().objects[1].options.texture==='ink' && !area.document().objects[1].options.alphabet`)
   await action(`window.libraryBefore=JSON.stringify(area.document());ui('.asset-card[data-texture=ink]')`)
   await check('single click selects a texture without opening or changing the map', `!document.body.classList.contains('texture-studio-active') && JSON.stringify(area.document())===libraryBefore`)
+
+  await action(`ui('[data-k=close-studio]'); const base=core.atmosphereStyle(engine.exportStyle());await area.openDocument({version:1,name:'Atmosphere previews',objects:[{id:'light-target',prefab:'bloco',position:[0,0,0]}],
+    atmospheres:{night:{name:'Saved night',style:{...base,brightness:.7}}},textures:{legacy:{name:'Legacy rig',style:{alphabet:'AB'},previewLighting:{...base,brightness:.5}}}});
+    document.querySelector('.asset-card[data-texture=legacy]').dispatchEvent(new MouseEvent('dblclick'));window.lightBefore=JSON.stringify(area.document().style);`)
+  await check('Environment and texture preview list saved atmospheres from one catalog', `['#environment-settings [data-k=atmosphere]','[data-texture=preview-atmosphere]'].every(selector=>Array.from(document.querySelector(selector).options).some(option=>option.value==='asset:night'&&option.textContent==='Saved night'))`)
+  await action(`tx('convert-lighting')`)
+  await until(`Object.values(area.document().atmospheres).some(asset=>asset.name==='Legacy rig lighting')`)
+  await check('old preview lighting converts once and selects the saved atmosphere', `document.querySelector('[data-texture=preview-atmosphere]').value.startsWith('asset:')&&!document.querySelector('[data-texture=convert-lighting]')&&JSON.stringify(area.document().style)===lightBefore`)
+  await action(`tx('preview-atmosphere','asset:night')`)
+  await check('Texture Studio exposes an atmosphere selector without duplicate light editing', `!document.querySelector('[data-texture-light], [data-texture=custom-lighting], [data-texture=apply-lighting]')`)
+  await check('preview atmosphere selection preserves live map lighting', `JSON.stringify(area.document().style)===lightBefore&&JSON.parse(document.querySelector('#texture-preview canvas').dataset.lighting).brightness===.7`)
+  await action(`ui('[data-studio-page=atmosphere]')`)
+  await check('Studio header distinguishes live map editing from isolated previews', `document.querySelector('[data-studio-mode]').textContent==='Editing the live map'`)
+  await action(`ui('[data-k=close-studio]');ui('#environment-settings [data-k=atmosphere]','asset:night')`)
+  await check('Environment explicitly applies a saved atmosphere to the map', `area.document().style.brightness===.7`)
+  await shot('09-shared-atmospheres')
 
   await writeFile(output+'/test-scene.ascii.json',JSON.stringify(await evaluate('area.document()'),null,2))
   await writeFile(output+'/result.json',JSON.stringify({errors,passed:errors.length===0},null,2))

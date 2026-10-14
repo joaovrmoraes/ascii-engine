@@ -6,7 +6,7 @@ export function createWorkspace() {
   document.body.classList.add('authoring')
   const root = document.createElement('div'); root.id = 'editor-workspace'
   root.innerHTML = `
-    <header id="studio-toolbar" hidden><button data-k="close-studio">← Back to scene</button><strong>Studio</strong><nav aria-label="Studio workspace"><button data-studio-page="effects">Effects</button><button data-studio-page="atmosphere">Atmosphere</button><button data-studio-page="textures">Textures</button></nav><span>Live preview</span></header>
+    <header id="studio-toolbar" hidden><button data-k="close-studio">← Back to scene</button><strong>Studio</strong><nav aria-label="Studio workspace"><button data-studio-page="effects">Effects</button><button data-studio-page="atmosphere">Atmosphere</button><button data-studio-page="textures">Textures</button></nav><span data-studio-mode>Isolated preview · map paused</span></header>
     <header id="authoring-toolbar">
       <div class="menu-row"><strong class="brand">${icon('cube')} ASCII Engine</strong>
         <details class="editor-menu"><summary>File</summary><div class="menu-items">
@@ -89,6 +89,7 @@ export function createWorkspace() {
     if (tab === 'effects') { studioPane = 'effects'; tab = 'studio' }
     document.body.classList.toggle('studio-mode', tab === 'studio')
     get('#studio-toolbar').hidden = tab !== 'studio'
+    get('[data-studio-mode]').textContent = studioPane === 'atmosphere' ? 'Editing the live map' : 'Isolated preview · map paused'
     get('#asset-browser .asset-body').hidden = tab !== 'assets'
     get('#studio-workspace').hidden = tab !== 'studio'
     get('#effect-editor').hidden = tab !== 'studio' || studioPane !== 'effects'

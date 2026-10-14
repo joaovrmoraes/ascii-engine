@@ -256,7 +256,8 @@ Ctrl Z undoes scene changes.
 
 Name it and choose **Save to Assets**. The preset appears under
 **Assets → Atmospheres**; **Show in Assets** opens that category. Click
-an asset to apply lighting; double-click to apply and open the Studio.
+an asset to select it, then choose its explicit Apply action. Double-click to
+open the live Atmosphere Studio. Environment lists built-in and saved atmospheres.
 Save updates the same preset; **Save copy** creates another. Presets live
 in `SceneDoc.atmospheres` and survive project files, local draft, undo/redo
 and export. Current lighting remains in `SceneDoc.style`.
@@ -298,11 +299,13 @@ lighting** and **Preview lighting**.
 - **Material lighting:** react to scene lights or use uniform local shading.
   Global exposure/tint still applies. Self light has its own color/intensity;
   it brightens the letters without illuminating other objects.
-- **Preview lighting:** enable a custom studio rig, then adjust exposure, main
-  light color/intensity/direction/shadows, ambient sky/ground colors, ambient
-  intensity, fill color/intensity, background and fog. These edits affect the
-  isolated preview. **Apply lighting to scene** changes the map with normal
-  scene undo. **Save lighting as atmosphere** creates a separate resource.
+- **Preview lighting:** choose **Current scene**, a built-in preset or a saved
+  atmosphere. The map stays paused and its lighting does not change. Edit lights
+  in Atmosphere Studio, which is labeled **Editing the live map**, and use
+  Environment to apply an atmosphere. Textures/Effects headers say **Isolated
+  preview · map paused**. Old texture preview rigs remain readable; **Save as
+  atmosphere** converts an unmatched rig once and selects the new resource.
+
 
 Edits and saved presets preserve each part's technique and family unless you
 explicitly choose either. Techniques, visibility and lighting response have

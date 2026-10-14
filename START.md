@@ -293,18 +293,19 @@ world size, spacing, rotation, density, RGB/palettes, ink strength, contrast,
 light threshold and shadow levels work for surface/body glyphs. Letters-only
 visibility removes solid occluders; body face visibility is explicit. Material
 lighting supports scene response, uniform local shading and self light.
-Adjustable preview lights include exposure, main/ambient/fill colors and
-intensities, direction, shadows, background and fog. New texture recipes use black gaps;
-unmodified scenes retain Pomorog defaults. Apply writes the selected appearance scope with scene undo; saved recipes
-link to objects/parts below local overrides. Editing the asset updates its users;
-Detach copies its current appearance into local overrides. Old copied styles retain
-their appearance; Save to Assets creates a reusable `SceneDoc.textures` recipe. The
-texture editor has its own undo/redo and portable `.texture.json` import/export.
-Presets are snapshots, not live links to instances. `texture.define` /
-`texture.apply` expose the same resources through the authoring API. Optional
-`TextureAsset.previewLighting` reproduces the studio light rig; applying a
-texture preserves scene lighting. Explicit actions apply those lights to the
-map or save them as an atmosphere. Font families use the viewing device's
+Preview lighting chooses the current scene, a built-in preset or a saved
+atmosphere from the same catalog as Environment and Atmosphere Studio. Lights
+are edited in Atmosphere Studio only; its header says Editing the live map.
+Textures/Effects explicitly show Isolated preview / map paused. Legacy preview
+lighting snapshots stay readable and can be saved as atmosphere assets once.
+New texture recipes use black gaps; unmodified scenes retain Pomorog defaults.
+Apply writes the selected scope with scene undo; saved recipes link to objects
+and parts below local overrides. Saving an asset updates its users; Detach bakes
+the current appearance into local fields. Old copied styles remain independent.
+Texture Studio has its own undo/redo and portable .texture.json import/export.
+texture.define/apply/detach expose resources through the authoring API. Optional
+TextureAsset.previewLighting stores the selected preview snapshot; applying a
+texture preserves map lighting. Font families use the viewing device's
 installed fonts and fallbacks; font files are not embedded.
 
 **Shared editor glyph catalog (consolidation stage 1):**
