@@ -4,6 +4,7 @@ import { SURFACE_ALPHA } from '../surface'
 import { FOREST_WATER } from '../techniques/water'
 import { parseEffect } from '../fx/validation'
 import { ATMOSPHERE_KEYS } from './atmosphere'
+import { GLYPH_STYLE_KEYS, validGlyphAlphabet } from '../style'
 
 const glyphs = ['screen', 'surface', 'body', 'water', 'particle', 'carpet']
 function fail(path: string, detail: string): never { throw new Error(`Invalid scene: ${path} ${detail}`) }
@@ -28,10 +29,23 @@ function style(value: unknown, path: string) {
   if (s.glyph !== undefined && !glyphs.includes(String(s.glyph))) fail(path, 'contains an unknown technique')
   if (s.surface !== undefined && !Object.hasOwn(SURFACE_ALPHA, String(s.surface))) fail(path, 'contains an unknown family')
   if (s.size !== undefined) number(s.size, `${path}.size`, .01, 10)
-  if (s.color !== undefined) {
-    number(s.color, `${path}.color`, 0, 0xffffff)
-    if (!Number.isInteger(s.color)) fail(`${path}.color`, 'must be an integer RGB colour')
+  for (const key of ['color', 'emissive']) if (s[key] !== undefined) {
+    number(s[key], `${path}.${key}`, 0, 0xffffff)
+    if (!Number.isInteger(s[key])) fail(`${path}.${key}`, 'must be an integer RGB colour')
   }
+  if (s.alphabet !== undefined && !validGlyphAlphabet(s.alphabet)) fail(`${path}.alphabet`, 'must contain 1–128 visible single characters, without control or combining sequences')
+  if (s.font !== undefined && (typeof s.font !== 'string' || !s.font.trim() || s.font.length > 100 || /[\p{C}]/u.test(s.font))) fail(`${path}.font`, 'must be a font family of 1–100 characters')
+  if (s.fontWeight !== undefined && s.fontWeight !== 400 && s.fontWeight !== 700) fail(`${path}.fontWeight`, 'must be 400 or 700')
+  if (s.open !== undefined && typeof s.open !== 'boolean') fail(`${path}.open`, 'must be a boolean')
+  if (s.faces !== undefined && !['front', 'both'].includes(String(s.faces))) fail(`${path}.faces`, 'must be front or both')
+  if (s.lighting !== undefined && !['scene', 'unlit'].includes(String(s.lighting))) fail(`${path}.lighting`, 'must be scene or unlit')
+  if (s.palette !== undefined) {
+    const palette = array(s.palette, `${path}.palette`)
+    if (palette.length < 2 || palette.length > 8) fail(`${path}.palette`, 'must contain 2–8 RGB colors')
+    palette.forEach((color, index) => { number(color, `${path}.palette[${index}]`, 0, 0xffffff); if (!Number.isInteger(color)) fail(`${path}.palette`, 'must contain integer RGB colors') })
+  }
+  for (const [key, min, max] of [['spacing', .5, 4], ['density', .05, 1], ['strength', 0, 4], ['gap', 0, .015], ['contrast', .1, 4], ['toneOffset', -1, 1], ['shadowSteps', 2, 16], ['rotation', -Math.PI, Math.PI], ['emissiveIntensity', 0, 4]] as const) if (s[key] !== undefined) number(s[key], `${path}.${key}`, min, max)
+  if (s.shadowSteps !== undefined && !Number.isInteger(s.shadowSteps)) fail(`${path}.shadowSteps`, 'must be an integer')
   if (s.type !== undefined && typeof s.type !== 'string') fail(`${path}.type`, 'must be text')
   if (s.body !== undefined) {
     const body = record(s.body, `${path}.body`)
@@ -98,6 +112,23 @@ export function parseScene(input: unknown, library?: PrefabLibrary): SceneDoc {
       const lighting = record(asset.style, `atmospheres.${id}.style`)
       for (const key of Object.keys(lighting)) if (!(ATMOSPHERE_KEYS as readonly string[]).includes(key)) fail(`atmospheres.${id}.style.${key}`, 'is not a lighting field')
       parseScene({ version: 1, objects: [], style: lighting })
+    }
+  }
+  if (root.textures !== undefined) {
+    const textures = record(root.textures, 'textures')
+    if (Object.keys(textures).length > 256) fail('textures', 'exceeds 256 textures')
+    for (const [id, raw] of Object.entries(textures)) {
+      const asset = record(raw, `textures.${id}`)
+      if (!id || typeof asset.name !== 'string' || !asset.name.trim()) fail(`textures.${id}`, 'needs an identifier and name')
+      const appearance = record(asset.style, `textures.${id}.style`)
+      for (const key of Object.keys(appearance)) if (!(GLYPH_STYLE_KEYS as readonly string[]).includes(key)) fail(`textures.${id}.style.${key}`, 'is not an appearance field')
+      if (appearance.glyph !== undefined && !['surface', 'body'].includes(String(appearance.glyph))) fail(`textures.${id}.style.glyph`, 'must use surface or body glyphs')
+      style(appearance, `textures.${id}.style`)
+      if (asset.previewLighting !== undefined) {
+        const lighting = record(asset.previewLighting, `textures.${id}.previewLighting`)
+        for (const key of Object.keys(lighting)) if (!(ATMOSPHERE_KEYS as readonly string[]).includes(key)) fail(`textures.${id}.previewLighting.${key}`, 'is not a lighting field')
+        parseScene({ version: 1, objects: [], style: lighting })
+      }
     }
   }
   if (root.effects !== undefined) {

@@ -13,6 +13,7 @@ import { createAtmosphereStudio } from '../editor/atmosphere'
 import { createPlacementPreview } from '../editor/placement'
 import { createSceneCameras } from '../editor/cameras'
 import { createEffectEditor } from '../editor/effects'
+import { createTextureStudio } from '../editor/textures'
 
 type Tool = 'select' | Brush | 'water' | 'place' | 'erase'
 export function defaultScene(): SceneDoc {
@@ -49,6 +50,7 @@ export async function createSandbox(engine: AsciiEngine, options: AreaOptions = 
   let ui: Workspace | undefined, gizmos: Gizmos | undefined
   let atmosphereStudio: ReturnType<typeof createAtmosphereStudio> | undefined
   let effectEditor: ReturnType<typeof createEffectEditor> | undefined
+  let textureStudio: ReturnType<typeof createTextureStudio> | undefined
   let transformMode: 'hand' | 'orbit' | 'translate' | 'rotate' | 'scale' = 'translate', preview = false, assetCategory = 'All', assetQuery = '', hierarchyQuery = ''
   const run = (action: () => void | Promise<void>) => { if (busy) return; void Promise.resolve().then(action).catch(error => message(String(error))) }
   function message(text: string) { note = text; const el = toolbar?.querySelector('[data-k="note"]'); if (el) el.textContent = text }
@@ -92,7 +94,7 @@ export async function createSandbox(engine: AsciiEngine, options: AreaOptions = 
       engine.setStyle(nextStyle, { replace: true })
       selected = undefined; selectedWater = -1; gizmos?.attach(); gizmos?.cursor()
       canvas.dispatchEvent(new Event('scene-replaced'))
-      refreshTools(); refreshHierarchy(); effectEditor?.refresh(); atmosphereStudio?.refresh()
+      refreshTools(); refreshHierarchy(); effectEditor?.refresh(); atmosphereStudio?.refresh(); textureStudio?.refresh()
       if (toolbar) toolbar.querySelector<HTMLInputElement>('[data-k="name"]')!.value = name
     } catch (error) { nextAssets?.dispose(); engine.setStyle(previousStyle, { replace: true }); throw error }
     finally { busy = false; for (const panel of [toolbar, hierarchy, sidebar, ui?.assets]) if (panel) panel.inert = false }
@@ -175,10 +177,10 @@ export async function createSandbox(engine: AsciiEngine, options: AreaOptions = 
     const doc = snapshot(), atmospheres = doc.atmospheres ?? {}
     const categories = ui.get('[data-k="categories"]')
     categories.replaceChildren()
-    for (const category of ['All', 'Nature', 'Buildings', 'Shapes', 'Effects', 'Atmospheres', 'Imported']) {
+    for (const category of ['All', 'Nature', 'Buildings', 'Shapes', 'Effects', 'Atmospheres', 'Textures', 'Imported']) {
       const button = document.createElement('button'); button.innerHTML = icon('folder')
       const text = document.createElement('span'); text.textContent = category; button.append(text)
-      const count = Object.keys(library).filter(key => category === 'All' || assetInfo(key).category === category).length + (category === 'All' || category === 'Atmospheres' ? Object.keys(atmospheres).length : 0)
+      const count = Object.keys(library).filter(key => category === 'All' || assetInfo(key).category === category).length + (category === 'All' || category === 'Atmospheres' ? Object.keys(atmospheres).length : 0) + (category === 'All' || category === 'Textures' ? Object.keys(doc.textures ?? {}).length : 0)
       const badge = document.createElement('small'); badge.textContent = String(count); button.append(badge)
       button.className = category === assetCategory ? 'active' : ''; button.onclick = () => { assetCategory = category; refreshLibrary() }; categories.append(button)
     }
@@ -210,7 +212,15 @@ export async function createSandbox(engine: AsciiEngine, options: AreaOptions = 
       card.ondblclick = () => { atmosphereStudio!.applyAsset(key); ui!.showStudio('atmosphere') }
       grid.append(card)
     }
-    if (!grid.childElementCount) { const hint = document.createElement('p'); hint.className = 'empty-library'; hint.textContent = assetCategory === 'Imported' ? 'Use Import model to add your GLB and GLTF files.' : assetCategory === 'Atmospheres' ? 'Create an atmosphere in the Studio and choose Save to Assets.' : 'No assets found.'; grid.append(hint) }
+    for (const [key, asset] of Object.entries(doc.textures ?? {})) {
+      if (assetCategory !== 'All' && assetCategory !== 'Textures' || !normalized(asset.name).includes(normalized(assetQuery))) continue
+      const card = document.createElement('button'); card.className = 'asset-card'; card.dataset.texture = key
+      card.title = `Open ${asset.name} in the Texture studio`; card.style.setProperty('--asset-color', '#96bfbe')
+      const thumbnail = document.createElement('span'); thumbnail.className = 'asset-thumbnail texture-thumbnail'; thumbnail.textContent = asset.style.alphabet ?? '@#*:'
+      const label = document.createElement('span'); label.textContent = asset.name; card.append(thumbnail, label)
+      card.onclick = () => { ui!.showStudio('textures'); textureStudio!.editAsset(key) }; grid.append(card)
+    }
+    if (!grid.childElementCount) { const hint = document.createElement('p'); hint.className = 'empty-library'; hint.textContent = assetCategory === 'Imported' ? 'Use Import model to add your GLB and GLTF files.' : assetCategory === 'Atmospheres' ? 'Create an atmosphere in the Studio and choose Save to Assets.' : assetCategory === 'Textures' ? 'Select an object, open Textures in the Studio and choose Save to Assets.' : 'No assets found.'; grid.append(hint) }
   }
   function refreshTools() {
     if (!ui) return
@@ -361,6 +371,32 @@ export async function createSandbox(engine: AsciiEngine, options: AreaOptions = 
       async save(key, definition) { const doc = snapshot(); doc.effects = { ...doc.effects, [key]: definition }; await replace(doc); selectAssetCategory('Effects'); changed() },
       place(key) { ui!.showProject('assets'); assetCategory = 'Effects'; beginPlacement(key) },
     })
+    textureStudio = createTextureStudio(ui.textureRoot, {
+      document: snapshot,
+      objects: () => scene.placed.map(item => ({ id: item.doc.id!, object: item.object })),
+      selected: () => scene.placed.find(item => item.object === selected)?.doc.id,
+      select: id => choose(scene.placed.find(item => item.doc.id === id)?.object),
+      reveal: () => revealAssets('Textures'),
+      async applyLighting(style) { engine.setStyle({ ...structuredClone(style), bodySceneLighting: true, inkFog: true }); changed() },
+      async saveLighting(name, style) {
+        const chosen = selected?.userData.sceneId, doc = snapshot()
+        doc.atmospheres = { ...doc.atmospheres, [`atmosphere-${crypto.randomUUID()}`]: { name, style: structuredClone(style) } }
+        await replace(doc); if (chosen) choose(scene.placed.find(item => item.doc.id === chosen)?.object)
+        selectAssetCategory('Atmospheres'); changed()
+      },
+      async save(id, asset) {
+        const chosen = selected?.userData.sceneId, doc = snapshot(); doc.textures = { ...doc.textures, [id]: asset }
+        await replace(doc); if (chosen) choose(scene.placed.find(item => item.doc.id === chosen)?.object)
+        selectAssetCategory('Textures'); changed()
+      },
+      async apply(id, part, style) {
+        const object = scene.placed.find(item => item.doc.id === id)?.object
+        if (!object) throw new Error('Select an object before applying a texture.')
+        if (part && !object.getObjectByName(part)) throw new Error('Part not found: ' + part)
+        if (part) engine.setPartStyle(object, part, style); else engine.setInstanceStyle(object, style)
+        choose(object); changed()
+      },
+    })
     cameraEditor = createSceneCameras(engine, { viewChanged: () => { refreshHierarchy(); refreshHint() }, changed, select: choose, focus: () => focus.clone() }); cameraEditor.load(scene.toJSON())
     gizmos = createGizmos(engine, { change: () => { if (tool.kind === 'place') placement.lock(); else { cameraEditor?.syncSelected(); syncTransformFields() } }, commit: () => { if (tool.kind !== 'place') changed() }, allowed: () => !busy && !preview && !cameraEditor?.viewed && !document.body.classList.contains('studio-mode') && (tool.kind === 'select' || tool.kind === 'place') && transformMode !== 'hand' && transformMode !== 'orbit' })
     const el = <T extends HTMLElement>(key: string) => ui!.get<T>(`[data-k="${key}"]`)
@@ -377,6 +413,7 @@ export async function createSandbox(engine: AsciiEngine, options: AreaOptions = 
     opener.onchange = () => { const file = opener.files?.[0]; opener.value = ''; if (file) run(async () => { await replace(JSON.parse(await file.text())); setMode('translate'); changed() }) }
     el('library').onclick = () => { ui!.showProject('assets'); assetCategory = 'All'; assetQuery = ''; el<HTMLInputElement>('asset-search').value = ''; refreshLibrary(); el('asset-search').focus() }
     el('create-camera').onclick = () => { cameraEditor!.view(null); setMode('translate', true); cameraEditor!.add() }
+    el('create-texture').onclick = () => { const part = document.querySelector<HTMLSelectElement>('#selection [data-k="part"]')?.value ?? ''; textureStudio!.open(undefined, part); ui!.showStudio('textures') }
     el('create-effect').onclick = () => { ui!.showProject('effects'); effectEditor!.newEffect() }
     el<HTMLInputElement>('search').oninput = e => { hierarchyQuery = (e.target as HTMLInputElement).value; refreshHierarchy() }
     el<HTMLInputElement>('asset-search').oninput = e => { assetQuery = (e.target as HTMLInputElement).value; refreshLibrary() }
@@ -415,6 +452,7 @@ export async function createSandbox(engine: AsciiEngine, options: AreaOptions = 
       for (const [key, asset] of Object.entries(item.assets ?? {})) { doc.assets ??= {}; doc.assets[remap.get(key)!] = asset }
       for (const [key, definition] of Object.entries(item.effects ?? {})) { const id = `fx:custom-${crypto.randomUUID()}`; remap.set(key, id); doc.effects ??= {}; doc.effects[id] = definition }
       for (const asset of Object.values(item.atmospheres ?? {})) { doc.atmospheres ??= {}; doc.atmospheres[`atmosphere-${crypto.randomUUID()}`] = asset }
+      for (const asset of Object.values(item.textures ?? {})) { doc.textures ??= {}; doc.textures[`texture-${crypto.randomUUID()}`] = asset }
       for (const camera of Object.values(item.cameras ?? {})) { doc.cameras ??= {}; doc.cameras[`camera-${crypto.randomUUID()}`] = { ...camera, position: [camera.position[0] + focus.x, camera.position[1], camera.position[2] + focus.z] } }
       for (const object of item.objects) {
         const type = object.options?.type ?? object.prefab, typeStyle = item.style?.types?.[type]
@@ -513,7 +551,7 @@ export async function createSandbox(engine: AsciiEngine, options: AreaOptions = 
     }, { capture: true, signal: signal.signal })
     addEventListener('keydown', e => {
       if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 's' && document.body.classList.contains('studio-mode')) {
-        e.preventDefault(); if (!ui!.effectRoot.hidden) void effectEditor!.save(); else void atmosphereStudio!.save(); return
+        e.preventDefault(); if (!ui!.effectRoot.hidden) void effectEditor!.save(); else if (!ui!.textureRoot.hidden) void textureStudio!.save(); else void atmosphereStudio!.save(); return
       }
       if (e.target instanceof HTMLElement && (e.target.matches('input,select,textarea') || e.target.isContentEditable)) return
       if (e.key === 'Escape') { if (gizmos?.dragging) gizmos.cancel(); else setMode('translate', true); return }
@@ -539,15 +577,15 @@ export async function createSandbox(engine: AsciiEngine, options: AreaOptions = 
     renderCameraPreview() { cameraEditor?.renderPreview(preview) },
     renderOverlay() { if (!player && !preview) { cameraEditor?.render(); if (!cameraEditor?.viewed) gizmos?.render() } },
     cameraView: () => player ? initialCamera : preview ? cameraEditor?.activeCamera() ?? cameraEditor?.current() : cameraEditor?.current(),
-    renderPreview: dt => effectEditor?.frame(dt) ?? false,
-    capturePreview: () => effectEditor?.capture(),
+    renderPreview: dt => textureStudio?.frame(dt) || effectEditor?.frame(dt) || false,
+    capturePreview: () => textureStudio?.capture() ?? effectEditor?.capture(),
     async openDocument(doc) { await replace(doc); changed() },
     authoring: player ? undefined : {
       replace,
       async commit() { history.commit(snapshot()); refreshHierarchy(); refreshHistory(); canvas.dispatchEvent(new Event('scene-document-changed')); await persist() },
       undo,
       lock(value) { automationLocked = value; placement.clear(); gizmos?.attach(); if (ui) ui.root.inert = value },
-      catalog: () => [...Object.entries(library).map(([id, prefab]) => ({ id, title: prefab.title, kind: Object.hasOwn(builtins, id) ? 'builtin' as const : Object.hasOwn(assets.library, id) ? 'asset' as const : 'effect' as const })), ...Object.entries(snapshot().atmospheres ?? {}).map(([id, asset]) => ({ id, title: asset.name, kind: 'atmosphere' as const }))],
+      catalog: () => [...Object.entries(library).map(([id, prefab]) => ({ id, title: prefab.title, kind: Object.hasOwn(builtins, id) ? 'builtin' as const : Object.hasOwn(assets.library, id) ? 'asset' as const : 'effect' as const })), ...Object.entries(snapshot().atmospheres ?? {}).map(([id, asset]) => ({ id, title: asset.name, kind: 'atmosphere' as const })), ...Object.entries(snapshot().textures ?? {}).map(([id, asset]) => ({ id, title: asset.name, kind: 'texture' as const }))],
       inspect(id) {
         if (snapshot().cameras?.[id]) return { camera: snapshot().cameras![id] }
         const placed = scene.placed.find(p => p.doc.id === id)
@@ -569,7 +607,7 @@ export async function createSandbox(engine: AsciiEngine, options: AreaOptions = 
     },
     update(time) { scene.update(time); placement.update(time) },
     dispose() {
-      placement.clear(); signal.abort(); cameraEditor?.dispose(); effectEditor?.dispose(); gizmos?.dispose(); scene.dispose(); assets.dispose()
+      placement.clear(); signal.abort(); cameraEditor?.dispose(); effectEditor?.dispose(); textureStudio?.dispose(); gizmos?.dispose(); scene.dispose(); assets.dispose()
       ui?.dispose()
     },
   }

@@ -1,7 +1,7 @@
 # AI visual authoring — API and MCP
 
 An agent can access the editor's full visual document: terrain, painting,
-water, models, objects and their parts, effects, lights, atmosphere, weather
+water, models, objects and their parts, effects, textures, lights, atmosphere, weather
 and export. It can edit the open scene, show a preview or apply directly.
 Each applied batch becomes one undo action.
 
@@ -248,3 +248,30 @@ and `pnpm compare`. Screenshots:
 
 The server uses the [official MCP TypeScript SDK](https://ts.sdk.modelcontextprotocol.io/v2/get-started/first-server),
 stdio transport and JSON Schema tool discovery.
+
+## Texture resources
+
+`texture.define` stores `{name,style}` in `SceneDoc.textures`. `style` is a
+`GlyphStyle`: optional surface/body technique, family, size, RGB color,
+custom alphabet/font/fontWeight, open, faces, rotation, palette, lighting,
+emissive/emissiveIntensity, spacing, density, strength, gap, contrast,
+toneOffset and shadowSteps. Optional `previewLighting` stores an AtmosphereStyle
+for the editor; texture.apply preserves the scene lighting. Omit fields to preserve more specific part styles.
+`texture.apply` merges a saved recipe into one object's options or a named
+part. Existing applications are independent snapshots.
+
+```json
+[
+  {"op":"texture.define","id":"leaf-ink","name":"Leaf ink","style":{"alphabet":" .oO@","gap":0,"spacing":1.4,"color":6404214}},
+  {"op":"texture.apply","id":"leaf-ink","objectId":"tree-1","part":"crown"}
+]
+```
+
+`resource.remove` accepts `kind: "textures"`. `editor.view` accepts
+`studio: "textures"`; captures use the isolated texture stage. Limits: 256
+texture assets; alphabet 1–128 single Unicode characters with a visible character
+(no control/combining sequences); font family 1–100 characters; fontWeight
+400/700; open boolean; faces front/both; rotation -π–π radians; palette 2–8
+integer RGB colors; lighting scene/unlit; emissive RGB and intensity 0–4; size .01–10 meters, spacing .5–4, density .05–1, strength 0–4,
+gap 0–.015, contrast .1–4, toneOffset -1–1, shadowSteps 2–16 (integer).
+The editor size slider covers .01–1 meters; the numeric/API range is .01–10.

@@ -15,7 +15,7 @@ export function mergeJson(base: unknown, patch: unknown): unknown {
 export function summarizeScene(doc: SceneDoc) {
   return { name: doc.name, objects: doc.objects, terrain: doc.terrain ? { size: doc.terrain.size, resolution: doc.terrain.resolution, layers: doc.terrain.layers, minHeight: doc.terrain.heights.reduce((a,b)=>Math.min(a,b), Infinity), maxHeight: doc.terrain.heights.reduce((a,b)=>Math.max(a,b), -Infinity) } : null,
     waters: doc.waters?.map((w,index)=>({ index, ...w, shape: { ...w.shape, mask: w.shape.mask ? { resolution: w.shape.mask.resolution, followsTerrain: !!w.shape.mask.heights } : undefined } })),
-    assets: Object.entries(doc.assets ?? {}).map(([id, asset])=>({ id, name: asset.name })), effects: doc.effects, atmospheres: doc.atmospheres, cameras: doc.cameras, activeCamera: doc.activeCamera, environment: doc.environment, style: doc.style }
+    assets: Object.entries(doc.assets ?? {}).map(([id, asset])=>({ id, name: asset.name })), effects: doc.effects, atmospheres: doc.atmospheres, textures: doc.textures, cameras: doc.cameras, activeCamera: doc.activeCamera, environment: doc.environment, style: doc.style }
 }
 
 /** Re-sample only water explicitly authored to follow terrain. */
@@ -106,13 +106,23 @@ export function applyCommands(source: SceneDoc, input: unknown): SceneDoc {
       case 'asset.define': (doc.assets ??= {})[cmd.id] = { name: cmd.name, source: cmd.source }; break
       case 'resource.remove':
         if (!doc[cmd.kind]?.[cmd.id]) throw new Error('Resource not found: ' + cmd.id)
-        if (cmd.kind !== 'atmospheres' && doc.objects.some(o => o.prefab === cmd.id)) throw new Error('Remove this asset\'s instances first: ' + cmd.id)
+        if (['assets', 'effects'].includes(cmd.kind) && doc.objects.some(o => o.prefab === cmd.id)) throw new Error('Remove this asset\'s instances first: ' + cmd.id)
         delete doc[cmd.kind]![cmd.id]; break
       case 'atmosphere.define': (doc.atmospheres ??= {})[cmd.id] = { name: cmd.name, style: atmosphereStyle(mergeJson(mergeJson(pomorog, doc.style ?? {}), { ...cmd.style, bodySceneLighting: true, inkFog: true }) as NonNullable<SceneDoc['style']>) }; break
       case 'atmosphere.apply': {
         const asset = doc.atmospheres?.[cmd.id]
         if (!asset) throw new Error('Atmosphere not found: ' + cmd.id)
         doc.style = mergeJson(doc.style ?? {}, asset.style) as SceneDoc['style']; break
+      }
+      case 'texture.define': (doc.textures ??= {})[cmd.id] = { name: cmd.name, style: structuredClone(cmd.style), ...(cmd.previewLighting ? { previewLighting: structuredClone(cmd.previewLighting) } : {}) }; break
+      case 'texture.apply': {
+        const asset = doc.textures?.[cmd.id]
+        if (!asset) throw new Error('Texture not found: ' + cmd.id)
+        const item = object(cmd.objectId)
+        item.options ??= {}
+        if (cmd.part) { item.options.parts ??= {}; item.options.parts[cmd.part] = { ...item.options.parts[cmd.part], ...asset.style } }
+        else Object.assign(item.options, asset.style)
+        break
       }
       case 'atmosphere.set': doc.style = mergeJson(mergeJson(pomorog, doc.style ?? {}), { ...cmd.style, bodySceneLighting: true, inkFog: true }) as SceneDoc['style']; break
       case 'camera.define': (doc.cameras ??= {})[cmd.id] = structuredClone(cmd.camera) as unknown as NonNullable<SceneDoc['cameras']>[string]; break

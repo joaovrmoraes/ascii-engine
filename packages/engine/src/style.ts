@@ -12,8 +12,8 @@ export type GlyphKind =
 /**
  * Letter style of one part: plain data, resolved by layers. Phase 1 covers the
  * technique, the letter family (alphabet, cell, ink of that material kind) and
- * the letter size and colour; more parameters join here (alphabet, spacing,
- * strength, gap, steps, open/occluder, sway).
+ * custom alphabets, spacing and discrete shading. Omitted fields retain the
+ * original Pomorog recipes.
  */
 export interface GlyphStyle {
   glyph?: GlyphKind
@@ -23,6 +23,45 @@ export interface GlyphStyle {
   size?: number
   /** Optional sRGB colour override. Omitted preserves the model's material colour. */
   color?: number
+  /** Single Unicode characters ordered from sparse to dense; up to 128 slots. */
+  alphabet?: string
+  /** CSS font family available to the renderer; omitted retains Courier New. */
+  font?: string
+  fontWeight?: 400 | 700
+  /** True removes the solid occluder and discards surface pixels between letters. */
+  open?: boolean
+  /** Body visibility; omitted retains the original front-face recipes. */
+  faces?: 'front' | 'both'
+  /** Letter rotation in radians within its cell/sprite. */
+  rotation?: number
+  /** Linear interpolation of 2–8 sRGB colors along the light ramp. */
+  palette?: number[]
+  /** Scene lights or uniform local shading; global exposure/tint still applies. */
+  lighting?: 'scene' | 'unlit'
+  /** Self-lit letters. Does not create a light illuminating other objects. */
+  emissive?: number
+  emissiveIntensity?: number
+  /** Distance between letters relative to their size (1 = original recipe). */
+  spacing?: number
+  /** Fraction of occupied cells (surface) or relative sampling density (body). */
+  density?: number
+  /** Ink multiplier, without adding a visible solid surface between letters. */
+  strength?: number
+  /** Surface background between letters. Zero makes the underlying faces invisible. */
+  gap?: number
+  /** Contrast around the middle of the lighting ramp. */
+  contrast?: number
+  /** Offset of the lighting ramp, independent of ink strength. */
+  toneOffset?: number
+  /** Discrete shadow levels; omitted retains the technique's original shading. */
+  shadowSteps?: number
+}
+
+export const GLYPH_STYLE_KEYS = ['glyph', 'surface', 'size', 'color', 'alphabet', 'font', 'fontWeight', 'open', 'faces', 'rotation', 'palette', 'lighting', 'emissive', 'emissiveIntensity', 'spacing', 'density', 'strength', 'gap', 'contrast', 'toneOffset', 'shadowSteps'] as const
+
+/** One atlas slot per single character; control/combining sequences are unsupported. */
+export function validGlyphAlphabet(value: unknown): value is string {
+  return typeof value === 'string' && Array.from(value).length >= 1 && Array.from(value).length <= 128 && !!value.trim() && !/[\p{C}\p{M}\p{Zl}\p{Zp}]/u.test(value)
 }
 
 /** Styles for a type of object ("tree") and its types of part ("crown", "trunk"). */

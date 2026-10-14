@@ -6,7 +6,7 @@ export function createWorkspace() {
   document.body.classList.add('authoring')
   const root = document.createElement('div'); root.id = 'editor-workspace'
   root.innerHTML = `
-    <header id="studio-toolbar" hidden><button data-k="close-studio">← Back to scene</button><strong>Studio</strong><nav aria-label="Studio workspace"><button data-studio-page="effects">Effects</button><button data-studio-page="atmosphere">Atmosphere</button></nav><span>Live preview</span></header>
+    <header id="studio-toolbar" hidden><button data-k="close-studio">← Back to scene</button><strong>Studio</strong><nav aria-label="Studio workspace"><button data-studio-page="effects">Effects</button><button data-studio-page="atmosphere">Atmosphere</button><button data-studio-page="textures">Textures</button></nav><span>Live preview</span></header>
     <header id="authoring-toolbar">
       <div class="menu-row"><strong class="brand">${icon('cube')} ASCII Engine</strong>
         <details class="editor-menu"><summary>File</summary><div class="menu-items">
@@ -21,6 +21,7 @@ export function createWorkspace() {
       <div class="main-toolbar">
         <button data-k="library">${icon('plus')} Add object</button>
         <button data-k="create-camera">${icon('camera')} Create camera</button>
+        <button data-k="create-texture">${icon('cube')} Create texture</button>
         <button data-k="create-effect">${icon('spark')} Create effect</button>
         <button data-k="save-short">${icon('save')} Save</button>
         <div class="preview-controls"><button data-k="preview">${icon('play')} Preview</button><button data-k="pause" title="Pause animation" aria-label="Pause animation">${icon('pause')}</button></div>
@@ -67,7 +68,7 @@ export function createWorkspace() {
       <div class="asset-body"><nav data-k="categories" aria-label="Asset categories"></nav><div class="asset-content">
         <div class="asset-search-row"><label class="search-field">${icon('search')}<input data-k="asset-search" type="search" placeholder="Search assets…" aria-label="Search assets"></label><span>Drag into the scene · or click and choose a position</span></div>
         <div data-k="assets" role="list" aria-label="Available assets"></div>
-      </div></div><section id="studio-workspace" hidden><nav class="studio-tabs" aria-label="Studio"><button data-studio-tab="effects">Effects</button><button data-studio-tab="atmosphere">Atmosphere</button></nav><section id="effect-editor" hidden></section><section id="atmosphere-studio" hidden></section></section>
+      </div></div><section id="studio-workspace" hidden><nav class="studio-tabs" aria-label="Studio"><button data-studio-tab="effects">Effects</button><button data-studio-tab="atmosphere">Atmosphere</button><button data-studio-tab="textures">Textures</button></nav><section id="effect-editor" hidden></section><section id="atmosphere-studio" hidden></section><section id="texture-studio" hidden></section></section>
     </section>`
   document.body.append(root)
   root.querySelector('[data-mount="panel"]')!.append(document.getElementById('panel')!)
@@ -82,7 +83,7 @@ export function createWorkspace() {
   }
   sidebar.querySelectorAll<HTMLButtonElement>('[data-tab]').forEach(el => { el.onclick = () => selectPane(el.dataset.tab!) })
   get('[data-k="view"]').onclick = () => selectPane(pane === 'view' ? 'object' : 'view')
-  let studioPane: 'effects' | 'atmosphere' = 'effects'
+  let studioPane: 'effects' | 'atmosphere' | 'textures' = 'effects'
   function showProject(tab: 'assets' | 'effects' | 'studio') {
     if (tab === 'effects') { studioPane = 'effects'; tab = 'studio' }
     document.body.classList.toggle('studio-mode', tab === 'studio')
@@ -91,6 +92,7 @@ export function createWorkspace() {
     get('#studio-workspace').hidden = tab !== 'studio'
     get('#effect-editor').hidden = tab !== 'studio' || studioPane !== 'effects'
     get('#atmosphere-studio').hidden = tab !== 'studio' || studioPane !== 'atmosphere'
+    get('#texture-studio').hidden = tab !== 'studio' || studioPane !== 'textures'
     get('.asset-actions').hidden = tab !== 'assets'
     root.querySelectorAll<HTMLButtonElement>('[data-project-tab]').forEach(button => { button.classList.toggle('active', button.dataset.projectTab === tab); button.setAttribute('aria-pressed', String(button.dataset.projectTab === tab)) })
     root.querySelectorAll<HTMLButtonElement>('[data-studio-tab], [data-studio-page]').forEach(button => { const active = (button.dataset.studioTab ?? button.dataset.studioPage) === studioPane; button.classList.toggle('active', active); button.setAttribute('aria-pressed', String(active)) })
@@ -105,7 +107,7 @@ export function createWorkspace() {
   root.querySelectorAll('.menu-items button, .menu-items label').forEach(el => el.addEventListener('click', () => root.querySelector('details')?.removeAttribute('open')))
   selectPane('object'); showProject('assets')
   return {
-    root, toolbar, hierarchy, sidebar, tools: get('#tools'), inspector: get('#object-inspector'), environment: get('#environment-settings'), assets: get('#asset-browser'), effectRoot: get('#effect-editor'), studioRoot: get('#atmosphere-studio'), get, selectPane, showProject, showStudio,
+    root, toolbar, hierarchy, sidebar, tools: get('#tools'), inspector: get('#object-inspector'), environment: get('#environment-settings'), assets: get('#asset-browser'), effectRoot: get('#effect-editor'), studioRoot: get('#atmosphere-studio'), textureRoot: get('#texture-studio'), get, selectPane, showProject, showStudio,
     hint(text: string, cancel = false) { get('[data-k="instruction"]').textContent = text; get('[data-k="cancel"]').hidden = !cancel; get('#scene-hint').classList.toggle('placing', cancel) },
     dispose() { layout.dispose(); document.body.append(document.getElementById('panel')!, document.getElementById('selection')!); root.remove(); document.body.classList.remove('authoring', 'previewing', 'studio-mode') },
   }

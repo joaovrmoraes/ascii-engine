@@ -4,6 +4,26 @@ import { applyCommands } from './commands'
 
 const initial = () => parseScene({ version: 1, name: 'Original', terrain: createTerrainData(16, 33), objects: [{ id: 'rock', prefab: 'pedregulho', position: [0,0,0] }] })
 describe('atomic authoring', () => {
+  it('keeps studio lighting separate when defining/applying an extended texture', () => {
+    const source = initial(), before = JSON.stringify(source)
+    const doc = applyCommands(source, [{ op: 'texture.define', id: 'symbols', name: 'Symbols', style: { alphabet: ' ↑→░▓█', font: 'monospace', fontWeight: 700, open: true, palette: [0x224466, 0xff8844] }, previewLighting: { brightness: 2, background: 0x080a12 } }, { op: 'texture.apply', id: 'symbols', objectId: 'rock' }])
+    expect(JSON.stringify(source)).toBe(before)
+    expect(doc.style).toEqual(source.style)
+    expect(doc.textures?.symbols.previewLighting).toEqual({ brightness: 2, background: 0x080a12 })
+    expect(doc.objects[0].options?.open).toBe(true)
+    expect(doc.objects[0].options?.palette).toEqual([0x224466, 0xff8844])
+  })
+  it('defines and applies a texture to a part without changing other parts or the source', () => {
+    const source = parseScene({ version: 1, objects: [{ id: 'tree', prefab: 'arvore', position: [0, 0, 0], options: { parts: { crown: { glyph: 'body' }, trunk: { glyph: 'surface', size: .17 } } } }] })
+    const before = JSON.stringify(source), style = { alphabet: ' .:#@', color: 0x39bb74, spacing: 1.4 }
+    const doc = applyCommands(source, [{ op: 'texture.define', id: 'leaves', name: 'Leaves', style }, { op: 'texture.apply', id: 'leaves', objectId: 'tree', part: 'crown' }])
+    expect(JSON.stringify(source)).toBe(before)
+    expect(doc.objects[0].options?.parts?.crown).toEqual({ glyph: 'body', ...style })
+    expect(doc.objects[0].options?.parts?.trunk).toEqual({ glyph: 'surface', size: .17 })
+    expect(applyCommands(doc, [{ op: 'resource.remove', kind: 'textures', id: 'leaves' }]).textures).toEqual({})
+    expect(() => applyCommands(source, [{ op: 'texture.define', id: 'bad', name: 'Bad', style: { alphabet: '\n#' } }])).toThrow()
+    expect(() => applyCommands(source, [{ op: 'texture.apply', id: 'missing', objectId: 'tree' }])).toThrow('Texture not found')
+  })
   it('creates, positions, activates and removes composition cameras', () => {
     const source=initial(), before=JSON.stringify(source)
     const camera={name:'Geral',projection:'orthographic',position:[0,8,10],rotation:[-.4,0,0],span:5,aspect:16/9}

@@ -144,7 +144,7 @@ function frame(now: number) {
   if (document.hidden) { last = now; return }
   const real = last ? (now - last) / 1000 : 0; last = now
   if (area.renderPreview?.(Math.max(0, real))) {
-    status.textContent = 'Effect studio · isolated preview · the map is paused'
+    status.textContent = `${document.body.classList.contains('texture-studio-active') ? 'Texture' : 'Effect'} studio · isolated preview · the map is paused`
     return
   }
   let dt = view.paused ? 0 : THREE.MathUtils.clamp(real, 0, .08)

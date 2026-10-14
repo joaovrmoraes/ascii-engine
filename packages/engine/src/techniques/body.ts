@@ -2,6 +2,8 @@ import * as THREE from 'three'
 import { MeshSurfaceSampler } from 'three/examples/jsm/math/MeshSurfaceSampler.js'
 import { inkLightsGLSL, inkLightUniforms } from '../illumination'
 import { SURFACE_ALPHA } from '../surface'
+import type { GlyphStyle } from '../style'
+import { customGlyphAtlas, ownGlyphAtlas, glyphPaletteGLSL } from './alphabet'
 
 /**
  * Technique `body` (Pomorog `glyphBody.ts`).
@@ -52,12 +54,15 @@ function glyphAtlas() {
   return atlas
 }
 
-function lettersMaterial(shared: BodyUniforms, color: THREE.Color, glow: THREE.Color, size: number, ramp: BodyRamp, open: boolean) {
-  const count = BODY_RAMPS[ramp].length
-  return new THREE.ShaderMaterial({
-    uniforms: { ...shared, atlas: { value: glyphAtlas() }, tint: { value: color }, glow: { value: glow } },
+function lettersMaterial(shared: BodyUniforms, color: THREE.Color, glow: THREE.Color, size: number, ramp: BodyRamp, open: boolean, style: GlyphStyle) {
+  const custom = !!(style.alphabet || style.font || style.fontWeight)
+  const alphabet = style.alphabet ?? BODY_RAMPS[ramp], count = Array.from(alphabet).length
+  const texture = custom ? customGlyphAtlas(alphabet, true, style) : glyphAtlas()
+  const material = new THREE.ShaderMaterial({
+    uniforms: { ...shared, atlas: { value: texture }, tint: { value: color }, glow: { value: glow } },
     vertexShader: `
       ${inkLightsGLSL}
+      ${glyphPaletteGLSL(style.palette)}
       attribute vec3 glyphColor; attribute float seed;
       uniform float pixelScale, ambient, sunPower; uniform vec3 sunColor; uniform vec3 moon, tint, glow; uniform vec4 lantern, hearth;
       varying vec3 vColor; varying float vIndex;
@@ -70,27 +75,36 @@ function lettersMaterial(shared: BodyUniforms, color: THREE.Color, glow: THREE.C
         float lamp = lantern.w * pow(max(0., 1. - distance(world.xyz, lantern.xyz) / 6.), 1.5);
         float fire = hearth.w * pow(max(0., 1. - distance(world.xyz, hearth.xyz) / 5.5), 1.7);
         vec3 point = pointInk(world.xyz);
-        float light = ambient + diffuse * .7 * sunPower + lamp * .9 + fire * .8 + dot(point, vec3(.2126,.7152,.0722)) * .5;
+        ${style.lighting === 'unlit' ? 'diffuse = 0.; lamp = 0.; fire = 0.; point = vec3(0.);' : ''}
+        float light = ${style.lighting === 'unlit' ? '1.' : 'ambient + diffuse * .7 * sunPower + lamp * .9 + fire * .8 + dot(point, vec3(.2126,.7152,.0722)) * .5'};
         // Letter shape carries the shading; colour stays the material's own hue.
         float level = clamp(light * .62 + (seed - .5) * .3 + length(glow) * .5, .08, .999);
-        vIndex = ${START[ramp]}.0 + 1.0 + floor(level * ${count - 1}.0);
+        ${style.contrast !== undefined || style.toneOffset !== undefined ? `level = clamp((level - .5) * ${(style.contrast ?? 1).toFixed(4)} + .5 + ${(style.toneOffset ?? 0).toFixed(4)}, 0., .999);` : ''}
+        ${style.shadowSteps !== undefined ? `level = floor(level * ${style.shadowSteps.toFixed(1)}) / ${style.shadowSteps.toFixed(1)};` : ''}
+        vIndex = ${style.alphabet ? `floor(level * ${count}.0)` : `${custom ? 0 : START[ramp]}.0 + 1.0 + floor(level * ${count - 1}.0)`};
         vColor = (glyphColor * tint * (.35 + light * .8) + vec3(.95, .6, .28) * (lamp * .25 + fire * .35) * tint + glow) * ${ramp === 'stone' ? '1.45' : '1.'};
         vColor = vColor * mix(vec3(1.), sunColor, diffuse * .6) + glyphColor * tint * point * .35;
+        ${style.palette ? 'vColor = (glyphPalette(level) * (.35 + light * .8) + vec3(.95, .6, .28) * (lamp * .25 + fire * .35)) * mix(vec3(1.), sunColor, diffuse * .6) + glyphPalette(level) * point * .35 + glow;' : ''}
+        ${style.strength !== undefined ? `vColor *= ${style.strength.toFixed(4)};` : ''}
         gl_Position = projectionMatrix * view;
         gl_Position.z -= .002 * gl_Position.w;
-        gl_PointSize = facing < ${ramp === 'stone' ? '.05' : open ? '-.2' : '-.05'} ? 0. : ${size.toFixed(3)} * pixelScale;
+        gl_PointSize = facing < ${style.faces === 'both' ? '-2.' : style.faces === 'front' || ramp === 'stone' ? '.05' : open ? '-.2' : '-.05'} ? 0. : ${size.toFixed(3)} * pixelScale;
       }`,
     fragmentShader: `
       uniform sampler2D atlas;
       varying vec3 vColor; varying float vIndex;
       void main() {
         vec2 uv = vec2((gl_PointCoord.x - .5) * 1.25 + .5, 1. - gl_PointCoord.y);
+        ${style.rotation ? `uv = mat2(${Math.cos(style.rotation).toFixed(6)},${Math.sin(style.rotation).toFixed(6)},${(-Math.sin(style.rotation)).toFixed(6)},${Math.cos(style.rotation).toFixed(6)}) * (uv - .5) + .5;` : ''}
         if (uv.x < 0. || uv.x > 1.) discard;
-        float ink = texture2D(atlas, vec2((vIndex + .08 + uv.x * .84) / ${glyphs.length}.0, .06 + uv.y * .88)).r;
+        ${style.rotation ? 'if (uv.y < 0. || uv.y > 1.) discard;' : ''}
+        float ink = texture2D(atlas, vec2((vIndex + .08 + uv.x * .84) / ${custom ? count : glyphs.length}.0, .06 + uv.y * .88)).r;
         if (ink < .38) discard;
         gl_FragColor = vec4(vColor, ${GLYPH_ALPHA.toFixed(2)});
       }`,
   })
+  if (custom) ownGlyphAtlas(material, texture)
+  return material
 }
 
 function triangleArea(geometry: THREE.BufferGeometry) {
@@ -176,7 +190,7 @@ const world = new THREE.Vector3()
  * Turns a mesh hierarchy into letters. `open` meshes (foliage, snow caps)
  * lose their surface entirely; the rest keep a dark occluder.
  */
-export function glyphBody(root: THREE.Object3D | THREE.Mesh[], shared: BodyUniforms, size = .1, fallback: BodyRamp = 'actor', force?: BodyRamp) {
+export function glyphBody(root: THREE.Object3D | THREE.Mesh[], shared: BodyUniforms, size = .1, fallback: BodyRamp = 'actor', force?: BodyRamp, style: GlyphStyle = {}) {
   const meshes: THREE.Mesh[] = []
   if (Array.isArray(root)) { for (const mesh of root) { mesh.updateWorldMatrix(true, false); if (!mesh.userData.glyphDone) meshes.push(mesh) } }
   else {
@@ -194,8 +208,8 @@ export function glyphBody(root: THREE.Object3D | THREE.Mesh[], shared: BodyUnifo
     if (!(material instanceof THREE.MeshStandardMaterial)) continue
     const ramp = force ?? rampOf(material, fallback)
     // Stones are an open shell of letters too: a dark body read as a hole.
-    const open = ramp === 'foliage' || ramp === 'snow' || ramp === 'stone'
-    const letter = ramp === 'stone' ? size * .95 : open ? size * 1.25 : size
+    const open = style.open ?? (ramp === 'foliage' || ramp === 'snow' || ramp === 'stone')
+    const letter = ramp === 'stone' ? size * .95 : ramp === 'foliage' || ramp === 'snow' ? size * 1.25 : size
     world.setFromMatrixScale(mesh.matrixWorld)
     const instanced = mesh instanceof THREE.InstancedMesh
     const matrices: THREE.Matrix4[] = [], colors: THREE.Color[] = []
@@ -205,11 +219,12 @@ export function glyphBody(root: THREE.Object3D | THREE.Mesh[], shared: BodyUnifo
         const c = new THREE.Color(1, 1, 1); if (mesh.instanceColor) mesh.getColorAt(i, c); colors.push(c)
       }
     } else { matrices.push(new THREE.Matrix4()); colors.push(white) }
-    const spacing = letter * (ramp === 'stone' ? .72 : open ? .9 : .82)
+    const spacing = letter * (ramp === 'stone' ? .72 : ramp === 'foliage' || ramp === 'snow' ? .9 : .82) * (style.spacing ?? 1) / Math.sqrt(style.density ?? 1)
     // Skinned meshes: letters follow the bones (positions re-skinned each frame).
     const skinned = mesh instanceof THREE.SkinnedMesh ? scatterSkinned(mesh, spacing, seed += 7919, taken) : undefined
     const geometry = skinned?.geometry ?? scatter(mesh.geometry, spacing, matrices, colors, world, seed += 7919, mesh.matrixWorld, taken)
-    const points = new THREE.Points(geometry, lettersMaterial(shared, material.color, material.emissive ?? noGlow, letter, ramp, open))
+    const glow = style.emissiveIntensity !== undefined ? (material.emissive ?? noGlow).clone().multiplyScalar(style.emissiveIntensity) : material.emissive ?? noGlow
+    const points = new THREE.Points(geometry, lettersMaterial(shared, material.color, glow, letter, ramp, open, style))
     points.userData.glyphDone = true; points.userData.glyphBodyOf = mesh; points.frustumCulled = false
     if (skinned) { points.userData.skin = skinned.skin; created.push(points) }
     mesh.add(points)

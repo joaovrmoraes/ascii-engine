@@ -4,6 +4,118 @@ Entries describe the state at each stage. Earlier limitations may have been
 resolved later; START.md and the editor guide describe the current scope.
 Historical filenames, reference IDs and captured interfaces are preserved.
 
+## 2026-10-14 — Texture Studio release preparation
+
+The owner explicitly authorized committing the validated texture work to main
+and publishing a GitHub release. The repository had no previous tags or
+releases; selected v0.1.0 — Texture Studio as its first source release.
+
+- Added [versioned release notes](releases/v0.1.0.md) with the editing workflow,
+  glyph/font/visibility/color controls, independent preview lights, reusable
+  assets, automation, compatibility and concrete current limits.
+- Reused the actual [Orca screenshot](captures/texture-controls-2026-10-14/orca-window.png)
+  and prepared the validated Blue hatch / Emerald symbols texture files plus
+  the portable multipart example scene as downloadable release assets.
+- Fetched origin/main before integration; it matched the feature branch's
+  starting commit, 07eee6a. The main checkout had no uncommitted changes, so
+  integration can fast-forward without overwriting other work.
+
+Validation reviewed: pnpm check (109 tests, types/build), 71 texture WebGL
+assertions, full authoring/API regressions, Orca and cdpshot evidence, and
+git diff --check. This publication stage changes documentation only beyond
+the already validated implementation. Native desktop execution and arbitrary
+decoder-dependent models remain unverified; no reference files were changed.
+Publication target: [v0.1.0](https://github.com/joaovrmoraes/ascii-engine/releases/tag/v0.1.0).
+
+## 2026-10-14 — Expanded texture, visibility and lighting controls
+
+The owner asked for broader control over letters, character sets, letters-only
+rendering, illumination and its colors. Explained that the initial editor did
+not expose every engine parameter, then expanded the concrete requested areas.
+
+- Up to 128 single Unicode characters, starter alphabets, installed font
+  families and regular/bold weight; atlas dimensions/indexes use character
+  counts, preserving supplementary characters. Added letter rotation.
+- Explicit letters-only/dark-occluder choice and front/both body faces. Surface
+  gaps are discarded in letters-only mode, allowing the world behind to show;
+  body meshes become invisible. Existing defaults remain unchanged unless
+  these new fields are authored.
+- Editable 2–8-stop color palettes, scene/uniform local shading and emissive
+  color/intensity. Palettes replace base color and receive colored lighting;
+  self light does not create lights affecting other objects.
+- Studio light controls for exposure/background, main color/intensity/
+  direction/shadows, ambient sky/ground, fill and fog. Optional
+  TextureAsset.previewLighting saves the rig separately from material style.
+  Texture application preserves scene lights. Explicit actions apply studio
+  lighting with scene undo or save it as an atmosphere asset.
+- Added navigation between control groups and avoided rebuilding letter
+  geometry/materials during lighting-only edits. Extended validation,
+  texture.define metadata, API references, START and the editor guide.
+
+Validation: pnpm check passed (109 tests, types/build). The real WebGL texture
+suite passed 71 assertions, including changed surface/body pixels, Unicode,
+fonts/weight, rotation, palettes, self light, real gaps, face visibility,
+colored lighting, uniform shading, both histories and all save/reopen/file
+paths. No runtime/shader errors. Existing authoring and API regressions passed.
+
+Evidence: [expanded texture captures](captures/texture-controls-2026-10-14/README.md),
+including Orca full-window/direct renderer screenshots, cdpshot and logs. The
+API bridge was restarted after dev reloads temporarily left it unavailable;
+an authoring run interrupted by live source reload was rerun after edits
+finished. Isolated profiles handled save/apply checks, preserving the owner's
+normal draft. Prior texture-stage evidence remains available.
+
+Limits: named surface/body parts, not automatic face/material-slot splitting.
+Fonts use installed families/fallbacks and are not embedded. Compound glyph
+sequences, raster painting and transparent PNG export are not supported here.
+Water, terrain/carpet and effects keep their own modules. Native desktop and
+arbitrary external/decoder-dependent GLTFs were not validated in this stage.
+No push or publication was performed.
+
+## 2026-10-14 — Separate texture authoring module
+
+Added Studio → Textures alongside Effects and Atmosphere, plus Create texture
+on the main toolbar and a Textures category in Assets. Reviewed both supplied
+WhatsApp videos for the character/contrast/color adjustment workflow.
+
+- Dedicated texture editor and disposable object preview modules. Select a
+  placed object or named part; orbit, pan, zoom, frame and pause motion. The
+  map pauses while the preview engine renders the selected model independently.
+- Custom printable ASCII alphabets, world size, spacing, density, RGB,
+  strength, contrast, light threshold and discrete shadows work on surface and
+  body letters. New recipes use black gaps. Existing Pomorog defaults remain
+  unchanged when these optional fields are absent.
+- Presets preserve each target's technique/family unless explicitly chosen.
+  Applying a crown texture preserves trunk styles. Applying then switching
+  parts retains committed changes in the preview. Local history handles edits
+  and resets; applying to the source creates one normal scene undo action.
+- SceneDoc.textures stores named appearance snapshots. Save/update/copy,
+  library reopen/reuse and .texture.json download/import are supported.
+  Drafts, project files, item insertion and exports preserve the assets.
+- Added texture.define / texture.apply, resource removal, scene summaries,
+  Studio navigation and capture support to authoring/API/MCP. Core remains
+  independent of editor/UI/game content. Custom atlases release with materials.
+- Updated START, editor guide and API documentation. Added validation of all
+  texture shader parameters, recipe boundaries and printable ASCII limits.
+
+Validation: pnpm check passed (97 tests, types/build); 38 real WebGL texture
+assertions passed, including changed rendered pixels, named imported parts,
+source isolation, both histories, clearing prior alphabet/RGB, save/reuse,
+file import/download, reload and module switching. Existing full authoring and
+API regressions passed. No shader or runtime errors.
+
+Evidence: [texture studio captures](captures/texture-studio-2026-10-14/README.md),
+including before/after, all control groups, body/imported parts, cdpshot and
+actual Orca renderer capture/runtime results. Orca full-window captures timed
+out because its panel did not draw compositor frames; DOM and direct renderer
+captures succeeded. Save/apply tests used isolated Chromium profiles and the
+owner's normal draft was preserved.
+
+Outstanding scope: raster painting/image texture creation, semantic face or
+material-slot segmentation, cross-project libraries, live preset links and
+native desktop execution are not part of this stage. Image/video conversion
+continues through Effects. No push or publication was performed.
+
 ## 2026-10-13 — Imported model appearance and named parts
 
 The owner reported that imported GLTF appearance/letter-size controls did not

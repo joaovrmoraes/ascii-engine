@@ -270,6 +270,70 @@ file**, transfer a preset as `.atmosphere.json`. Save to Assets after
 importing. The library belongs to the open document; it is not a shared
 global library across projects.
 
+## Create textures
+
+Select an object and choose **Create texture**, or open **Studio → Textures**.
+Use **Object** and **Part** to switch the preview target. Named groups such as
+crown and trunk can be edited separately; undivided meshes remain one part.
+Drag the isolated preview to orbit, right-drag to pan, scroll to zoom and use
+**Frame object** to fit it. Clicking a named part also selects it. The map is
+paused while this module is open.
+
+The control navigation jumps between **Letters**, **Letter visibility**,
+**Size and spacing**, **Ink and contrast**, **Color palette**, **Material
+lighting** and **Preview lighting**.
+
+- **Letters:** choose the technique/family or keep the target's declarations.
+  Type up to 128 single characters from sparse to dense, or start with Shading,
+  Letters, Digits, Binary, Blocks or Arrows. Unicode symbols and precomposed
+  accented letters are supported. Control characters and combining sequences
+  are rejected. Choose a font family and Regular/Bold; installed fonts and
+  fallbacks determine the glyphs. Font files are not embedded.
+- **Visibility:** **Letters only** removes the body and lets the world behind
+  show through the gaps. **Dark occluder** keeps a near-black silhouette. Body
+  faces can show the front or both sides. Gap tint affects occluded surfaces.
+  The scene background remains a separate lighting/display setting.
+- **Layout/ink:** world size, spacing, density, rotation in degrees, RGB, ink
+  strength, contrast, threshold and discrete shadow levels. Model color removes
+  the local RGB override. Rotation is stored in radians in documents/API.
+- **Palette:** 2–8 colors interpolated from shadow to light, replacing the base
+  glyph color. Each letter uses one color; the RGB picker is disabled while the
+  palette is active. Scene lights can tint the palette.
+- **Material lighting:** react to scene lights or use uniform local shading.
+  Global exposure/tint still applies. Self light has its own color/intensity;
+  it brightens the letters without illuminating other objects.
+- **Preview lighting:** enable a custom studio rig, then adjust exposure, main
+  light color/intensity/direction/shadows, ambient sky/ground colors, ambient
+  intensity, fill color/intensity, background and fog. These edits affect the
+  isolated preview. **Apply lighting to scene** changes the map with normal
+  scene undo. **Save lighting as atmosphere** creates a separate resource.
+
+Edits and saved presets preserve each part's technique and family unless you
+explicitly choose either. Techniques, visibility and lighting response have
+context: body-face visibility affects glyph bodies; gap tint affects occluded
+surfaces; unlit letters ignore local lighting. Water, terrain/carpet and effect
+components retain their own authoring modules.
+
+Preview edits have their own **Undo/Redo** and Ctrl Z / Ctrl Shift Z. **Reset
+edits** restores the target's starting appearance with black gaps. Selecting
+another object or part starts a new texture; switching Studio modules preserves
+the draft. **Apply to object/part** copies the recipe onto that instance. Return
+to the scene to undo that application with the normal scene history.
+
+Name the texture and choose **Save to Assets**. It appears in **Assets →
+Textures**; clicking a texture opens it in the Studio for the current target.
+Choose **Apply** to use it. Saving updates the open preset; **Save copy** adds
+another. Texture assets live in `SceneDoc.textures`, survive browser drafts,
+project files, insertion and exports, and are shared within the open document.
+They store appearance snapshots plus optional `previewLighting`; applying the
+texture preserves scene lights. Editing a preset does not update instances
+that already received it.
+
+**Download texture** / **Open texture**, under **Import or download file**,
+transfer a `.texture.json` file. Imported files are validated before use.
+Textures author mesh appearances; use the Effects and water tools for their
+respective components. Image/video conversion remains in the Effects module.
+
 ## Create with AI
 
 The API/MCP reads and edits the full visual document, imports models,

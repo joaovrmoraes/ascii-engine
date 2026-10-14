@@ -206,12 +206,17 @@ export function createAsciiEngine(canvas: HTMLCanvasElement, options: AsciiEngin
   function applyTechnique(s: GlyphStyle, nodes: THREE.Object3D[]) {
     const meshes = nodes.filter((n): n is THREE.Mesh => n instanceof THREE.Mesh)
     const tint = (copy: THREE.Material) => {
-      if (s.color !== undefined && copy instanceof THREE.MeshStandardMaterial) copy.color.setHex(s.color)
+      if (copy instanceof THREE.MeshStandardMaterial) {
+        if (s.palette) copy.color.setHex(0xffffff)
+        else if (s.color !== undefined) copy.color.setHex(s.color)
+        if (s.emissive !== undefined) copy.emissive.setHex(s.emissive)
+        if (s.emissiveIntensity !== undefined) copy.emissiveIntensity = s.emissiveIntensity
+      }
       return copy
     }
     switch (s.glyph) {
       case 'surface':
-        for (const mesh of meshes.filter(standardLike)) swapMaterials(mesh, `surface:${s.surface ?? ''}:${s.size ?? ''}:${s.color ?? ''}`, (copy) => {
+        for (const mesh of meshes.filter(standardLike)) swapMaterials(mesh, `surface:${JSON.stringify(s)}`, (copy) => {
           if (!(copy instanceof THREE.MeshStandardMaterial)) return copy
           tint(copy)
           if (s.surface) copy.userData.asciiSurface = s.surface
@@ -222,10 +227,10 @@ export function createAsciiEngine(canvas: HTMLCanvasElement, options: AsciiEngin
         for (const mesh of meshes.filter(standardLike)) swapMaterials(mesh, `screen:${s.surface ?? 'actor'}:${s.color ?? ''}`, (copy) => markScreen(tint(copy), s.surface ?? 'actor'))
         return
       case 'body': {
-        if (s.color !== undefined) for (const mesh of meshes.filter(standardLike)) swapMaterials(mesh, `body-color:${s.color}`, tint)
+        if (s.color !== undefined || s.palette || s.emissive !== undefined || s.emissiveIntensity !== undefined) for (const mesh of meshes.filter(standardLike)) swapMaterials(mesh, `body-color:${s.color}:${!!s.palette}:${s.emissive}:${s.emissiveIntensity}`, tint)
         const ramp = s.surface ? BODY_RAMPS[s.surface] : undefined
         const scenery = ramp && ramp !== 'actor'
-        skinnedLetters.push(...glyphBody(meshes, bodies, s.size ?? (scenery ? .19 : .155), 'actor', ramp))
+        skinnedLetters.push(...glyphBody(meshes, bodies, s.size ?? (scenery ? .19 : .155), 'actor', ramp, s))
         return
       }
       case 'carpet':

@@ -6,7 +6,7 @@
 export const ENGINE_VERSION = '0.1.0'
 
 export { createAsciiEngine, type AsciiEngine, type AsciiEngineOptions, type AddOptions } from './engine'
-export { mergeGlyphStyles, nodeGlyphStyle, resolveGlyphStyle, type GlyphKind, type GlyphStyle, type ObjectTypeStyle, type StyleLayers } from './style'
+export { GLYPH_STYLE_KEYS, validGlyphAlphabet, mergeGlyphStyles, nodeGlyphStyle, resolveGlyphStyle, type GlyphKind, type GlyphStyle, type ObjectTypeStyle, type StyleLayers } from './style'
 export { SURFACE_ALPHA, SURFACE_TOLERANCE, surfaceAlpha, tagSurface, type SurfaceKind } from './surface'
 export { createAsciiPass, type AsciiPassHook } from './ascii'
 export { createIllumination, illuminationGLSL, illuminationUniforms, type IlluminationOptions } from './illumination'
@@ -46,3 +46,4 @@ export { loadSceneAssets } from './import/assets'
 export { createWaterPaint, paintWater, waterMaskEdge, waterHeightAt, type WaterMask } from './world/waterPaint'
 export { ATMOSPHERE_KEYS, atmosphereStyle, type AtmosphereStyle, type AtmosphereAsset } from './world/atmosphere'
 export { applySceneCamera, type SceneCamera } from './world/camera'
+export { textureStyle, type TextureAsset } from './world/texture'

@@ -254,7 +254,7 @@ resize, detach/dock at edges; localStorage stores layout separately from
 scene data. Reset restores it. TransformControls draw in an editor-only
 overlay outside the ASCII pipeline/exported document.
 
-**Visual Studio:** dedicated effects/atmosphere pages with a large preview
+**Visual Studio:** dedicated Effects, Atmosphere and Textures pages with a large preview
 and controls. Effects use disposable empty-space preview engines and pause
 the map. Atmospheres expose exposure, glyph tint, lights/direction, shadows
 and fog. Essential controls and templates simplify creation. Effects live
@@ -263,6 +263,25 @@ current lighting in `SceneDoc.style`. Click atmosphere assets to apply,
 double-click to edit. Advanced JSON exposes heat, curves and flipbooks.
 Layers have name, XYZ origin, gizmo and separate history; heat, particles
 and trails respect saved offsets. Graphical timeline/curves remain pending.
+
+**Texture Studio:** select a placed object or named part and adjust its
+letters in an isolated, disposable preview. Custom alphabets (up to 128 single Unicode characters), fonts/weight,
+world size, spacing, rotation, density, RGB/palettes, ink strength, contrast,
+light threshold and shadow levels work for surface/body glyphs. Letters-only
+visibility removes solid occluders; body face visibility is explicit. Material
+lighting supports scene response, uniform local shading and self light.
+Adjustable preview lights include exposure, main/ambient/fill colors and
+intensities, direction, shadows, background and fog. New texture recipes use black gaps;
+unmodified scenes retain Pomorog defaults. Apply updates one object/part with
+scene undo; Save to Assets creates a reusable `SceneDoc.textures` recipe. The
+texture editor has its own undo/redo and portable `.texture.json` import/export.
+Presets are snapshots, not live links to instances. `texture.define` /
+`texture.apply` expose the same resources through the authoring API. Optional
+`TextureAsset.previewLighting` reproduces the studio light rig; applying a
+texture preserves scene lighting. Explicit actions apply those lights to the
+map or save them as an atmosphere. Font families use the viewing device's
+installed fonts and fallbacks; font files are not embedded.
+
 
 **Water dynamics:** `world/waterDynamics.ts` integrates gravity-driven flow,
 depth and impulses on a shallow-water grid. `waters[].physics` stores depth,

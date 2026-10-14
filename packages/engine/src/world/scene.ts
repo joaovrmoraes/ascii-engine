@@ -12,6 +12,7 @@ import { createEffectPrefabs } from '../fx/prefabs'
 import type { EffectDef } from '../fx/effects'
 import type { AtmosphereAsset } from './atmosphere'
 import type { SceneCamera } from './camera'
+import type { TextureAsset } from './texture'
 
 /**
  * Scenes as JSON (phase 5): terrain, waters, a carpet and objects placed from
@@ -53,6 +54,8 @@ export interface SceneDoc {
   effects?: Record<string, EffectDef>
   /** Saved lighting presets in the document's resource library. */
   atmospheres?: Record<string, AtmosphereAsset>
+  /** Reusable object/part appearances, saved by the texture studio. */
+  textures?: Record<string, TextureAsset>
   cameras?: Record<string, SceneCamera>
   /** Initial composition when opening this document in the player. */
   activeCamera?: string

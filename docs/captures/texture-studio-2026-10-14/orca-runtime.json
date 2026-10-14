@@ -1,0 +1,30 @@
+{
+  "objects": [
+    {
+      "id": "object-1",
+      "options": {
+        "parts": {}
+      }
+    },
+    {
+      "id": "object-2",
+      "options": {
+        "parts": {},
+        "type": "arvore"
+      }
+    },
+    {
+      "id": "object-3",
+      "options": {
+        "parts": {}
+      }
+    }
+  ],
+  "ready": "object-2",
+  "studio": "authoring studio-mode texture-studio-active",
+  "style": {
+    "alphabet": " .oO@",
+    "gap": 0,
+    "size": 0.19
+  }
+}

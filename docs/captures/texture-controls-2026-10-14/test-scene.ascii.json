@@ -1,0 +1,288 @@
+{
+  "version": 1,
+  "name": "Texture studio validation",
+  "objects": [
+    {
+      "id": "block",
+      "prefab": "bloco",
+      "name": "Sample block",
+      "position": [
+        0,
+        0,
+        0
+      ],
+      "scale": 3,
+      "seed": 2654483778,
+      "visible": true,
+      "rotation3": [
+        0,
+        0,
+        0
+      ],
+      "scale3": [
+        3,
+        3,
+        3
+      ],
+      "options": {
+        "parts": {},
+        "gap": 0,
+        "alphabet": " .:-+#@",
+        "size": 0.25,
+        "spacing": 1.5,
+        "color": 7519950
+      }
+    },
+    {
+      "id": "tree",
+      "prefab": "arvore",
+      "name": "Tree",
+      "position": [
+        4,
+        0,
+        0
+      ],
+      "seed": 1013952243,
+      "visible": true,
+      "rotation3": [
+        0,
+        0,
+        0
+      ],
+      "scale3": [
+        1,
+        1,
+        1
+      ],
+      "options": {
+        "type": "arvore",
+        "parts": {
+          "crown": {
+            "size": 0.28,
+            "gap": 0,
+            "color": 14465623,
+            "alphabet": "oO@"
+          }
+        }
+      }
+    },
+    {
+      "id": "import",
+      "prefab": "asset:tree",
+      "name": "Imported tree",
+      "position": [
+        -4,
+        0,
+        0
+      ],
+      "seed": 3668388004,
+      "visible": true,
+      "rotation3": [
+        0,
+        0,
+        0
+      ],
+      "scale3": [
+        1,
+        1,
+        1
+      ],
+      "options": {
+        "type": "asset:tree",
+        "parts": {
+          "crown": {
+            "size": 0.25,
+            "color": 7519950,
+            "alphabet": " ↑↗→↘↓↙←↖",
+            "spacing": 1.4,
+            "gap": 0,
+            "font": "\"DejaVu Sans\", sans-serif",
+            "fontWeight": 700,
+            "open": true,
+            "lighting": "scene",
+            "emissive": 0
+          }
+        }
+      }
+    }
+  ],
+  "assets": {
+    "asset:tree": {
+      "name": "Imported tree",
+      "source": "data:model/gltf+json;base64,eyJhc3NldCI6eyJ2ZXJzaW9uIjoiMi4wIn0sInNjZW5lIjowLCJzY2VuZXMiOlt7Im5vZGVzIjpbMF19XSwibm9kZXMiOlt7Im5hbWUiOiJ0cmVlIiwiY2hpbGRyZW4iOlsxLDJdfSx7Im5hbWUiOiJ0cnVuayIsIm1lc2giOjAsImV4dHJhcyI6eyJnbHlwaCI6InN1cmZhY2UiLCJnbHlwaF9zdXJmYWNlIjoiYmFyayJ9fSx7Im5hbWUiOiJjcm93biIsImNoaWxkcmVuIjpbMyw0XSwiZXh0cmFzIjp7ImdseXBoIjoiYm9keSIsImdseXBoX3N1cmZhY2UiOiJmb2xpYWdlIiwiZ2x5cGhfc2l6ZSI6MC4xOX19LHsibmFtZSI6ImxlYWYiLCJtZXNoIjoxfSx7Im5hbWUiOiJsZWFmMiIsIm1lc2giOjEsInRyYW5zbGF0aW9uIjpbMC43LDAuMywwLjJdfV0sIm1lc2hlcyI6W3sicHJpbWl0aXZlcyI6W3siYXR0cmlidXRlcyI6eyJQT1NJVElPTiI6MCwiTk9STUFMIjoxfSwibWF0ZXJpYWwiOjB9XX0seyJwcmltaXRpdmVzIjpbeyJhdHRyaWJ1dGVzIjp7IlBPU0lUSU9OIjoyLCJOT1JNQUwiOjN9LCJtYXRlcmlhbCI6MX1dfV0sIm1hdGVyaWFscyI6W3sicGJyTWV0YWxsaWNSb3VnaG5lc3MiOnsiYmFzZUNvbG9yRmFjdG9yIjpbMC40NSwwLjI1LDAuMSwxXSwibWV0YWxsaWNGYWN0b3IiOjAsInJvdWdobmVzc0ZhY3RvciI6MX0sImRvdWJsZVNpZGVkIjp0cnVlfSx7InBick1ldGFsbGljUm91Z2huZXNzIjp7ImJhc2VDb2xvckZhY3RvciI6WzAuMTIsMC41LDAuMiwxXSwibWV0YWxsaWNGYWN0b3IiOjAsInJvdWdobmVzc0ZhY3RvciI6MX0sImRvdWJsZVNpZGVkIjp0cnVlfV0sImJ1ZmZlcnMiOlt7ImJ5dGVMZW5ndGgiOjE3MjgsInVyaSI6ImRhdGE6YXBwbGljYXRpb24vb2N0ZXQtc3RyZWFtO2Jhc2U2NCw3RkU0UGdBQUFBQUFBQUFBN0ZFNFBtWm1Ka0FBQUFBQWZGVUNQZ0FBQUFCOFZRSStmRlVDUGdBQUFBQjhWUUkrN0ZFNFBtWm1Ka0FBQUFBQWZGVUNQbVptSmtCOFZRSStmRlVDUGdBQUFBQjhWUUkrZkZVQ1BtWm1Ka0I4VlFJK0ZGRkxJd0FBQUFEc1VUZytGRkZMSXdBQUFBRHNVVGcrZkZVQ1BtWm1Ka0I4VlFJK0ZGRkxJMlptSmtEc1VUZytGRkZMSXdBQUFBRHNVVGcrRkZGTEkyWm1Ka0RzVVRnK2ZGVUN2Z0FBQUFCOFZRSStmRlVDdmdBQUFBQjhWUUkrRkZGTEkyWm1Ka0RzVVRnK2ZGVUN2bVptSmtCOFZRSStmRlVDdmdBQUFBQjhWUUkrZkZVQ3ZtWm1Ka0I4VlFJKzdGRTR2Z0FBQUFBVVVjc2o3RkU0dmdBQUFBQVVVY3NqZkZVQ3ZtWm1Ka0I4VlFJKzdGRTR2bVptSmtBVVVjc2o3RkU0dmdBQUFBQVVVY3NqN0ZFNHZtWm1Ka0FVVWNzamZGVUN2Z0FBQUFCOFZRSytmRlVDdmdBQUFBQjhWUUsrN0ZFNHZtWm1Ka0FVVWNzamZGVUN2bVptSmtCOFZRSytmRlVDdmdBQUFBQjhWUUsrZkZVQ3ZtWm1Ka0I4VlFLK3ozd1lwQUFBQUFEc1VUaSt6M3dZcEFBQUFBRHNVVGkrZkZVQ3ZtWm1Ka0I4VlFLK3ozd1lwR1ptSmtEc1VUaSt6M3dZcEFBQUFBRHNVVGkrejN3WXBHWm1Ka0RzVVRpK2ZGVUNQZ0FBQUFCOFZRSytmRlVDUGdBQUFBQjhWUUsrejN3WXBHWm1Ka0RzVVRpK2ZGVUNQbVptSmtCOFZRSytmRlVDUGdBQUFBQjhWUUsrZkZVQ1BtWm1Ka0I4VlFLKzdGRTRQZ0FBQUFBQUFBQUE3RkU0UGdBQUFBQUFBQUFBZkZVQ1BtWm1Ka0I4VlFLKzdGRTRQbVptSmtBQUFBQUFYb05zUHdBQUFJQVY3OE0rWG9Oc1B3QUFBSUFWNzhNK1hvTnNQd0FBQUlBVjc4TStYb05zUHdBQUFJQVY3OE0rWG9Oc1B3QUFBSUFWNzhNK1hvTnNQd0FBQUlBVjc4TStGZS9EUGdBQUFJQmVnMncvRmUvRFBnQUFBSUJlZzJ3L0ZlL0RQZ0FBQUlCZWcydy9GZS9EUGdBQUFJQmVnMncvRmUvRFBnQUFBSUJlZzJ3L0ZlL0RQZ0FBQUlCZWcydy9GZS9EdmdBQUFBQmVnMncvRmUvRHZnQUFBQUJlZzJ3L0ZlL0R2Z0FBQUFCZWcydy9GZS9EdmdBQUFBQmVnMncvRmUvRHZnQUFBQUJlZzJ3L0ZlL0R2Z0FBQUFCZWcydy9Yb05zdndBQUFBQVY3OE0rWG9Oc3Z3QUFBQUFWNzhNK1hvTnN2d0FBQUFBVjc4TStYb05zdndBQUFBQVY3OE0rWG9Oc3Z3QUFBQUFWNzhNK1hvTnN2d0FBQUFBVjc4TStYb05zdndBQUFBQVY3OE8rWG9Oc3Z3QUFBQUFWNzhPK1hvTnN2d0FBQUFBVjc4TytYb05zdndBQUFBQVY3OE8rWG9Oc3Z3QUFBQUFWNzhPK1hvTnN2d0FBQUFBVjc4TytGZS9EdmdBQUFBQmVnMnkvRmUvRHZnQUFBQUJlZzJ5L0ZlL0R2Z0FBQUFCZWcyeS9GZS9EdmdBQUFBQmVnMnkvRmUvRHZnQUFBQUJlZzJ5L0ZlL0R2Z0FBQUFCZWcyeS9GZS9EUGdBQUFBQmVnMnkvRmUvRFBnQUFBQUJlZzJ5L0ZlL0RQZ0FBQUFCZWcyeS9GZS9EUGdBQUFBQmVnMnkvRmUvRFBnQUFBQUJlZzJ5L0ZlL0RQZ0FBQUFCZWcyeS9Yb05zUHdBQUFBQVY3OE8rWG9Oc1B3QUFBQUFWNzhPK1hvTnNQd0FBQUFBVjc4TytYb05zUHdBQUFBQVY3OE8rWG9Oc1B3QUFBQUFWNzhPK1hvTnNQd0FBQUFBVjc4TytBQUNBUDVxWk9VQUFBQUFBQUFBQUFBQUFnRUFBQUFBQUFBQUFBSnFaT1VBQUFJQS9BQUFBQUpxWk9VQUFBSUEvQUFBQUFHWm1Ca0FBQUFBQUFBQ0FQNXFaT1VBQUFBQUFBQUFBQUpxWk9VQUFBSUEvQUFBQUFBQUFnRUFBQUFBQUFBQ0F2NXFaT1VBQUFBQUFBQUNBdjVxWk9VQUFBQUFBQUFBQUFHWm1Ca0FBQUFBQUFBQUFBSnFaT1VBQUFJQS9BQUNBdjVxWk9VQUFBQUFBQUFBQUFBQUFnRUFBQUFBQUFBQUFBSnFaT1VBQUFJQy9BQUFBQUpxWk9VQUFBSUMvQUFBQUFHWm1Ca0FBQUFBQUFBQ0F2NXFaT1VBQUFBQUFBQUFBQUpxWk9VQUFBSUMvQUFBQUFBQUFnRUFBQUFBQUFBQ0FQNXFaT1VBQUFBQUFBQUNBUDVxWk9VQUFBQUFBQUFBQUFHWm1Ca0FBQUFBQUFBQUFBSnFaT1VBQUFJQy9sMFVZUDg5dENqK1hSUmcvbDBVWVA4OXRDaitYUlJnL2wwVVlQODl0Q2orWFJSZy8wcUVIUDBlS0tiL1NvUWMvMHFFSFAwZUtLYi9Tb1FjLzBxRUhQMGVLS2IvU29RYy9sMFVZdjg5dENqK1hSUmcvbDBVWXY4OXRDaitYUlJnL2wwVVl2ODl0Q2orWFJSZy8wcUVIdjBlS0tiL1NvUWMvMHFFSHYwZUtLYi9Tb1FjLzBxRUh2MGVLS2IvU29RYy9sMFVZdjg5dENqK1hSUmkvbDBVWXY4OXRDaitYUlJpL2wwVVl2ODl0Q2orWFJSaS8wcUVIdjBlS0tiL1NvUWUvMHFFSHYwZUtLYi9Tb1FlLzBxRUh2MGVLS2IvU29RZS9sMFVZUDg5dENqK1hSUmkvbDBVWVA4OXRDaitYUlJpL2wwVVlQODl0Q2orWFJSaS8wcUVIUDBlS0tiL1NvUWUvMHFFSFAwZUtLYi9Tb1FlLzBxRUhQMGVLS2IvU29RZS8ifV0sImJ1ZmZlclZpZXdzIjpbeyJidWZmZXIiOjAsImJ5dGVPZmZzZXQiOjAsImJ5dGVMZW5ndGgiOjU3Nn0seyJidWZmZXIiOjAsImJ5dGVPZmZzZXQiOjU3NiwiYnl0ZUxlbmd0aCI6NTc2fSx7ImJ1ZmZlciI6MCwiYnl0ZU9mZnNldCI6MTE1MiwiYnl0ZUxlbmd0aCI6Mjg4fSx7ImJ1ZmZlciI6MCwiYnl0ZU9mZnNldCI6MTQ0MCwiYnl0ZUxlbmd0aCI6Mjg4fV0sImFjY2Vzc29ycyI6W3siYnVmZmVyVmlldyI6MCwiY29tcG9uZW50VHlwZSI6NTEyNiwiY291bnQiOjQ4LCJ0eXBlIjoiVkVDMyIsIm1pbiI6Wy0wLjE4LDAsLTAuMThdLCJtYXgiOlswLjE4LDIuNiwwLjE4XX0seyJidWZmZXJWaWV3IjoxLCJjb21wb25lbnRUeXBlIjo1MTI2LCJjb3VudCI6NDgsInR5cGUiOiJWRUMzIn0seyJidWZmZXJWaWV3IjoyLCJjb21wb25lbnRUeXBlIjo1MTI2LCJjb3VudCI6MjQsInR5cGUiOiJWRUMzIiwibWluIjpbLTEsMi4xLC0xXSwibWF4IjpbMSw0LDFdfSx7ImJ1ZmZlclZpZXciOjMsImNvbXBvbmVudFR5cGUiOjUxMjYsImNvdW50IjoyNCwidHlwZSI6IlZFQzMifV19"
+    }
+  },
+  "style": {
+    "cellSize": 6,
+    "brightness": 1,
+    "background": 131330,
+    "fog": {
+      "color": 131330,
+      "density": 0.012
+    },
+    "hemisphere": {
+      "sky": 12766916,
+      "ground": 3420961,
+      "intensity": 1.25
+    },
+    "moon": {
+      "color": 14739404,
+      "intensity": 2.2,
+      "position": [
+        -5,
+        12,
+        7
+      ],
+      "shadowIntensity": 0.62,
+      "shadowExtent": 16,
+      "mapSize": 1024
+    },
+    "fill": {
+      "color": 10207157,
+      "intensity": 0.3,
+      "position": [
+        6,
+        6,
+        -7
+      ]
+    },
+    "interior": false,
+    "bodyAmbient": 0.3,
+    "bodyLantern": 0.7,
+    "atmosphere": "moon",
+    "glyphs": {},
+    "types": {
+      "tree": {
+        "style": {
+          "glyph": "surface",
+          "surface": "bark"
+        },
+        "parts": {
+          "crown": {
+            "glyph": "body",
+            "surface": "foliage",
+            "size": 0.19
+          },
+          "trunk": {
+            "glyph": "surface",
+            "surface": "bark"
+          }
+        }
+      },
+      "rock": {
+        "style": {
+          "glyph": "body",
+          "surface": "stone",
+          "size": 0.19
+        }
+      },
+      "creature": {
+        "style": {
+          "glyph": "body",
+          "size": 0.155
+        }
+      },
+      "hero": {
+        "style": {
+          "glyph": "screen",
+          "surface": "actor"
+        }
+      },
+      "prop": {
+        "style": {
+          "glyph": "surface",
+          "surface": "wood"
+        }
+      },
+      "ground": {
+        "style": {
+          "glyph": "surface",
+          "surface": "earth"
+        }
+      },
+      "arvore": {
+        "style": {
+          "glyph": "surface",
+          "surface": "bark"
+        },
+        "parts": {
+          "crown": {
+            "glyph": "body",
+            "surface": "foliage",
+            "size": 0.19
+          },
+          "trunk": {
+            "glyph": "surface",
+            "surface": "bark"
+          }
+        }
+      },
+      "asset:tree": {}
+    }
+  },
+  "textures": {
+    "texture-ae03ac3d-d61b-49e2-9c2b-c73dc77bab15": {
+      "name": "Blue hatch",
+      "style": {
+        "size": 0.25,
+        "color": 7519950,
+        "alphabet": " .:-+#@",
+        "spacing": 1.5,
+        "gap": 0
+      }
+    },
+    "texture-45212c5f-fee1-41f5-a630-4daae4b92986": {
+      "name": "Emerald symbols",
+      "style": {
+        "size": 0.25,
+        "color": 7519950,
+        "alphabet": " ↑↗→↘↓↙←↖",
+        "font": "\"DejaVu Sans\", sans-serif",
+        "fontWeight": 700,
+        "open": true,
+        "lighting": "scene",
+        "emissive": 0,
+        "spacing": 1.4,
+        "gap": 0
+      },
+      "previewLighting": {
+        "atmosphere": "moon",
+        "bodySceneLighting": true,
+        "inkFog": true,
+        "brightness": 1,
+        "background": 526864,
+        "fog": {
+          "color": 131330,
+          "density": 0.012
+        },
+        "hemisphere": {
+          "sky": 12766916,
+          "ground": 3420961,
+          "intensity": 1.25
+        },
+        "moon": {
+          "color": 3407752,
+          "intensity": 2,
+          "position": [
+            -5,
+            12,
+            7
+          ],
+          "shadowIntensity": 0.62,
+          "shadowExtent": 16,
+          "mapSize": 1024
+        },
+        "fill": {
+          "color": 10207157,
+          "intensity": 0.3,
+          "position": [
+            6,
+            6,
+            -7
+          ]
+        },
+        "bodyAmbient": 0.3
+      }
+    }
+  }
+}

@@ -1,6 +1,7 @@
 import * as THREE from 'three'
 import { SURFACE_ALPHA, type SurfaceKind } from '../surface'
 import type { GlyphStyle } from '../style'
+import { customGlyphAtlas, ownGlyphAtlas, glyphPaletteGLSL } from './alphabet'
 
 /**
  * Technique `surface` (Pomorog `worldGlyph.ts`).
@@ -57,9 +58,12 @@ function kindOf(material: THREE.Material, fallback: string) {
 export function surfaceMaterial(material: THREE.MeshStandardMaterial, fallback = 'generic', style: GlyphStyle = {}) {
   if (material.userData.worldGlyph) return material
   const kind = kindOf(material, fallback)
-  const cellSize = style.size ?? SURFACE_CELL[kind]
-  const [start, count] = SURFACE_RANGES[kind], [gain, paper] = SURFACE_INK[kind]
-  const texture = surfaceAtlas()
+  const cellSize = (style.size ?? SURFACE_CELL[kind]) * (style.spacing ?? 1)
+  const custom = !!(style.alphabet || style.font || style.fontWeight)
+  const alphabet = style.alphabet ?? SURFACE_ALPHABETS[kind]
+  const [start, count] = custom ? [0, Array.from(alphabet).length] : SURFACE_RANGES[kind], [gain, paper] = SURFACE_INK[kind]
+  const texture = custom ? customGlyphAtlas(alphabet, false, style) : surfaceAtlas()
+  if (custom) ownGlyphAtlas(material, texture)
   material.userData.worldGlyph = kind
   // Keep earlier injections (snow cover, footprints), drop only their ID alpha.
   const previous = material.onBeforeCompile
@@ -82,7 +86,8 @@ export function surfaceMaterial(material: THREE.MeshStandardMaterial, fallback =
       .replace('#include <common>', `#include <common>
         uniform sampler2D glyphAtlas;
         varying vec3 vGlyphPos; varying vec3 vGlyphNormal;
-        float glyphHash(vec3 p) { return fract(sin(dot(p, vec3(127.1, 311.7, 74.7))) * 43758.5453); }`)
+        float glyphHash(vec3 p) { return fract(sin(dot(p, vec3(127.1, 311.7, 74.7))) * 43758.5453); }
+        ${glyphPaletteGLSL(style.palette)}`)
       .replace('#include <dithering_fragment>', `#include <dithering_fragment>
         {
           // Project the lattice on the face's dominant axis, letters upright on walls.
@@ -93,30 +98,40 @@ export function surfaceMaterial(material: THREE.MeshStandardMaterial, fallback =
           float face = n.y > max(n.x, n.z) ? 1. : n.x > n.z ? 2. : 3.;
           float grain = glyphHash(vec3(grid, face));
           // Roll off hot lantern light first, then read the cell's value.
-          vec3 lit = max(gl_FragColor.rgb, vec3(0.));
+          vec3 lit = max(${style.lighting === 'unlit' ? 'diffuseColor.rgb + totalEmissiveRadiance' : 'gl_FragColor.rgb'}, vec3(0.));
           lit = lit / (vec3(1.) + lit * .9);
           float tone = dot(pow(lit, vec3(.4545)), vec3(.2126, .7152, .0722));
+          ${style.contrast !== undefined || style.toneOffset !== undefined ? `tone = clamp((tone - .5) * ${(style.contrast ?? 1).toFixed(4)} + .5 + ${(style.toneOffset ?? 0).toFixed(4)}, 0., 1.);` : ''}
           // An ASCII object, not a textured solid: shading is the choice of
           // letter (sparse . : to dense # @) in a few steps, the gap between
           // letters is near black, and each letter carries one flat colour.
-          float steps = 6.;
+          float steps = ${(style.shadowSteps ?? 6).toFixed(1)};
           ${kind === 'snow'
             // Bright snow would saturate to the densest letter everywhere: let the
             // cell's grain pick sparse flakes, shade (and boot marks) thin them out.
             ? 'float level = clamp(.18 + tone * .25 + grain * .5, 0., .999);'
             : 'float level = clamp(floor(tone * 1.5 * steps + grain * .85) / steps, 0., .999);'}
+          ${kind === 'snow' && style.shadowSteps !== undefined ? 'level = floor(level * steps) / steps;' : ''}
           float index = ${start}.0 + floor(level * ${count}.0);
           float slot = ${texture.userData.slot.toFixed(6)};
+          ${style.spacing !== undefined && style.spacing > 1 ? `inside = (inside - .5) * ${style.spacing.toFixed(4)} + .5;` : ''}
+          ${style.rotation ? `inside = mat2(${Math.cos(style.rotation).toFixed(6)},${Math.sin(style.rotation).toFixed(6)},${(-Math.sin(style.rotation)).toFixed(6)},${Math.cos(style.rotation).toFixed(6)}) * (inside - .5) + .5;` : ''}
           float ink = texture2D(glyphAtlas, vec2((index + .08 + inside.x * .84) * slot, .06 + inside.y * .88)).r;
           ink = smoothstep(.1, .45, ink)${kind === 'snow' ? ' * .84' : ''};
+          ${style.density !== undefined ? `ink *= step(grain, ${style.density.toFixed(4)});` : ''}
+          ${(style.spacing !== undefined && style.spacing > 1) || style.rotation ? 'ink *= step(0., inside.x) * step(inside.x, 1.) * step(0., inside.y) * step(inside.y, 1.);' : ''}
           vec3 hue = lit / max(dot(lit, vec3(.2126, .7152, .0722)), .002);
           vec3 letter = ${kind === 'snow' ? `lit * ${gain.toFixed(3)}` : `hue * pow(.18 + level * .82, 2.2) * ${gain.toFixed(3)} * .5`};
-          gl_FragColor.rgb = mix(lit * ${paper.toFixed(3)}, letter, ink);
+          ${style.palette ? `letter = glyphPalette(level) * hue * (.3 + level * .9) * ${gain.toFixed(3)} * .5;` : ''}
+          ${style.palette && style.emissive !== undefined ? 'letter += totalEmissiveRadiance;' : ''}
+          ${style.strength !== undefined ? `letter *= ${style.strength.toFixed(4)};` : ''}
+          ${style.open === true ? 'if (ink < .02) discard;' : ''}
+          gl_FragColor.rgb = mix(lit * ${(style.open === true ? 0 : style.gap ?? paper).toFixed(4)}, letter, ink);
           gl_FragColor.a = ${WORLD_GLYPH_ALPHA.toFixed(2)};
         }`)
   }
   const previousKey = material.customProgramCacheKey.call(material)
-  material.customProgramCacheKey = () => `world-glyph-${kind}-${cellSize.toFixed(3)}-${previousKey}`
+  material.customProgramCacheKey = () => `world-glyph-${kind}-${cellSize.toFixed(3)}-${JSON.stringify(style)}-${previousKey}`
   material.needsUpdate = true
   return material
 }
