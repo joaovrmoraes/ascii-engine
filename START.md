@@ -301,6 +301,14 @@ texture preserves scene lighting. Explicit actions apply those lights to the
 map or save them as an atmosphere. Font families use the viewing device's
 installed fonts and fallbacks; font files are not embedded.
 
+**Shared editor glyph catalog (consolidation stage 1):**
+`src/editor/glyphCatalog.ts` supplies family/part/layer display labels,
+technique-specific size defaults, alphabet lookup and model-color inspection
+to the inspector and Texture Studio. Terrain labels use the same catalog;
+legacy scene identifiers stay unchanged. This stage changes no document format
+or renderer defaults. The appearance controls and lighting/file workflows remain
+available until their later consolidation stages.
+
 
 **Water dynamics:** `world/waterDynamics.ts` integrates gravity-driven flow,
 depth and impulses on a shallow-water grid. `waters[].physics` stores depth,

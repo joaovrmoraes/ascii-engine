@@ -1,0 +1,11 @@
+{
+  "id": "ed144699-29b5-4e71-93b5-99033c8fa672",
+  "ok": true,
+  "result": {
+    "result": "{\"inspector\":{\"color\":\"#d1894b\",\"families\":[[\"earth\",\"Earth\"],[\"stone\",\"Stone\"],[\"wood\",\"Wood\"],[\"bark\",\"Bark\"],[\"foliage\",\"Foliage\"],[\"snow\",\"Snow\"],[\"wetgrass\",\"Wet grass\"],[\"actor\",\"Character\"]]},\"studio\":{\"color\":\"#d1894b\",\"families\":[[\"earth\",\"Earth\"],[\"stone\",\"Stone\"],[\"wood\",\"Wood\"],[\"bark\",\"Bark\"],[\"foliage\",\"Foliage\"],[\"snow\",\"Snow\"],[\"wetgrass\",\"Wet grass\"],[\"actor\",\"Character\"]]},\"documentUnchanged\":true,\"url\":\"http://localhost:1440/?area=sandbox\"}",
+    "origin": "http://localhost:1440/?area=sandbox"
+  },
+  "_meta": {
+    "runtimeId": "327bd229-b588-4def-b562-15b9bd27a70c"
+  }
+}

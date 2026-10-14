@@ -1,6 +1,6 @@
 import * as THREE from 'three'
 import type { AsciiEngine, GlyphKind, GlyphStyle, SurfaceKind } from '@ascii-engine/core'
-import { SURFACE_CELL, SURFACE_ALPHABETS, BODY_RAMPS } from '@ascii-engine/core'
+import { GLYPH_FAMILIES, defaultGlyphSize, glyphAlphabet, glyphLabel, modelGlyphColor } from './editor/glyphCatalog'
 
 /**
  * Part selection (§3.1, phase 4): a click selects the part under the cursor,
@@ -9,8 +9,6 @@ import { SURFACE_CELL, SURFACE_ALPHABETS, BODY_RAMPS } from '@ascii-engine/core'
  * only, this part in every object of the type, or the global style.
  */
 const KINDS: GlyphKind[] = ['surface', 'body', 'screen']
-const FAMILIES: SurfaceKind[] = ['earth', 'stone', 'wood', 'bark', 'foliage', 'snow', 'wetgrass', 'actor']
-const LABELS: Record<string, string> = { surface: 'Surface glyphs', body: 'Glyph body', screen: 'Character (screen)', earth: 'Earth', stone: 'Stone', wood: 'Wood', bark: 'Bark', foliage: 'Foliage', snow: 'Snow', wetgrass: 'Wet grass', actor: 'Character', crown: 'Crown', trunk: 'Trunk', copa: 'Crown', tronco: 'Trunk' }
 
 export function createSelection(engine: AsciiEngine, canvas: HTMLCanvasElement, root: HTMLElement, callbacks: { select?: (object?: THREE.Object3D) => void; changed?: () => void; blocked?: () => boolean; objectFirst?: boolean } = {}) {
   let selected: Omit<NonNullable<ReturnType<AsciiEngine['pick']>>, 'node'> & { node: THREE.Object3D; level: 'part' | 'object' } | undefined
@@ -22,8 +20,8 @@ export function createSelection(engine: AsciiEngine, canvas: HTMLCanvasElement, 
   root.innerHTML = `
     <strong>ASCII appearance</strong><div data-k="what">click a scene part</div>
     <label>part <select data-k="part"></select></label>
-    <label>Technique <select data-k="glyph"><option value="">Mixed / inherit</option>${KINDS.map((k) => `<option value="${k}">${LABELS[k]}</option>`).join('')}</select></label>
-    <label>Glyph family <select data-k="surface"><option value="">Model default / mixed</option>${FAMILIES.map((k) => `<option value="${k}">${LABELS[k]}</option>`).join('')}</select></label>
+    <label>Technique <select data-k="glyph"><option value="">Mixed / inherit</option>${KINDS.map((k) => `<option value="${k}">${glyphLabel(k)}</option>`).join('')}</select></label>
+    <label>Glyph family <select data-k="surface"><option value="">Model default / mixed</option>${GLYPH_FAMILIES.map((k) => `<option value="${k}">${glyphLabel(k)}</option>`).join('')}</select></label>
     <div data-k="letters" class="glyph-letters"></div>
     <label>Size (m) <input data-k="size" type="number" min=".01" max="10" step=".01" placeholder="(inherit)"></label>
     <label>Color <span class="glyph-color"><input data-k="color" type="color" aria-label="Glyph color"><button data-k="inherit-color" title="Use the original model color">Model color</button></span></label>
@@ -55,8 +53,7 @@ export function createSelection(engine: AsciiEngine, canvas: HTMLCanvasElement, 
   function hints() {
     const glyph = el<HTMLSelectElement>('glyph').value
     const family = el<HTMLSelectElement>('surface').value
-    const ramp = family === 'wood' ? 'bark' : family
-    el('letters').textContent = glyph === 'body' ? BODY_RAMPS[ramp as keyof typeof BODY_RAMPS] ?? BODY_RAMPS.actor : SURFACE_ALPHABETS[family || 'generic'] ?? ''
+    el('letters').textContent = glyphAlphabet({ glyph: glyph as GlyphKind, surface: (family || undefined) as SurfaceKind | undefined })
     el<HTMLInputElement>('size').disabled = glyph === 'screen'
     el('help').textContent = glyph === 'screen' ? 'Screen letter size is controlled by Display. Family changes the letters.' : 'Size is in world meters. Family changes the letters; Color changes their color.'
   }
@@ -78,23 +75,16 @@ export function createSelection(engine: AsciiEngine, canvas: HTMLCanvasElement, 
       node.traverse(child => { if (child instanceof THREE.Mesh) containsMesh = true })
       if (containsMesh) names.add(node.name)
     })
-    names.forEach(name => parts.append(new Option(LABELS[name] ?? name, name)))
+    names.forEach(name => parts.append(new Option(glyphLabel(name), name)))
     parts.value = selected.level === 'part' ? selected.part ?? '' : ''
     what.textContent = selected.level === 'part' && selected.part ? `part "${selected.part}" · ${selected.object.name}` : `object "${selected.object.name || selected.object.type}"`
     el<HTMLSelectElement>('glyph').value = style.glyph ?? ''
     el<HTMLSelectElement>('surface').value = style.surface ?? ''
     el<HTMLInputElement>('size').value = style.size ? String(style.size) : ''
-    const defaultSize = style.glyph === 'surface' ? SURFACE_CELL[style.surface ?? 'generic'] ?? .18 : style.surface && ['stone', 'foliage', 'snow', 'bark', 'wood'].includes(style.surface) ? .19 : .155
+    const defaultSize = defaultGlyphSize(style)
     el<HTMLInputElement>('size').placeholder = mixedSize ? 'Mixed sizes' : `${defaultSize} (inherit)`
     inheritColor = style.color === undefined
-    let modelColor = 0xffffff
-    target.traverse(node => {
-      if (!(node instanceof THREE.Mesh)) return
-      const material = node.userData.glyphBodyMaterial ?? node.userData.asciiOriginal ?? node.material
-      const first = [material].flat()[0]
-      if (first instanceof THREE.MeshStandardMaterial) modelColor = first.color.getHex()
-    })
-    el<HTMLInputElement>('color').value = '#' + (style.color ?? modelColor).toString(16).padStart(6, '0')
+    el<HTMLInputElement>('color').value = '#' + (style.color ?? modelGlyphColor(target)).toString(16).padStart(6, '0')
     el<HTMLButtonElement>('inherit-color').disabled = inheritColor
     el<HTMLSelectElement>('scope').querySelector<HTMLOptionElement>('[value="type"]')!.disabled = !selected.type
     hints()

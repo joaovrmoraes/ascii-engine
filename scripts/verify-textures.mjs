@@ -67,6 +67,40 @@ try {
     select('block'); window.before=JSON.stringify(area.document()); ui('[data-k="create-texture"]');`)
   await until('document.querySelector("#texture-preview canvas").dataset.ready === "block"')
   await check('Textures is a separate module with an isolated object', 'document.body.classList.contains("texture-studio-active") && !document.querySelector("#texture-studio").hidden && document.querySelector("#effect-preview").hidden')
+  await check('inspector and studio share family names and stable IDs', `(() => {
+    const options = selector => Array.from(document.querySelectorAll(selector)).filter(o => o.value).map(o => [o.value, o.textContent]);
+    const inspector = options('#selection [data-k=surface] option');
+    return JSON.stringify(inspector) === JSON.stringify(options('#texture-studio [data-texture-field=surface] option')) &&
+      inspector.some(([id, label]) => id === 'wetgrass' && label === 'Wet grass') &&
+      inspector.some(([id, label]) => id === 'actor' && label === 'Character');
+  })()`)
+  for (const [id, part] of [['block', ''], ['tree', 'crown'], ['tree', 'trunk'], ['import', 'crown'], ['import', 'trunk']]) {
+    await action(`ui('[data-k=close-studio]'); select('${id}'); ui('#selection [data-k=part]', '${part}');
+      window.catalogColor = document.querySelector('#selection [data-k=color]').value;
+      window.catalogSize = document.querySelector('#selection [data-k=size]').value || parseFloat(document.querySelector('#selection [data-k=size]').placeholder);
+      window.catalogLetters = document.querySelector('#selection [data-k=letters]').textContent;
+      ui('[data-k=create-texture]')`)
+    await until(`document.querySelector('#texture-preview canvas').dataset.ready === '${id}'`)
+    await check(`${id}/${part || 'object'}: panels agree on inherited color, size and alphabet`, `
+      document.querySelector('#texture-studio [data-texture-field=color]').value === catalogColor &&
+      Number(document.querySelector('#texture-studio [data-texture-number=size]').value) === Number(catalogSize) &&
+      document.querySelector('#texture-studio .texture-ramp').textContent === catalogLetters &&
+      (${JSON.stringify(id)} !== 'import' || catalogColor !== '#ffffff')`)
+    if (part) await check(`${id}/${part}: panels share the selected part label`, `
+      document.querySelector('#selection [data-k=part]').selectedOptions[0].textContent ===
+      document.querySelector('#texture-studio [data-texture=part]').selectedOptions[0].textContent`)
+  }
+  await check('reading the shared catalog leaves the document unchanged', 'JSON.stringify(area.document()) === before')
+  await action(`ui('[data-k=close-studio]'); window.catalogScene = area.document();
+    const actor = structuredClone(catalogScene); actor.objects[0].options = {glyph:'body', surface:'actor'};
+    await area.openDocument(actor); select('block'); ui('[data-k=create-texture]')`)
+  await until('document.querySelector("#texture-preview canvas").dataset.ready === "block"')
+  await check('inherited character body size matches the renderer default in both panels', `
+    parseFloat(document.querySelector('#selection [data-k=size]').placeholder) === .155 &&
+    Number(document.querySelector('#texture-studio [data-texture-number=size]').value) === .155`)
+  await action(`ui('[data-k=close-studio]'); await area.openDocument(catalogScene); select('block');
+    window.before = JSON.stringify(area.document()); ui('[data-k=create-texture]')`)
+  await until('document.querySelector("#texture-preview canvas").dataset.ready === "block"')
   await action(`ui('[data-texture-preview="pause"]')`);
   await shot('01-surface-before')
   const capture = async () => { await sleep(150); return evaluate('area.capturePreview()') }
@@ -90,6 +124,9 @@ try {
   await evaluate(`document.querySelector('#texture-studio').scrollTop=0`);
   await action(`tx('apply')`)
   await check('apply persists the texture on only the selected object', 'area.document().objects[0].options.alphabet===" .:-+#@" && area.document().objects[0].options.color===0x72bece && !area.document().objects[1].options.alphabet')
+  await check('inspector and studio agree on an explicit RGB override', `
+    document.querySelector('#selection [data-k=color]').value === '#72bece' &&
+    document.querySelector('#texture-studio [data-texture-field=color]').value === '#72bece'`)
   await action(`ui('[data-k="close-studio"]'); ui('[data-k="undo"]')`); await until('!area.document().objects[0].options.alphabet');
   await action(`ui('[data-k="redo"]')`); await until('area.document().objects[0].options.alphabet===" .:-+#@"');
   await action(`select('block'); ui('[data-k="create-texture"]'); tx('name','Blue hatch')`); await until('document.querySelector("#texture-preview canvas").dataset.ready==="block"');

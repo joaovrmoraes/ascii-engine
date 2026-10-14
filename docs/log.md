@@ -4,6 +4,39 @@ Entries describe the state at each stage. Earlier limitations may have been
 resolved later; START.md and the editor guide describe the current scope.
 Historical filenames, reference IDs and captured interfaces are preserved.
 
+## 2026-10-14 — Editor consolidation stage 1: shared glyph catalog
+
+Created `apps/editor/src/editor/glyphCatalog.ts` and reused it in selection,
+Texture Studio and the sandbox terrain layer menu. Family labels, known part
+names, default world sizes, alphabet lookup and model-color inspection now
+have one editor source. The Studio uses Wet grass / Character and the same
+part labels as the inspector. Its inherited character body size now matches
+the renderer's existing .155 m default instead of displaying .19 m.
+
+No controls were removed. Saved IDs, document format and rendering recipes
+remain unchanged. The sandbox only needed a catalog import/label lookup;
+decomposition was unnecessary at this stage. The owner's uncommitted plan
+remains untouched. No authoring/MCP format migration is needed for stage 1.
+
+Validation: pnpm check passed (114 tests, boundaries, types/build), plus
+verify:textures (85 checks), verify:gltf (18) and verify:authoring (67) with
+pnpm dev running from threadfin. Added browser assertions for panel parity,
+inherited character size, explicit RGB, parts and stable terrain layer names.
+The historical item-roundtrip document was opened with cdpshot before/after:
+the world viewport comparison has RMSE 0. Orca commands used the editor's
+explicit page ID at localhost:1440; labels and color matched and its document
+was preserved. Orca screenshot capture timed out; GPU Chromium images were
+inspected instead. See [stage evidence](captures/glyph-catalog-stage1-2026-10-14/README.md).
+
+The observed A5 mismatch was not reproduced on the current pretzel selection:
+both panels already showed #d1894b before the refactor. Model-color detection
+is shared now. Moss is a terrain layer, not a supported glyph family; its
+label/ID was preserved pending stage 6. The core follow-ups at the end of the
+plan are partly stale after c93f647; the snow baseline remains pending.
+
+Stage 1 ends with a local commit and no push. Stage 2 and subsequent stages
+have not started. Native desktop and physical mobile interaction are untested.
+
 ## 2026-10-14 — Embedded map switching in the Pages gallery
 
 The owner requested an iframe so visitors can click between the five demos

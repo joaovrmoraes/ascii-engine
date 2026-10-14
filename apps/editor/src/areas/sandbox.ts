@@ -1,4 +1,4 @@
-import { terrainLayerName } from '../editor/names'
+import { glyphLabel } from '../editor/glyphCatalog'
 import * as THREE from 'three'
 import { buildScene, createTerrainData, createHistory, createEffectPrefabs, emptyScene, createWaterPaint, paintWater, loadSceneAssets, parseScene, waterEdge, type AsciiEngine, type Brush, type BuiltScene, type SceneDoc } from '@ascii-engine/core'
 import { pomorog } from '@ascii-engine/core/pomorog'
@@ -227,7 +227,7 @@ export async function createSandbox(engine: AsciiEngine, options: AreaOptions = 
     if (!ui) return
     if (!library[tool.prefab]) { tool.prefab = 'arvore'; if (tool.kind === 'place') tool.kind = 'select' }
     const layers = box.querySelector<HTMLSelectElement>('[data-k="layer"]')!
-    layers.replaceChildren(...(scene.terrain?.data.layers ?? []).map((l, i) => new Option(terrainLayerName(l.name), String(i))))
+    layers.replaceChildren(...(scene.terrain?.data.layers ?? []).map((l, i) => new Option(glyphLabel(l.name), String(i))))
     layers.value = String(tool.layer); layers.disabled = !scene.terrain
     box.querySelectorAll<HTMLButtonElement>('[data-brush]').forEach(button => { button.disabled = !scene.terrain; const active = tool.kind === button.dataset.brush; button.classList.toggle('active', active); button.setAttribute('aria-pressed', String(active)) })
     ui.get('[data-k="no-terrain"]').hidden = !!scene.terrain

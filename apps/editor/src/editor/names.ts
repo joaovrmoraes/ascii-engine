@@ -4,6 +4,4 @@ const effects: Record<string, string> = {
   aura: 'Aura', raio: 'Lightning', 'explosao-de-fogo': 'Fire explosion', gelo: 'Ice',
   'anel-de-chuva': 'Rain ripple', rastro: 'Trail',
 }
-const layers: Record<string, string> = { musgo: 'Moss', terra: 'Earth', pedra: 'Stone', neve: 'Snow' }
 export const effectName = (id: string) => effects[id] ?? id
-export const terrainLayerName = (name: string) => layers[name] ?? name

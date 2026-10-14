@@ -1,0 +1,19 @@
+$ node scripts/verify-gltf-appearance.mjs .cache/glyph-catalog-stage1/gltf
+PASS b020f707-2213-4314-a34b-1dd4b95bf6a3: surface size changes the rendered pixels
+PASS b020f707-2213-4314-a34b-1dd4b95bf6a3: family changes the letters
+PASS b020f707-2213-4314-a34b-1dd4b95bf6a3: color overrides the original material
+PASS b020f707-2213-4314-a34b-1dd4b95bf6a3: model color can be restored
+PASS b020f707-2213-4314-a34b-1dd4b95bf6a3: body size and color affect glyph sprites
+PASS b020f707-2213-4314-a34b-1dd4b95bf6a3: imported model supports the type scope
+PASS type changes reach both imported copies
+PASS instance override affects only its copy
+PASS save/reopen preserves model, type and instance appearance
+PASS undo/redo restores imported appearance
+PASS whole-tree size preserves separate crown and trunk techniques
+PASS named crown group edits its descendants without changing the trunk
+PASS trunk size and family change independently
+PASS nested imported part appearance survives save/reopen
+PASS clicking a crown selects its named group after hierarchy selection
+PASS all-copy crown edits override Blender defaults and leave every trunk unchanged
+PASS import after deletion preserves existing IDs and allocates a unique new ID
+PASS no runtime or shader errors

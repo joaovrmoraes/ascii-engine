@@ -1,7 +1,8 @@
 import * as THREE from 'three'
-import { BODY_RAMPS, GLYPH_STYLE_KEYS, SURFACE_ALPHABETS, SURFACE_CELL, atmosphereStyle, createHistory, parseScene, textureStyle, validGlyphAlphabet, type AtmosphereStyle, type GlyphStyle, type SceneDoc, type TextureAsset } from '@ascii-engine/core'
+import { GLYPH_STYLE_KEYS, atmosphereStyle, createHistory, parseScene, textureStyle, validGlyphAlphabet, type AtmosphereStyle, type GlyphStyle, type SceneDoc, type TextureAsset } from '@ascii-engine/core'
 import { pomorog } from '@ascii-engine/core/pomorog'
 import { createTexturePreview } from './texturePreview'
+import { GLYPH_FAMILIES, defaultGlyphSize, glyphAlphabet, glyphLabel, modelGlyphColor } from './glyphCatalog'
 
 interface TextureDraft extends TextureAsset { cleared?: (keyof GlyphStyle)[] }
 
@@ -86,7 +87,7 @@ export function createTextureStudio(root: HTMLElement, callbacks: {
       let containsMesh = false; node.traverse(child => { if (child instanceof THREE.Mesh) containsMesh = true })
       if (containsMesh) names.add(node.name)
     })
-    names.forEach(name => parts.append(new Option(name, name))); parts.value = part
+    names.forEach(name => parts.append(new Option(glyphLabel(name), name))); parts.value = part
     const assets = get<HTMLSelectElement>('asset'); assets.replaceChildren(new Option('Open a saved texture…', ''))
     for (const [id, asset] of Object.entries(callbacks.document().textures ?? {})) assets.append(new Option(asset.name, id))
     assets.value = selectedKey ?? ''
@@ -132,8 +133,8 @@ export function createTextureStudio(root: HTMLElement, callbacks: {
       row.append(output, input); box.append(row)
     }
     const letters = group('Letters', 'Characters run from sparse to dense. A whole-object edit keeps different part techniques unless you choose one.')
-    select(letters, 'Technique', 'glyph', [['surface', 'Surface glyphs'], ['body', 'Glyph body']])
-    select(letters, 'Glyph family', 'surface', ['earth', 'stone', 'wood', 'bark', 'foliage', 'snow', 'wetgrass', 'actor'].map(key => [key, key[0].toUpperCase() + key.slice(1)]))
+    select(letters, 'Technique', 'glyph', ['surface', 'body'].map(key => [key, glyphLabel(key)]))
+    select(letters, 'Glyph family', 'surface', GLYPH_FAMILIES.map(key => [key, glyphLabel(key)]))
     const alphabetRow = document.createElement('label'); alphabetRow.textContent = 'Custom alphabet'
     const alphabet = document.createElement('input'); alphabet.type = 'text'; alphabet.maxLength = 256; alphabet.dataset.textureField = 'alphabet'; alphabet.setAttribute('aria-label', 'Custom alphabet')
     alphabet.value = effective.alphabet ?? ''; alphabet.placeholder = 'Use family letters'; alphabet.spellcheck = false
@@ -145,7 +146,7 @@ export function createTextureStudio(root: HTMLElement, callbacks: {
     }
     alphabet.onchange = () => { if (alphabet.reportValidity()) edited() }; alphabetRow.append(alphabet); letters.append(alphabetRow)
     const ramp = document.createElement('pre'); ramp.className = 'texture-ramp'; ramp.setAttribute('aria-label', 'Texture letters'); letters.append(ramp)
-    function updateRamp() { const s = { ...baseline, ...previewStyle() }, family = s.surface ?? 'generic'; ramp.textContent = s.alphabet ?? (s.glyph === 'body' ? BODY_RAMPS[(family === 'wood' ? 'bark' : family) as keyof typeof BODY_RAMPS] ?? BODY_RAMPS.actor : SURFACE_ALPHABETS[family] ?? SURFACE_ALPHABETS.generic) }
+    function updateRamp() { ramp.textContent = glyphAlphabet({ ...baseline, ...previewStyle() }) }
     updateRamp()
     const patterns = document.createElement('div'); patterns.className = 'texture-patterns'
     for (const [name, letters] of [['Shading', ' .:-=+*#@'], ['Letters', ' .abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ'], ['Digits', ' 0123456789'], ['Binary', ' 01'], ['Blocks', ' ░▒▓█'], ['Arrows', ' ·↑↗→↘↓↙←↖']]) {
@@ -171,21 +172,15 @@ export function createTextureStudio(root: HTMLElement, callbacks: {
     slider(visibility, 'gap', 'Gap tint (surface)', 0, 0, .015, .001)
     const surfaceNote = document.createElement('p'); surfaceNote.className = 'empty-note'; surfaceNote.textContent = 'Gap tint affects surfaces with an occluder. Body faces affects glyph bodies.'; visibility.append(surfaceNote)
     const layout = group('Size and spacing', 'World meters keep letters attached to the object as the camera moves.')
-    const size = effective.glyph === 'surface' ? SURFACE_CELL[effective.surface ?? 'generic'] ?? .18 : .19
+    const size = defaultGlyphSize(effective)
     slider(layout, 'size', 'Letter size (m)', size, .01, 1, .01)
     slider(layout, 'spacing', 'Spacing', 1, .5, 4, .05); slider(layout, 'density', 'Density', 1, .05, 1, .05)
     slider(layout, 'rotation', 'Letter rotation (degrees)', 0, -180, 180, 1)
     const ink = group('Ink and contrast')
     const colorRow = document.createElement('label'); colorRow.textContent = 'Glyph color'
     const color = document.createElement('input'); color.type = 'color'; color.dataset.textureField = 'color'; color.setAttribute('aria-label', 'Texture color')
-    let modelColor = 0xffffff
     const object = target(), node = part ? object?.getObjectByName(part) : object
-    node?.traverse(child => {
-      if (!(child instanceof THREE.Mesh)) return
-      const material = [child.userData.asciiOriginal ?? child.userData.glyphBodyMaterial ?? child.material].flat()[0]
-      if (material instanceof THREE.MeshStandardMaterial) modelColor = material.color.getHex()
-    })
-    color.value = '#' + (effective.color ?? modelColor).toString(16).padStart(6, '0')
+    color.value = '#' + (effective.color ?? modelGlyphColor(node)).toString(16).padStart(6, '0')
     color.disabled = !!effective.palette
     color.oninput = () => { retain('color'); draft.style.color = parseInt(color.value.slice(1), 16); edited(false) }; color.onchange = () => edited()
     const inherit = document.createElement('button'); inherit.textContent = 'Model color'; inherit.dataset.texture = 'model-color'

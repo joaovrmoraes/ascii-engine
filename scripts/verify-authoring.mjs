@@ -43,6 +43,11 @@ try {
   await until('!!window.area && !!document.querySelector("canvas[data-ready]")')
   await evaluate(`window.ui = (selector, value) => { const el = document.querySelector(selector); if (!el) throw new Error(selector); if (value === undefined) el.click(); else { el.value = value; el.dispatchEvent(new Event('change')); } }`)
   await check('map starts with stable object identities', 'area.document().objects.every(o => o.id && Number.isInteger(o.seed))')
+  await check('terrain labels share the glyph vocabulary and preserve legacy layer names', `
+    JSON.stringify(Array.from(document.querySelectorAll('[data-k=layer] option'), o => o.textContent)) ===
+      JSON.stringify(['Moss', 'Earth', 'Stone', 'Snow']) &&
+    JSON.stringify(area.document().terrain.layers.map(layer => layer.name)) ===
+      JSON.stringify(['musgo', 'terra', 'pedra', 'neve'])`)
 
   // Real mouse drag from a library card into the viewport, using the browser's
   // native DataTransfer payload (not a scene API call).
