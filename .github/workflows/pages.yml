@@ -1,4 +1,4 @@
-name: Publish gallery and live sandbox
+name: Publish gallery and map demos
 
 on:
   push:
@@ -15,6 +15,9 @@ concurrency:
 jobs:
   build:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pages: write
     steps:
       - uses: actions/checkout@v7.0.1
       - uses: pnpm/action-setup@v6.1.0
@@ -26,20 +29,11 @@ jobs:
       - run: pnpm install --frozen-lockfile
       - run: pnpm check
       - run: pnpm pages:build
-      - uses: actions/upload-pages-artifact@v5.0.0
-        with:
-          path: .cache/pages
-
-  deploy:
-    needs: build
-    runs-on: ubuntu-latest
-    permissions:
-      pages: write
-      id-token: write
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
-    steps:
-      - name: Deploy to GitHub Pages
-        id: deployment
-        uses: actions/deploy-pages@v5.0.1
+      - name: Publish hosting branch
+        id: publication
+        run: node scripts/publish-pages.mjs
+      - name: Request Pages build
+        if: steps.publication.outputs.changed == 'true'
+        run: gh api --method POST "repos/${GITHUB_REPOSITORY}/pages/builds"
+        env:
+          GH_TOKEN: ${{ github.token }}

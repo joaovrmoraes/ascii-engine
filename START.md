@@ -343,13 +343,18 @@ components discussed as future work are not part of the current runtime.
 including the English Texture Studio walkthrough, plus the supported AI/MCP
 workflow. `scripts/preview-readme.mjs --github-pages --generate-only` generates
 both `docs/index.html` and `docs/watch.html` from the README. GitHub Actions
-publishes the gallery and full browser editor at `/ascii-engine/sandbox/` on
-main pushes. Direct `?area=dark_forest` and `?area=sunken_cathedral` links open
-the demos; `?area=sandbox` opens scene authoring. `pnpm pages:build` assembles
-tracked documentation and the editor in ignored `.cache/pages`; generated
-application bundles are not committed. The public build keeps the in-page
-authoring API and skips the local MCP bridge and optional exported-game probe.
-Local development and exported players retain their existing setup. New MP4 footage
+publishes the gallery and five map demos at `/ascii-engine/sandbox/` on main
+pushes. The public menu contains only Dark Forest, Rain Marsh, Snow Pines,
+Old Mine and Sunken Cathedral, with camera, letter/light and capture controls.
+Authoring URLs fall back to Dark Forest. Scene editing, file import, per-object
+selection and the authoring API belong to the local editor.
+`pnpm pages:build` assembles tracked docs and the public build in ignored
+`.cache/pages`. `scripts/publish-pages.mjs` publishes it to the `gh-pages`
+hosting branch with an isolated Git index and regular pushes; generated bundles
+stay out of main. Pages serves that branch at its root. This branch-based
+publication avoids a stale completed deployment blocking the artifact API.
+The public build skips the local MCP bridge and optional exported-game probe.
+Local development and exported players retain their setup. New MP4 footage
 is generated in `.cache/showcase` and hosted as a release asset; its short GIF
 and validation screenshots remain in the repository. Historical media is
 preserved. See [showcase workflow](docs/showcase/README.md).

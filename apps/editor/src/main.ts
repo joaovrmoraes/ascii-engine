@@ -29,12 +29,16 @@ import { createSelection } from './selection'
  * ASCII Engine editor. URL: ?area=<id>, ?ascii=screen|raw, ?angle=<rad>,
  * ?zoom=<.75–1.5>, ?pause=<seconds>, ?camp=1, ?hunt=<seconds>, ?at=<metres>, ?peaceful=1, ?cell=<px>, ?light=<.65–1.4>.
  */
-export const AREAS: Record<string, AreaEntry> = {
+const publicDemo = import.meta.env.VITE_PUBLIC_DEMO === 'true'
+const demoAreas: Record<string, AreaEntry> = {
   dark_forest: { title: 'Dark Forest', create: createForest },
   rain_marsh: { title: 'Rain Marsh', create: createMarsh, hooks: marshHooks },
   snow_pines: { title: 'Snow Pines', create: createSnow },
   old_mine: { title: 'Old Mine', create: createMine },
   sunken_cathedral: { title: 'Sunken Cathedral', create: createCathedral },
+}
+export const AREAS: Record<string, AreaEntry> = publicDemo ? demoAreas : {
+  ...demoAreas,
   sandbox: { title: 'Scene: terrain and prefabs', create: createSandbox },
   effects: { title: 'Effects (system)', create: createEffectsArea },
   gltf: { title: 'GLTF import (demo)', create: createGltfDemo },
@@ -49,11 +53,12 @@ const params = new URLSearchParams(location.search)
  * panels, no selection). `?player=1` previews that mode.
  */
 interface GameConfig { title?: string; area?: string; scene?: string; style?: Partial<core.AsciiStyle>; zoom?: number }
-const game: GameConfig | undefined = import.meta.env.VITE_PUBLIC_DEMO === 'true'
+const game: GameConfig | undefined = publicDemo
   ? undefined
   : await fetch('./game.json').then((r) => r.ok ? r.json() : undefined).catch(() => undefined)
 const player = !!game || params.has('player')
 if (player) document.body.classList.add('player')
+if (publicDemo) document.getElementById('selection')!.remove()
 if (game?.title) document.title = game.title
 const sceneDoc: core.SceneDoc | undefined = game?.scene ? await fetch(game.scene).then((r) => r.json()) : undefined
 const host = document.getElementById('app')!
@@ -61,7 +66,10 @@ const canvas = document.createElement('canvas')
 canvas.style.width = canvas.style.height = '100%'; canvas.style.display = 'block'
 host.appendChild(canvas)
 
-const areaId = params.get('area') ?? game?.area ?? (sceneDoc ? 'sandbox' : params.get('scene') ?? 'sandbox')
+const requestedArea = params.get('area')
+const areaId = publicDemo
+  ? (requestedArea && Object.hasOwn(demoAreas, requestedArea) ? requestedArea : 'dark_forest')
+  : requestedArea ?? game?.area ?? (sceneDoc ? 'sandbox' : params.get('scene') ?? 'sandbox')
 const entry = AREAS[areaId] ?? AREAS.dark_forest
 const engine = createAsciiEngine(canvas, { hooks: entry.hooks, style: game?.style })
 const mode = params.get('ascii') ?? 'letters'
@@ -119,14 +127,14 @@ const importAt = (file: File) => importFile(engine, file, area.focus(angle, new 
   .catch((error) => { status.dataset.note = `import error for ${file.name}: ${error}` })
 addEventListener('dragover', (e) => e.preventDefault())
 const importFiles = (files: File[]) => {
-  if (player) return
+  if (player || publicDemo) return
   const action = area.importFiles ? area.importFiles(files) : Promise.all(files.map(importAt))
   void action.catch(error => { status.dataset.note = String(error) })
 }
 addEventListener('drop', (e) => { e.preventDefault(); const files = Array.from(e.dataTransfer?.files ?? []); if (files.length) importFiles(files) })
 canvas.addEventListener('editor-import-files', e => importFiles((e as CustomEvent<File[]>).detail))
-const panel = createPanel({ engine, view, areas: AREAS, areaId, mode, capture: () => captureNext = true, importFiles, changed: area.changed })
-const selection = player ? { refresh() {} } : createSelection(engine, canvas, document.getElementById('selection')!, { select: area.select, changed: area.changed, blocked: area.blocksSelection, objectFirst: area.id === 'sandbox' })
+const panel = createPanel({ engine, view, areas: AREAS, areaId, mode, viewer: publicDemo, capture: () => captureNext = true, importFiles, changed: area.changed })
+const selection = player || publicDemo ? { refresh() {} } : createSelection(engine, canvas, document.getElementById('selection')!, { select: area.select, changed: area.changed, blocked: area.blocksSelection, objectFirst: area.id === 'sandbox' })
 const status = document.getElementById('status')!
 const focus = new THREE.Vector3()
 let last = 0, frames = 0, sample = 0, fps = 0, captureNext = false
@@ -180,7 +188,7 @@ function download(url: string) {
   const a = document.createElement('a'); a.href = url; a.download = `${area.id}-${Date.now()}.png`; a.click()
 }
 Object.assign(window, { engine, area, view, core })
-if (!player) {
+if (!player && !publicDemo) {
   const { connectAuthoring } = await import('./api/client')
   connectAuthoring(engine, area, view, () => {
     const preview = area.capturePreview?.()

@@ -9,6 +9,7 @@ interface PanelOptions {
   capture: () => void
   importFiles: (files: File[]) => void
   changed?: () => void
+  viewer?: boolean
 }
 
 /**
@@ -16,7 +17,7 @@ interface PanelOptions {
  * brightness (the player's "Image" controls), zoom and rotation.
  * Changing area or mode reloads with the URL, so every view is shareable.
  */
-export function createPanel({ engine, view, areas, areaId, mode, capture, importFiles, changed }: PanelOptions) {
+export function createPanel({ engine, view, areas, areaId, mode, capture, importFiles, changed, viewer = false }: PanelOptions) {
   const root = document.getElementById('panel')!
   const go = (key: string, value: string) => { const p = new URLSearchParams(location.search); p.set(key, value); location.search = p.toString() }
   root.innerHTML = `
@@ -27,9 +28,9 @@ export function createPanel({ engine, view, areas, areaId, mode, capture, import
     <label>zoom <input data-k="zoom" type="range" min="${areaId === 'sandbox' ? '.18' : '.75'}" max="${areaId === 'sandbox' ? '4' : '1.5'}" step=".05"><output></output></label>
     <label>rotation <input data-k="angle" type="range" min="-3.14" max="3.14" step=".05"><output></output></label>
     <button data-k="pause">[ pause ]</button> <button data-k="shot">[ capture ]</button>
-    <label class="file">[ import models and files ]<input data-k="import" type="file" multiple accept=".glb,.gltf,.bin,.png,.jpg,.jpeg,.webp" hidden></label>
+    ${viewer ? '' : `<label class="file">[ import models and files ]<input data-k="import" type="file" multiple accept=".glb,.gltf,.bin,.png,.jpg,.jpeg,.webp" hidden></label>
     <button data-k="save">[ save preset .json ]</button>
-    <label class="file">[ load preset .json ]<input data-k="load" type="file" accept=".json" hidden></label>`
+    <label class="file">[ load preset .json ]<input data-k="load" type="file" accept=".json" hidden></label>`}`
   const input = (k: string) => root.querySelector<HTMLInputElement>(`[data-k="${k}"]`)!
   root.querySelector<HTMLSelectElement>('[data-k="area"]')!.onchange = (e) => go('area', (e.target as HTMLSelectElement).value)
   root.querySelector<HTMLSelectElement>('[data-k="mode"]')!.onchange = (e) => go('ascii', (e.target as HTMLSelectElement).value)
@@ -49,19 +50,21 @@ export function createPanel({ engine, view, areas, areaId, mode, capture, import
   const pause = root.querySelector<HTMLButtonElement>('[data-k="pause"]')!
   pause.onclick = () => { view.paused = !view.paused; pause.textContent = view.paused ? '[ resume ]' : '[ pause ]' }
   root.querySelector<HTMLButtonElement>('[data-k="shot"]')!.onclick = capture
-  const picker = input('import')
-  picker.onchange = () => { importFiles(Array.from(picker.files ?? [])); picker.value = '' }
-  // Presets: the global letter layer, object types, lights and screen settings as JSON.
-  root.querySelector<HTMLButtonElement>('[data-k="save"]')!.onclick = () => {
-    const blob = new Blob([JSON.stringify(engine.exportStyle(), null, 2)], { type: 'application/json' })
-    const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'preset-ascii.json'; a.click()
-    setTimeout(() => URL.revokeObjectURL(a.href), 1000)
-  }
-  const loader = input('load')
-  loader.onchange = async () => {
-    const file = loader.files?.[0]; loader.value = ''
-    if (!file) return
-    try { const doc = parseScene({ version: 1, objects: [], style: JSON.parse(await file.text()) }); engine.setStyle(doc.style!); refresh(); changed?.() } catch (error) { document.getElementById('status')!.dataset.note = `invalid preset: ${error}` }
+  if (!viewer) {
+    const picker = input('import')
+    picker.onchange = () => { importFiles(Array.from(picker.files ?? [])); picker.value = '' }
+    // Presets: the global letter layer, object types, lights and screen settings as JSON.
+    root.querySelector<HTMLButtonElement>('[data-k="save"]')!.onclick = () => {
+      const blob = new Blob([JSON.stringify(engine.exportStyle(), null, 2)], { type: 'application/json' })
+      const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'preset-ascii.json'; a.click()
+      setTimeout(() => URL.revokeObjectURL(a.href), 1000)
+    }
+    const loader = input('load')
+    loader.onchange = async () => {
+      const file = loader.files?.[0]; loader.value = ''
+      if (!file) return
+      try { const doc = parseScene({ version: 1, objects: [], style: JSON.parse(await file.text()) }); engine.setStyle(doc.style!); refresh(); changed?.() } catch (error) { document.getElementById('status')!.dataset.note = `invalid preset: ${error}` }
+    }
   }
   const refresh = () => shows.forEach((show) => show())
   refresh()

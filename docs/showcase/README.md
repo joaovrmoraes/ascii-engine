@@ -41,18 +41,20 @@ node scripts/preview-readme.mjs --github-pages --generate-only
 ```
 
 The public gallery is docs/index.html and docs/watch.html. GitHub Actions
-builds and deploys the gallery and browser editor on main pushes using
-.github/workflows/pages.yml. Each chapter GIF links to its gallery section.
+builds and publishes the gallery and five map demos on main pushes using
+.github/workflows/pages.yml. It updates the gh-pages hosting branch, which
+Pages serves from its root. Each chapter GIF links to its gallery section.
 Published gallery URL:
 https://joaovrmoraes.github.io/ascii-engine/watch.html.
 The generator derives chapter navigation and video sources from the README;
 it supports local historical MP4s and external release assets.
 
-The live editor is https://joaovrmoraes.github.io/ascii-engine/sandbox/.
-Direct `?area=dark_forest` and `?area=sunken_cathedral` links open the demos;
-`?area=sandbox` opens the complete scene editor, including Texture Studio.
-Browser authoring works without installation; MCP uses the documented local
-setup. The public build does not connect to visitors' local bridge services.
+The live demos are at https://joaovrmoraes.github.io/ascii-engine/sandbox/.
+The menu is limited to Dark Forest, Rain Marsh, Snow Pines, Old Mine and
+Sunken Cathedral. Direct area links open each map; unsupported authoring URLs
+fall back to Dark Forest. Camera, letter/light, pause and capture controls remain.
+Scene editing and MCP use the documented local setup. The public build does
+not expose authoring tools or connect to visitors' local bridge services.
 
 Build and preview the same publication artifact locally:
 
@@ -63,7 +65,9 @@ python -m http.server 4179 --directory .cache/pages
 
 Open http://localhost:4179/sandbox/?area=dark_forest. The ignored artifact
 contains tracked documentation and fresh relative-path editor bundles;
-browser profiles and caches are excluded. Application bundles stay outside Git.
+browser profiles and caches are excluded. Application bundles stay outside main
+and are generated only in the hosting branch. The publication script uses an
+isolated Git index and regular pushes, preserving source checkout and history.
 
 Validate the deployed browser workflow with:
 

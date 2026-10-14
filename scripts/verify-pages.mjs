@@ -90,12 +90,20 @@ try {
   await send('Page.navigate', { url: base.href })
   await until('!!document.querySelector("#try-in-your-browser")')
   check(await evaluate('document.querySelectorAll("video").length === 7'), 'gallery retains seven video chapters')
-  check(await evaluate(`['dark_forest', 'sunken_cathedral', 'sandbox'].every(id =>
+  check(await evaluate(`['dark_forest', 'sunken_cathedral', 'rain_marsh', 'snow_pines', 'old_mine'].every(id =>
     !!document.querySelector('#try-in-your-browser + p + ul a[href$="?area=' + id + '"]'))`),
-    'gallery exposes direct forest, cathedral and scene editor links')
+    'gallery exposes direct links to all five map demos')
   await shot('gallery')
 
   await openArea('dark_forest')
+  check(await evaluate(`JSON.stringify(Array.from(document.querySelector('[data-k=area]').options,
+    option => option.value)) === JSON.stringify(['dark_forest','rain_marsh','snow_pines','old_mine','sunken_cathedral'])`),
+    'public area menu contains only the five requested maps')
+  check(await evaluate(`!document.querySelector('[data-k=import]') &&
+    !document.querySelector('[data-k=save]') && !document.querySelector('[data-k=load]') &&
+    !document.querySelector('#selection') && !document.querySelector('#editor-workspace') &&
+    !window.asciiEngineApi`),
+    'public demos expose viewing controls without authoring tools')
   await shot('dark-forest')
   await evaluate('document.querySelector("[data-k=pause]").click()')
   check(await evaluate('view.paused'), 'visitors can pause the forest demo')
@@ -112,39 +120,12 @@ try {
   check(await evaluate('location.pathname.endsWith("/sandbox/") && location.search.includes("sunken_cathedral")'),
     'area switching preserves the hosted subdirectory and shareable URL')
   await shot('sunken-cathedral')
-  for (const id of ['rain_marsh', 'snow_pines', 'old_mine', 'sandbox']) await openArea(id)
-
-  await until('!!window.asciiEngineApi')
-  await evaluate(`(async () => {
-    const state = await asciiEngineApi.request({method:'scene.read'});
-    await asciiEngineApi.request({method:'scene.apply',revision:state.revision,preview:false,
-      commands:[{op:'scene.replace',document:{version:1,name:'Public sandbox check',
-        objects:[{id:'public-block',prefab:'bloco',position:[0,0,0],scale:3}]}}]});
-  })()`)
-  check(await evaluate('area.document().objects[0].id === "public-block"'),
-    'production scene editor supports document authoring without a bridge')
-  await evaluate(`document.querySelector('[data-object-id="public-block"]').click();
-    document.querySelector('[data-k="create-texture"]').click()`)
-  await until('document.querySelector("#texture-preview canvas")?.dataset.ready === "public-block"')
-  check(await evaluate('document.body.classList.contains("texture-studio-active")'),
-    'production Texture Studio opens its isolated preview')
-  await evaluate(`const alphabet = document.querySelector('[data-texture-field=alphabet]');
-    alphabet.value = 'XYZ'; alphabet.dispatchEvent(new Event('input'));
-    alphabet.dispatchEvent(new Event('change'));
-    document.querySelector('[data-texture=apply]').click()`)
-  await until('area.document().objects[0].options?.alphabet === "XYZ"')
-  console.log('PASS public Texture Studio applies custom letters to a scene object')
-  await shot('texture-studio')
-  await evaluate(`document.querySelector('[data-k="close-studio"]').click();
-    document.querySelector('[data-k="undo"]').click()`)
-  await until('!area.document().objects[0].options?.alphabet')
-  console.log('PASS public editor undoes the texture change')
-  await sleep(500)
-  const saved = await evaluate('JSON.stringify(area.document())')
-  await send('Page.reload')
-  await until('window.area?.id === "sandbox" && !!window.asciiEngineApi')
-  check(await evaluate('JSON.stringify(area.document())') === saved,
-    'public editor restores the saved draft after a reload')
+  for (const id of ['rain_marsh', 'snow_pines', 'old_mine']) await openArea(id)
+  for (const id of ['sandbox', 'effects', 'gltf', 'reference', 'terrain']) {
+    await send('Page.navigate', { url: new URL(`sandbox/?area=${id}`, base).href })
+    await until('window.area?.id === "dark_forest" && !!document.querySelector("canvas[data-ready]")')
+    console.log(`PASS authoring URL ${id} falls back to the forest demo`)
+  }
 
   check(sockets.length === 0, 'public sandbox never attempts a local WebSocket connection')
   check(failed.length === 0, 'gallery and all demos load without failed HTTP responses' +

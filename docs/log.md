@@ -4,6 +4,27 @@ Entries describe the state at each stage. Earlier limitations may have been
 resolved later; START.md and the editor guide describe the current scope.
 Historical filenames, reference IDs and captured interfaces are preserved.
 
+## 2026-10-14 — Five-map public viewer and hosting branch
+
+The owner clarified that the public demo should expose only Dark Forest,
+Rain Marsh, Snow Pines, Old Mine and Sunken Cathedral for viewing.
+
+- Limited the public area registry/menu to those five IDs. Unknown and authoring
+  URLs fall back to Dark Forest. Removed the public Scene Editor link.
+- Retained camera, glyph/light, pause and PNG capture controls. Public views
+  disable object selection, file/preset import and authoring API initialization.
+  The local editor and exported players retain their tools and area library.
+- Changed publication to the gh-pages hosting branch after GitHub repeatedly
+  blocked artifact deployment on completed commit c93f647 and refused its
+  cancellation. The source and compiled artifact had passed all checks.
+- Added a publisher with an isolated Git index, append-only hosting commits and
+  regular pushes. Main contains source; generated files live in the hosting
+  branch. Actions requests the native Pages build after publishing.
+
+Validation and final viewer captures are recorded in
+[five-map evidence](captures/five-map-demos-2026-10-14/README.md).
+Historical renderer recipes, baseline images and scene IDs are unchanged.
+
 ## 2026-10-14 — Live browser sandbox on GitHub Pages
 
 The owner requested public, interactive links for Dark Forest and Sunken
