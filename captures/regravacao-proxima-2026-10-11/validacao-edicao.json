@@ -1,0 +1,163 @@
+[
+  {
+    "file": "ASCII-Engine-editado.mp4",
+    "expectedFrames": 13149,
+    "programs": [],
+    "stream_groups": [],
+    "streams": [
+      {
+        "codec_name": "h264",
+        "width": 2560,
+        "height": 1440,
+        "pix_fmt": "yuv420p",
+        "color_range": "tv",
+        "color_space": "bt709",
+        "r_frame_rate": "30/1",
+        "nb_read_frames": "13149"
+      }
+    ],
+    "format": {
+      "duration": "438.300000",
+      "size": "1202885653"
+    },
+    "fullDecode": "passed"
+  },
+  {
+    "file": "partes/01-Terreno.mp4",
+    "expectedFrames": 1176,
+    "programs": [],
+    "stream_groups": [],
+    "streams": [
+      {
+        "codec_name": "h264",
+        "width": 2560,
+        "height": 1440,
+        "pix_fmt": "yuv420p",
+        "color_range": "tv",
+        "color_space": "bt709",
+        "r_frame_rate": "30/1",
+        "nb_read_frames": "1176"
+      }
+    ],
+    "format": {
+      "duration": "39.200000",
+      "size": "96250538"
+    },
+    "fullDecode": "passed"
+  },
+  {
+    "file": "partes/02-Agua.mp4",
+    "expectedFrames": 2540,
+    "programs": [],
+    "stream_groups": [],
+    "streams": [
+      {
+        "codec_name": "h264",
+        "width": 2560,
+        "height": 1440,
+        "pix_fmt": "yuv420p",
+        "color_range": "tv",
+        "color_space": "bt709",
+        "r_frame_rate": "30/1",
+        "nb_read_frames": "2540"
+      }
+    ],
+    "format": {
+      "duration": "84.666667",
+      "size": "207202713"
+    },
+    "fullDecode": "passed"
+  },
+  {
+    "file": "partes/03-Objetos.mp4",
+    "expectedFrames": 1975,
+    "programs": [],
+    "stream_groups": [],
+    "streams": [
+      {
+        "codec_name": "h264",
+        "width": 2560,
+        "height": 1440,
+        "pix_fmt": "yuv420p",
+        "color_range": "tv",
+        "color_space": "bt709",
+        "r_frame_rate": "30/1",
+        "nb_read_frames": "1975"
+      }
+    ],
+    "format": {
+      "duration": "65.833333",
+      "size": "198199185"
+    },
+    "fullDecode": "passed"
+  },
+  {
+    "file": "partes/04-Efeito-e-luz.mp4",
+    "expectedFrames": 2308,
+    "programs": [],
+    "stream_groups": [],
+    "streams": [
+      {
+        "codec_name": "h264",
+        "width": 2560,
+        "height": 1440,
+        "pix_fmt": "yuv420p",
+        "color_range": "tv",
+        "color_space": "bt709",
+        "r_frame_rate": "30/1",
+        "nb_read_frames": "2308"
+      }
+    ],
+    "format": {
+      "duration": "76.933333",
+      "size": "110741387"
+    },
+    "fullDecode": "passed"
+  },
+  {
+    "file": "partes/05-Atmosfera.mp4",
+    "expectedFrames": 1933,
+    "programs": [],
+    "stream_groups": [],
+    "streams": [
+      {
+        "codec_name": "h264",
+        "width": 2560,
+        "height": 1440,
+        "pix_fmt": "yuv420p",
+        "color_range": "tv",
+        "color_space": "bt709",
+        "r_frame_rate": "30/1",
+        "nb_read_frames": "1933"
+      }
+    ],
+    "format": {
+      "duration": "64.433333",
+      "size": "274552864"
+    },
+    "fullDecode": "passed"
+  },
+  {
+    "file": "partes/06-Camera-e-exportacao.mp4",
+    "expectedFrames": 2977,
+    "programs": [],
+    "stream_groups": [],
+    "streams": [
+      {
+        "codec_name": "h264",
+        "width": 2560,
+        "height": 1440,
+        "pix_fmt": "yuv420p",
+        "color_range": "tv",
+        "color_space": "bt709",
+        "r_frame_rate": "30/1",
+        "nb_read_frames": "2977"
+      }
+    ],
+    "format": {
+      "duration": "99.233333",
+      "size": "305869874"
+    },
+    "fullDecode": "passed"
+  }
+]

@@ -1,0 +1,11 @@
+{
+  "version": 1,
+  "name": "Blue hatch",
+  "texture": {
+    "size": 0.25,
+    "color": 7519950,
+    "alphabet": " .:-+#@",
+    "spacing": 1.5,
+    "gap": 0
+  }
+}

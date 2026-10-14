@@ -1,0 +1,1 @@
+Master 4:4:4: decodificação integral sem erros.

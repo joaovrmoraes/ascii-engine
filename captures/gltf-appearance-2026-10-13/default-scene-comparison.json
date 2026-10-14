@@ -1,0 +1,13 @@
+{
+  "beforeCommit": "ea743f0ca41a77bd623555e1d2203c9a18b6d03e",
+  "controlledBeforeAfterRMSE": {
+    "referencia": 0.0,
+    "pantano": 0.00432118,
+    "neve": 0.00383929,
+    "mina": 0.00794798,
+    "catedral": 0.00582536,
+    "floresta": 0.00928926
+  },
+  "initialForestUnderConcurrentGpuLoad": 0.0436554,
+  "historicalBaselineCheck": "Fails for reference/forest/snow/cathedral in both original and changed code; baselines unchanged."
+}

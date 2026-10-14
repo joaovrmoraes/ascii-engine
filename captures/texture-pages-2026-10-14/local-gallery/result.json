@@ -1,0 +1,17 @@
+{
+  "base": "http://localhost:4178/docs/",
+  "players": 7,
+  "rootAndWatch": true,
+  "mcpSection": true,
+  "releaseVideoPlayback": {
+    "currentTime": 0.506993,
+    "duration": 36.333333,
+    "width": 1920,
+    "height": 1080,
+    "source": "https://github.com/joaovrmoraes/ascii-engine/releases/download/v0.1.0/07-textures.mp4",
+    "error": null
+  },
+  "mobileOverflow": false,
+  "runtimeErrors": [],
+  "passed": true
+}

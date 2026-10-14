@@ -1,0 +1,24 @@
+{
+  "persistence": {
+    "liveInstance": {
+      "type": "arvore",
+      "parts": {
+        "crown": {
+          "size": 0.31
+        }
+      }
+    },
+    "savedInstance": null,
+    "liveBrightness": 0.8,
+    "savedStyle": null,
+    "liveTypeSize": 0.29,
+    "reopenedInstance": {
+      "type": "arvore",
+      "parts": {}
+    },
+    "reopenedTypeSize": 0.19
+  },
+  "prefabSameDocumentSameGeometry": false,
+  "removedCarpetStillUpdated": 1,
+  "emptyScene": "TypeError: Cannot read properties of undefined (reading 'data')"
+}

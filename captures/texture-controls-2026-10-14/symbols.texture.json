@@ -1,0 +1,54 @@
+{
+  "version": 1,
+  "name": "Emerald symbols",
+  "texture": {
+    "size": 0.25,
+    "color": 7519950,
+    "alphabet": " ↑↗→↘↓↙←↖",
+    "font": "\"DejaVu Sans\", sans-serif",
+    "fontWeight": 700,
+    "open": true,
+    "lighting": "scene",
+    "emissive": 0,
+    "spacing": 1.4,
+    "gap": 0
+  },
+  "previewLighting": {
+    "atmosphere": "moon",
+    "bodySceneLighting": true,
+    "inkFog": true,
+    "brightness": 1,
+    "background": 526864,
+    "fog": {
+      "color": 131330,
+      "density": 0.012
+    },
+    "hemisphere": {
+      "sky": 12766916,
+      "ground": 3420961,
+      "intensity": 1.25
+    },
+    "moon": {
+      "color": 3407752,
+      "intensity": 2,
+      "position": [
+        -5,
+        12,
+        7
+      ],
+      "shadowIntensity": 0.62,
+      "shadowExtent": 16,
+      "mapSize": 1024
+    },
+    "fill": {
+      "color": 10207157,
+      "intensity": 0.3,
+      "position": [
+        6,
+        6,
+        -7
+      ]
+    },
+    "bodyAmbient": 0.3
+  }
+}

@@ -1,0 +1,68 @@
+[
+  {
+    "advanced": true,
+    "decodedFrames": 119,
+    "duration": 39.2,
+    "error": null,
+    "file": "docs/showcase/videos/01-terrain.mp4",
+    "size": [
+      1920,
+      1080
+    ]
+  },
+  {
+    "advanced": true,
+    "decodedFrames": 119,
+    "duration": 84.666667,
+    "error": null,
+    "file": "docs/showcase/videos/02-water.mp4",
+    "size": [
+      1920,
+      1080
+    ]
+  },
+  {
+    "advanced": true,
+    "decodedFrames": 65,
+    "duration": 65.833333,
+    "error": null,
+    "file": "docs/showcase/videos/03-objects.mp4",
+    "size": [
+      1920,
+      1080
+    ]
+  },
+  {
+    "advanced": true,
+    "decodedFrames": 119,
+    "duration": 76.933333,
+    "error": null,
+    "file": "docs/showcase/videos/04-effects.mp4",
+    "size": [
+      1920,
+      1080
+    ]
+  },
+  {
+    "advanced": true,
+    "decodedFrames": 244,
+    "duration": 64.433333,
+    "error": null,
+    "file": "docs/showcase/videos/05-atmosphere.mp4",
+    "size": [
+      1920,
+      1080
+    ]
+  },
+  {
+    "advanced": true,
+    "decodedFrames": 119,
+    "duration": 99.233333,
+    "error": null,
+    "file": "docs/showcase/videos/06-camera.mp4",
+    "size": [
+      1920,
+      1080
+    ]
+  }
+]

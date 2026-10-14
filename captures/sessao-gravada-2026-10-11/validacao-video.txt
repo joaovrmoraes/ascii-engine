@@ -1,0 +1,3 @@
+Decodificação integral do MP4 por FFmpeg: passou, sem erros.
+OBS: captura PipeWire da janela ASCII Engine.
+Nenhum áudio foi incluído.

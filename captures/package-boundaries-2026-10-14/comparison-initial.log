@@ -1,0 +1,6 @@
+referencia RMSE 0.0000  ok
+floresta   RMSE 0.0005  ok
+pantano    RMSE 0.0098  ok
+neve       RMSE 0.1093  ACIMA DO LIMITE 0.04
+mina       RMSE 0.0085  ok
+catedral   RMSE 0.0134  ok

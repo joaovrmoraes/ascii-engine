@@ -1,0 +1,28 @@
+{
+  "name": "Margem Viva",
+  "terrain": 32,
+  "objects": 10,
+  "waters": 1,
+  "effects": 1,
+  "atmospheres": 1,
+  "cameras": 1,
+  "activeCamera": true,
+  "camera": {
+    "name": "Margem — plano próximo",
+    "projection": "orthographic",
+    "position": [
+      15.27,
+      12.362029327076472,
+      16.046352125589173
+    ],
+    "rotation": [
+      -0.6878887373053744,
+      0.6970511425663626,
+      0.4854499605895086
+    ],
+    "span": 3.25,
+    "aspect": 1.7777777777777777,
+    "near": 0.1,
+    "far": 90
+  }
+}

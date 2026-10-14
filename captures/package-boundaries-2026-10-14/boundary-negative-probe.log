@@ -1,0 +1,2 @@
+PASS boundary guard rejects dynamic imports crossing package sources.
+packages/engine/src/package-boundary-probe.ts imports another package's source: ../../../apps/editor/src/main

@@ -1,0 +1,14 @@
+$ node scripts/verify-water.mjs /tmp/ascii-orbit-water-water
+PASS cilindro-reflexo-lateral: 472 pixels changed by more than 8/255
+PASS reflected cylinder changes with view direction and disappears outside the wet footprint
+PASS luar-alinhado: 9862 pixels changed by more than 8/255
+PASS moving an object in shallow water produces physical displacement
+PASS agua-antes-impacto: 1525 pixels changed by more than 8/255
+PASS water simulation never writes transient state into the document
+PASS gravity drives a downhill current and changes depth on the slope
+PASS flow leaves sculpted terrain and authored water unchanged
+PASS wet water vertices remain above the mountain surface
+PASS water inspector persists physical settings
+PASS water source can be closed in the inspector
+PASS custom channel outlines retain their CPU simulation footprint
+PASS no uncaught page exceptions

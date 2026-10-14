@@ -1,0 +1,20 @@
+$ node scripts/verify-visual.mjs /tmp/ascii-composition-visual
+PASS asset selection previews the actual 3D object without changing the document
+PASS preview gizmo changes scale without placing or saving an object
+PASS Enter places the transformed preview and releases the ghost
+PASS Escape cancels preview with no remaining object
+PASS one drag draws continuous water without flattening the mountain
+PASS wet hillside mesh follows terrain and has downhill flow normals
+PASS undo removes the whole water stroke
+PASS redo restores water mask and slope
+PASS painted water persists through browser reload
+PASS studio opens a dedicated screen with a return to scene
+PASS studio contains effects and atmosphere; preset changes the scene lights
+PASS studio color and intensity changes persist in the portable document
+PASS effect studio exposes color, intensity and reach
+PASS effect recipe saves its light settings
+PASS campfire light reaches the carpet and body letter uniforms
+PASS visible coplanar waters both receive the same current reflection
+PASS reflexo: 405 pixels respond in the rendered frame
+PASS fogueira-luz: 3640 pixels respond in the rendered frame
+PASS no uncaught page exceptions

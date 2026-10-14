@@ -1,0 +1,11 @@
+{
+  "id": "286ebc81-cd67-444a-aace-c59941a9f09b",
+  "ok": false,
+  "error": {
+    "code": "browser_eval_error",
+    "message": "AbortError: The play() request was interrupted because video-only background media was paused to save power. https://goo.gl/LdLk22"
+  },
+  "_meta": {
+    "runtimeId": "327bd229-b588-4def-b562-15b9bd27a70c"
+  }
+}

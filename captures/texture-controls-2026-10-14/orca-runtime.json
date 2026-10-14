@@ -1,0 +1,70 @@
+{
+  "lighting": {
+    "atmosphere": "moon",
+    "background": 131330,
+    "bodyAmbient": 0.3,
+    "bodySceneLighting": true,
+    "brightness": 1,
+    "fill": {
+      "color": 10207157,
+      "intensity": 0.3,
+      "position": [
+        6,
+        6,
+        -7
+      ]
+    },
+    "fog": {
+      "color": 131330,
+      "density": 0.012
+    },
+    "hemisphere": {
+      "ground": 3420961,
+      "intensity": 1.25,
+      "sky": 12766916
+    },
+    "inkFog": true,
+    "moon": {
+      "color": 3407752,
+      "intensity": 2.2,
+      "mapSize": 1024,
+      "position": [
+        -5,
+        12,
+        7
+      ],
+      "shadowExtent": 16,
+      "shadowIntensity": 0.62
+    }
+  },
+  "objects": [
+    {
+      "id": "object-1",
+      "options": {
+        "parts": {}
+      }
+    },
+    {
+      "id": "object-2",
+      "options": {
+        "parts": {},
+        "type": "arvore"
+      }
+    },
+    {
+      "id": "object-3",
+      "options": {
+        "parts": {}
+      }
+    }
+  ],
+  "ready": "object-2",
+  "style": {
+    "alphabet": " .\u2191\u2197\u2192\u2198\u2193\u2199\u2190\u2196",
+    "font": "DejaVu Sans, sans-serif",
+    "fontWeight": 700,
+    "gap": 0,
+    "open": true,
+    "size": 0.19
+  }
+}

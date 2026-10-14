@@ -1,0 +1,34 @@
+[
+  {
+    "name": "grama",
+    "start": 118,
+    "crop": "400:260:330:190",
+    "frames": 90,
+    "unique": 90,
+    "identicalConsecutive": 0
+  },
+  {
+    "name": "fogo",
+    "start": 277,
+    "crop": "400:300:900:220",
+    "frames": 90,
+    "unique": 90,
+    "identicalConsecutive": 0
+  },
+  {
+    "name": "agua",
+    "start": 381,
+    "crop": "500:300:900:350",
+    "frames": 90,
+    "unique": 90,
+    "identicalConsecutive": 0
+  },
+  {
+    "name": "previa",
+    "start": 442,
+    "crop": "1050:600:700:150",
+    "frames": 90,
+    "unique": 90,
+    "identicalConsecutive": 0
+  }
+]

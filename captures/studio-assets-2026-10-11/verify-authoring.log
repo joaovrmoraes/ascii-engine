@@ -1,0 +1,67 @@
+$ node scripts/verify-authoring.mjs /tmp/ascii-studios-verification
+PASS map starts with stable object identities
+PASS right/middle pan follows mouse in both directions at three angles and zooms
+PASS camera navigation preserves the document
+PASS native library drag creates a selected object at the drop point
+PASS dragging the X gizmo moves the object, updates inspector and leaves camera still
+PASS gizmo drag is one undo action
+PASS scale gizmo changes the selected object
+PASS dragging the rotation ring turns the object
+PASS preview disables authoring without changing the document
+PASS undo also removes the dropped object
+PASS transform edited in inspector is serialized
+PASS part style is serialized
+PASS document roundtrip keeps geometry seeds, transforms and styles
+PASS terainless item opens
+PASS object added to item
+PASS duplicate has independent identity
+PASS undo duplicate
+PASS redo duplicate
+PASS keyboard undo
+PASS malformed JSON, unknown prefab, build failure and broken model preserve current document/resources
+PASS GLTF embeds companion buffer and registers animation
+PASS GLB is portable too
+PASS animated models survive reopen
+PASS saved composition can be inserted with independent assets and identities
+PASS rain is saved and registered
+PASS weather replacement frees rain
+PASS repeated reopen does not accumulate layers or lights
+PASS terrain brush changes heightmap
+PASS undo restores entire stroke
+PASS flat water brush carves and creates editable water
+PASS browser reload restores IndexedDB draft with style, geometry and weather
+PASS docked library resizes and viewport follows
+PASS effects tab previews a new effect without modifying the map
+PASS effect form saves its recipe into the document and library
+PASS void preview pauses map rendering and preserves document/camera
+PASS effect playback can be paused independently
+PASS restart restores visible particles
+PASS saved effect is placed as an object with its portable recipe
+PASS custom effect survives rebuild without a global preset registration
+PASS inserting an effect item remaps both its recipe and instance
+PASS replacing effects releases previous instances
+PASS invalid effect JSON preserves the saved scene
+PASS atmosphere save creates a named asset immediately
+PASS editing an atmosphere updates the same asset
+PASS undo restores the previous atmosphere asset
+PASS redo restores the updated atmosphere asset
+PASS view assets opens the Atmosferas category
+PASS atmosphere asset applies its lighting to the open scene
+PASS double click reopens a named atmosphere for editing
+PASS save copy creates a separate atmosphere resource
+PASS double click reopens a saved effect in the void
+PASS essential slider edits persist in the reusable recipe
+PASS saving the reopened effect updates instead of duplicating
+PASS reopening the stage still renders after disposing earlier previews
+PASS template fire opens a valid recipe without modifying saved assets
+PASS template smoke opens a valid recipe without modifying saved assets
+PASS template sparks opens a valid recipe without modifying saved assets
+PASS template magic opens a valid recipe without modifying saved assets
+PASS template explosion opens a valid recipe without modifying saved assets
+PASS template lightning opens a valid recipe without modifying saved assets
+PASS dragging a panel title detaches it and frees viewport space
+PASS floating panel can be resized
+PASS panel docks to a different edge and displaces the previous occupant safely
+PASS layout, effects and atmosphere assets restore after reloading the browser
+PASS restore panels brings every panel back
+PASS no uncaught page exceptions

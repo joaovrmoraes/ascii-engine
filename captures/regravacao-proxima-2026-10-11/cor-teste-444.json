@@ -1,0 +1,21 @@
+{
+  "screenshot": {
+    "meanSaturationHSV": 0.3886669918818986,
+    "pixels": 97054,
+    "uiRGB": [
+      48,
+      50,
+      56
+    ]
+  },
+  "OBS444": {
+    "meanSaturationHSV": 0.33016313109478174,
+    "pixels": 96354,
+    "uiRGB": [
+      48,
+      50,
+      56
+    ]
+  },
+  "note": "Momentos diferentes da mesma vista animada; compara distribuição, não equivalência pixel a pixel."
+}

@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Ctext y='26' font-size='28' font-family='monospace' fill='%23d3b27c'%3E%40%3C/text%3E%3C/svg%3E">
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>ASCII Engine</title>
+    <style>
+      html, body { margin: 0; height: 100%; background: #09080e; color: #c8c4bd; font: 12px ui-monospace, monospace; }
+      #app { position: fixed; inset: 0; }
+      #status { position: fixed; left: 12px; bottom: 10px; color: #d3b27c; pointer-events: none; }
+      #panel { position: fixed; top: 10px; right: 10px; display: grid; gap: 6px; padding: 10px 12px; background: #09080ecc; border: 1px dashed #3a3640; color: #c8c4bd; }
+      #panel label { display: grid; grid-template-columns: 64px 1fr 44px; align-items: center; gap: 6px; }
+      #panel select, #panel button { font: inherit; color: inherit; background: #141219; border: 1px solid #3a3640; padding: 2px 4px; }
+      #panel select { grid-column: 2 / 4; }
+      #panel button { cursor: pointer; }
+      #panel output { color: #d3b27c; }
+      #panel label.file { display: block; text-align: center; cursor: pointer; border: 1px solid #3a3640; padding: 2px 4px; background: #141219; }
+      #selection { position: fixed; top: 10px; left: 10px; display: grid; gap: 6px; padding: 10px 12px; background: #09080ecc; border: 1px dashed #3a3640; min-width: 260px; }
+      #selection[hidden] { display: none; }
+      #tools { position: fixed; right: 10px; bottom: 34px; display: grid; gap: 6px; padding: 10px 12px; background: #09080ecc; border: 1px dashed #3a3640; min-width: 260px; }
+      #tools .title { color: #d3b27c; }
+      #tools label { display: grid; grid-template-columns: 76px 1fr; align-items: center; gap: 6px; }
+      #tools select, #tools button { font: inherit; color: inherit; background: #141219; border: 1px solid #3a3640; padding: 2px 4px; cursor: pointer; }
+      #tools textarea { font: 11px ui-monospace, monospace; color: inherit; background: #141219; border: 1px solid #3a3640; width: 300px; }
+      #tools label.file { display: block; text-align: center; cursor: pointer; border: 1px solid #3a3640; padding: 2px 4px; background: #141219; }
+      #selection label { display: grid; grid-template-columns: 70px 1fr; align-items: center; gap: 6px; }
+      #selection select, #selection input, #selection button { font: inherit; color: inherit; background: #141219; border: 1px solid #3a3640; padding: 2px 4px; }
+      #selection [data-k="what"] { color: #d3b27c; }
+      body.player #panel, body.player #selection, body.player #tools, body.player #status { display: none; }
+      @media (max-width: 640px) { #panel { left: 10px; } #selection { top: auto; bottom: 30px; right: 10px; } }
+    </style>
+    <script type="module" crossorigin src="./assets/index-c4oPASm_.js"></script>
+    <link rel="stylesheet" crossorigin href="./assets/index-C5FpH7NH.css">
+  </head>
+  <body>
+    <div id="app"></div>
+    <div id="status"></div>
+    <div id="panel"></div>
+    <div id="selection"></div>
+  </body>
+</html>

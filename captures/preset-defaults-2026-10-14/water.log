@@ -1,0 +1,23 @@
+$ node scripts/verify-water.mjs .cache/preset-defaults-water-2026-10-14
+PASS cilindro-reflexo-lateral: 422 pixels changed by more than 8/255
+PASS reflected cylinder changes with view direction and disappears outside the wet footprint
+PASS a deep still pool remains clear and its mirror follows the simulated surface
+PASS luar-alinhado: 12084 pixels changed by more than 8/255
+PASS moving an object in shallow water produces physical displacement
+PASS agua-antes-impacto: 923 pixels changed by more than 8/255
+PASS water simulation never writes transient state into the document
+bank elevation=0.12 orbit=0.00: {"changed":1947,"escaped":0}
+bank elevation=0.12 orbit=1.57: {"changed":2429,"escaped":0}
+bank elevation=0.12 orbit=3.14: {"changed":1780,"escaped":0}
+bank elevation=0.12 orbit=4.71: {"changed":1837,"escaped":0}
+bank elevation=0.55 orbit=0.00: {"changed":12367,"escaped":0}
+bank elevation=0.55 orbit=1.57: {"changed":12504,"escaped":0}
+bank elevation=0.55 orbit=3.14: {"changed":12177,"escaped":0}
+bank elevation=0.55 orbit=4.71: {"changed":12478,"escaped":0}
+PASS gravity drives a downhill current and changes depth on the slope
+PASS flow leaves sculpted terrain and authored water unchanged
+PASS wet water vertices remain above the mountain surface
+PASS water inspector persists physical settings
+PASS water source can be closed in the inspector
+PASS custom channel outlines retain their CPU simulation footprint
+PASS no uncaught page exceptions
