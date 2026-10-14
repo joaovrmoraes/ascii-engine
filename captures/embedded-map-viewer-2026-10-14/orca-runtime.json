@@ -1,0 +1,11 @@
+{
+  "id": "6c17e3aa-5041-4db0-b9f5-cb08a4753546",
+  "ok": true,
+  "result": {
+    "result": "{\"area\":\"sunken_cathedral\",\"objects\":6,\"selected\":\"sunken_cathedral\",\"buttons\":5,\"hasArea\":false,\"hasPause\":true,\"url\":\"http://127.0.0.1:4180/ascii-engine/#try-in-your-browser\"}",
+    "origin": "http://127.0.0.1:4180/ascii-engine/#try-in-your-browser"
+  },
+  "_meta": {
+    "runtimeId": "327bd229-b588-4def-b562-15b9bd27a70c"
+  }
+}
