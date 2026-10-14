@@ -4,6 +4,32 @@ Entries describe the state at each stage. Earlier limitations may have been
 resolved later; START.md and the editor guide describe the current scope.
 Historical filenames, reference IDs and captured interfaces are preserved.
 
+## 2026-10-14 — Live browser sandbox on GitHub Pages
+
+The owner requested public, interactive links for Dark Forest and Sunken
+Cathedral rather than local-only URLs. Added a prominent browser section in
+the README/Pages gallery linking both demos, Scene Editor and the other areas.
+
+- Added a GitHub Actions Pages workflow that checks the workspace and publishes
+  the gallery plus a fresh editor at /ascii-engine/sandbox/ on main pushes.
+- Added pnpm pages:build. The artifact combines tracked docs and relative-path
+  application bundles in ignored .cache/pages; browser profiles are excluded
+  and compiled bundles stay out of Git. Existing gallery/media URLs remain.
+- The public build skips optional game.json probing and local bridge sockets
+  while retaining in-page authoring. Local MCP and exported games keep their
+  setup. Added a self-contained glyph favicon to avoid missing-icon requests.
+- Added pnpm verify:pages for production/public browser checks, including area
+  switching, scene creation, texture editing/undo and persistent drafts.
+
+Validation: pnpm check passed (114 tests, boundary guard, types/build).
+The production artifact passed 24 GPU WebGL/browser assertions beneath the
+project prefix, without failed HTTP responses, page exceptions or local
+WebSocket attempts. Local MCP passed 32 assertions. Inspected cdpshot and
+Orca at localhost:1440 plus the generated gallery. See
+[evidence and public verification command](captures/live-sandbox-pages-2026-10-14/README.md).
+Rendering recipes and historical baselines are unchanged. Native desktop and
+mobile touch interaction remain unverified; MCP still uses the local setup.
+
 ## 2026-10-14 — Independent preset defaults and documented alias
 
 Applied the four small follow-ups to the package-boundary review:

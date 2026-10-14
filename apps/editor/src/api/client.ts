@@ -101,7 +101,8 @@ export function connectAuthoring(engine: AsciiEngine, area: Area, view: { angle:
     socket.onclose = () => { if (!stopped) setTimeout(connect, 3000) }
     socket.onerror = () => socket?.close()
   }
-  connect()
+  // The hosted sandbox keeps its in-page API without contacting visitors' local services.
+  if (import.meta.env.VITE_PUBLIC_DEMO !== 'true') connect()
   const api = { sessionId, request: request as (request: AuthoringRequest) => Promise<unknown> }
   Object.assign(window, { asciiEngineApi: api })
   import.meta.hot?.dispose(() => {

@@ -40,12 +40,36 @@ node scripts/prepare-showcase-gifs.mjs
 node scripts/preview-readme.mjs --github-pages --generate-only
 ```
 
-The public player gallery is docs/index.html and docs/watch.html, served by GitHub Pages from
-main:/docs with .nojekyll. Its paths work at the project URL, and each
-chapter GIF links to the corresponding gallery section. Published URL:
+The public gallery is docs/index.html and docs/watch.html. GitHub Actions
+builds and deploys the gallery and browser editor on main pushes using
+.github/workflows/pages.yml. Each chapter GIF links to its gallery section.
+Published gallery URL:
 https://joaovrmoraes.github.io/ascii-engine/watch.html.
 The generator derives chapter navigation and video sources from the README;
 it supports local historical MP4s and external release assets.
+
+The live editor is https://joaovrmoraes.github.io/ascii-engine/sandbox/.
+Direct `?area=dark_forest` and `?area=sunken_cathedral` links open the demos;
+`?area=sandbox` opens the complete scene editor, including Texture Studio.
+Browser authoring works without installation; MCP uses the documented local
+setup. The public build does not connect to visitors' local bridge services.
+
+Build and preview the same publication artifact locally:
+
+```bash
+pnpm pages:build
+python -m http.server 4179 --directory .cache/pages
+```
+
+Open http://localhost:4179/sandbox/?area=dark_forest. The ignored artifact
+contains tracked documentation and fresh relative-path editor bundles;
+browser profiles and caches are excluded. Application bundles stay outside Git.
+
+Validate the deployed browser workflow with:
+
+```bash
+pnpm verify:pages https://joaovrmoraes.github.io/ascii-engine/ /tmp/ascii-pages-public
+```
 
 ## Reproduce the Texture Studio walkthrough
 

@@ -49,7 +49,9 @@ const params = new URLSearchParams(location.search)
  * panels, no selection). `?player=1` previews that mode.
  */
 interface GameConfig { title?: string; area?: string; scene?: string; style?: Partial<core.AsciiStyle>; zoom?: number }
-const game: GameConfig | undefined = await fetch('./game.json').then((r) => r.ok ? r.json() : undefined).catch(() => undefined)
+const game: GameConfig | undefined = import.meta.env.VITE_PUBLIC_DEMO === 'true'
+  ? undefined
+  : await fetch('./game.json').then((r) => r.ok ? r.json() : undefined).catch(() => undefined)
 const player = !!game || params.has('player')
 if (player) document.body.classList.add('player')
 if (game?.title) document.title = game.title

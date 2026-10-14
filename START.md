@@ -342,7 +342,14 @@ components discussed as future work are not part of the current runtime.
 **Public presentation:** the README and Pages gallery include seven chapters,
 including the English Texture Studio walkthrough, plus the supported AI/MCP
 workflow. `scripts/preview-readme.mjs --github-pages --generate-only` generates
-both `docs/index.html` and `docs/watch.html` from the README. New MP4 footage
+both `docs/index.html` and `docs/watch.html` from the README. GitHub Actions
+publishes the gallery and full browser editor at `/ascii-engine/sandbox/` on
+main pushes. Direct `?area=dark_forest` and `?area=sunken_cathedral` links open
+the demos; `?area=sandbox` opens scene authoring. `pnpm pages:build` assembles
+tracked documentation and the editor in ignored `.cache/pages`; generated
+application bundles are not committed. The public build keeps the in-page
+authoring API and skips the local MCP bridge and optional exported-game probe.
+Local development and exported players retain their existing setup. New MP4 footage
 is generated in `.cache/showcase` and hosted as a release asset; its short GIF
 and validation screenshots remain in the repository. Historical media is
 preserved. See [showcase workflow](docs/showcase/README.md).

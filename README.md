@@ -7,6 +7,22 @@ Sculpt terrain, paint water, arrange objects and bring your world to life
 with wind, particles, lighting and atmosphere. Letters follow the geometry
 and movement of the things they form.
 
+## Try in your browser
+
+Open the live sandbox on GitHub Pages. No installation is needed.
+
+- [Dark Forest](https://joaovrmoraes.github.io/ascii-engine/sandbox/?area=dark_forest): explore the forest, animated characters and combat effects.
+- [Sunken Cathedral](https://joaovrmoraes.github.io/ascii-engine/sandbox/?area=sunken_cathedral): explore ruins, reflected water and interior lighting.
+- [Scene Editor](https://joaovrmoraes.github.io/ascii-engine/sandbox/?area=sandbox): create a scene, sculpt terrain, place objects and open Studio for textures, effects and atmospheres.
+
+Drag to rotate the demo camera, scroll to zoom and use the controls to adjust
+letters and light or pause the animation. Switch areas from the menu, or open
+[Rain Marsh](https://joaovrmoraes.github.io/ascii-engine/sandbox/?area=rain_marsh),
+[Snow Pines](https://joaovrmoraes.github.io/ascii-engine/sandbox/?area=snow_pines)
+and [Old Mine](https://joaovrmoraes.github.io/ascii-engine/sandbox/?area=old_mine).
+The Scene Editor can save and reopen editable documents in your browser.
+AI/MCP uses the local setup described below.
+
 ![Living Shore: animated grass, water and fire made of letters](docs/showcase/gifs/living-shore.gif)
 
 ## See it in action
