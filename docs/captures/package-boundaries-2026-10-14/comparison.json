@@ -1,0 +1,14 @@
+{
+  "reference": 0.0,
+  "forest": 0.0005,
+  "marsh": 0.0098,
+  "snow_original_repeat_vs_current": 0.00712157,
+  "mine": 0.0085,
+  "cathedral": 0.0134,
+  "limit": 0.04,
+  "original_commit": "957f64c",
+  "initial_snow_difference": 0.1093,
+  "initial_difference_reproduced_on_original": true,
+  "historical_baselines_changed": false,
+  "passed": true
+}

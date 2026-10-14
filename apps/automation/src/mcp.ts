@@ -4,7 +4,7 @@ import { z } from 'zod'
 import { readFile, writeFile, link, rename, unlink } from 'node:fs/promises'
 import { resolve, relative, dirname, basename } from 'node:path'
 import { randomUUID } from 'node:crypto'
-import { batchSchema, requestSchema } from '@ascii-engine/authoring'
+import { batchSchema, requestSchema } from '@ascii-engine/authoring/schema'
 
 const endpoint = process.env.ASCII_ENGINE_API ?? 'http://127.0.0.1:1442'
 const session = { sessionId: z.string().uuid().describe('Identifier returned by engine_sessions; explicitly choose the scene to edit.') }

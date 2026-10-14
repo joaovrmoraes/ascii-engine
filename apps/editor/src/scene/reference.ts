@@ -1,5 +1,6 @@
 import * as THREE from 'three'
-import { createCampfire, forestFloorMaterial, forestMeadowCover, type AsciiEngine, type GlyphStyle } from '@ascii-engine/core'
+import { createCampfire, forestFloorMaterial, forestMeadowCover } from '@ascii-engine/core/pomorog'
+import { type AsciiEngine, type GlyphStyle } from '@ascii-engine/core'
 import { box, createTree, piece, pomorogKind, rock } from './pomorogKit'
 import { createAdventurer } from '../pomorog/models'
 

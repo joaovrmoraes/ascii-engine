@@ -1,4 +1,4 @@
-import type { AsciiStyle } from '../presets/pomorog'
+import type { AsciiStyle } from '../config'
 
 /** Reusable lighting only: never overrides geometry, glyph techniques or weather. */
 export const ATMOSPHERE_KEYS = ['atmosphere', 'inkTint', 'bodySceneLighting', 'inkFog', 'brightness', 'background', 'fog', 'hemisphere', 'moon', 'fill', 'bodyAmbient'] as const

@@ -1,5 +1,6 @@
 import * as THREE from 'three'
-import { forestFloorMaterial, forestMeadowCover, gifToFlipbook, spriteSheetToFlipbook, videoToFlipbook, type AsciiEngine, type EffectDef, type EffectInstance, type FlipbookData } from '@ascii-engine/core'
+import { forestFloorMaterial, forestMeadowCover } from '@ascii-engine/core/pomorog'
+import { gifToFlipbook, spriteSheetToFlipbook, videoToFlipbook, type AsciiEngine, type EffectDef, type EffectInstance, type FlipbookData } from '@ascii-engine/core'
 import type { Area, AreaOptions } from './types'
 import { effectName } from '../editor/names'
 

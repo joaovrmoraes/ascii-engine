@@ -182,6 +182,11 @@ techniques declared per object and per part. The editor in `apps/editor`
 uses Vite and includes a Tauri desktop shell. Data authoring and the
 API/MCP automation bridge live in separate modules.
 
+The renderer accepts appearance and effect libraries explicitly. Import
+specialized APIs through `@ascii-engine/core/techniques`, `/world` or `/fx`;
+optional Pomorog recipes use `/pomorog`. See the
+[package boundary decision](docs/decisions/0003-package-boundaries.md).
+
 ```bash
 pnpm check              # types, tests and build
 pnpm compare            # visual demo comparison; requires pnpm dev

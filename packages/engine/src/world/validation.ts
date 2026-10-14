@@ -1,5 +1,5 @@
 import type { SceneDoc, PrefabLibrary } from './scene'
-import { pomorog } from '../presets/pomorog'
+import { DEFAULT_ASCII_STYLE } from '../config'
 import { SURFACE_ALPHA } from '../surface'
 import { FOREST_WATER } from '../techniques/water'
 import { parseEffect } from '../fx/validation'
@@ -171,7 +171,7 @@ export function parseScene(input: unknown, library?: PrefabLibrary): SceneDoc {
       else if (k === 'bodySceneLighting' || k === 'inkFog') { if (typeof v !== 'boolean') fail(`style.${k}`, 'must be a boolean') }
       else if (k === 'inkTint') vector(v, 'style.inkTint', 3, 0)
       else if (k === 'atmosphere') { if (!['moon', 'dusk', 'ember'].includes(String(v))) fail('style.atmosphere', 'unknown') }
-      else if (k in pomorog) sameShape(v, pomorog[k as keyof typeof pomorog], `style.${k}`)
+      else if (k in DEFAULT_ASCII_STYLE) sameShape(v, DEFAULT_ASCII_STYLE[k as keyof typeof DEFAULT_ASCII_STYLE], `style.${k}`)
     }
     if (s.cellSize !== undefined) number(s.cellSize, 'style.cellSize', 1, 100)
     if (s.brightness !== undefined) number(s.brightness, 'style.brightness', 0, 10)

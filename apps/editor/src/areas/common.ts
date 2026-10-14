@@ -1,5 +1,6 @@
 import * as THREE from 'three'
-import { createCampfire, pushFireflies, pushLanternMotes, createDustTrail, type AsciiEngine, type GlyphCloud } from '@ascii-engine/core'
+import { createCampfire, pushFireflies, pushLanternMotes, createDustTrail } from '@ascii-engine/core/pomorog'
+import { type AsciiEngine, type GlyphCloud } from '@ascii-engine/core'
 import { createCamp, createKit, type Kit } from '../scene/pomorogKit'
 import { createAdventurer } from '../pomorog/models'
 import { damp, smooth, turn } from '../pomorog/motion'

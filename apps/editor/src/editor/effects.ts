@@ -1,4 +1,5 @@
-import { POMOROG_EFFECTS, parseEffect, createHistory, type EffectDef, type EmitterDef } from '@ascii-engine/core'
+import { POMOROG_EFFECTS } from '@ascii-engine/core/pomorog'
+import { parseEffect, createHistory, type EffectDef, type EmitterDef } from '@ascii-engine/core'
 import { createEffectPreview } from './effectPreview'
 import { effectName } from './names'
 

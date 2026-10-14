@@ -1,7 +1,6 @@
 import * as THREE from 'three'
-import type { GlyphCloud } from '../techniques/particle'
-import type { AsciiStyle } from './pomorog'
-import { pomorog } from './pomorog'
+import { snowflake, type GlyphCloud, type AsciiStyle } from '@ascii-engine/core'
+import { pomorog } from '@ascii-engine/core/pomorog'
 
 /**
  * Snow (Pomorog `snow.ts` + `snowEnvironment.ts`): a snow floor whose colour
@@ -13,8 +12,6 @@ import { pomorog } from './pomorog'
 export const SNOW_TRACK_LIFE = 110
 const clamp = (n: number) => Math.max(0, Math.min(1, n))
 const smooth = (n: number) => { const t = clamp(n); return t * t * (3 - 2 * t) }
-const fract = (n: number) => n - Math.floor(n)
-const hash = (n: number) => fract(Math.sin(n * 127.1 + 311.7) * 43758.5453)
 
 /** Pomorog snow lights (hemisphere, moon) and the brighter body ambient. */
 export const pomorogSnow: Partial<AsciiStyle> = {
@@ -25,19 +22,6 @@ export const pomorogSnow: Partial<AsciiStyle> = {
 
 export const snowAccumulation = (time: number) => .28 + .72 * (1 - Math.exp(-Math.max(0, time) / 42))
 export const snowMeltRadius = (time: number) => 1.48 + .35 * (1 - Math.exp(-Math.max(0, time) / 38))
-
-/** Slow flakes drift sideways in gusts; no rain-like straight velocity. */
-export function snowflake(index: number, time: number) {
-  const speed = .48 + hash(index + 23) * .48
-  const phase = fract(hash(index + 7) + time * speed / 8)
-  return {
-    x: (hash(index * 3 + 1) - .5) * 26 + Math.sin(time * .42 + index) * .45 + Math.sin(time * .13) * .65,
-    y: 8 * (1 - phase),
-    z: (hash(index * 3 + 2) - .5) * 26 + Math.cos(time * .31 + index * 2.4) * .35,
-    size: .085 + hash(index + 9) * .105,
-    phase,
-  }
-}
 
 export interface SnowBoot { position: { x: number; y: number; z: number }; step: number }
 export interface SnowOptions {

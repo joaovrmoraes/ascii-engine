@@ -1,7 +1,7 @@
 import * as THREE from 'three'
 import type { GlyphCloud } from '../techniques/particle'
 import { PARTICLE_GLYPHS } from '../techniques/particle'
-import { POMOROG_FIRE, type HeatGridSpec } from '../presets/campfire'
+import { DEFAULT_HEAT_GRID, type HeatGridSpec } from './heat'
 
 /**
  * Effect system (§3.3): effects are data. An effect has emitters on a
@@ -311,7 +311,7 @@ export function createEffectSystem(cloud: GlyphCloud, scene: THREE.Object3D, opt
       })
     }
     function heatGrid(e: EmitterDef, time: number, camera: THREE.Camera) {
-      const spec = { ...POMOROG_FIRE, ...e.heat }, [ox, oy, oz] = e.offset ?? [0,0,0]
+      const spec = { ...DEFAULT_HEAT_GRID, ...e.heat }, [ox, oy, oz] = e.offset ?? [0,0,0]
       const cols = spec.cols, rows = spec.rows, [cw, ch] = spec.cell
       const r = tmp.setFromMatrixColumn(camera.matrixWorld, 0).setY(0).normalize(), rx = r.x, rz = r.z
       const tw = new THREE.Vector3().setFromMatrixColumn(camera.matrixWorld, 2).setY(0).normalize().multiplyScalar(spec.toward)

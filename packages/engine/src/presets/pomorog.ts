@@ -1,40 +1,10 @@
 import * as THREE from 'three'
 import type { GroundCover } from '../techniques/carpet'
-import type { GlyphStyle, ObjectTypeStyle } from '../style'
 
-/**
- * The approved Pomorog look (10–11/10/2026), exterior "moon" atmosphere.
- * Numbers from `scene.ts`, `visual-pipeline.md` §10 and the player defaults.
- */
-export interface AsciiStyle {
-  /** Screen-pass cell in CSS px (player: 5–12, default 6). */
-  cellSize: number
-  /** Ink multiplier of screen pass, carpet and particles (player: .65–1.4). */
-  brightness: number
-  background: number
-  fog: { color: number; density: number } | null
-  hemisphere: { sky: number; ground: number; intensity: number }
-  moon: { color: number; intensity: number; position: [number, number, number]; shadowIntensity: number; shadowExtent: number; mapSize: number }
-  fill: { color: number; intensity: number; position: [number, number, number] }
-  /** Interior = discovery by lantern; exterior = open moonlight. */
-  interior: boolean
-  /** `body`: ambient term (interior .12, snow .42, others .30). */
-  bodyAmbient: number
-  /** `body`: lantern strength (interior 1.2, exterior .7). */
-  bodyLantern: number
-  atmosphere: 'moon' | 'dusk' | 'ember'
-  /** Optional studio tint, applied to ink in world space. */
-  inkTint?: [number, number, number]
-  /** Body letters follow the scene directional light; omitted keeps legacy shading. */
-  bodySceneLighting?: boolean
-  /** Fog reaches body/carpet/particle ink, in addition to mesh materials. */
-  inkFog?: boolean
-  /** Global layer of the per-part letter style. */
-  glyphs: GlyphStyle
-  /** Object types known to the preset ("tree" → crown/trunk…). */
-  types: Record<string, ObjectTypeStyle>
-}
+import type { AsciiStyle } from '../config'
+export type { AsciiStyle } from '../config'
 
+/** The approved Pomorog appearance, supplied explicitly by consumers. */
 export const pomorog: AsciiStyle = {
   cellSize: 6,
   brightness: 1,

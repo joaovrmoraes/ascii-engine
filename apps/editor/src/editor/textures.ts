@@ -1,5 +1,6 @@
 import * as THREE from 'three'
-import { BODY_RAMPS, GLYPH_STYLE_KEYS, SURFACE_ALPHABETS, SURFACE_CELL, atmosphereStyle, createHistory, parseScene, pomorog, textureStyle, validGlyphAlphabet, type AtmosphereStyle, type GlyphStyle, type SceneDoc, type TextureAsset } from '@ascii-engine/core'
+import { BODY_RAMPS, GLYPH_STYLE_KEYS, SURFACE_ALPHABETS, SURFACE_CELL, atmosphereStyle, createHistory, parseScene, textureStyle, validGlyphAlphabet, type AtmosphereStyle, type GlyphStyle, type SceneDoc, type TextureAsset } from '@ascii-engine/core'
+import { pomorog } from '@ascii-engine/core/pomorog'
 import { createTexturePreview } from './texturePreview'
 
 interface TextureDraft extends TextureAsset { cleared?: (keyof GlyphStyle)[] }

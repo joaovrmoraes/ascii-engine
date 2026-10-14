@@ -1,5 +1,6 @@
 import * as THREE from 'three'
-import { createCombatEffects, IMPACT_DELAY, FIRE_TRAVEL_TIME, type AsciiEngine, type Carpet, type Entry, type Spell } from '@ascii-engine/core'
+import { createCombatEffects, IMPACT_DELAY, FIRE_TRAVEL_TIME, type Entry, type Spell } from '../pomorog/combatEffects'
+import { type AsciiEngine, type Carpet } from '@ascii-engine/core'
 import { createCreature, type ActorModel } from '../pomorog/models'
 import { smooth, turn } from '../pomorog/motion'
 

@@ -10,7 +10,7 @@
     "build": "pnpm -r build",
     "test": "pnpm -r test",
     "typecheck": "pnpm -r typecheck",
-    "check": "pnpm typecheck && pnpm test && pnpm build",
+    "check": "node scripts/check-package-boundaries.mjs && pnpm typecheck && pnpm test && pnpm build",
     "tauri": "pnpm --filter @ascii-engine/editor tauri",
     "compare": "node scripts/compare.mjs",
     "verify:visual": "node scripts/verify-visual.mjs",

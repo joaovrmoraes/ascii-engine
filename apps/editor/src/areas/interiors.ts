@@ -1,5 +1,6 @@
 import * as THREE from 'three'
-import { type AsciiEngine, type GroundCover, type LightObstacle, pomorogInterior } from '@ascii-engine/core'
+import { type AsciiEngine, type GroundCover, type LightObstacle } from '@ascii-engine/core'
+import { pomorogInterior } from '@ascii-engine/core/pomorog'
 import { createKit, rock } from '../scene/pomorogKit'
 import { createFixedMapActors } from './common'
 import type { Area, AreaOptions } from './types'

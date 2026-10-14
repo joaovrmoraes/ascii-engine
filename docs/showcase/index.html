@@ -61,6 +61,7 @@ pnpm dev</code></pre>
 <p>In development. The current release covers visual content creation, editing and export. The player runs scenes and existing demos. Gameplay components and scripts attached to objects through the editor are a future stage; demo combat follows a programmed sequence.</p>
 <h2 id="development">Development</h2>
 <p>The core in <code>packages/engine</code> uses TypeScript and Three.js, with glyph techniques declared per object and per part. The editor in <code>apps/editor</code> uses Vite and includes a Tauri desktop shell. Data authoring and the API/MCP automation bridge live in separate modules.</p>
+<p>The renderer accepts appearance and effect libraries explicitly. Import specialized APIs through <code>@ascii-engine/core/techniques</code>, <code>/world</code> or <code>/fx</code>; optional Pomorog recipes use <code>/pomorog</code>. See the <a href="docs/decisions/0003-package-boundaries.md">package boundary decision</a>.</p>
 <pre><code>pnpm check              # types, tests and build
 pnpm compare            # visual demo comparison; requires pnpm dev
 pnpm verify:authoring   # editor interaction checks; requires pnpm dev</code></pre>

@@ -1,6 +1,7 @@
 import * as THREE from 'three'
 import { GLTFExporter } from 'three/examples/jsm/exporters/GLTFExporter.js'
-import { forestFloorMaterial, forestMeadowCover, loadGlyphModel, type AsciiEngine, type GlyphModel } from '@ascii-engine/core'
+import { forestFloorMaterial, forestMeadowCover } from '@ascii-engine/core/pomorog'
+import { loadGlyphModel, type AsciiEngine, type GlyphModel } from '@ascii-engine/core'
 import type { Area, AreaOptions } from './types'
 
 /**

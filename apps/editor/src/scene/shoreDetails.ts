@@ -1,5 +1,5 @@
 import * as THREE from 'three'
-import type { MarshIsland } from '@ascii-engine/core'
+import type { MarshIsland } from '../pomorog/marshWater'
 
 /**
  * Bank geometry of the marsh (Pomorog `shoreDetails.ts`, marsh branch): bent

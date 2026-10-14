@@ -1,6 +1,8 @@
 import * as THREE from 'three'
-import type { GlyphCloud } from '../techniques/particle'
-import { createDustTrail } from './ambient'
+import type { GlyphCloud } from '@ascii-engine/core/techniques'
+import { createDustTrail } from '@ascii-engine/core/pomorog'
+import { IMPACT_DELAY, FIRE_TRAVEL_TIME } from './motion'
+export { IMPACT_DELAY, FIRE_TRAVEL_TIME } from './motion'
 
 /**
  * Combat effects (Pomorog `effects.ts`), all in letters, ×1.4 so they read
@@ -9,8 +11,6 @@ import { createDustTrail } from './ambient'
  * with its own light, death dissolve and creature entrances (rise, charge
  * dust, swoop wind). Presets for the §3.3 effect system.
  */
-export const IMPACT_DELAY = .2
-export const FIRE_TRAVEL_TIME = .22
 export type Spell = 'fire' | 'lightning' | 'frost'
 export type Entry = 'charge' | 'rise' | 'swoop'
 

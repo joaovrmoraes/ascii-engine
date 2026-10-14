@@ -1,5 +1,6 @@
 import * as THREE from 'three'
-import { createSnowField, pomorogSnow, snowAccumulation, snowMeltRadius, type AsciiEngine, type GroundCover, type SurfaceKind } from '@ascii-engine/core'
+import { createSnowField, pomorogSnow, snowAccumulation, snowMeltRadius } from '../pomorog/snow'
+import { type AsciiEngine, type GroundCover, type SurfaceKind } from '@ascii-engine/core'
 import { declare } from '../scene/pomorogKit'
 import { CAMP, createFixedMapActors } from './common'
 import type { Area, AreaOptions } from './types'

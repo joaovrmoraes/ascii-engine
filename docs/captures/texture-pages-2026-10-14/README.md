@@ -52,3 +52,9 @@ the successful playback and screenshot evidence.
 The owner's normal browser draft was preserved. Existing historical videos,
 captures and release tag are unchanged. Native desktop execution and arbitrary
 decoder-dependent models were not verified in this presentation stage.
+
+Publication verified for main commit 957f64c: Pages build completed, the root
+and watch pages contain both new sections, and the live release video played
+at 1920×1080 without a media error. Public desktop/mobile evidence and result:
+[deployed gallery](public-gallery/result.json), [Textures](public-gallery/textures-desktop.png)
+and [AI/MCP](public-gallery/mcp-desktop.png).

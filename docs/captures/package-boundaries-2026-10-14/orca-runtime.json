@@ -1,0 +1,19 @@
+{
+  "area": "reference",
+  "types": [
+    "tree",
+    "rock",
+    "creature",
+    "hero",
+    "prop",
+    "ground"
+  ],
+  "resources": {
+    "objects": 66,
+    "carpets": 1,
+    "particles": 1,
+    "rain": 0,
+    "waters": 0
+  },
+  "time": 272.9648000000134
+}

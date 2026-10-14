@@ -1,6 +1,7 @@
 import { terrainLayerName } from '../editor/names'
 import * as THREE from 'three'
-import { buildScene, createTerrainData, createHistory, createEffectPrefabs, emptyScene, createWaterPaint, paintWater, loadSceneAssets, parseScene, pomorog, waterEdge, type AsciiEngine, type Brush, type BuiltScene, type SceneDoc } from '@ascii-engine/core'
+import { buildScene, createTerrainData, createHistory, createEffectPrefabs, emptyScene, createWaterPaint, paintWater, loadSceneAssets, parseScene, waterEdge, type AsciiEngine, type Brush, type BuiltScene, type SceneDoc } from '@ascii-engine/core'
+import { pomorog } from '@ascii-engine/core/pomorog'
 import { createPrefabs } from '../scene/prefabs'
 import { downloadDocument, importModelFiles } from '../scene/files'
 import { readDraft, saveDraft } from '../scene/storage'

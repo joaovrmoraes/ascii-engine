@@ -1,7 +1,8 @@
 import * as THREE from 'three'
 import { TransformControls } from 'three/examples/jsm/controls/TransformControls.js'
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
-import { createAsciiEngine, parseEffect, type EffectDef, type EffectInstance } from '@ascii-engine/core'
+import { parseEffect, type EffectDef, type EffectInstance } from '@ascii-engine/core'
+import { createAsciiEngine } from '../engine'
 
 /** A disposable, empty stage. Never borrows objects, camera or style from the map. */
 export function createEffectPreview(callbacks: { move(offset: [number,number,number], commit: boolean): void }) {

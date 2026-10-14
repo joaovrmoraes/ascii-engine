@@ -1,4 +1,5 @@
-import { pomorog, parseScene, atmosphereStyle, type AtmosphereAsset, type AsciiEngine, type AsciiStyle } from '@ascii-engine/core'
+import { pomorog } from '@ascii-engine/core/pomorog'
+import { parseScene, atmosphereStyle, type AtmosphereAsset, type AsciiEngine, type AsciiStyle } from '@ascii-engine/core'
 
 /** Lighting authoring shares the scene's portable style, including undo/export. */
 export function createAtmosphereStudio(root: HTMLElement, engine: AsciiEngine, changed: () => void, callbacks: {

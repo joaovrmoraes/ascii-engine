@@ -1,5 +1,6 @@
 import * as THREE from 'three'
-import { createCampfire, POMOROG_EFFECTS, type AsciiEngine, type EffectInstance, type PrefabLibrary } from '@ascii-engine/core'
+import { createCampfire, POMOROG_EFFECTS } from '@ascii-engine/core/pomorog'
+import { type AsciiEngine, type EffectInstance, type PrefabLibrary } from '@ascii-engine/core'
 import { cap, createCamp, createKit, createTree, log, rock } from './pomorogKit'
 import { effectName } from '../editor/names'
 

@@ -44,6 +44,16 @@ try {
   await send('Browser.setDownloadBehavior', { behavior: 'allow', downloadPath: downloads })
   await send('Page.navigate', { url: 'http://localhost:1440/?area=sandbox' })
   await until('!!window.area && !!document.querySelector("canvas[data-ready]")')
+  const standalone = await evaluate(`(() => {
+    const canvas=document.createElement('canvas');canvas.style.cssText='width:128px;height:128px';document.body.append(canvas);
+    const pure=core.createAsciiEngine(canvas,{effects:[{name:'consumer-effect',duration:1,emitters:[{rate:0,life:1,glyphs:'.'}]}]});
+    let missing=false;try{pure.fx.play('fogueira',pure.camera.position)}catch{missing=true}
+    const instance=pure.fx.play('consumer-effect',pure.camera.position);
+    const result={types:Object.keys(pure.exportStyle().types).length,noGameEffect:missing,customEffect:!!instance};
+    pure.dispose();pure.renderer.forceContextLoss();canvas.remove();return result;
+  })()`)
+  if(standalone.types!==0||!standalone.noGameEffect||!standalone.customEffect)throw new Error('Generic engine still depends on an implicit game library')
+  console.log('PASS standalone core has no game types/effects and accepts a consumer effect library')
   const treeSource = 'data:model/gltf+json;base64,' + (await readFile('docs/captures/gltf-appearance-2026-10-13/tree-parts.gltf')).toString('base64')
   await action(`window.ui = (selector, value) => { const el = document.querySelector(selector); if (!el) throw new Error(selector); if (value === undefined) el.click(); else { el.value=value; el.dispatchEvent(new Event('input')); el.dispatchEvent(new Event('change')); } };
     window.tf = (key,value) => ui('#texture-studio [data-texture-field="'+key+'"]',value);

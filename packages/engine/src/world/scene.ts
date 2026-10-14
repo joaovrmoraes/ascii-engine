@@ -1,6 +1,6 @@
 import * as THREE from 'three'
 import type { AddOptions, AsciiEngine } from '../engine'
-import type { AsciiStyle } from '../presets/pomorog'
+import type { AsciiStyle } from '../config'
 import type { ObjectTypeStyle } from '../style'
 import type { GroundCover } from '../techniques/carpet'
 import { waterHeightAt } from './waterPaint'

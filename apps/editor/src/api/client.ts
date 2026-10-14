@@ -1,5 +1,6 @@
 import { applyCommands, assertSafeJson, commandJsonSchema, requestSchema, summarizeScene, type AuthoringRequest } from '@ascii-engine/authoring'
-import { pomorog, FOREST_WATER, DEFAULT_WATER_PHYSICS, POMOROG_EFFECTS, SURFACE_ALPHA, parseScene, type AsciiEngine, type SceneDoc } from '@ascii-engine/core'
+import { pomorog, POMOROG_EFFECTS } from '@ascii-engine/core/pomorog'
+import { FOREST_WATER, DEFAULT_WATER_PHYSICS, SURFACE_ALPHA, parseScene, type AsciiEngine, type SceneDoc } from '@ascii-engine/core'
 import { importModelFiles } from '../scene/files'
 import type { Area } from '../areas/types'
 

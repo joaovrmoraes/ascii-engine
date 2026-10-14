@@ -16,6 +16,7 @@
     "three": "^0.186.1"
   },
   "devDependencies": {
+    "@ascii-engine/automation": "workspace:*",
     "@tauri-apps/api": "^2.1.1",
     "@tauri-apps/cli": "^2.1.0",
     "@types/three": "^0.186.0",

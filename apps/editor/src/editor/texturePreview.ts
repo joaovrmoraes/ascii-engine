@@ -1,6 +1,7 @@
 import * as THREE from 'three'
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
-import { atmosphereStyle, buildScene, createAsciiEngine, createEffectPrefabs, loadSceneAssets, type AddOptions, type AtmosphereStyle, type BuiltScene, type GlyphStyle, type SceneDoc } from '@ascii-engine/core'
+import { atmosphereStyle, buildScene, createEffectPrefabs, loadSceneAssets, type AddOptions, type AtmosphereStyle, type BuiltScene, type GlyphStyle, type SceneDoc } from '@ascii-engine/core'
+import { createAsciiEngine } from '../engine'
 import { createPrefabs } from '../scene/prefabs'
 
 /** Owns its engine and model resources; the map stays paused during editing. */

@@ -1,8 +1,6 @@
 import * as THREE from 'three'
-import {
-  circuitGLSL, createCampfire, createChunkStreamer, createCircuit, createDustTrail, pushFireflies, pushLanternMotes,
-  waterEdge, waterEdgeGLSL, type AsciiEngine, type Circuit, type GroundCover, type Water, type WaterShape,
-} from '@ascii-engine/core'
+import { circuitGLSL, createChunkStreamer, createCircuit, waterEdge, waterEdgeGLSL, type AsciiEngine, type Circuit, type GroundCover, type Water, type WaterShape } from '@ascii-engine/core'
+import { createCampfire, createDustTrail, pushFireflies, pushLanternMotes } from '@ascii-engine/core/pomorog'
 import { cap, createCamp, createKit, createTree, log, rock } from '../scene/pomorogKit'
 import { createAdventurer } from '../pomorog/models'
 import { damp, smooth, turn } from '../pomorog/motion'

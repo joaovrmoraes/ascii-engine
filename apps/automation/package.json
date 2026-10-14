@@ -3,6 +3,7 @@
   "private": true,
   "version": "0.1.0",
   "type": "module",
+  "exports": { "./bridge": "./src/bridge.ts" },
   "scripts": { "build": "tsc --noEmit", "typecheck": "tsc --noEmit", "test": "vitest run", "api": "tsx src/serve.ts", "mcp": "tsx src/mcp.ts" },
   "dependencies": { "@ascii-engine/authoring": "workspace:*", "@modelcontextprotocol/server": "^2.3.1", "ws": "^8.18.3", "zod": "^4.3.6", "tsx": "^4.20.6" },
   "devDependencies": { "@modelcontextprotocol/client": "^2.3.1", "@types/node": "^22.0.0", "@types/ws": "^8.18.1", "typescript": "^5.7.2", "vitest": "^3.2.4" }

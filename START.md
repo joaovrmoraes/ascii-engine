@@ -191,8 +191,10 @@ The **core** knows no game, UI or Tauri and runs in a browser:
   `exploration.ts`: local lighting/discovery.
 - `techniques/`: screen, surface, skinned body, carpet, particle and
   glyph-reflecting water.
-- `presets/`: Pomorog style/types, campfire heat grid, fireflies/lantern
-  motes/running dust, combat, legacy marsh water and snow.
+- `config.ts`: renderer settings and content-free defaults. Consumers supply
+  object types and effect recipes explicitly through engine options.
+- `presets/`: optional Pomorog appearance, campfire and ambient recipes,
+  exported through `@ascii-engine/core/presets` or `/pomorog`.
 - `weather/`: rain/storm; `world/`: circuit, distance-loaded chunks,
   ripples, brush terrain and JSON scene/prefab/connector generation.
 - `fx/`: data-driven effects, Pomorog recipes and ASCII flipbooks.
@@ -203,6 +205,20 @@ reference scene, terrain authoring, effects, GLTF import, adjustments, per-part
 selection and presets. Game content such as models, prefabs and hunt pacing
 belongs in `src/pomorog/` / `src/scene/`, never the core. `game.json` next to
 `index.html` turns it into an exported game's visual player.
+
+`apps/editor/src/engine.ts` supplies the approved Pomorog appearance and
+effect library to both the main renderer and isolated previews. Combat timing,
+hero/foe feedback, marsh foot/body contacts and snow track policy live in
+`apps/editor/src/pomorog/`. Generic heat-grid data and snow particle samples
+remain in the core, with their established numerical values.
+
+Public package entries: `@ascii-engine/core` for the renderer and shared
+settings, `/techniques`, `/world`, `/fx`, and optional `/presets` / `/pomorog`.
+The root preserves generic exports; optional presets now require their
+explicit entry. `@ascii-engine/authoring/schema` exposes the transport contract
+without loading document/renderer implementations. Vite imports the development
+bridge through `@ascii-engine/automation/bridge`. See
+[ADR 0003](docs/decisions/0003-package-boundaries.md).
 
 Commands: `pnpm compare` compares screenshots with the baseline;
 `pnpm export -- --title … --area …|--scene … [--desktop]` exports web/Tauri.
@@ -420,6 +436,9 @@ pnpm check               # typecheck + tests + build
 pnpm tauri dev           # desktop editor
 node scripts/preview-readme.mjs  # local README/video preview: localhost:4178
 ```
+
+`pnpm check` also enforces package import direction and checks that generic
+renderer entries cannot reach optional presets or application code.
 
 Headless captures: `.claude/skills/pomorog-ascii-visual/scripts/cdpshot.mjs`
 (Chromium with GPU and `--use-angle=gl`). Validate in **Orca Browser** too.

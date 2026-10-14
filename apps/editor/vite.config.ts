@@ -1,5 +1,5 @@
 import { defineConfig } from 'vite'
-import { startBridge } from '../automation/src/bridge'
+import { startBridge } from '@ascii-engine/automation/bridge'
 
 // Port 1440 avoids conflicts with Pomorog (1420/1430).
 // `base: './'`: exported games (web folder or Tauri) load assets relatively.

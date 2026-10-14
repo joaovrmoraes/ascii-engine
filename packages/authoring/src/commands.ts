@@ -1,4 +1,4 @@
-import { createTerrain, createTerrainData, createWaterPaint, paintWater, waterEdge, parseScene, seededRandom, pomorog, atmosphereStyle, FOREST_WATER, type SceneDoc, type SceneWater, type PlacedObject, type EffectDef } from '@ascii-engine/core'
+import { createTerrain, createTerrainData, createWaterPaint, paintWater, waterEdge, parseScene, seededRandom, DEFAULT_ASCII_STYLE, atmosphereStyle, FOREST_WATER, type SceneDoc, type SceneWater, type PlacedObject, type EffectDef } from '@ascii-engine/core'
 import { assertSafeJson, batchSchema } from './schema'
 
 /** Merge plain JSON only, protecting object prototypes before any assignment. */
@@ -108,7 +108,7 @@ export function applyCommands(source: SceneDoc, input: unknown): SceneDoc {
         if (!doc[cmd.kind]?.[cmd.id]) throw new Error('Resource not found: ' + cmd.id)
         if (['assets', 'effects'].includes(cmd.kind) && doc.objects.some(o => o.prefab === cmd.id)) throw new Error('Remove this asset\'s instances first: ' + cmd.id)
         delete doc[cmd.kind]![cmd.id]; break
-      case 'atmosphere.define': (doc.atmospheres ??= {})[cmd.id] = { name: cmd.name, style: atmosphereStyle(mergeJson(mergeJson(pomorog, doc.style ?? {}), { ...cmd.style, bodySceneLighting: true, inkFog: true }) as NonNullable<SceneDoc['style']>) }; break
+      case 'atmosphere.define': (doc.atmospheres ??= {})[cmd.id] = { name: cmd.name, style: atmosphereStyle(mergeJson(mergeJson(DEFAULT_ASCII_STYLE, doc.style ?? {}), { ...cmd.style, bodySceneLighting: true, inkFog: true }) as NonNullable<SceneDoc['style']>) }; break
       case 'atmosphere.apply': {
         const asset = doc.atmospheres?.[cmd.id]
         if (!asset) throw new Error('Atmosphere not found: ' + cmd.id)
@@ -124,7 +124,7 @@ export function applyCommands(source: SceneDoc, input: unknown): SceneDoc {
         else Object.assign(item.options, asset.style)
         break
       }
-      case 'atmosphere.set': doc.style = mergeJson(mergeJson(pomorog, doc.style ?? {}), { ...cmd.style, bodySceneLighting: true, inkFog: true }) as SceneDoc['style']; break
+      case 'atmosphere.set': doc.style = mergeJson(mergeJson(DEFAULT_ASCII_STYLE, doc.style ?? {}), { ...cmd.style, bodySceneLighting: true, inkFog: true }) as SceneDoc['style']; break
       case 'camera.define': (doc.cameras ??= {})[cmd.id] = structuredClone(cmd.camera) as unknown as NonNullable<SceneDoc['cameras']>[string]; break
       case 'camera.update':
         if (!doc.cameras?.[cmd.id]) throw new Error('Camera not found: ' + cmd.id)

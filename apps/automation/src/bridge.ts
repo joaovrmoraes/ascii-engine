@@ -1,9 +1,8 @@
 import { createServer } from 'node:http'
 import { randomUUID } from 'node:crypto'
 import { WebSocketServer, WebSocket } from 'ws'
-// Relative source lets Vite bundle this schema into its Node config too.
-// Importing the package root would pull renderer modules into the service.
-import { assertSafeJson, rpcSchema } from '../../../packages/authoring/src/schema'
+// The schema entry keeps the transport independent of document rendering.
+import { assertSafeJson, rpcSchema } from '@ascii-engine/authoring/schema'
 
 const MAX_BYTES = 64 * 1024 * 1024
 const origins = new Set(['http://localhost:1440', 'http://127.0.0.1:1440', 'tauri://localhost', 'http://tauri.localhost', 'https://tauri.localhost'])
@@ -21,8 +20,8 @@ export async function startBridge(port = 1442) {
     if (!allowedOrigin(req.headers.origin) || !['127.0.0.1', 'localhost', '[::1]'].includes((req.headers.host ?? '').replace(/:\d+$/, ''))) { reply(403, { error: 'The API only accepts local access from allowed origins.' }); return }
     if (req.method === 'GET' && req.url === '/v1/sessions') { reply(200, [...sessions].map(([sessionId, s]) => ({ sessionId, name: s.name, revision: s.revision, preview: s.preview }))); return }
     if (req.method === 'GET' && req.url === '/health') { reply(200, { name: 'ascii-engine-authoring', version: 1 }); return }
-    if (req.method !== 'POST' || req.url !== '/v1/request') { reply(404, { error: 'Use GET /v1/sessions ou POST /v1/request.' }); return }
-    if (!req.headers['content-type']?.startsWith('application/json')) { reply(415, { error: 'Envie application/json.' }); return }
+    if (req.method !== 'POST' || req.url !== '/v1/request') { reply(404, { error: 'Use GET /v1/sessions or POST /v1/request.' }); return }
+    if (!req.headers['content-type']?.startsWith('application/json')) { reply(415, { error: 'Send application/json.' }); return }
     try {
       const chunks: Buffer[] = []; let bytes = 0
       for await (const chunk of req) { bytes += chunk.length; if (bytes > MAX_BYTES) { reply(413, { error: '64 MB limit per request.' }); return }; chunks.push(Buffer.from(chunk)) }

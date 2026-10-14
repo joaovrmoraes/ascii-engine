@@ -2,7 +2,7 @@ import * as THREE from 'three'
 import { createAsciiPass, type AsciiPassHook } from './ascii'
 import { ABSENT, createIllumination, MAX_INK_LIGHTS } from './illumination'
 import type { LightObstacle } from './exploration'
-import { pomorog, type AsciiStyle } from './presets/pomorog'
+import { DEFAULT_ASCII_STYLE, engineStyle, type AsciiStyle } from './config'
 import { nodeGlyphStyle, resolveGlyphStyle, type GlyphStyle, type ObjectTypeStyle } from './style'
 import type { SurfaceKind } from './surface'
 import { bodyUniforms, glyphBody, removeGlyphBody, updateGlyphBodies, updateSkinnedBody, type BodyRamp } from './techniques/body'
@@ -12,11 +12,12 @@ import { markScreen } from './techniques/screen'
 import { surfaceMaterial } from './techniques/surface'
 import { createWater, type WaterOptions, type WaterShape } from './techniques/water'
 import { createRainStreaks, type RainStreaks } from './weather/rain'
-import { createEffectSystem, type EffectSystem } from './fx/effects'
-import { POMOROG_EFFECTS } from './fx/presets'
+import { createEffectSystem, type EffectDef, type EffectSystem } from './fx/effects'
 
 export interface AsciiEngineOptions {
   style?: Partial<AsciiStyle>
+  /** Optional recipes supplied by the consumer. The engine registers no game library. */
+  effects?: readonly EffectDef[]
   /** Device pixel ratio cap (Pomorog: between 1 and 1.5). */
   maxPixelRatio?: number
   /** Biome effects for the screen pass. */
@@ -65,7 +66,8 @@ export function createAsciiEngine(canvas: HTMLCanvasElement, options: AsciiEngin
   // plane count never changes, so materials never switch programs per frame.
   renderer.clippingPlanes = [new THREE.Plane(new THREE.Vector3(0, 1, 0), 1e9)]
 
-  let style: AsciiStyle = { ...pomorog, ...options.style }
+  const initialStyle = engineStyle(options.style)
+  let style = structuredClone(initialStyle)
   const scene = new THREE.Scene()
   /** Layers drawn after the screen pass, with depth (Pomorog render order). */
   const carpetScene = new THREE.Scene(), waterScene = new THREE.Scene(), particleScene = new THREE.Scene()
@@ -133,7 +135,7 @@ export function createAsciiEngine(canvas: HTMLCanvasElement, options: AsciiEngin
   function shareIllumination(uniforms: Record<string, THREE.IUniform>) { Object.assign(uniforms, illumination.uniforms) }
   shareIllumination(ascii.material.uniforms)
   shareIllumination(bodies)
-  const lightPosition = new THREE.Vector3(), originalMoonColor = new THREE.Color(pomorog.moon.color)
+  const lightPosition = new THREE.Vector3(), originalMoonColor = new THREE.Color(DEFAULT_ASCII_STYLE.moon.color)
 
   function resize() {
     width = Math.max(canvas.clientWidth, 1); height = Math.max(canvas.clientHeight, 1)
@@ -424,7 +426,7 @@ export function createAsciiEngine(canvas: HTMLCanvasElement, options: AsciiEngin
     setStyle(next: Partial<AsciiStyle>, options: { replace?: boolean } = {}) {
       const interior = style.interior
       if (options.replace) for (const name of Object.keys(types)) delete types[name]
-      style = { ...(options.replace ? structuredClone(pomorog) : style), ...next }
+      style = { ...(options.replace ? structuredClone(initialStyle) : style), ...next }
       if (options.replace) Object.assign(types, style.types)
       if (next.types) Object.assign(types, next.types)
       applyStyle()
@@ -476,13 +478,13 @@ export function createAsciiEngine(canvas: HTMLCanvasElement, options: AsciiEngin
     },
     /** Extra ink for one particle layer (cloud or rain), multiplied by the style brightness. */
     setGain(layer: GlyphCloud | RainStreaks, gain: number) { gains.set(layer, gain) },
-    /** Effect system (§3.3): `engine.fx.play('fogueira', alvo)`; Pomorog effects pre-registered. */
+    /** Lazy effect system; registers only the recipes supplied by the consumer. */
     get fx(): EffectSystem {
       if (!effects) {
         effectLetters = engine.createParticles(8000)
         engine.add(effectLetters.mesh, { glyph: 'particle' })
         effects = createEffectSystem(effectLetters, scene)
-        effects.register(...POMOROG_EFFECTS)
+        effects.register(...(options.effects ?? []))
       }
       return effects
     },
@@ -524,12 +526,12 @@ export function createAsciiEngine(canvas: HTMLCanvasElement, options: AsciiEngin
       const ink = illumination.uniforms
       const tint = style.inkTint ?? (style.atmosphere === 'dusk' ? [1.25, .8, .65] : style.atmosphere === 'ember' ? [1.5, .65, .36] : [1, 1, 1])
       ink.atmosphereTint.value.setRGB(tint[0], tint[1], tint[2])
-      bodies.sunPower.value = style.bodySceneLighting ? style.moon.intensity / pomorog.moon.intensity : 1
+      bodies.sunPower.value = style.bodySceneLighting ? style.moon.intensity / DEFAULT_ASCII_STYLE.moon.intensity : 1
       if (style.bodySceneLighting) {
         bodies.sunColor.value.setHex(style.moon.color)
         bodies.sunColor.value.r /= originalMoonColor.r; bodies.sunColor.value.g /= originalMoonColor.g; bodies.sunColor.value.b /= originalMoonColor.b
       } else bodies.sunColor.value.setRGB(1,1,1)
-      bodies.moon.value.set(...(style.bodySceneLighting ? style.moon.position : pomorog.moon.position)).normalize()
+      bodies.moon.value.set(...(style.bodySceneLighting ? style.moon.position : DEFAULT_ASCII_STYLE.moon.position)).normalize()
       ink.inkFogDensity.value = style.inkFog ? style.fog?.density ?? 0 : 0
       ink.inkFogColor.value.setHex(style.fog?.color ?? style.background).convertLinearToSRGB()
       let count = 0

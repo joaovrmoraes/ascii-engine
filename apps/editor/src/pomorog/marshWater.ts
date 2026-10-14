@@ -1,8 +1,6 @@
 import * as THREE from 'three'
-import { surfaceAlpha } from '../surface'
-import type { GlyphCloud } from '../techniques/particle'
-import { createWaterReflection } from '../techniques/water'
-import { createRippleField } from '../world/rippleField'
+import { surfaceAlpha, createWaterReflection, type GlyphCloud } from '@ascii-engine/core/techniques'
+import { createRippleField } from '@ascii-engine/core/world'
 
 /**
  * "Old marsh" water preset (§3.2), the approved Pomorog swamp

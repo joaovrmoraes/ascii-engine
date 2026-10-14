@@ -1,5 +1,6 @@
 import * as THREE from 'three'
-import { forestFloorMaterial, forestMeadowCover, type AsciiEngine } from '@ascii-engine/core'
+import { forestFloorMaterial, forestMeadowCover } from '@ascii-engine/core/pomorog'
+import { type AsciiEngine } from '@ascii-engine/core'
 
 /** Height of the test relief: a hill, a ridge with a steep face and a hollow. */
 export function reliefHeight(x: number, z: number) {

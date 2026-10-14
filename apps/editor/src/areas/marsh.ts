@@ -1,5 +1,6 @@
 import * as THREE from 'three'
-import { createMarshWater, createRain, marshShoreGLSL, stormAt, type AsciiEngine, type AsciiPassHook, type GroundCover, type MarshIsland, type SurfaceKind } from '@ascii-engine/core'
+import { createMarshWater, marshShoreGLSL, type MarshIsland } from '../pomorog/marshWater'
+import { createRain, stormAt, type AsciiEngine, type AsciiPassHook, type GroundCover, type SurfaceKind } from '@ascii-engine/core'
 import { createTree, declare } from '../scene/pomorogKit'
 import { createShoreDetails } from '../scene/shoreDetails'
 import { createFixedMapActors, legacyFloor } from './common'

@@ -1,6 +1,6 @@
 import * as THREE from 'three'
 import type { AsciiEngine } from '../engine'
-import { snowflake } from '../presets/snow'
+import { snowflake } from './snow'
 import { createRain } from './rain'
 
 export interface SceneEnvironment { weather: 'none' | 'rain' | 'snow'; intensity?: number }

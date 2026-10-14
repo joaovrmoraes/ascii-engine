@@ -4,6 +4,46 @@ Entries describe the state at each stage. Earlier limitations may have been
 resolved later; START.md and the editor guide describe the current scope.
 Historical filenames, reference IDs and captured interfaces are preserved.
 
+## 2026-10-14 — Enforced package boundaries and explicit presets
+
+After Pages/MCP publication, the owner selected the package-boundary portion
+of the architecture review. Added [ADR 0003](decisions/0003-package-boundaries.md)
+and updated START and consumer guidance.
+
+- Moved combat timing/feedback, marsh contact state and snow-track policy
+  from core presets to editor src/pomorog. Shared combat timing now comes
+  from the existing editor motion module. Recipes and draw order are intact.
+- Moved AsciiStyle and type-free defaults into config.ts. The renderer
+  owns copied settings and receives its type/effect libraries explicitly.
+  The editor factory supplies Pomorog for the map and isolated previews.
+- Separated generic heat-grid data and snow particle sampling from optional
+  content. Added core /techniques, /world, /fx, /presets and /pomorog entries;
+  the root retains generic exports and no longer imports optional presets.
+- Published the lightweight authoring/schema and automation/bridge entries.
+  Transport and Vite imports use package names; the editor's automation
+  dependency is development-only. Updated the workspace lockfile.
+- Added a package-direction/import-graph guard to pnpm check and meaningful
+  config ownership tests. A dynamic cross-package negative probe failed as
+  expected; standalone WebGL verified that no game library is implicit.
+
+Validation: pnpm check passed (112 tests, types/build and 41-module boundary
+guard), 72 texture WebGL assertions, 31 actual MCP assertions and the full
+authoring regression passed. Cold dev startup through public entries passed.
+All six controlled scene comparisons are below .04, reference exactly zero.
+Initial snow capture variation reproduced on unchanged original main;
+fresh original/current comparison was .0071. Historical baselines are intact.
+See [evidence and limits](captures/package-boundaries-2026-10-14/README.md).
+Orca direct rendering/runtime and cdpshot succeeded; Orca full-window capture
+still timed out. Native desktop and compiled consumer distributions remain
+unverified. The published v0.1.0 tag retains its original source API.
+
+Follow-ups: large-file decomposition/formatting, editor logic unit coverage,
+historical media storage, live document filenames and shared skill storage.
+Checked that docs/captures/diff contains no tracked files. No history rewrite
+or reference-archive changes were performed.
+New full comparison screenshots are retained as a release evidence archive;
+only logs/results and representative images enter this stage's Git commit.
+
 ## 2026-10-14 — Public Texture Studio and AI/MCP showcase
 
 The owner noticed the release had not updated the Pages gallery and asked to
@@ -34,6 +74,8 @@ playback, so GPU Chromium supplied that evidence. See
 The owner selected package-boundary corrections as the next stage after
 Pages/MCP publication. Git history/media migration and broad formatting remain
 separate follow-up work. Native desktop remains unverified.
+Pages commit 957f64c completed its build; live root/watch pages, public release
+video playback and mobile layout were verified successfully.
 
 ## 2026-10-14 — Texture Studio release publication
 
