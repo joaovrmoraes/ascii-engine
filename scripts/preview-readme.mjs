@@ -10,13 +10,14 @@ const githubPages = process.argv.includes('--github-pages')
 const output = join(root, githubPages ? 'docs/watch.html' : 'docs/showcase/index.html')
 const escape = text => text.replace(/[&<>\"]/g, char => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[char])
 const slug = text => text.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '')
+const videoSources = new Map()
 
 // Renders the syntax used by this README without extra dependencies.
 function inline(text) {
   const tokens = []
   const token = html => { tokens.push(html); return `\u0000${tokens.length - 1}\u0000` }
   text = text.replace(/\[!\[([^\]]*)\]\(([^)]+\.gif)\)\]\(https:\/\/joaovrmoraes\.github\.io\/ascii-engine\/watch\.html#[^)]+\)/g, (_, label, poster) => {
-    const src = poster.replace('/gifs/', '/videos/').replace(/\.gif$/, '.mp4')
+    const src = videoSources.get(poster) ?? poster.replace('/gifs/', '/videos/').replace(/\.gif$/, '.mp4')
     return token(`<video controls playsinline preload="none" poster="${escape(poster)}" aria-label="${escape(label)}" src="${escape(src)}"><a href="${escape(src)}">${escape(label)}</a></video>`)
   })
   text = text.replace(/\[!\[([^\]]*)\]\(([^)]+)\)\]\(([^)]+\.mp4)\)/g, (_, label, poster, src) =>
@@ -54,20 +55,31 @@ function render(markdown) {
 }
 
 function generate() {
-  let body = render(readFileSync(join(root, 'README.md'), 'utf8'))
+  const markdown = readFileSync(join(root, 'README.md'), 'utf8')
+  videoSources.clear()
+  for (const chapter of markdown.split(/^### /m).slice(1)) {
+    const preview = /\[!\[[^\]]*\]\(([^)]+\.gif)\)\]/.exec(chapter)
+    const download = /\[Download the full video\]\(([^)]+)\)/.exec(chapter)
+    if (preview && download) videoSources.set(preview[1], download[1].replace(/\?raw=true$/, ''))
+  }
+  const navigation = [...markdown.matchAll(/^### \d{2} · (.+)$/gm)]
+    .map(([heading, label]) => `<a href="#${slug(heading.slice(4))}">${escape(label)}</a>`).join('')
+  let body = render(markdown)
   if (githubPages) body = body.replace(/\b(src|poster|href)="([^"]+)"/g, (_, attribute, url) => {
     if (/^https?:|^#/.test(url)) return `${attribute}="${url}"`
     if (/\.md(?:\?|$)/.test(url)) return `${attribute}="https://github.com/joaovrmoraes/ascii-engine/blob/main/${url}"`
     return `${attribute}="${url.replace(/^docs\//, '')}"`
   })
   mkdirSync(dirname(output), { recursive: true })
-  writeFileSync(output, `<!doctype html>
+  const html = `<!doctype html>
 <html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">${githubPages ? '' : '<base href="../../">'}<title>ASCII Engine — ${githubPages ? 'Feature videos' : 'README'}</title>
 <style>
 :root{color-scheme:dark}*{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;background:#0d1117;color:#e6edf3;font:16px/1.65 system-ui,-apple-system,sans-serif}main{max-width:1080px;margin:32px auto;padding:40px 48px;border:1px solid #30363d;border-radius:8px}header{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap;color:#919ba7;font-size:13px;border-bottom:1px solid #30363d;padding-bottom:18px;margin-bottom:28px}h1{font-size:40px;letter-spacing:-1.2px;margin:0 0 14px}h2{font-size:26px;margin:48px 0 16px;padding-bottom:10px;border-bottom:1px solid #30363d}h3{font-size:22px;margin:42px 0 12px}p{margin:14px 0}a{color:#8bbaff;text-decoration:none}a:hover{text-decoration:underline}img,video{display:block;width:100%;height:auto;border-radius:6px;background:#050708}video{border:1px solid #30363d;aspect-ratio:16/9}code{font:14px/1.6 ui-monospace,monospace;background:#20262e;padding:3px 6px;border-radius:4px}pre{padding:18px 20px;overflow:auto;border-radius:6px;background:#161b22}pre code{padding:0;background:none}li{margin:7px 0}ul{padding-left:24px}nav{display:flex;flex-wrap:wrap;gap:8px 20px;margin:20px 0;font-size:14px}h1+p{font-size:22px}h1+p strong{font-weight:500}h3+ p{color:#b4beca}@media(max-width:700px){main{margin:0;border:0;border-radius:0;padding:24px 18px}h1{font-size:34px}h2{font-size:23px}header{font-size:12px}}
 </style></head><body><main><header><span>ASCII ENGINE / ${githubPages ? 'FEATURE VIDEOS' : 'README PREVIEW'}</span><a href="${githubPages ? 'https://github.com/joaovrmoraes/ascii-engine' : 'README.md'}">${githubPages ? 'View on GitHub' : 'Open Markdown'}</a></header>
-<nav aria-label="Videos"><a href="#01-terrain">Terrain</a><a href="#02-water-paths-and-wind">Water and wind</a><a href="#03-objects-and-composition">Objects</a><a href="#04-effects-and-lighting">Effects</a><a href="#05-atmosphere">Atmosphere</a><a href="#06-cameras-preview-and-export">Cameras and export</a></nav>
-${body}</main><script>document.querySelectorAll('video').forEach(video=>video.addEventListener('play',()=>document.querySelectorAll('video').forEach(other=>{if(other!==video)other.pause()})));</script></body></html>\n`)
+<nav aria-label="Videos">${navigation}<a href="#create-with-ai-through-mcp">AI / MCP</a></nav>
+${body}</main><script>document.querySelectorAll('video').forEach(video=>video.addEventListener('play',()=>document.querySelectorAll('video').forEach(other=>{if(other!==video)other.pause()})));</script></body></html>\n`
+  writeFileSync(output, html)
+  if (githubPages) writeFileSync(join(root, 'docs/index.html'), html)
 }
 generate()
 if (process.argv.includes('--generate-only')) process.exit(0)

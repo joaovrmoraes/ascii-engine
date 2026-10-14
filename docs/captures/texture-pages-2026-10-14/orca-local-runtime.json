@@ -1,0 +1,11 @@
+{
+  "id": "57aeddad-44ca-4b04-85f0-6ab319b66dae",
+  "ok": true,
+  "result": {
+    "result": "{\"players\":7,\"mcp\":true,\"video\":[{\"source\":\"https://github.com/joaovrmoraes/ascii-engine/releases/download/v0.1.0/07-textures.mp4\",\"readyState\":4,\"width\":1920,\"height\":1080,\"duration\":36.333333,\"error\":null}],\"visibility\":\"visible\"}",
+    "origin": "http://localhost:4178/docs/watch.html#07-texture-studio"
+  },
+  "_meta": {
+    "runtimeId": "327bd229-b588-4def-b562-15b9bd27a70c"
+  }
+}

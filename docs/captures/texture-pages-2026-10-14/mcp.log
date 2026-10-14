@@ -1,0 +1,32 @@
+$ node scripts/verify-api.mjs docs/captures/texture-pages-2026-10-14/mcp
+PASS official MCP handshake and all 14 tools discoverable
+PASS isolated browser registered, session selected explicitly
+PASS MCP discovers actual editor prefab library
+PASS machine-readable command schema
+PASS complete batch validates without mutation
+PASS MCP creates terrain, continuous slope water, objects, custom effect, atmosphere and weather
+PASS pending preview visibly locks editing and offers accept/cancel
+PASS MCP water impact is transient and preserves document revision
+PASS stale revision rejected without overwriting scene
+PASS preview cancel returns to saved scene
+PASS cancel restores entire original document
+PASS real MCP defines and applies Unicode, font, visibility and palette texture controls
+PASS MCP saves texture preview lights without applying them to scene lighting
+PASS entire AI batch undoes in a single step
+PASS redo restores full authored scene
+PASS unknown prefab and broken model preserve scene and GPU resources
+PASS MCP imports local GLTF with explicit companion bytes
+PASS MCP inspects imported mesh parts
+PASS MCP applies a reusable texture to an imported named part
+PASS MCP returns actual rendered scene as image content
+PASS MCP atmosphere appears in asset catalog
+PASS MCP inspects a saved camera
+PASS MCP selects a saved composition camera
+PASS MCP captures the isolated effect stage
+PASS API stage switch isolates preview
+PASS MCP export retains texture assets, studio lights and named-part appearances
+PASS export embeds models, effects, atmosphere, terrain and slope water
+PASS export refuses accidental file overwrite
+PASS export and reopen through MCP preserve complete document
+PASS human UI edits advance revision and block stale AI writes
+PASS no uncaught page exceptions

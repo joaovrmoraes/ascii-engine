@@ -1,0 +1,219 @@
+{
+  "version": 1,
+  "name": "Texture Studio showcase",
+  "style": {
+    "cellSize": 6,
+    "brightness": 1,
+    "background": 1384491,
+    "fog": {
+      "color": 131330,
+      "density": 0.012
+    },
+    "hemisphere": {
+      "sky": 12766916,
+      "ground": 3420961,
+      "intensity": 1.25
+    },
+    "moon": {
+      "color": 14739404,
+      "intensity": 2.2,
+      "position": [
+        -5,
+        12,
+        7
+      ],
+      "shadowIntensity": 0.62,
+      "shadowExtent": 16,
+      "mapSize": 1024
+    },
+    "fill": {
+      "color": 10207157,
+      "intensity": 0.3,
+      "position": [
+        6,
+        6,
+        -7
+      ]
+    },
+    "interior": false,
+    "bodyAmbient": 0.3,
+    "bodyLantern": 0.7,
+    "atmosphere": "moon",
+    "glyphs": {},
+    "types": {
+      "tree": {
+        "style": {
+          "glyph": "surface",
+          "surface": "bark"
+        },
+        "parts": {
+          "crown": {
+            "glyph": "body",
+            "surface": "foliage",
+            "size": 0.19
+          },
+          "trunk": {
+            "glyph": "surface",
+            "surface": "bark"
+          }
+        }
+      },
+      "rock": {
+        "style": {
+          "glyph": "body",
+          "surface": "stone",
+          "size": 0.19
+        }
+      },
+      "creature": {
+        "style": {
+          "glyph": "body",
+          "size": 0.155
+        }
+      },
+      "hero": {
+        "style": {
+          "glyph": "screen",
+          "surface": "actor"
+        }
+      },
+      "prop": {
+        "style": {
+          "glyph": "surface",
+          "surface": "wood"
+        }
+      },
+      "ground": {
+        "style": {
+          "glyph": "surface",
+          "surface": "earth"
+        }
+      },
+      "arvore": {
+        "style": {
+          "glyph": "surface",
+          "surface": "bark"
+        },
+        "parts": {
+          "crown": {
+            "glyph": "body",
+            "surface": "foliage",
+            "size": 0.19
+          },
+          "trunk": {
+            "glyph": "surface",
+            "surface": "bark"
+          }
+        }
+      }
+    }
+  },
+  "objects": [
+    {
+      "id": "tree",
+      "prefab": "arvore",
+      "name": "Tree",
+      "position": [
+        0,
+        0,
+        0
+      ],
+      "seed": 2654483778,
+      "visible": true,
+      "rotation3": [
+        0,
+        0,
+        0
+      ],
+      "scale3": [
+        1,
+        1,
+        1
+      ],
+      "options": {
+        "type": "arvore",
+        "parts": {
+          "crown": {
+            "size": 0.3,
+            "gap": 0,
+            "alphabet": " ·↑↗→↘↓↙←↖",
+            "font": "\"DejaVu Sans\", sans-serif",
+            "fontWeight": 700,
+            "spacing": 1.4,
+            "rotation": 0.2617993877991494,
+            "density": 0.8,
+            "open": true,
+            "color": 7591584,
+            "strength": 1.25,
+            "contrast": 1.3,
+            "palette": [
+              4488821,
+              13041598
+            ]
+          }
+        }
+      }
+    }
+  ],
+  "textures": {
+    "texture-6e30c385-ce8c-40fe-9bbe-e363c371b0ae": {
+      "name": "Emerald arrows",
+      "style": {
+        "size": 0.3,
+        "color": 7591584,
+        "alphabet": " ·↑↗→↘↓↙←↖",
+        "font": "\"DejaVu Sans\", sans-serif",
+        "fontWeight": 700,
+        "open": true,
+        "rotation": 0.2617993877991494,
+        "palette": [
+          4488821,
+          13041598
+        ],
+        "spacing": 1.4,
+        "density": 0.8,
+        "strength": 1.25,
+        "gap": 0,
+        "contrast": 1.3
+      },
+      "previewLighting": {
+        "atmosphere": "moon",
+        "bodySceneLighting": true,
+        "inkFog": true,
+        "brightness": 1,
+        "background": 1384491,
+        "fog": {
+          "color": 131330,
+          "density": 0.012
+        },
+        "hemisphere": {
+          "sky": 12766916,
+          "ground": 3420961,
+          "intensity": 1.25
+        },
+        "moon": {
+          "color": 6483886,
+          "intensity": 2,
+          "position": [
+            4.934091071002871,
+            12.000000000000002,
+            7.046612328136814
+          ],
+          "shadowIntensity": 0.62,
+          "shadowExtent": 16,
+          "mapSize": 1024
+        },
+        "fill": {
+          "color": 10207157,
+          "intensity": 0.3,
+          "position": [
+            6,
+            6,
+            -7
+          ]
+        },
+        "bodyAmbient": 0.3
+      }
+    }
+  }
+}

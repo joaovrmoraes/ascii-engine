@@ -9,6 +9,20 @@ This covers visual features implemented in the editor. The API does not
 create game rules, install a Pomorog importer or add unsupported renderer
 features.
 
+## Can AI author the whole scene?
+
+Yes: an MCP-capable agent can create, inspect, refine, save and reopen a
+complete visual scene using the supported engine features. `scene.patch`
+and `scene.replace` expose every `SceneDoc` field, including advanced
+settings without a dedicated command. Manual clicks are unnecessary for
+these document operations once the local editor and MCP client are connected.
+
+This is full access to the supported visual document, rather than a promise
+that every interface gesture or future feature is implemented as an MCP tool.
+Panel docking, font installation, new renderer features, gameplay logic and
+native application packaging are outside this server's tool set. Web/desktop
+packaging uses the project CLI. `scene_export` saves the editable document.
+
 ## Start and connect
 
 From the project root:
@@ -91,6 +105,7 @@ Operations include:
 | Resources | `effect.define`, `asset.define`, `resource.remove` |
 | Environment | `atmosphere.set`, `environment.set` |
 | Saved atmospheres | `atmosphere.define`, `atmosphere.apply` |
+| Saved textures | `texture.define`, `texture.apply` |
 | Cameras | `camera.define`, `camera.update`, `camera.remove`, `camera.activate` |
 
 `scene.patch` recursively merges objects and replaces entire arrays.

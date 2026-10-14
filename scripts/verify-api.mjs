@@ -69,20 +69,22 @@ try {
   let state=await invoke('scene_read',{full:true})
   const initial=state.document
   const commands=[
-    {op:'scene.replace',document:{version:1,name:'Environment criado pelo MCP',objects:[]}},
+    {op:'scene.replace',document:{version:1,name:'MCP-authored clearing',objects:[]}},
     {op:'terrain.create',size:24,resolution:65},
     {op:'terrain.stroke',strokes:[{brush:'raise',x:1,z:-2,radius:5,strength:2},{brush:'paint',x:-3,z:0,radius:2,strength:1,layer:1}]},
     {op:'scene.patch',patch:{carpet:{count:35000,seed:48}}},
     {op:'water.paint',points:[{x:1,z:-2},{x:0,z:0},{x:-3,z:2}],radius:1,mode:'terrain'},
     {op:'object.add',object:{id:'fire',prefab:'fogueira',position:[-3,0,-1]}},
     {op:'object.add',object:{id:'rock',prefab:'pedregulho',position:[0,1.2,-3]}},
+    {op:'texture.define',id:'mcp-symbols',name:'MCP arrow ink',style:{alphabet:' ↑↗→↘↓↙←↖',font:'"DejaVu Sans", sans-serif',fontWeight:700,open:true,spacing:1.2,palette:[0x55aaff,0xaaffdd],lighting:'scene',rotation:.15},previewLighting:{brightness:1.1,background:0x080a10}},
+    {op:'texture.apply',id:'mcp-symbols',objectId:'rock'},
     {op:'object.scatter',prefab:'arvore',count:8,seed:123,bounds:{minX:4,maxX:8,minZ:-6,maxZ:2},scale:[.7,1.1]},
-    {op:'effect.define',id:'fx:custom-blue',effect:{name:'Luz azul',duration:2,loop:true,emitters:[{rate:12,life:2,shape:{kind:'sphere',radius:.25},velocity:[0,.5,0],glyphs:'.+*',color:[.2,.6,1],size:.16,glow:2}],light:{color:0x3388ff,intensity:8,distance:7,offset:[0,.7,0]}}},
+    {op:'effect.define',id:'fx:custom-blue',effect:{name:'Blue sparks',duration:2,loop:true,emitters:[{rate:12,life:2,shape:{kind:'sphere',radius:.25},velocity:[0,.5,0],glyphs:'.+*',color:[.2,.6,1],size:.16,glow:2}],light:{color:0x3388ff,intensity:8,distance:7,offset:[0,.7,0]}}},
     {op:'object.add',object:{id:'blue',prefab:'fx:custom-blue',position:[-2,0,3]}},
     {op:'atmosphere.set',style:{moon:{intensity:1.9,color:0xaabbff},inkTint:[.85,.95,1],fog:{color:0x0a1020,density:.018}}},
-    {op:'atmosphere.define',id:'blue-night',name:'Noite azul',style:{moon:{intensity:2.2}}},
+    {op:'atmosphere.define',id:'blue-night',name:'Blue night',style:{moon:{intensity:2.2}}},
     {op:'atmosphere.apply',id:'blue-night'},
-    {op:'camera.define',id:'wide',camera:{name:'Plano MCP',projection:'orthographic',position:[10,12,16],rotation:[-.6,.3,0],span:10,aspect:16/9}},
+    {op:'camera.define',id:'wide',camera:{name:'MCP wide shot',projection:'orthographic',position:[10,12,16],rotation:[-.6,.3,0],span:10,aspect:16/9}},
     {op:'camera.activate',id:'wide'},
     {op:'environment.set',weather:'rain',intensity:.2},
   ]
@@ -94,13 +96,16 @@ try {
   const impact=await invoke('water_disturb',{index:0,x:0,z:0,strength:.2,radius:.8});assert(impact.revision===state.revision,'MCP water impact is transient and preserves document revision')
   await shot('mcp-previa')
   await invoke('scene_apply',{revision:state.revision-1,commands:[{op:'scene.patch',patch:{name:'Stale'}}],preview:false},true)
-  assert((await invoke('scene_read')).scene.name==='Environment criado pelo MCP','stale revision rejected without overwriting scene')
+  assert((await invoke('scene_read')).scene.name==='MCP-authored clearing','stale revision rejected without overwriting scene')
   const canceled=await invoke('scene_preview',{revision:state.revision,action:'cancel'})
   assert(!canceled.preview,'preview cancel returns to saved scene')
   assert(JSON.stringify((await invoke('scene_read',{full:true})).document)===JSON.stringify(initial),'cancel restores entire original document')
   state=await invoke('scene_apply',{revision:canceled.revision,commands,preview:true})
   state=await invoke('scene_preview',{revision:state.revision,action:'accept'})
   const committed=(await invoke('scene_read',{full:true})).document
+  const texture=committed.textures['mcp-symbols'],rock=committed.objects.find(object=>object.id==='rock')
+  assert(texture.style.alphabet.includes('↑')&&texture.style.fontWeight===700&&texture.style.open&&texture.style.palette.length===2&&rock.options.alphabet===texture.style.alphabet,'real MCP defines and applies Unicode, font, visibility and palette texture controls')
+  assert(texture.previewLighting.brightness===1.1&&committed.style.brightness!==1.1,'MCP saves texture preview lights without applying them to scene lighting')
   state=await invoke('scene_history',{revision:state.revision,action:'undo'})
   assert(JSON.stringify((await invoke('scene_read',{full:true})).document)===JSON.stringify(initial),'entire AI batch undoes in a single step')
   state=await invoke('scene_history',{revision:state.revision,action:'redo'})
@@ -117,18 +122,19 @@ try {
   state=await invoke('assets_import',{revision:state.revision,paths:[gltf,bin],preview:false})
   const imported=state.scene.assets.find(a=>a.name==='model.gltf')
   assert(!!imported,'MCP imports local GLTF with explicit companion bytes')
-  state=await invoke('scene_apply',{revision:state.revision,preview:false,commands:[{op:'object.add',object:{id:'imported',prefab:imported.id,position:[-4,0,3],options:{glyph:'surface',surface:'stone'}}}]})
+  state=await invoke('scene_apply',{revision:state.revision,preview:false,commands:[{op:'object.add',object:{id:'imported',prefab:imported.id,position:[-4,0,3],options:{glyph:'surface',surface:'stone'}}},{op:'texture.apply',id:'mcp-symbols',objectId:'imported',part:'blade'}]})
   const inspected=await invoke('object_inspect',{id:'imported'})
   assert(inspected.parts.some(p=>p.name==='blade'),'MCP inspects imported mesh parts')
+  assert((await invoke('scene_read',{full:true})).document.objects.find(object=>object.id==='imported').options.parts.blade.alphabet===texture.style.alphabet,'MCP applies a reusable texture to an imported named part')
   const capture=await invoke('editor_capture')
   await writeFile(join(output,'mcp-cena.png'),Buffer.from(capture.content[0].data,'base64'))
   assert(capture.content[0].mimeType==='image/png'&&capture.content[0].data.length>10000,'MCP returns actual rendered scene as image content')
   assert((await invoke('engine_reference',{topic:'catalog'})).some(asset=>asset.id==='blue-night'&&asset.kind==='atmosphere'),'MCP atmosphere appears in asset catalog')
   await invoke('editor_view',{cameraId:'wide'})
-  assert((await invoke('object_inspect',{id:'wide'})).camera.name==='Plano MCP','MCP inspects a saved camera')
+  assert((await invoke('object_inspect',{id:'wide'})).camera.name==='MCP wide shot','MCP inspects a saved camera')
   const cameraCapture=await invoke('editor_capture')
   await writeFile(join(output,'mcp-camera.png'),Buffer.from(cameraCapture.content[0].data,'base64'))
-  await check('MCP selects a saved composition camera', `document.querySelector('#app > canvas').dataset.cameraView==='Plano MCP' && engine.camera.position.x===10`)
+  await check('MCP selects a saved composition camera', `document.querySelector('#app > canvas').dataset.cameraView==='MCP wide shot' && engine.camera.position.x===10`)
   await invoke('editor_view',{cameraId:null})
   await invoke('editor_view',{studio:'effects'})
   const effectCapture=await invoke('editor_capture')
@@ -139,6 +145,7 @@ try {
   const exported=join(output,'mcp-cenario.pomorog.json')
   await invoke('scene_export',{path:exported,overwrite:true})
   const data=JSON.parse(await readFile(exported,'utf8'))
+  assert(data.textures['mcp-symbols'].style.fontWeight===700&&data.textures['mcp-symbols'].previewLighting.brightness===1.1&&data.objects.find(object=>object.id==='imported').options.parts.blade.open,'MCP export retains texture assets, studio lights and named-part appearances')
   assert(data.activeCamera==='wide'&&data.cameras.wide.span===10&&data.atmospheres['blue-night'].style.moon.intensity===2.2&&data.effects['fx:custom-blue']&&data.assets[imported.id].source.startsWith('data:')&&data.waters[0].shape.mask.heights.length===65*65,'export embeds models, effects, atmosphere, terrain and slope water')
   await invoke('scene_export',{path:exported},true)
   assert(JSON.parse(await readFile(exported,'utf8')).name===data.name,'export refuses accidental file overwrite')

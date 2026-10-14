@@ -4,6 +4,37 @@ Entries describe the state at each stage. Earlier limitations may have been
 resolved later; START.md and the editor guide describe the current scope.
 Historical filenames, reference IDs and captured interfaces are preserved.
 
+## 2026-10-14 — Public Texture Studio and AI/MCP showcase
+
+The owner noticed the release had not updated the Pages gallery and asked to
+make AI authoring visible. Confirmed six old chapters and a 404 at the Pages
+root. Added chapter 07 and a prominent AI/MCP workflow with setup, an example
+prompt, real scene capture and explicit coverage of supported visual features.
+
+- Recorded the current English Texture Studio in isolated GPU Chromium:
+  object/part, letters/fonts, layout, letters-only, ink/palette, preview lights
+  and Apply/Save/Assets. Preserved the owner's normal draft.
+- Uploaded the 36.33-second, 5.4 MiB MP4 to v0.1.0; its SHA-256 matches the
+  local file. New full footage stays in ignored .cache/showcase, while its
+  344 KiB GIF and screenshots are versioned. Historical media is unchanged.
+- Generated docs/index.html and docs/watch.html from README. Chapter
+  navigation/video sources now derive from the README, including release
+  assets. Updated showcase instructions, START and portable MCP setup paths.
+- Extended actual MCP integration with Unicode/font/open/palette textures,
+  independent preview lights, imported named parts and export/reopen.
+
+Validation: pnpm check passed (109 tests, types/build), 31 real MCP assertions
+passed, MP4/GIF full decoding passed, GIF has 32 distinct frames, and local
+gallery playback/desktop/mobile checks passed with seven players and no
+horizontal overflow or runtime errors. Orca decoded the MP4 and verified
+content; its background-media policy/full screenshot could not verify visible
+playback, so GPU Chromium supplied that evidence. See
+[captures](captures/texture-pages-2026-10-14/README.md).
+
+The owner selected package-boundary corrections as the next stage after
+Pages/MCP publication. Git history/media migration and broad formatting remain
+separate follow-up work. Native desktop remains unverified.
+
 ## 2026-10-14 — Texture Studio release publication
 
 The owner explicitly authorized committing the validated texture work to main

@@ -1,0 +1,81 @@
+{
+  "origin": "Actual GPU Chromium screencast of the English editor in an isolated profile",
+  "frames": 1059,
+  "chapters": [
+    {
+      "start": 0.03454398399999991,
+      "title": "Select an object or named part",
+      "detail": "Work on a tree crown while the trunk keeps its own appearance."
+    },
+    {
+      "start": 3.7077323220000005,
+      "title": "Choose letters and fonts",
+      "detail": "Custom alphabets, Unicode symbols and installed regular or bold fonts."
+    },
+    {
+      "start": 9.360957238000001,
+      "title": "Adjust size, spacing and rotation",
+      "detail": "Letters remain attached to the model as you refine their layout."
+    },
+    {
+      "start": 14.469520458000002,
+      "title": "Show only the letters",
+      "detail": "Remove the solid body so the background shows through the gaps."
+    },
+    {
+      "start": 19.103757015,
+      "title": "Shape the ink and colors",
+      "detail": "Tune contrast and use a palette from shadow to light."
+    },
+    {
+      "start": 23.471607869,
+      "title": "Light the preview",
+      "detail": "Change light color and direction; scene lighting stays separate."
+    },
+    {
+      "start": 29.838699542999997,
+      "title": "Apply and save a reusable texture",
+      "detail": "Apply to the selected part, save to Assets and reuse the recipe."
+    }
+  ],
+  "video": {
+    "programs": [],
+    "stream_groups": [],
+    "streams": [
+      {
+        "codec_name": "h264",
+        "width": 1920,
+        "height": 1080,
+        "pix_fmt": "yuv420p",
+        "r_frame_rate": "30/1",
+        "nb_read_frames": "1090"
+      }
+    ],
+    "format": {
+      "duration": "36.333333",
+      "size": "5683791"
+    }
+  },
+  "gif": {
+    "programs": [],
+    "stream_groups": [],
+    "streams": [
+      {
+        "codec_name": "gif",
+        "width": 800,
+        "height": 450,
+        "pix_fmt": "bgra",
+        "r_frame_rate": "8/1",
+        "nb_read_frames": "32"
+      }
+    ],
+    "format": {
+      "duration": "4.010000",
+      "size": "349397"
+    }
+  },
+  "sourceIsolated": true,
+  "savedPartAndAsset": true,
+  "runtimeErrors": [],
+  "fullDecode": "passed"
+}

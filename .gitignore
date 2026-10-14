@@ -7,3 +7,4 @@ apps/editor/src-tauri/gen/
 docs/captures/diff/
 docs/captures/**/*-prof/
 exports/
+/.cache/

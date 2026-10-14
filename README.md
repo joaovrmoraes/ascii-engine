@@ -16,8 +16,9 @@ shaping a map to framing the finished scene. GIFs play directly in this
 README. [Watch the full chapters with video players](https://joaovrmoraes.github.io/ascii-engine/watch.html),
 or download them below. The [local gallery](docs/showcase/index.html)
 also works from a checkout.
-The existing footage is re-edited with English captions; its captured
-historical interface is Portuguese. The current editor uses English.
+Chapters 01–06 reuse existing footage with English captions; their captured
+historical interface is Portuguese. Texture Studio shows the current
+English editor.
 
 ### 01 · Terrain
 
@@ -78,6 +79,48 @@ and preview the composition with animated grass, water and fire.
 
 [Download the full video](docs/showcase/videos/06-camera.mp4?raw=true)
 
+### 07 · Texture Studio
+
+Select an object or named part and shape its appearance in an isolated
+preview. Choose letters and fonts, adjust size, spacing, colors and contrast,
+or show only the letters. Tune the preview lights, then apply and save
+the texture to reuse on another object.
+
+[![Editing letters, visibility, colors and lighting in Texture Studio](docs/showcase/gifs/07-textures.gif)](https://joaovrmoraes.github.io/ascii-engine/watch.html#07-texture-studio)
+
+[Download the full video](https://github.com/joaovrmoraes/ascii-engine/releases/download/v0.1.0/07-textures.mp4)
+
+## Create with AI through MCP
+
+An AI agent can run the complete supported visual authoring workflow through
+the local MCP server: create a scene, inspect its rendered result, adjust it
+and export an editable document. Once the editor and client are connected,
+the agent can perform these operations without manual interface clicks.
+
+- Sculpt terrain, paint water, arrange objects and import GLTF/GLB models.
+- Edit named model parts; create and reuse textures, effects and atmospheres.
+- Adjust letters, fonts, colors, lighting, fog, weather and composition cameras.
+- Read the live catalog, preview edits, inspect PNG captures and undo/redo.
+- Save and reopen portable scenes with embedded models and reusable assets.
+
+**Example prompt:** “Create a moonlit clearing with a lake and trees. Give
+the tree crowns green arrow glyphs with no solid body, save that texture,
+show me a preview and export the editable scene.”
+
+![A scene created and inspected through the real MCP connection](docs/showcase/posters/mcp-authoring.png)
+
+The server exposes 14 tools. `scene_apply` accepts atomic batches;
+`scene.patch` and `scene.replace` cover every supported `SceneDoc` field.
+Each accepted batch shares the editor's undo history. This covers the visual
+features currently implemented; gameplay rules and unsupported rendering
+features require additional development. MCP runs locally and needs an open
+editor session and an MCP-capable AI client.
+
+Start the editor with `pnpm dev`, then configure your client using the
+[MCP configuration example](https://github.com/joaovrmoraes/ascii-engine/blob/main/.mcp.example.json),
+replacing the example paths with your checkout. Follow the
+[connection guide and tool reference](docs/api-mcp.md) for setup and commands.
+
 ## What you can create
 
 - **Maps and items:** brush-based terrain, paths, water, built-in assets
@@ -86,6 +129,8 @@ and preview the composition with animated grass, water and fire.
   of a model, their own glyph technique, alphabet, size and color.
 - **Reusable effects:** particle layers, fire, smoke, sparks and lights,
   with an isolated preview and recipes saved to the library.
+- **Reusable textures:** letters, fonts, visibility, palettes and preview
+  lights, applied to whole objects or named parts and saved to the library.
 - **Environments:** lighting, shadows, fog, rain and snow.
 - **Compositions:** saved orthographic cameras, aspect ratios,
   live thumbnails and preview through the initial camera.
@@ -111,7 +156,8 @@ creature and combat effect demo.
 
 In the editor, **W** moves, **E** rotates, **R** scales and **O** activates
 orbit. Drag assets from the library into the scene. Open **Studio** for
-effects and atmospheres, and **Preview** to view the animated composition.
+effects, atmospheres and textures, and **Preview** to view the animated
+composition.
 
 Export a web demo without the editor panels:
 

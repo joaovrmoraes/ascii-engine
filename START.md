@@ -320,6 +320,14 @@ compatible. Preserve user-authored names and the original reference archive.
 See [ADR 0002](docs/decisions/0002-project-language.md). Scripts/gameplay
 components discussed as future work are not part of the current runtime.
 
+**Public presentation:** the README and Pages gallery include seven chapters,
+including the English Texture Studio walkthrough, plus the supported AI/MCP
+workflow. `scripts/preview-readme.mjs --github-pages --generate-only` generates
+both `docs/index.html` and `docs/watch.html` from the README. New MP4 footage
+is generated in `.cache/showcase` and hosted as a release asset; its short GIF
+and validation screenshots remain in the repository. Historical media is
+preserved. See [showcase workflow](docs/showcase/README.md).
+
 The core validates documents in `world/validation.ts`, stores bounded
 snapshots in `world/history.ts`, resolves embedded assets in `import/assets.ts`
 and applies document precipitation through `weather/sceneWeather.ts`.
