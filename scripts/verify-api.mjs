@@ -66,6 +66,9 @@ try {
   assert(catalog.some(p=>p.id==='pedregulho')&&catalog.some(p=>p.id==='fogueira'),'MCP discovers actual editor prefab library')
   const schema=await invoke('engine_reference',{topic:'commands'})
   assert(!!schema.commands.items,'machine-readable command schema')
+  const water=await invoke('engine_reference',{topic:'water'})
+  const waterDefaults=await evaluate('core.DEFAULT_WATER_LOOK')
+  assert(JSON.stringify(water.defaults)===JSON.stringify(waterDefaults),'MCP water reference exposes generic rendering defaults')
   let state=await invoke('scene_read',{full:true})
   const initial=state.document
   const commands=[

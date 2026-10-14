@@ -66,7 +66,7 @@ export const waterEdgeGLSL = `
 `
 
 type RGB = [number, number, number]
-/** Look of the water letters. Defaults: Pomorog forest (lakes and streams). */
+/** Look of the water letters in lakes and streams. */
 export interface WaterLook {
   /** Cell on the water plane (m). */
   cell: [number, number]
@@ -91,7 +91,8 @@ export interface WaterLook {
   }
 }
 
-export const FOREST_WATER: WaterLook = {
+/** Established water-rendering defaults, independent of biome content. */
+export const DEFAULT_WATER_LOOK: WaterLook = {
   cell: [.15, .19], flow: .35, pondDrift: [.02, .015],
   open: [.07, .17, .22], sheen: [.12, .16, .18], sparse: .22,
   foam: [.32, .52, .62], bank: .25,
@@ -102,7 +103,7 @@ const f = (v: number) => v.toFixed(4)
 const v3 = (c: RGB) => `vec3(${f(c[0])}, ${f(c[1])}, ${f(c[2])})`
 
 /** `waterLetters(p, time, crest, flow, vegetation, weed)` for a look. */
-export function waterLettersGLSL(look: WaterLook = FOREST_WATER, followSlope = false, movingSurface = false) {
+export function waterLettersGLSL(look: WaterLook = DEFAULT_WATER_LOOK, followSlope = false, movingSurface = false) {
   const texture = surfaceAtlas(), slot = (texture.userData.slot as number).toFixed(6)
   const [ws, wc] = SURFACE_RANGES.water, [cs, cc] = SURFACE_RANGES.crest, [rs, rc] = SURFACE_RANGES.actor, [gs, gc] = SURFACE_RANGES.wetgrass
   const r = look.reflection
@@ -295,7 +296,7 @@ export interface WaterOptions {
 
 /** One water body: add `water.mesh` with `{ glyph: 'water' }`. */
 export function createWater(shape: WaterShape, options: WaterOptions = {}) {
-  const look: WaterLook = { ...FOREST_WATER, ...options.look, reflection: { ...FOREST_WATER.reflection, ...options.look?.reflection } }
+  const look: WaterLook = { ...DEFAULT_WATER_LOOK, ...options.look, reflection: { ...DEFAULT_WATER_LOOK.reflection, ...options.look?.reflection } }
   const mask = shape.kind === 'paint' ? shape.mask : undefined
   const physics = { ...DEFAULT_WATER_PHYSICS, enabled: !options.edgeGLSL || !!options.distance, ...options.physics }
   const size = mask ? shape.size * 2 : options.size ?? (shape.kind === 'stream' ? 38 : shape.size * 2.8 + 2)

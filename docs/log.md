@@ -4,6 +4,30 @@ Entries describe the state at each stage. Earlier limitations may have been
 resolved later; START.md and the editor guide describe the current scope.
 Historical filenames, reference IDs and captured interfaces are preserved.
 
+## 2026-10-14 — Independent preset defaults and documented alias
+
+Applied the four small follow-ups to the package-boundary review:
+
+- Documented core /pomorog as the official alias for the optional content pack;
+  /presets exposes the same API for compatibility. Updated START and ADR 0003.
+- Added generic DEFAULT_WATER_LOOK for rendering, scene validation, authoring
+  commands and the MCP reference. Moved FOREST_WATER to the optional pack as
+  an independent deep copy. All existing water numbers are byte-identical.
+- Restored AsciiStyle field comments with the established adjustment ranges.
+- Made POMOROG_FIRE an independent deep copy of DEFAULT_HEAT_GRID. Added
+  two regression tests that mutate nested preset data and check core isolation.
+
+Validation: pnpm check passed (101 + 12 + 1 tests, boundary guard, type checks
+and production build). Water WebGL verification passed 14 assertions and eight
+bank/camera checks; actual MCP passed 32 assertions, including generic water
+defaults. Inspected cdpshot, water reflection and full-window Orca captures.
+Orca capture succeeded in this session; native desktop remains unverified.
+See [evidence](captures/preset-defaults-2026-10-14/README.md).
+
+Historical snow baselines are unchanged and still require a separate approved
+visual update. Large-file decomposition, editor unit coverage, historical media,
+live document filenames and shared skill storage remain outside this stage.
+
 ## 2026-10-14 — Enforced package boundaries and explicit presets
 
 After Pages/MCP publication, the owner selected the package-boundary portion

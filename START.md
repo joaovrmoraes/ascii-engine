@@ -193,8 +193,9 @@ The **core** knows no game, UI or Tauri and runs in a browser:
   glyph-reflecting water.
 - `config.ts`: renderer settings and content-free defaults. Consumers supply
   object types and effect recipes explicitly through engine options.
-- `presets/`: optional Pomorog appearance, campfire and ambient recipes,
-  exported through `@ascii-engine/core/presets` or `/pomorog`.
+- `presets/`: optional Pomorog appearance, water, campfire and ambient recipes.
+  `@ascii-engine/core/pomorog` is the official alias for this content pack;
+  `/presets` exposes the same API for compatibility.
 - `weather/`: rain/storm; `world/`: circuit, distance-loaded chunks,
   ripples, brush terrain and JSON scene/prefab/connector generation.
 - `fx/`: data-driven effects, Pomorog recipes and ASCII flipbooks.
@@ -209,8 +210,10 @@ belongs in `src/pomorog/` / `src/scene/`, never the core. `game.json` next to
 `apps/editor/src/engine.ts` supplies the approved Pomorog appearance and
 effect library to both the main renderer and isolated previews. Combat timing,
 hero/foe feedback, marsh foot/body contacts and snow track policy live in
-`apps/editor/src/pomorog/`. Generic heat-grid data and snow particle samples
-remain in the core, with their established numerical values.
+`apps/editor/src/pomorog/`. Generic heat-grid data, water defaults and snow
+particle samples remain in the core, with their established numerical values.
+`DEFAULT_WATER_LOOK` and `DEFAULT_HEAT_GRID` are independent of the mutable
+optional `FOREST_WATER` and `POMOROG_FIRE` preset copies.
 
 Public package entries: `@ascii-engine/core` for the renderer and shared
 settings, `/techniques`, `/world`, `/fx`, and optional `/presets` / `/pomorog`.

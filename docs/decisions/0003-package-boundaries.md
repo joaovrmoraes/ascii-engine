@@ -13,7 +13,9 @@ Its generic entries import no application or optional Pomorog preset.
 - `@ascii-engine/core/techniques`: glyph styles, materials, ink and water techniques.
 - `@ascii-engine/core/world`: terrain, scenes, documents, import, weather and cameras.
 - `@ascii-engine/core/fx`: effect runtime, validation, flipbooks and heat-grid data.
-- `@ascii-engine/core/presets` and `/pomorog`: optional appearance and visual recipes.
+- `@ascii-engine/core/pomorog`: official alias for the optional Pomorog content pack.
+  `/presets` exposes exactly the same API for compatibility; these are two names
+  for one pack, not different libraries.
 
 `AsciiStyle` lives in `config.ts`. The default settings retain established
 renderer numbers but contain no object type library. An engine owns copies of
@@ -26,7 +28,10 @@ The editor's engine factory explicitly supplies Pomorog's style and effect
 library, including its isolated Texture/Effects previews. Combat timing and
 feedback, legacy marsh contacts and snow-track policy live in editor
 `src/pomorog/`. Their numerical recipes, alphabets and draw order are preserved.
-Deterministic snow particle sampling and reusable heat-grid data remain generic.
+Deterministic snow particle sampling, `DEFAULT_WATER_LOOK` and
+`DEFAULT_HEAT_GRID` remain generic. The optional `FOREST_WATER` and
+`POMOROG_FIRE` presets own deep copies of those defaults; changing preset
+arrays or nested light/reflection settings cannot change core defaults.
 
 ## Package contracts
 
@@ -43,8 +48,9 @@ adapter or optional-preset dependencies.
 
 ## Consumer migration
 
-Generic root imports continue to work. Optional preset imports move to their
-explicit entry:
+Generic root imports continue to work. Water defaults use `DEFAULT_WATER_LOOK`
+from the root or `/techniques`; the biome-named `FOREST_WATER` export moves
+to the optional content pack. Optional preset imports use their explicit entry:
 
 ```ts
 import { createAsciiEngine } from '@ascii-engine/core'

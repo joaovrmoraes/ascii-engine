@@ -1,4 +1,4 @@
-import { createTerrain, createTerrainData, createWaterPaint, paintWater, waterEdge, parseScene, seededRandom, DEFAULT_ASCII_STYLE, atmosphereStyle, FOREST_WATER, type SceneDoc, type SceneWater, type PlacedObject, type EffectDef } from '@ascii-engine/core'
+import { createTerrain, createTerrainData, createWaterPaint, paintWater, waterEdge, parseScene, seededRandom, DEFAULT_ASCII_STYLE, atmosphereStyle, DEFAULT_WATER_LOOK, type SceneDoc, type SceneWater, type PlacedObject, type EffectDef } from '@ascii-engine/core'
 import { assertSafeJson, batchSchema } from './schema'
 
 /** Merge plain JSON only, protecting object prototypes before any assignment. */
@@ -87,7 +87,7 @@ export function applyCommands(source: SceneDoc, input: unknown): SceneDoc {
           ;(doc.waters ??= []).push(entry)
         }
         if (entry.shape.kind !== 'paint') throw new Error('This water has no paintable mask. Use water.update or create another.')
-        if (cmd.look) entry.look = mergeJson(mergeJson(FOREST_WATER, entry.look ?? {}), cmd.look) as SceneWater['look']
+        if (cmd.look) entry.look = mergeJson(mergeJson(DEFAULT_WATER_LOOK, entry.look ?? {}), cmd.look) as SceneWater['look']
         if (cmd.level !== undefined) entry.level = cmd.level
         cmd.points.forEach((p, i) => paintWater(entry.shape, cmd.points[Math.max(0, i - 1)], p, cmd.radius, cmd.erase))
         if (!entry.shape.mask?.heights && !cmd.erase) {
@@ -98,7 +98,7 @@ export function applyCommands(source: SceneDoc, input: unknown): SceneDoc {
       }
       case 'water.update': {
         const entry = water(cmd.index)
-        doc.waters![cmd.index] = mergeJson({ ...entry, look: mergeJson(FOREST_WATER, entry.look ?? {}) }, cmd.patch) as SceneWater
+        doc.waters![cmd.index] = mergeJson({ ...entry, look: mergeJson(DEFAULT_WATER_LOOK, entry.look ?? {}) }, cmd.patch) as SceneWater
         followTerrain(doc); break
       }
       case 'water.remove': water(cmd.index); doc.waters!.splice(cmd.index, 1); break

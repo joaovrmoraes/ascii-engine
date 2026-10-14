@@ -71,7 +71,7 @@ export {
   waterEdgeGLSL,
   waterLettersGLSL,
   waterVec4,
-  FOREST_WATER,
+  DEFAULT_WATER_LOOK,
   type Water,
   type WaterLook,
   type WaterOptions,

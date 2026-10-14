@@ -5,7 +5,8 @@ const fract = (v: number) => v - Math.floor(v)
 
 import { DEFAULT_HEAT_GRID, type HeatGridSpec } from '../fx/heat'
 export type { HeatGridSpec } from '../fx/heat'
-export const POMOROG_FIRE = DEFAULT_HEAT_GRID
+/** The optional preset owns its nested settings; editing it cannot alter core defaults. */
+export const POMOROG_FIRE: HeatGridSpec = structuredClone(DEFAULT_HEAT_GRID)
 
 /**
  * Bonfire as `particle` (Pomorog `effects.ts`): a heat grid anchored at the

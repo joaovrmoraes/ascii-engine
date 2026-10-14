@@ -1,7 +1,7 @@
 import type { SceneDoc, PrefabLibrary } from './scene'
 import { DEFAULT_ASCII_STYLE } from '../config'
 import { SURFACE_ALPHA } from '../surface'
-import { FOREST_WATER } from '../techniques/water'
+import { DEFAULT_WATER_LOOK } from '../techniques/water'
 import { parseEffect } from '../fx/validation'
 import { ATMOSPHERE_KEYS } from './atmosphere'
 import { GLYPH_STYLE_KEYS, validGlyphAlphabet } from '../style'
@@ -215,7 +215,7 @@ export function parseScene(input: unknown, library?: PrefabLibrary): SceneDoc {
     if (w.look !== undefined) {
       const look = record(w.look, `waters[${i}].look`)
       for (const [k, value] of Object.entries(look)) {
-        if (k in FOREST_WATER) sameShape(value, FOREST_WATER[k as keyof typeof FOREST_WATER], `waters[${i}].look.${k}`)
+        if (k in DEFAULT_WATER_LOOK) sameShape(value, DEFAULT_WATER_LOOK[k as keyof typeof DEFAULT_WATER_LOOK], `waters[${i}].look.${k}`)
       }
       if (look.cell) vector(look.cell, `waters[${i}].look.cell`, 2, .001)
       if (look.reflection) number(record(look.reflection, 'reflection').rows, 'reflection.rows', 1, 10000)
