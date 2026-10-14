@@ -23,6 +23,12 @@ Rain Marsh, Snow Pines, Old Mine and Sunken Cathedral for viewing.
 
 Validation and final viewer captures are recorded in
 [five-map evidence](captures/five-map-demos-2026-10-14/README.md).
+Publication succeeded from source 66dbe5c through hosting commit 64e224e.
+Both the native Pages deployment and main publication workflow passed.
+All 24 checks also passed against the live HTTPS site, including the five-map
+menu and authoring URL fallback. Orca opened the public cathedral and confirmed
+the five options. The public viewer produced no failed HTTP responses, page
+exceptions or local bridge connections.
 Historical renderer recipes, baseline images and scene IDs are unchanged.
 
 ## 2026-10-14 — Live browser sandbox on GitHub Pages

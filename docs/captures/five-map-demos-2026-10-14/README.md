@@ -21,6 +21,14 @@ and [local MCP](mcp-local.log). The publisher dry run preserved the source
 checkout and its Git index. Representative screenshots show the updated
 gallery and five-map viewer; full-window Orca and cdpshot were inspected.
 
+Public verification also passed all 24 checks on the actual HTTPS site; see
+[public browser log](public-viewer.log) and [network results](public-result.json).
+Orca confirmed the public cathedral menu contains exactly the five maps.
+Source 66dbe5c was published through hosting commit 64e224e. Both the
+[Pages deployment](https://github.com/joaovrmoraes/ascii-engine/actions/runs/38603343784)
+and [main publication workflow](https://github.com/joaovrmoraes/ascii-engine/actions/runs/38603348578)
+completed successfully.
+
 Run the
 same GPU Chromium verifier against the live site:
 
