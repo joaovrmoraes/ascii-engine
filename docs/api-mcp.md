@@ -299,3 +299,19 @@ texture assets; alphabet 1–128 single Unicode characters with a visible charac
 integer RGB colors; lighting scene/unlit; emissive RGB and intensity 0–4; size .01–10 meters, spacing .5–4, density .05–1, strength 0–4,
 gap 0–.015, contrast .1–4, toneOffset -1–1, shadowSteps 2–16 (integer).
 The editor size slider covers .01–1 meters; the numeric/API range is .01–10.
+
+### Linked appearance resources
+
+`options.texture` and `options.parts[name].texture` optionally reference a
+`SceneDoc.textures` ID. The renderer resolves global/type/model declarations,
+explicit type fields, linked object texture, linked part texture, instance fields,
+then instance part fields. Local overrides win over both linked recipes. Unknown
+IDs are rejected. Existing copied appearances remain plain overrides.
+
+`texture.apply` accepts `link: true`; omitted/false retains the previous copy
+behavior. `texture.detach {objectId, part?}` bakes the current recipe into local
+fields. Omitting part detaches all object/part links, preserving appearance even
+when parent overrides compete with part recipes. `resource.remove` rejects
+textures still in use. Define an updated recipe under the same ID to update its
+users; preview/accept/undo retain their normal atomic behavior. Applying a texture
+never transfers preview lighting into the scene.

@@ -286,7 +286,7 @@ try {
   await action(`ui('[data-studio="reveal"]')`)
   await check('view assets opens the Atmospheres category', `!document.body.classList.contains('studio-mode') && document.querySelector('[data-k="categories"] .active').textContent.includes('Atmospheres') && document.querySelector('[data-atmosphere="'+atmosphereKey+'"]')`)
   await shot('assets-atmosfera')
-  await action(`ui('#environment-settings [data-k="atmosphere"]','moon'); ui('[data-atmosphere="'+atmosphereKey+'"]')`)
+  await action(`ui('#environment-settings [data-k="atmosphere"]','moon'); ui('[data-atmosphere="'+atmosphereKey+'"]'); ui('[data-resource-action=apply-atmosphere]')`)
   await check('atmosphere asset applies its lighting to the open scene', `engine.style.moon.intensity===3.5 && engine.style.atmosphere==='dusk'`)
   await action(`document.querySelector('[data-atmosphere="'+atmosphereKey+'"]')?.dispatchEvent(new MouseEvent('dblclick'))`)
   await check('double click reopens a named atmosphere for editing', `document.body.classList.contains('studio-mode') && document.querySelector('[data-studio="name"]').value==='Dusk salvo'`)
@@ -327,6 +327,15 @@ try {
   await check('layout, effects and atmosphere assets restore after reloading the browser', `localStorage.getItem('ascii-editor-layout-v1')===${JSON.stringify(layout)} && document.querySelector('#hierarchy').dataset.dock==='bottom' && document.querySelector('#asset-browser').dataset.dock==='floating' && JSON.stringify(area.document())===${JSON.stringify(finalDoc)}`)
   await evaluate(`document.querySelector('[data-k="reset-layout"]').click()`)
   await check('restore panels brings every panel back', `document.querySelector('#hierarchy').dataset.dock==='left' && document.querySelector('#asset-browser').dataset.dock==='bottom' && document.querySelector('#authoring-sidebar').dataset.dock==='right'`)
+  await action(`document.querySelector('[data-k=close-studio]').click(); window.beforeLinkedInsert=area.document().objects.length;
+    const item={version:1,name:'Linked item',objects:[{id:'source',prefab:'bloco',position:[0,0,0],options:{type:'source-type',texture:'ink'}}],
+      style:{glyphs:{alphabet:'GG'},types:{'source-type':{style:{color:0x111111,size:.19},authored:{style:['color']}}}},
+      textures:{ink:{name:'Inserted ink',style:{alphabet:'XZ',color:0x55aa88}}}};
+    const transfer=new DataTransfer(); transfer.items.add(new File([JSON.stringify(item)],'linked.item.json',{type:'application/json'}));
+    const input=document.querySelector('[data-k=insert]');input.files=transfer.files;input.dispatchEvent(new Event('change'));`)
+  await until('area.document().objects.length===beforeLinkedInsert+1')
+  await check('item insertion remaps texture IDs and preserves linked-over-type appearance', `(()=>{const doc=area.document(),item=doc.objects.at(-1);let style;engine.scene.children.find(o=>o.userData.sceneId===item.id).traverse(n=>{if(n.isMesh)style=n.userData.glyphResolved});return item.options.texture!=='ink'&&doc.textures[item.options.texture].style.alphabet==='XZ'&&style.alphabet==='XZ'&&style.color===0x55aa88})()`)
+
   if (errors.length) throw new Error(errors.join('\n'))
   console.log('PASS no uncaught page exceptions')
 } finally {

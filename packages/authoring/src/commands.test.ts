@@ -1,9 +1,24 @@
 import { describe, expect, it } from 'vitest'
-import { createTerrainData, parseScene, waterEdge } from '@ascii-engine/core'
+import { createTerrainData, parseScene, waterEdge, resolveGlyphStyle, textureUsers, textureStyle } from '@ascii-engine/core'
 import { applyCommands } from './commands'
 
 const initial = () => parseScene({ version: 1, name: 'Original', terrain: createTerrainData(16, 33), objects: [{ id: 'rock', prefab: 'pedregulho', position: [0,0,0] }] })
 describe('atomic authoring', () => {
+  it('links assets, prevents dangling references and detaches without changing resolved appearance', () => {
+    const source = parseScene({ version: 1, objects: [{ id: 'tree', prefab: 'tree', position: [0,0,0], options: { size: .5, parts: { crown: { color: 777 } } } }], textures: { whole: { name: 'Whole', style: { alphabet: 'AB', color: 123 } }, leaves: { name: 'Leaves', style: { alphabet: 'XY', size: .3, color: 456 } } } })
+    const linked = applyCommands(source, [{ op: 'texture.apply', id: 'whole', objectId: 'tree', link: true }, { op: 'texture.apply', id: 'leaves', objectId: 'tree', part: 'crown', link: true }])
+    expect(linked.objects[0].options?.alphabet).toBeUndefined()
+    expect(textureUsers(linked, 'whole')).toHaveLength(1)
+    expect(() => applyCommands(linked, [{ op: 'resource.remove', kind: 'textures', id: 'leaves' }])).toThrow('Detach')
+    expect(() => parseScene({ ...linked, textures: {} })).toThrow('texture not found')
+    const before = resolveGlyphStyle({ texture: linked.textures!.whole.style, texturePart: linked.textures!.leaves.style, instance: textureStyle(linked.objects[0].options ?? {}), instanceParts: linked.objects[0].options?.parts, part: 'crown' })
+    for (const part of ['crown', undefined]) {
+      const detached = applyCommands(linked, [{ op: 'texture.detach', objectId: 'tree', part }]), options = detached.objects[0].options
+      expect(resolveGlyphStyle({ texture: options?.texture ? detached.textures![options.texture].style : undefined, instance: textureStyle(options ?? {}), instanceParts: options?.parts, part: 'crown' })).toEqual(before)
+      expect(options?.parts?.crown.texture).toBeUndefined()
+    }
+    expect(source.objects[0].options?.texture).toBeUndefined()
+  })
   it('keeps studio lighting separate when defining/applying an extended texture', () => {
     const source = initial(), before = JSON.stringify(source)
     const doc = applyCommands(source, [{ op: 'texture.define', id: 'symbols', name: 'Symbols', style: { alphabet: ' ↑→░▓█', font: 'monospace', fontWeight: 700, open: true, palette: [0x224466, 0xff8844] }, previewLighting: { brightness: 2, background: 0x080a12 } }, { op: 'texture.apply', id: 'symbols', objectId: 'rock' }])

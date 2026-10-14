@@ -282,8 +282,8 @@ and controls. Effects use disposable empty-space preview engines and pause
 the map. Atmospheres expose exposure, glyph tint, lights/direction, shadows
 and fog. Essential controls and templates simplify creation. Effects live
 in `SceneDoc.effects`; named atmosphere assets in `SceneDoc.atmospheres`;
-current lighting in `SceneDoc.style`. Click atmosphere assets to apply,
-double-click to edit. Advanced JSON exposes heat, curves and flipbooks.
+current lighting in `SceneDoc.style`. Click texture/atmosphere assets to select; double-click to edit. Atmospheres
+have an explicit Apply action; drag textures onto objects/parts to link. Advanced JSON exposes heat, curves and flipbooks.
 Layers have name, XYZ origin, gizmo and separate history; heat, particles
 and trails respect saved offsets. Graphical timeline/curves remain pending.
 
@@ -295,8 +295,10 @@ visibility removes solid occluders; body face visibility is explicit. Material
 lighting supports scene response, uniform local shading and self light.
 Adjustable preview lights include exposure, main/ambient/fill colors and
 intensities, direction, shadows, background and fog. New texture recipes use black gaps;
-unmodified scenes retain Pomorog defaults. Apply updates one object/part with
-scene undo; Save to Assets creates a reusable `SceneDoc.textures` recipe. The
+unmodified scenes retain Pomorog defaults. Apply writes the selected appearance scope with scene undo; saved recipes
+link to objects/parts below local overrides. Editing the asset updates its users;
+Detach copies its current appearance into local overrides. Old copied styles retain
+their appearance; Save to Assets creates a reusable `SceneDoc.textures` recipe. The
 texture editor has its own undo/redo and portable `.texture.json` import/export.
 Presets are snapshots, not live links to instances. `texture.define` /
 `texture.apply` expose the same resources through the authoring API. Optional

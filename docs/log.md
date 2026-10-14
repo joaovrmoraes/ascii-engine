@@ -4,6 +4,30 @@ Entries describe the state at each stage. Earlier limitations may have been
 resolved later; START.md and the editor guide describe the current scope.
 Historical filenames, reference IDs and captured interfaces are preserved.
 
+## 2026-10-14 — Editor consolidation stage 4: linked texture resources
+
+Objects and named parts can reference SceneDoc.textures by ID. Core layering
+places both recipes below local instance/part overrides. setTextures re-resolves
+users; buildScene loads definitions and rolls back failures. Old copied styles
+are never migrated. Authoring texture.apply accepts link:true, texture.detach
+bakes appearance, and resource.remove rejects textures in use. Validation,
+MCP descriptions/schema and API docs were updated.
+
+Texture Studio lists users, opens linked recipes, preserves preview precedence,
+and offers detach/delete (confirmation before detaching users for deletion).
+Saving a resource updates every link. Library click selects, double click edits;
+texture cards drag onto scene parts, hierarchy objects or the selected inspector
+part. Atmosphere cards select and expose an explicit Apply action. Item export
+includes texture definitions; insertion remaps texture/asset/type IDs and keeps
+source global/type layers below linked recipes instead of flattening them.
+
+Validation: pnpm check passed 120 tests; textures 98, authoring 73 and actual
+stdio MCP/API 34 assertions, with dev running. Restarted only this worktree's
+stale standalone bridge to load the new schema. Pinned Orca checks preserved
+the owner's document after a temporary fixture. Old item world RMSE 0.
+[Captures/logs](captures/consolidation-stage4-2026-10-14/README.md).
+No push. Lighting/components/files remain stages 5–7; native desktop unverified.
+
 ## 2026-10-14 — Editor consolidation stage 3: one appearance editor
 
 Texture Studio now edits part, object, shared asset/type and global scopes.

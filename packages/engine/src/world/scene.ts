@@ -99,6 +99,7 @@ export function buildScene(engine: AsciiEngine, source: SceneDoc, library: Prefa
   const doc = parseScene(source, library)
   library = { ...library, ...createEffectPrefabs(engine, doc.effects) }
   const previousStyle = engine.exportStyle()
+  const previousTextures = structuredClone(engine.textures)
   let terrain: Terrain | undefined
   let carpet: ReturnType<AsciiEngine['createCarpet']> | undefined
   let weather: ReturnType<typeof createSceneWeather> | undefined
@@ -112,6 +113,7 @@ export function buildScene(engine: AsciiEngine, source: SceneDoc, library: Prefa
     if (carpet) engine.remove(carpet.mesh, { dispose: true })
   }
   try {
+    engine.setTextures({ ...previousTextures, ...doc.textures })
     for (const [name, prefab] of Object.entries(library)) if (prefab.style || doc.style?.types?.[name]?.authored) engine.setTypeStyle(name, prefab.style ?? {})
     if (doc.style) engine.setStyle(doc.style)
     terrain = doc.terrain ? createTerrain(doc.terrain) : undefined
@@ -125,7 +127,7 @@ export function buildScene(engine: AsciiEngine, source: SceneDoc, library: Prefa
     carpet = doc.carpet && terrain ? engine.createCarpet(terrainCover(terrain, doc.carpet.count, doc.waters ?? []), doc.carpet.seed) : undefined
     if (carpet) engine.add(carpet.mesh, { glyph: 'carpet' })
     weather = createSceneWeather(engine, doc.environment, doc.terrain?.size)
-  } catch (error) { dispose(); engine.setStyle(previousStyle, { replace: true }); throw error }
+  } catch (error) { dispose(); engine.setTextures(previousTextures); engine.setStyle(previousStyle, { replace: true }); throw error }
   function place(item: PlacedObject) {
     const prefab = library[item.prefab]
     if (!prefab) throw new Error(`ascii-engine: unknown prefab "${item.prefab}"`)
@@ -148,7 +150,7 @@ export function buildScene(engine: AsciiEngine, source: SceneDoc, library: Prefa
     terrain, waters, placed,
     /** Adds one object to the scene (and to the document). */
     place(item: PlacedObject) {
-      const next = parseScene({ version: 1, objects: [{ ...item, id: item.id ?? crypto.randomUUID(), seed: item.seed ?? Math.floor(Math.random() * 4294967296) }] }, library).objects[0]
+      const next = parseScene({ version: 1, textures: doc.textures, objects: [{ ...item, id: item.id ?? crypto.randomUUID(), seed: item.seed ?? Math.floor(Math.random() * 4294967296) }] }, library).objects[0]
       const object = place(next)
       doc.objects.push(next)
       return object

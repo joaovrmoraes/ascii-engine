@@ -1,4 +1,4 @@
-import { createTerrain, createTerrainData, createWaterPaint, paintWater, waterEdge, parseScene, seededRandom, DEFAULT_ASCII_STYLE, atmosphereStyle, DEFAULT_WATER_LOOK, type SceneDoc, type SceneWater, type PlacedObject, type EffectDef } from '@ascii-engine/core'
+import { detachTexture, textureUsers, createTerrain, createTerrainData, createWaterPaint, paintWater, waterEdge, parseScene, seededRandom, DEFAULT_ASCII_STYLE, atmosphereStyle, DEFAULT_WATER_LOOK, type SceneDoc, type SceneWater, type PlacedObject, type EffectDef } from '@ascii-engine/core'
 import { assertSafeJson, batchSchema } from './schema'
 
 /** Merge plain JSON only, protecting object prototypes before any assignment. */
@@ -107,6 +107,7 @@ export function applyCommands(source: SceneDoc, input: unknown): SceneDoc {
       case 'resource.remove':
         if (!doc[cmd.kind]?.[cmd.id]) throw new Error('Resource not found: ' + cmd.id)
         if (['assets', 'effects'].includes(cmd.kind) && doc.objects.some(o => o.prefab === cmd.id)) throw new Error('Remove this asset\'s instances first: ' + cmd.id)
+        if (cmd.kind === 'textures' && textureUsers(doc, cmd.id).length) throw new Error('Detach this texture from its users first: ' + cmd.id)
         delete doc[cmd.kind]![cmd.id]; break
       case 'atmosphere.define': (doc.atmospheres ??= {})[cmd.id] = { name: cmd.name, style: atmosphereStyle(mergeJson(mergeJson(DEFAULT_ASCII_STYLE, doc.style ?? {}), { ...cmd.style, bodySceneLighting: true, inkFog: true }) as NonNullable<SceneDoc['style']>) }; break
       case 'atmosphere.apply': {
@@ -120,10 +121,12 @@ export function applyCommands(source: SceneDoc, input: unknown): SceneDoc {
         if (!asset) throw new Error('Texture not found: ' + cmd.id)
         const item = object(cmd.objectId)
         item.options ??= {}
-        if (cmd.part) { item.options.parts ??= {}; item.options.parts[cmd.part] = { ...item.options.parts[cmd.part], ...asset.style } }
-        else Object.assign(item.options, asset.style)
+        const patch = cmd.link ? { texture: cmd.id } : asset.style
+        if (cmd.part) { item.options.parts ??= {}; item.options.parts[cmd.part] = { ...item.options.parts[cmd.part], ...patch } }
+        else Object.assign(item.options, patch)
         break
       }
+      case 'texture.detach': { const item = object(cmd.objectId); item.options = detachTexture(item.options ?? {}, doc.textures ?? {}, cmd.part); break }
       case 'atmosphere.set': doc.style = mergeJson(mergeJson(DEFAULT_ASCII_STYLE, doc.style ?? {}), { ...cmd.style, bodySceneLighting: true, inkFog: true }) as SceneDoc['style']; break
       case 'camera.define': (doc.cameras ??= {})[cmd.id] = structuredClone(cmd.camera) as unknown as NonNullable<SceneDoc['cameras']>[string]; break
       case 'camera.update':

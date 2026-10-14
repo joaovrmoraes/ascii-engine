@@ -1,0 +1,302 @@
+{
+  "id": "bd32d31e-8161-4f04-8731-a18bf4b7dac7",
+  "ok": true,
+  "result": {
+    "origin": "http://localhost:1440/?area=sandbox",
+    "refs": {
+      "e1": {
+        "name": "Asset library",
+        "role": "region"
+      },
+      "e10": {
+        "name": "Create effect",
+        "role": "button"
+      },
+      "e11": {
+        "name": "Save",
+        "role": "button"
+      },
+      "e12": {
+        "name": "Export",
+        "role": "button"
+      },
+      "e13": {
+        "name": "Search scene",
+        "role": "searchbox"
+      },
+      "e14": {
+        "name": "Terrain",
+        "role": "button"
+      },
+      "e15": {
+        "name": "Tree",
+        "role": "button"
+      },
+      "e16": {
+        "name": "Campfire",
+        "role": "button"
+      },
+      "e17": {
+        "name": "pretzel.gltf",
+        "role": "button"
+      },
+      "e18": {
+        "name": "pretzel.gltf",
+        "role": "button"
+      },
+      "e19": {
+        "name": "Water 1",
+        "role": "button"
+      },
+      "e2": {
+        "name": "Undo",
+        "role": "button"
+      },
+      "e20": {
+        "name": "Orbit",
+        "role": "button"
+      },
+      "e21": {
+        "name": "Q",
+        "role": "button"
+      },
+      "e22": {
+        "name": "W",
+        "role": "button"
+      },
+      "e23": {
+        "name": "E",
+        "role": "button"
+      },
+      "e24": {
+        "name": "R",
+        "role": "button"
+      },
+      "e25": {
+        "name": "Transform space",
+        "role": "combobox"
+      },
+      "e26": {
+        "name": "Snap",
+        "role": "button"
+      },
+      "e27": {
+        "name": "Focus selection (F)",
+        "role": "button"
+      },
+      "e28": {
+        "name": "Isometric",
+        "role": "button"
+      },
+      "e29": {
+        "name": "Display ▾",
+        "role": "button"
+      },
+      "e3": {
+        "name": "Redo",
+        "role": "button"
+      },
+      "e30": {
+        "name": "Object",
+        "role": "button"
+      },
+      "e31": {
+        "name": "Terrain",
+        "role": "button"
+      },
+      "e32": {
+        "name": "Environment",
+        "role": "button"
+      },
+      "e33": {
+        "name": "Display",
+        "role": "button"
+      },
+      "e34": {
+        "name": "Project",
+        "role": "button"
+      },
+      "e35": {
+        "name": "Studio",
+        "role": "button"
+      },
+      "e36": {
+        "name": "",
+        "role": "LabelText"
+      },
+      "e37": {
+        "name": "",
+        "role": "LabelText"
+      },
+      "e38": {
+        "name": "All 22",
+        "role": "button"
+      },
+      "e39": {
+        "name": "Nature 4",
+        "role": "button"
+      },
+      "e4": {
+        "name": "Document name",
+        "role": "textbox"
+      },
+      "e40": {
+        "name": "Buildings 4",
+        "role": "button"
+      },
+      "e41": {
+        "name": "Shapes 3",
+        "role": "button"
+      },
+      "e42": {
+        "name": "Effects 9",
+        "role": "button"
+      },
+      "e43": {
+        "name": "Atmospheres 0",
+        "role": "button"
+      },
+      "e44": {
+        "name": "Textures 1",
+        "role": "button"
+      },
+      "e45": {
+        "name": "Imported 1",
+        "role": "button"
+      },
+      "e46": {
+        "name": "Search assets",
+        "role": "searchbox"
+      },
+      "e47": {
+        "name": "Tree",
+        "role": "button"
+      },
+      "e48": {
+        "name": "Boulder",
+        "role": "button"
+      },
+      "e49": {
+        "name": "Crate",
+        "role": "button"
+      },
+      "e5": {
+        "name": "Inspector panels",
+        "role": "navigation"
+      },
+      "e50": {
+        "name": "Bridge",
+        "role": "button"
+      },
+      "e51": {
+        "name": "Ruin",
+        "role": "button"
+      },
+      "e52": {
+        "name": "Standing stones",
+        "role": "button"
+      },
+      "e53": {
+        "name": "Fallen log",
+        "role": "button"
+      },
+      "e54": {
+        "name": "Block",
+        "role": "button"
+      },
+      "e55": {
+        "name": "Cylinder",
+        "role": "button"
+      },
+      "e56": {
+        "name": "Faceted rock",
+        "role": "button"
+      },
+      "e57": {
+        "name": "Campfire",
+        "role": "button"
+      },
+      "e58": {
+        "name": "Dust",
+        "role": "button"
+      },
+      "e59": {
+        "name": "Fireflies",
+        "role": "button"
+      },
+      "e6": {
+        "name": "Asset categories",
+        "role": "navigation"
+      },
+      "e60": {
+        "name": "Dissolve",
+        "role": "button"
+      },
+      "e61": {
+        "name": "Aura",
+        "role": "button"
+      },
+      "e62": {
+        "name": "Lightning",
+        "role": "button"
+      },
+      "e63": {
+        "name": "Fire explosion",
+        "role": "button"
+      },
+      "e64": {
+        "name": "Ice",
+        "role": "button"
+      },
+      "e65": {
+        "name": "Rain ripple",
+        "role": "button"
+      },
+      "e66": {
+        "name": "Trail",
+        "role": "button"
+      },
+      "e67": {
+        "name": "pretzel.gltf",
+        "role": "button"
+      },
+      "e68": {
+        "name": "0123456789 My texture",
+        "role": "button"
+      },
+      "e69": {
+        "name": "Preview",
+        "role": "button"
+      },
+      "e7": {
+        "name": "Add object",
+        "role": "button"
+      },
+      "e70": {
+        "name": "Pause animation",
+        "role": "button"
+      },
+      "e71": {
+        "name": "Global",
+        "role": "option"
+      },
+      "e72": {
+        "name": "Local",
+        "role": "option"
+      },
+      "e8": {
+        "name": "Create camera",
+        "role": "button"
+      },
+      "e9": {
+        "name": "Create texture",
+        "role": "button"
+      }
+    },
+    "snapshot": "- generic\n- StaticText \"ascii-engine 0.1.0 · Editor visual · 20 fps · 4 objects · 1 waters · Everything saved in this browser\"\n- generic\n  - banner\n    - strong\n      - StaticText \"ASCII Engine\"\n    - group\n      - DisclosureTriangle \"File\" [expanded=false]\n    - button \"Undo\" [disabled, ref=e2]\n      - StaticText \"↶\"\n    - button \"Redo\" [disabled, ref=e3]\n      - StaticText \"↷\"\n    - textbox \"Document name\" [ref=e4]: My map\n      - StaticText \"My map\"\n    - StaticText \"Visual scene\"\n    - status\n      - StaticText \"Everything saved in this browser\"\n    - generic\n      - button \"Add object\" [ref=e7]\n      - button \"Create camera\" [ref=e8]\n      - button \"Create texture\" [ref=e9]\n      - button \"Create effect\" [ref=e10]\n      - button \"Save\" [ref=e11]\n      - generic\n        - button \"Preview\" [ref=e69]\n        - button \"Pause animation\" [ref=e70]\n      - button \"Export\" [ref=e12]\n  - complementary \"Hierarchy\"\n    - generic\n      - StaticText \"⠿\"\n      - StaticText \"Hierarchy\"\n      - StaticText \"6\"\n    - LabelText\n      - searchbox \"Search scene\" [ref=e13]\n    - StaticText \"▾\"\n    - StaticText \"My map\"\n    - list \"Scene objects\"\n      - button \"Terrain\" [ref=e14]\n        - StaticText \"Terrain\"\n      - button \"Tree\" [ref=e15]\n        - StaticText \"Tree\"\n      - button \"Campfire\" [ref=e16]\n        - StaticText \"Campfire\"\n      - button \"pretzel.gltf\" [ref=e17]\n        - StaticText \"pretzel.gltf\"\n      - button \"pretzel.gltf\" [ref=e18]\n        - StaticText \"pretzel.gltf\"\n      - button \"Water 1\" [ref=e19]\n        - StaticText \"Water 1\"\n    - StaticText \"Everything in this map\"\n    - separator \"Drag to resize\"\n  - generic\n    - StaticText \"Scene\"\n    - StaticText \"Editor view\"\n    - toolbar \"Scene tools\"\n      - button \"Orbit\" [ref=e20]\n        - StaticText \"Orbit\"\n      - button \"Q\" [ref=e21]\n        - StaticText \"Q\"\n      - button \"W\" [ref=e22]\n        - StaticText \"W\"\n      - button \"E\" [ref=e23]\n        - StaticText \"E\"\n      - button \"R\" [ref=e24]\n        - StaticText \"R\"\n      - combobox \"Transform space\" [expanded=false, ref=e25]: Global\n        - MenuListPopup\n          - option \"Global\" [selected, ref=e71]\n          - option \"Local\" [ref=e72]\n      - button \"Snap\" [ref=e26]\n      - button \"Focus selection (F)\" [ref=e27]\n      - button \"Isometric\" [ref=e28]\n      - button \"Display ▾\" [ref=e29]\n  - StaticText \"Drag an asset into the scene · O orbit in 3D · right drag to pan · scroll to zoom\"\n  - complementary \"Inspector\"\n    - generic\n      - StaticText \"⠿\"\n      - StaticText \"Inspector\"\n    - navigation \"Inspector panels\" [ref=e5]\n      - button \"Object\" [ref=e30]\n      - button \"Terrain\" [ref=e31]\n      - button \"Environment\" [ref=e32]\n      - button \"Display\" [ref=e33]\n    - generic\n      - strong\n        - StaticText \"No object selected\"\n      - StaticText \"Click an object in the scene to edit its properties.\"\n      - StaticText \"To add an object, drag an asset from the library below onto the map.\"\n    - separator \"Drag to resize\"\n  - region \"Asset library\" [ref=e1]\n    - generic\n      - StaticText \"⠿\"\n      - button \"Project\" [ref=e34]\n      - button \"Studio\" [ref=e35]\n      - LabelText [ref=e36] clickable [cursor:pointer]\n        - StaticText \"Import model\"\n      - LabelText [ref=e37] clickable [cursor:pointer]\n        - StaticText \"Insert saved item\"\n    - navigation \"Asset categories\" [ref=e6]\n      - button \"All 22\" [ref=e38]\n        - StaticText \"All\"\n        - StaticText \"22\"\n      - button \"Nature 4\" [ref=e39]\n        - StaticText \"Nature\"\n        - StaticText \"4\"\n      - button \"Buildings 4\" [ref=e40]\n        - StaticText \"Buildings\"\n        - StaticText \"4\"\n      - button \"Shapes 3\" [ref=e41]\n        - StaticText \"Shapes\"\n        - StaticText \"3\"\n      - button \"Effects 9\" [ref=e42]\n        - StaticText \"Effects\"\n        - StaticText \"9\"\n      - button \"Atmospheres 0\" [ref=e43]\n        - StaticText \"Atmospheres\"\n        - StaticText \"0\"\n      - button \"Textures 1\" [ref=e44]\n        - StaticText \"Textures\"\n        - StaticText \"1\"\n      - button \"Imported 1\" [ref=e45]\n        - StaticText \"Imported\"\n        - StaticText \"1\"\n    - LabelText\n      - searchbox \"Search assets\" [ref=e46]\n    - StaticText \"Drag into the scene · or click and choose a position\"\n    - list \"Available assets\"\n      - button \"Tree\" [ref=e47]\n        - StaticText \"Tree\"\n      - button \"Boulder\" [ref=e48]\n        - StaticText \"Boulder\"\n      - button \"Crate\" [ref=e49]\n        - StaticText \"Crate\"\n      - button \"Bridge\" [ref=e50]\n        - StaticText \"Bridge\"\n      - button \"Ruin\" [ref=e51]\n        - StaticText \"Ruin\"\n      - button \"Standing stones\" [ref=e52]\n        - StaticText \"Standing stones\"\n      - button \"Fallen log\" [ref=e53]\n        - StaticText \"Fallen log\"\n      - button \"Block\" [ref=e54]\n        - StaticText \"Block\"\n      - button \"Cylinder\" [ref=e55]\n        - StaticText \"Cylinder\"\n      - button \"Faceted rock\" [ref=e56]\n        - StaticText \"Faceted rock\"\n      - button \"Campfire\" [ref=e57]\n        - StaticText \"Campfire\"\n      - button \"Dust\" [ref=e58]\n        - StaticText \"Dust\"\n      - button \"Fireflies\" [ref=e59]\n        - StaticText \"Fireflies\"\n      - button \"Dissolve\" [ref=e60]\n        - StaticText \"Dissolve\"\n      - button \"Aura\" [ref=e61]\n        - StaticText \"Aura\"\n      - button \"Lightning\" [ref=e62]\n        - StaticText \"Lightning\"\n      - button \"Fire explosion\" [ref=e63]\n        - StaticText \"Fire explosion\"\n      - button \"Ice\" [ref=e64]\n        - StaticText \"Ice\"\n      - button \"Rain ripple\" [ref=e65]\n        - StaticText \"Rain ripple\"\n      - button \"Trail\" [ref=e66]\n        - StaticText \"Trail\"\n      - button \"pretzel.gltf\" [ref=e67]\n        - StaticText \"pretzel.gltf\"\n      - button \"0123456789 My texture\" [ref=e68]\n        - StaticText \"0123456789\"\n        - StaticText \"My texture\"\n    - separator \"Drag to resize\"",
+    "browserPageId": "2f12dd1f-17bf-4272-8c88-548057dfb5e6"
+  },
+  "_meta": {
+    "runtimeId": "327bd229-b588-4def-b562-15b9bd27a70c"
+  }
+}

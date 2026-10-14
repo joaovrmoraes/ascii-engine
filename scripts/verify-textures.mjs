@@ -166,7 +166,7 @@ try {
   await action(`ui('[data-studio-page="atmosphere"]')`)
   await check('Atmosphere returns to the map and releases isolated stages', 'document.querySelector("#texture-preview").hidden && document.querySelector("#effect-preview").hidden')
   await action(`ui('[data-k="close-studio"]'); window.finalDoc=area.document(); await area.openDocument(finalDoc)`)
-  await check('save/reopen keeps assets, object texture and part overrides', 'JSON.stringify(area.document().textures)===JSON.stringify(finalDoc.textures) && area.document().objects[1].options.parts.crown.alphabet==="oO@" && area.document().objects[2].options.parts.crown.color===0x72bece')
+  await check('save/reopen keeps assets, object texture and part overrides', 'JSON.stringify(area.document().textures)===JSON.stringify(finalDoc.textures) && area.document().objects[1].options.parts.crown.alphabet==="oO@" && area.document().objects[2].options.parts.crown.texture===textureKey && object("import").getObjectByName("leaf").userData.glyphResolved.color===0x72bece')
   await sleep(500)
   await send('Page.reload'); await sleep(1000); await until('!!window.area && area.document().name==="Texture studio validation"')
   await check('browser draft reload keeps textures', 'Object.values(area.document().textures)[0].name==="Blue hatch" && area.document().objects[0].options.alphabet===" .:-+#@"')
@@ -256,7 +256,7 @@ try {
   await action(`tx('apply');tx('name','Legacy character');tx('save')`)
   await check('screen appearance applies and saves as a portable recipe', `
     area.document().objects[0].options.glyph==='screen' && Object.values(area.document().textures).some(t=>t.name==='Legacy character'&&t.style.glyph==='screen')`)
-  await action(`ui('[data-k=close-studio]');ui('.asset-card[data-texture=sample]')`)
+  await action(`ui('[data-k=close-studio]');document.querySelector('.asset-card[data-texture=sample]').dispatchEvent(new MouseEvent('dblclick'))`)
   await check('opening a texture asset does not silently target the last object', `
     document.querySelector('[data-texture=object]').value==='' && document.querySelector('[data-texture=apply]').disabled &&
     document.querySelector('#texture-studio h2').textContent==='Edit texture: Sample texture'`)
@@ -264,6 +264,32 @@ try {
   await until('document.querySelector("#texture-preview canvas").dataset.ready==="scope-b"')
   await check('an explicit asset target keeps the opened appearance recipe', `
     document.querySelector('[data-texture-field=alphabet]').value==='XY' && document.querySelector('[data-texture-field=color]').value==='#88cc44'`)
+
+  await action(`ui('[data-k=close-studio]');await area.openDocument({version:1,name:'Linked textures',objects:[
+    {id:'link-a',prefab:'bloco',position:[-1,0,0],options:{texture:'ink',size:.3}},
+    {id:'link-b',prefab:'bloco',position:[1,0,0],options:{texture:'ink'}}],textures:{ink:{name:'Shared ink',style:{alphabet:'AB',color:0x88cc44}}}});select('link-a');ui('#selection [data-k=edit-letters]')`)
+  await until('document.querySelector("#texture-preview canvas").dataset.ready==="link-a"')
+  await check('linked target opens its recipe with a real used-by list', `document.querySelector('[data-texture=users]').textContent.includes('Used by 2 objects')`)
+  await action(`tf('alphabet','XYZ');tf('color','#dd8822');tx('save')`)
+  await until(`area.document().textures.ink.style.alphabet==='XYZ'&&!document.querySelector('[data-texture=save]').disabled`)
+  await check('saving a linked recipe updates every user while local overrides win', `['link-a','link-b'].every(id=>{let style;object(id).traverse(n=>{if(n.isMesh)style=n.userData.glyphResolved});return style.alphabet==='XYZ'&&style.color===0xdd8822&&(id!=='link-a'||style.size===.3)}) && !area.document().objects[1].options.alphabet`)
+  await shot('08-linked-texture-users')
+  await action(`ui('[data-k=close-studio]');window.linkDoc=area.document();await area.openDocument(linkDoc);select('link-a');ui('#selection [data-k=edit-letters]');tx('detach')`)
+  await until(`!area.document().objects[0].options.texture`)
+  await check('detach preserves appearance and leaves other users linked', `area.document().objects[0].options.alphabet==='XYZ'&&area.document().objects[0].options.size===.3&&area.document().objects[1].options.texture==='ink'`)
+  await action(`ui('[data-k=close-studio]');select('link-b');ui('#selection [data-k=edit-letters]');tx('detach')`)
+  await until(`!area.document().objects[1].options.texture`)
+  await check('linked resources survive reload and can detach independently', `area.document().objects[1].options.color===0xdd8822&&area.document().textures.ink.style.alphabet==='XYZ'`)
+
+  await action(`ui('[data-k=close-studio]');const dragDoc=area.document();dragDoc.objects[1].options={};await area.openDocument(dragDoc);
+    const card=document.querySelector('.asset-card[data-texture=ink]'), transfer=new DataTransfer();
+    card.dispatchEvent(new DragEvent('dragstart',{dataTransfer:transfer}));
+    const row=document.querySelector('#hierarchy [data-object-id="link-b"]');
+    row.dispatchEvent(new DragEvent('dragover',{dataTransfer:transfer,bubbles:true,cancelable:true}));
+    row.dispatchEvent(new DragEvent('drop',{dataTransfer:transfer,bubbles:true,cancelable:true}));`)
+  await check('dragging a library texture links the hierarchy object through its UI handler', `area.document().objects[1].options.texture==='ink' && !area.document().objects[1].options.alphabet`)
+  await action(`window.libraryBefore=JSON.stringify(area.document());ui('.asset-card[data-texture=ink]')`)
+  await check('single click selects a texture without opening or changing the map', `!document.body.classList.contains('texture-studio-active') && JSON.stringify(area.document())===libraryBefore`)
 
   await writeFile(output+'/test-scene.ascii.json',JSON.stringify(await evaluate('area.document()'),null,2))
   await writeFile(output+'/result.json',JSON.stringify({errors,passed:errors.length===0},null,2))

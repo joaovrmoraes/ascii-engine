@@ -3,7 +3,8 @@ import { createAsciiPass, type AsciiPassHook } from './ascii'
 import { ABSENT, createIllumination, MAX_INK_LIGHTS } from './illumination'
 import type { LightObstacle } from './exploration'
 import { DEFAULT_ASCII_STYLE, engineStyle, type AsciiStyle } from './config'
-import { glyphStyleSources, nodeGlyphStyle, resolveGlyphStyle, type GlyphStyle, type ObjectTypeStyle } from './style'
+import { glyphStyleSources, nodeGlyphStyle, resolveGlyphStyle, type GlyphStyle, type LinkedGlyphStyle, type ObjectTypeStyle } from './style'
+import type { TextureAsset } from './world/texture'
 import type { SurfaceKind } from './surface'
 import { bodyUniforms, glyphBody, removeGlyphBody, updateGlyphBodies, updateSkinnedBody, type BodyRamp } from './techniques/body'
 import { createCarpet, type Carpet, type GroundCover } from './techniques/carpet'
@@ -27,10 +28,10 @@ export interface AsciiEngineOptions {
 }
 
 /** Instance style plus the parts of this instance, by node name. */
-export interface AddOptions extends GlyphStyle {
+export interface AddOptions extends LinkedGlyphStyle {
   /** Object type registered in the style ("tree", "rock", …). */
   type?: string
-  parts?: Record<string, GlyphStyle>
+  parts?: Record<string, LinkedGlyphStyle>
 }
 
 interface Entry { object: THREE.Object3D; options: AddOptions }
@@ -103,6 +104,7 @@ export function createAsciiEngine(canvas: HTMLCanvasElement, options: AsciiEngin
   let reflectionRange = 11
   const entries = new Map<THREE.Object3D, Entry>()
   const types: Record<string, ObjectTypeStyle> = { ...style.types }
+  let textures: Record<string, TextureAsset> = {}
 
   const lights = new THREE.Group(); lights.name = 'ascii-style-lights'
   const hemisphere = new THREE.HemisphereLight()
@@ -175,7 +177,11 @@ export function createAsciiEngine(canvas: HTMLCanvasElement, options: AsciiEngin
     const groups = new Map<string, { style: GlyphStyle; meshes: THREE.Object3D[] }>()
     const missing: string[] = []
     // The instance layer is the style fields only (not `type` and `parts`).
-    const { type: _type, parts: _parts, ...instanceStyle } = instance
+    const { type: _type, parts: _parts, texture: _texture, ...instanceStyle } = instance
+    const linked = (id?: string) => {
+      if (id && !textures[id]) throw new Error(`ascii-engine: unknown texture "${id}"`)
+      return id ? textures[id].style : undefined
+    }
     const visit = (node: THREE.Object3D, part: string | undefined, nodeStyle: GlyphStyle | undefined, defaults: GlyphStyle | undefined) => {
       if (node.userData.glyphBodyOf) return
       // An object added on its own keeps its own styles (a tree inside a chunk).
@@ -185,11 +191,12 @@ export function createAsciiEngine(canvas: HTMLCanvasElement, options: AsciiEngin
       if (own && node.userData.glyphDefault) defaults = { ...defaults, ...own }
       else if (own) nodeStyle = { ...nodeStyle, ...own }
       if (node instanceof THREE.Mesh || node instanceof THREE.Points || node instanceof THREE.LineSegments) {
-        const style_ = resolveGlyphStyle({ defaults, global: style.glyphs, type, part, node: nodeStyle, instance: instanceStyle, instanceParts: instance.parts })
+        const layers = { defaults, global: style.glyphs, type, part, node: nodeStyle, texture: linked(instance.texture), texturePart: linked(part ? instance.parts?.[part]?.texture : undefined), instance: instanceStyle, instanceParts: instance.parts }
+        const style_ = resolveGlyphStyle(layers)
         if (!style_.glyph) missing.push(node.name || node.type)
         else {
           node.userData.glyphResolved = style_; node.userData.glyphPart = part
-          node.userData.glyphSources = glyphStyleSources({ defaults, global: style.glyphs, type, part, node: nodeStyle, instance: instanceStyle, instanceParts: instance.parts })
+          node.userData.glyphSources = glyphStyleSources(layers)
           // A body is the whole part (or whole object): one spacing hash.
           const key = `${part ?? ''}|${JSON.stringify(style_)}`
           let group = groups.get(key)
@@ -352,14 +359,14 @@ export function createAsciiEngine(canvas: HTMLCanvasElement, options: AsciiEngin
       }
     },
     /** Changes one part of one instance ("only this crown") and re-applies it. */
-    setPartStyle(object: THREE.Object3D, part: string, partStyle: GlyphStyle) {
+    setPartStyle(object: THREE.Object3D, part: string, partStyle: LinkedGlyphStyle) {
       const entry = entries.get(object)
       if (!entry) throw new Error('ascii-engine: object was not added with engine.add')
       entry.options.parts = { ...entry.options.parts, [part]: { ...entry.options.parts?.[part], ...partStyle } }
       unapply(entry); apply(entry)
     },
     /** Changes the instance layer of one added object (all its parts unless they override). */
-    setInstanceStyle(object: THREE.Object3D, instanceStyle: GlyphStyle) {
+    setInstanceStyle(object: THREE.Object3D, instanceStyle: AddOptions) {
       const entry = entries.get(object)
       if (!entry) throw new Error('ascii-engine: object was not added with engine.add')
       entry.options = { ...entry.options, ...instanceStyle }
@@ -409,6 +416,16 @@ export function createAsciiEngine(canvas: HTMLCanvasElement, options: AsciiEngin
     exportStyle(): Partial<AsciiStyle> { return JSON.parse(JSON.stringify({ ...style, types })) },
     /** Instance options of an added object (its own layer and its parts). */
     instanceStyle(object: THREE.Object3D) { return entries.get(object)?.options },
+    /** Update resources and re-resolve linked users without copying asset fields. */
+    setTextures(next: Record<string, TextureAsset>) {
+      for (const entry of entries.values()) {
+        const ids = [entry.options.texture, ...Object.values(entry.options.parts ?? {}).map(part => part.texture)]
+        for (const id of ids) if (id && !next[id]) throw new Error(`ascii-engine: texture is in use "${id}"`)
+      }
+      textures = structuredClone(next)
+      for (const entry of entries.values()) if (entry.options.texture || Object.values(entry.options.parts ?? {}).some(part => part.texture)) { unapply(entry); apply(entry) }
+    },
+    get textures(): Readonly<Record<string, TextureAsset>> { return textures },
 
     /** A carpet of standing letters; add `carpet.mesh` with `{ glyph: 'carpet' }`. */
     createCarpet(cover: GroundCover, seed = 48017) {

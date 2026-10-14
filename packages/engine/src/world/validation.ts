@@ -149,7 +149,15 @@ export function parseScene(input: unknown, library?: PrefabLibrary): SceneDoc {
     if (item.rotation3 !== undefined) vector(item.rotation3, `${path}.rotation3`, 3)
     if (item.scale3 !== undefined) vector(item.scale3, `${path}.scale3`, 3, .001)
     if (item.seed !== undefined) number(item.seed, `${path}.seed`, 0, 4294967295)
-    if (item.options !== undefined) style(item.options, `${path}.options`)
+    if (item.options !== undefined) {
+      style(item.options, `${path}.options`)
+      const options = record(item.options, `${path}.options`)
+      const link = (value: unknown, linkPath: string) => {
+        if (value !== undefined && (typeof value !== 'string' || !Object.hasOwn(root.textures ?? {}, value))) fail(linkPath, 'texture not found')
+      }
+      link(options.texture, `${path}.options.texture`)
+      for (const [name, raw] of Object.entries(options.parts ?? {})) link(record(raw, `${path}.options.parts.${name}`).texture, `${path}.options.parts.${name}.texture`)
+    }
     if (item.visible !== undefined && typeof item.visible !== 'boolean') fail(`${path}.visible`, 'must be a boolean')
     if (item.animation !== undefined && item.animation !== null && typeof item.animation !== 'string') fail(`${path}.animation`, 'must be a clip name or null')
     if (item.name !== undefined && typeof item.name !== 'string') fail(`${path}.name`, 'must be text')

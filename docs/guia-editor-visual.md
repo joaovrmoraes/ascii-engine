@@ -317,14 +317,16 @@ the draft. **Apply** writes the selected part, object, shared type or global lay
 to the scene to undo that application with the normal scene history.
 
 Name the texture and choose **Save to Assets**. It appears in **Assets →
-Textures**; opening a texture from the library uses **No target · editing asset
-only**. Choose an object explicitly before applying.
-Choose **Apply** to use it. Saving updates the open preset; **Save copy** adds
+Textures**; click selects; double-click opens with **No target · editing asset only**.
+Drag a texture onto a scene part, hierarchy object or selected inspector part to link it. Choose an object explicitly before applying.
+Choose a target and **Apply** to save and link the opened recipe. Local object/part
+overrides still win. Saving updates the open preset and every linked user; **Save copy** adds
 another. Texture assets live in `SceneDoc.textures`, survive browser drafts,
 project files, insertion and exports, and are shared within the open document.
 They store appearance snapshots plus optional `previewLighting`; applying the
-texture preserves scene lights. Editing a preset does not update instances
-that already received it.
+texture preserves scene lights. **Used by** lists linked objects. **Detach target** preserves the current appearance
+as local overrides. Existing copied appearances stay independent. Deleting an asset
+asks before detaching its users; API removal refuses resources still in use.
 
 **Download texture** / **Open texture**, under **Import or download file**,
 transfer a `.texture.json` file. Imported files are validated before use.

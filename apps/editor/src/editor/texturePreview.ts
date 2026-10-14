@@ -47,11 +47,11 @@ export function createTexturePreview(selectPart: (part: string) => void) {
     engine.camera.zoom = 1; controls.target.copy(center)
     engine.frame(center, span, Math.PI / 7); controls.update()
   }
-  function apply(nextPart: string, nextStyle: GlyphStyle, nextScope: TextureScope = nextPart ? 'part' : 'object') {
+  function apply(nextPart: string, nextStyle: GlyphStyle, nextScope: TextureScope = nextPart ? 'part' : 'object', textureId?: string) {
     part = nextPart; style = structuredClone(nextStyle); scope = nextScope
     const object = scene?.placed[0]?.object
     if (!object || !engine) return
-    const signature = JSON.stringify([part, scope, Object.entries(style).map(([key, value]) => [key, value === undefined ? { unset: true } : value])])
+    const signature = JSON.stringify([part, scope, textureId, Object.entries(style).map(([key, value]) => [key, value === undefined ? { unset: true } : value])])
     if (signature === appliedSignature) return
     // Re-add from its saved options so resetting a field or changing parts
     // cannot leave an earlier preview edit on the model.
@@ -63,9 +63,13 @@ export function createTexturePreview(selectPart: (part: string) => void) {
       const fields = Object.keys(style) as (keyof GlyphStyle)[]
       engine.setTypeStyle(type, part ? { parts: { [part]: style }, authored: { parts: { [part]: fields } } } : { style, authored: { style: fields } })
     }
-    engine.add(object, { ...structuredClone(baseline), ...(scope === 'type' ? { type: baseline.type ?? object.userData.prefab } : {}) })
-    if (scope === 'part' && part) engine.setPartStyle(object, part, style)
-    else if (scope === 'object') engine.setInstanceStyle(object, style)
+    if (textureId) engine.setTextures({ ...engine.textures, [textureId]: { name: 'Preview', style } })
+    const options = structuredClone(baseline)
+    if (textureId && scope === 'part') options.parts = { ...options.parts, [part]: { ...options.parts?.[part], texture: textureId } }
+    else if (textureId) options.texture = textureId
+    engine.add(object, { ...options, ...(scope === 'type' ? { type: baseline.type ?? object.userData.prefab } : {}) })
+    if (!textureId && scope === 'part' && part) engine.setPartStyle(object, part, style)
+    else if (!textureId && scope === 'object') engine.setInstanceStyle(object, style)
     appliedSignature = signature
     canvas.dataset.part = part; canvas.dataset.style = JSON.stringify(style); canvas.dataset.options = JSON.stringify(engine.instanceStyle(object))
   }
@@ -89,7 +93,7 @@ export function createTexturePreview(selectPart: (part: string) => void) {
       title.textContent = `Loading ${item.name ?? item.prefab}…`
       try {
         const source: SceneDoc = { version: 1, style: doc.style, objects: [{ ...item, visible: true, position: [0, 0, 0] }],
-          assets: doc.assets?.[item.prefab] ? { [item.prefab]: doc.assets[item.prefab] } : undefined, effects: doc.effects }
+          assets: doc.assets?.[item.prefab] ? { [item.prefab]: doc.assets[item.prefab] } : undefined, effects: doc.effects, textures: doc.textures }
         const loaded = await loadSceneAssets(source)
         if (request !== version || root.hidden) { loaded.dispose(); return }
         assets = loaded

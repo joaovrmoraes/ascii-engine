@@ -1,6 +1,6 @@
 import { glyphLabel } from '../editor/glyphCatalog'
 import * as THREE from 'three'
-import { buildScene, createTerrainData, createHistory, createEffectPrefabs, emptyScene, createWaterPaint, paintWater, loadSceneAssets, parseScene, waterEdge, type AsciiEngine, type Brush, type BuiltScene, type SceneDoc } from '@ascii-engine/core'
+import { textureUsers, detachTexture, buildScene, createTerrainData, createHistory, createEffectPrefabs, emptyScene, createWaterPaint, paintWater, loadSceneAssets, parseScene, waterEdge, type AsciiEngine, type Brush, type BuiltScene, type SceneDoc } from '@ascii-engine/core'
 import { pomorog } from '@ascii-engine/core/pomorog'
 import { createPrefabs } from '../scene/prefabs'
 import { downloadDocument, importModelFiles } from '../scene/files'
@@ -94,7 +94,7 @@ export async function createSandbox(engine: AsciiEngine, options: AreaOptions = 
       const next = buildScene(engine, doc, nextLibrary)
       effectEditor?.stop(); scene.dispose(); assets.dispose()
       scene = next; cameraEditor?.load(doc); initialCamera = doc.cameras?.[doc.activeCamera ?? '']; assets = nextAssets; library = nextLibrary; name = doc.name ?? 'Untitled'
-      engine.setStyle(nextStyle, { replace: true })
+      engine.setStyle(nextStyle, { replace: true }); engine.setTextures(doc.textures ?? {})
       selected = undefined; selectedWater = -1; gizmos?.attach(); gizmos?.cursor()
       canvas.dispatchEvent(new Event('scene-replaced'))
       refreshTools(); refreshHierarchy(); effectEditor?.refresh(); atmosphereStudio?.refresh(); textureStudio?.refresh()
@@ -123,7 +123,7 @@ export async function createSandbox(engine: AsciiEngine, options: AreaOptions = 
   function exportItem() {
     if (!selected) return
     const doc = snapshot(), item = doc.objects[scene.placed.findIndex(p => p.object === selected)]
-    downloadDocument({ version: 1, name: item.name || item.prefab, style: doc.style, objects: [{ ...item, position: [0, 0, 0] }], assets: doc.assets?.[item.prefab] ? { [item.prefab]: doc.assets[item.prefab] } : undefined, effects: doc.effects?.[item.prefab] ? { [item.prefab]: doc.effects[item.prefab] } : undefined }, 'item.json')
+    downloadDocument({ version: 1, name: item.name || item.prefab, style: doc.style, textures: doc.textures, objects: [{ ...item, position: [0, 0, 0] }], assets: doc.assets?.[item.prefab] ? { [item.prefab]: doc.assets[item.prefab] } : undefined, effects: doc.effects?.[item.prefab] ? { [item.prefab]: doc.effects[item.prefab] } : undefined }, 'item.json')
   }
   function refreshHistory() {
     if (!toolbar) return
@@ -208,20 +208,20 @@ export async function createSandbox(engine: AsciiEngine, options: AreaOptions = 
     for (const [key, asset] of Object.entries(atmospheres)) {
       if (assetCategory !== 'All' && assetCategory !== 'Atmospheres' || !normalized(asset.name).includes(normalized(assetQuery))) continue
       const card = document.createElement('button'); card.className = 'asset-card'; card.dataset.atmosphere = key
-      card.title = `Click to apply ${asset.name}; double-click to edit`; card.style.setProperty('--asset-color', '#b4a6cf')
+      card.title = `Click to select ${asset.name}; double-click to edit; Apply to change the scene`; card.style.setProperty('--asset-color', '#b4a6cf')
       card.innerHTML = `<span class="asset-thumbnail">${icon('spark')}</span>`
       const label = document.createElement('span'); label.textContent = asset.name; card.append(label)
-      card.onclick = () => { placement.clear(); tool.kind = 'select'; gizmos?.attach(selected); gizmos?.cursor(); refreshHint(); grid.querySelectorAll('.active').forEach(card => card.classList.remove('active')); atmosphereStudio!.applyAsset(key) }
+      card.onclick = () => { placement.clear(); tool.kind = 'select'; gizmos?.attach(selected); gizmos?.cursor(); refreshHint(); grid.querySelectorAll('.active').forEach(card => card.classList.remove('active')); card.classList.add('active'); grid.querySelector('[data-resource-action]')?.remove(); const action = document.createElement('button'); action.dataset.resourceAction = 'apply-atmosphere'; action.textContent = `Apply ${asset.name} to scene`; action.onclick = () => atmosphereStudio!.applyAsset(key); grid.append(action) }
       card.ondblclick = () => { atmosphereStudio!.applyAsset(key); ui!.showStudio('atmosphere') }
       grid.append(card)
     }
     for (const [key, asset] of Object.entries(doc.textures ?? {})) {
       if (assetCategory !== 'All' && assetCategory !== 'Textures' || !normalized(asset.name).includes(normalized(assetQuery))) continue
       const card = document.createElement('button'); card.className = 'asset-card'; card.dataset.texture = key
-      card.title = `Open ${asset.name} in the Texture studio`; card.style.setProperty('--asset-color', '#96bfbe')
+      card.title = `Click to select ${asset.name}; double-click to edit; drag onto an object or part to link`; card.draggable = true; card.style.setProperty('--asset-color', '#96bfbe')
       const thumbnail = document.createElement('span'); thumbnail.className = 'asset-thumbnail texture-thumbnail'; thumbnail.textContent = asset.style.alphabet ?? '@#*:'
       const label = document.createElement('span'); label.textContent = asset.name; card.append(thumbnail, label)
-      card.onclick = () => { textureStudio!.editAsset(key, true); ui!.showStudio('textures') }; grid.append(card)
+      card.onclick = () => { grid.querySelectorAll('.active').forEach(card => card.classList.remove('active')); card.classList.add('active'); message(`Texture selected: ${asset.name}. Drag onto an object or part; double-click to edit.`) }; card.ondblclick = () => { textureStudio!.editAsset(key, true); ui!.showStudio('textures') }; card.ondragstart = event => { event.dataTransfer?.setData('application/x-ascii-texture', key); if (event.dataTransfer) event.dataTransfer.effectAllowed = 'link' }; grid.append(card)
     }
     if (!grid.childElementCount) { const hint = document.createElement('p'); hint.className = 'empty-library'; hint.textContent = assetCategory === 'Imported' ? 'Use Import model to add your GLB and GLTF files.' : assetCategory === 'Atmospheres' ? 'Create an atmosphere in the Studio and choose Save to Assets.' : assetCategory === 'Textures' ? 'Select an object, open Textures in the Studio and choose Save to Assets.' : 'No assets found.'; grid.append(hint) }
   }
@@ -394,11 +394,23 @@ export async function createSandbox(engine: AsciiEngine, options: AreaOptions = 
         await replace(doc); if (chosen) choose(scene.placed.find(item => item.doc.id === chosen)?.object)
         selectAssetCategory('Textures'); changed()
       },
-      async apply(id, part, style, scope) {
+      async detach(id, part) {
+        const doc = snapshot(), item = doc.objects.find(item => item.id === id)
+        if (!item) throw new Error('Object not found: ' + id)
+        item.options = detachTexture(item.options ?? {}, doc.textures ?? {}, part)
+        await replace(doc); choose(scene.placed.find(item => item.doc.id === id)?.object); changed()
+      },
+      async remove(id) {
+        const doc = snapshot()
+        for (const item of textureUsers(doc, id)) item.options = detachTexture(item.options ?? {}, doc.textures ?? {})
+        delete doc.textures![id]; await replace(doc); changed()
+      },
+      async apply(id, part, style, scope, textureId) {
         if (scope === 'global') { engine.setStyle({ glyphs: { ...engine.style.glyphs, ...style } }); changed(); return }
         const object = scene.placed.find(item => item.doc.id === id)?.object
         if (!object) throw new Error('Select an object before applying a texture.')
         if (part && !object.getObjectByName(part)) throw new Error('Part not found: ' + part)
+        if (textureId) { part ? engine.setPartStyle(object, part, { texture: textureId }) : engine.setInstanceStyle(object, { texture: textureId }); choose(object); changed(); return }
         if (scope === 'type') {
           const type = engine.instanceStyle(object)?.type ?? object.userData.prefab
           if (!type) throw new Error('This object has no shared type.')
@@ -413,6 +425,18 @@ export async function createSandbox(engine: AsciiEngine, options: AreaOptions = 
     })
     cameraEditor = createSceneCameras(engine, { viewChanged: () => { refreshHierarchy(); refreshHint() }, changed, select: choose, focus: () => focus.clone() }); cameraEditor.load(scene.toJSON())
     gizmos = createGizmos(engine, { change: () => { if (tool.kind === 'place') placement.lock(); else { cameraEditor?.syncSelected(); syncTransformFields() } }, commit: () => { if (tool.kind !== 'place') changed() }, allowed: () => !busy && !preview && !cameraEditor?.viewed && !document.body.classList.contains('studio-mode') && (tool.kind === 'select' || tool.kind === 'place') && transformMode !== 'hand' && transformMode !== 'orbit' })
+    for (const surface of [ui.sidebar, ui.hierarchy]) {
+      surface.addEventListener('dragover', event => { if ((event as DragEvent).dataTransfer?.types.includes('application/x-ascii-texture')) event.preventDefault() }, { signal: signal.signal })
+      surface.addEventListener('drop', event => {
+        const e = event as DragEvent, id = e.dataTransfer?.getData('application/x-ascii-texture')
+        const objectId = (e.target as HTMLElement).closest<HTMLElement>('[data-object-id]')?.dataset.objectId
+        const object = objectId ? scene.placed.find(item => item.doc.id === objectId)?.object : selected
+        if (!id || !object || !snapshot().textures?.[id]) return
+        e.preventDefault(); e.stopPropagation()
+        const part = surface === ui!.sidebar && appearanceObject === object ? appearancePart : undefined
+        part ? engine.setPartStyle(object, part, { texture: id }) : engine.setInstanceStyle(object, { texture: id }); choose(object); changed()
+      }, { signal: signal.signal })
+    }
     const el = <T extends HTMLElement>(key: string) => ui!.get<T>(`[data-k="${key}"]`)
     el<HTMLInputElement>('name').value = name
     el<HTMLInputElement>('name').onchange = e => { name = (e.target as HTMLInputElement).value || 'Untitled'; changed() }
@@ -473,13 +497,21 @@ export async function createSandbox(engine: AsciiEngine, options: AreaOptions = 
       for (const [key, asset] of Object.entries(item.assets ?? {})) { doc.assets ??= {}; doc.assets[remap.get(key)!] = asset }
       for (const [key, definition] of Object.entries(item.effects ?? {})) { const id = `fx:custom-${crypto.randomUUID()}`; remap.set(key, id); doc.effects ??= {}; doc.effects[id] = definition }
       for (const asset of Object.values(item.atmospheres ?? {})) { doc.atmospheres ??= {}; doc.atmospheres[`atmosphere-${crypto.randomUUID()}`] = asset }
-      for (const asset of Object.values(item.textures ?? {})) { doc.textures ??= {}; doc.textures[`texture-${crypto.randomUUID()}`] = asset }
+      const textureRemap = new Map<string, string>()
+      for (const [key, asset] of Object.entries(item.textures ?? {})) { const id = `texture-${crypto.randomUUID()}`; textureRemap.set(key, id); doc.textures ??= {}; doc.textures[id] = asset }
       for (const camera of Object.values(item.cameras ?? {})) { doc.cameras ??= {}; doc.cameras[`camera-${crypto.randomUUID()}`] = { ...camera, position: [camera.position[0] + focus.x, camera.position[1], camera.position[2] + focus.z] } }
+      const insertedTypes = new Map<string, string>()
       for (const object of item.objects) {
-        const type = object.options?.type ?? object.prefab, typeStyle = item.style?.types?.[type]
+        const type = object.options?.type ?? object.prefab, typeStyle = item.style?.types?.[type] ?? library[object.prefab]?.style
+        const objectOptions = structuredClone(object.options ?? {})
+        if (objectOptions.texture) objectOptions.texture = textureRemap.get(objectOptions.texture) ?? objectOptions.texture
+        for (const part of Object.values(objectOptions.parts ?? {})) if (part.texture) part.texture = textureRemap.get(part.texture) ?? part.texture
+        let insertedType = insertedTypes.get(type)
+        if (!insertedType) { insertedType = `item-type-${crypto.randomUUID()}`; insertedTypes.set(type, insertedType); doc.style ??= {}; doc.style.types ??= {}; doc.style.types[insertedType] = { ...typeStyle, style: { ...item.style?.glyphs, ...typeStyle?.style } } }
+        objectOptions.type = insertedType
         doc.objects.push({ ...object, id: crypto.randomUUID(), prefab: remap.get(object.prefab) ?? object.prefab,
           position: [object.position[0] + focus.x, object.position[1] + (scene.terrain?.heightAt(focus.x, focus.z) ?? 0), object.position[2] + focus.z],
-          options: { ...item.style?.glyphs, ...typeStyle?.style, ...object.options, parts: { ...typeStyle?.parts, ...object.options?.parts } },
+          options: objectOptions,
         })
       }
       await replace(doc); changed()
@@ -496,6 +528,7 @@ export async function createSandbox(engine: AsciiEngine, options: AreaOptions = 
       return scene.terrain ? raycaster.intersectObject(scene.terrain.mesh)[0]?.point : raycaster.ray.intersectPlane(plane, new THREE.Vector3())
     }
     canvas.addEventListener('dragover', e => {
+      if (e.dataTransfer?.types.includes('application/x-ascii-texture') && !busy && !preview) { e.preventDefault(); e.dataTransfer.dropEffect = 'link'; return }
       if (!e.dataTransfer?.types.includes('application/x-ascii-prefab') || busy || preview) return
       e.preventDefault(); e.dataTransfer.dropEffect = 'copy'
       const point = groundAt(e); gizmos!.cursor(); placement.show(tool.prefab, point ?? undefined)
@@ -503,6 +536,8 @@ export async function createSandbox(engine: AsciiEngine, options: AreaOptions = 
     }, { signal: signal.signal })
     canvas.addEventListener('dragleave', () => { placement.clear(); gizmos!.cursor(); ui!.get('#placement-label').hidden = true }, { signal: signal.signal })
     canvas.addEventListener('drop', e => {
+      const texture = e.dataTransfer?.getData('application/x-ascii-texture')
+      if (texture) { e.preventDefault(); e.stopPropagation(); const rect = canvas.getBoundingClientRect(), hit = engine.pick((e.clientX - rect.left) / rect.width * 2 - 1, 1 - (e.clientY - rect.top) / rect.height * 2); if (hit && scene.placed.some(item => item.object === hit.object)) { hit.part ? engine.setPartStyle(hit.object, hit.part, { texture }) : engine.setInstanceStyle(hit.object, { texture }); choose(hit.object); changed() } return }
       const key = e.dataTransfer?.getData('application/x-ascii-prefab')
       if (!key || !library[key]) return
       e.preventDefault(); e.stopPropagation(); const point = groundAt(e)

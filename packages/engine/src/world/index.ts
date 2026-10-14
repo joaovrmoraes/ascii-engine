@@ -91,6 +91,8 @@ export {
 } from './camera'
 export {
   textureStyle,
+  textureUsers,
+  detachTexture,
   type TextureAsset,
 } from './texture'
 export {

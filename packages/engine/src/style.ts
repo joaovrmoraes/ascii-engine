@@ -72,12 +72,15 @@ export interface ObjectTypeStyle {
   authored?: { style?: (keyof GlyphStyle)[]; parts?: Record<string, (keyof GlyphStyle)[]> }
 }
 
+/** Asset reference is a layer, never part of the portable appearance recipe. */
+export interface LinkedGlyphStyle extends GlyphStyle { texture?: string }
+
 /** Later layers win; `undefined` fields never erase earlier ones. */
 export function mergeGlyphStyles(...layers: (GlyphStyle | undefined)[]): GlyphStyle {
   const out: GlyphStyle = {}
   for (const layer of layers) {
     if (!layer) continue
-    for (const [key, value] of Object.entries(layer)) if (value !== undefined) (out as Record<string, unknown>)[key] = value
+    for (const [key, value] of Object.entries(layer)) if (key !== 'texture' && value !== undefined) (out as Record<string, unknown>)[key] = value
   }
   return out
 }
@@ -89,6 +92,8 @@ export interface StyleLayers {
   type?: ObjectTypeStyle
   /** Style carried by the node itself (`userData.glyph` / `userData.glyphStyle`, e.g. from GLTF). */
   node?: GlyphStyle
+  texture?: GlyphStyle
+  texturePart?: GlyphStyle
   instance?: GlyphStyle
   instanceParts?: Record<string, GlyphStyle>
   /** Name of the part the node belongs to, if any. */
@@ -106,6 +111,7 @@ function glyphLayers(layers: StyleLayers): [string, GlyphStyle | undefined][] {
     ['type part', part ? layers.type?.parts?.[part] : undefined], ['model part', layers.node],
     ['authored type', authored(layers.type?.style, layers.type?.authored?.style)],
     ['authored type part', part ? authored(layers.type?.parts?.[part], layers.type?.authored?.parts?.[part]) : undefined],
+    ['linked texture', layers.texture], ['linked part texture', layers.texturePart],
     ['instance', layers.instance], ['instance part', part ? layers.instanceParts?.[part] : undefined]]
 }
 export function resolveGlyphStyle(layers: StyleLayers): GlyphStyle {

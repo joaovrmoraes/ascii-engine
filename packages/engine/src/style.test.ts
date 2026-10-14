@@ -2,6 +2,11 @@ import { describe, expect, it } from 'vitest'
 import { glyphStyleSources, mergeGlyphStyles, nodeGlyphStyle, resolveGlyphStyle } from './style'
 
 describe('glyph style layers', () => {
+  it('resolves linked object/part recipes below both local override layers', () => {
+    const layers = { global: { size: .1 }, node: { size: .2 }, texture: { size: .3, alphabet: 'AB' }, texturePart: { size: .4, color: 123 }, instance: { size: .5 }, instanceParts: { crown: { color: 456, texture: 'ink' } }, part: 'crown' }
+    expect(resolveGlyphStyle(layers)).toEqual({ size: .5, alphabet: 'AB', color: 456 })
+    expect(glyphStyleSources(layers)).toEqual({ size: 'instance', alphabet: 'linked texture', color: 'instance part' })
+  })
   it('reports per-field origins without changing resolution or treating undefined as an override', () => {
     const layers = { defaults: { glyph: 'surface' as const }, global: { size: .17, color: 0xffffff }, type: { style: { size: .2 } }, instance: { color: 0x44bb66, size: undefined } }
     expect(glyphStyleSources(layers)).toEqual({ glyph: 'model default', size: 'type', color: 'instance' })

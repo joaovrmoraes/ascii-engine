@@ -130,6 +130,14 @@ try {
   const inspected=await invoke('object_inspect',{id:'imported'})
   assert(inspected.parts.some(p=>p.name==='blade'),'MCP inspects imported mesh parts')
   assert((await invoke('scene_read',{full:true})).document.objects.find(object=>object.id==='imported').options.parts.blade.alphabet===texture.style.alphabet,'MCP applies a reusable texture to an imported named part')
+  state=await invoke('scene_apply',{revision:state.revision,preview:false,commands:[
+    {op:'object.add',object:{id:'linked',prefab:'bloco',position:[3,0,3]}},
+    {op:'texture.apply',id:'mcp-symbols',objectId:'linked',link:true}]})
+  assert((await invoke('object_inspect',{id:'linked'})).options.texture==='mcp-symbols','actual MCP stores a linked texture without copying fields')
+  await invoke('scene_apply',{revision:state.revision,preview:false,commands:[{op:'resource.remove',kind:'textures',id:'mcp-symbols'}]},true)
+  state=await invoke('scene_apply',{revision:state.revision,preview:false,commands:[{op:'texture.detach',objectId:'linked'}]})
+  const detached=await invoke('object_inspect',{id:'linked'})
+  assert(!detached.options.texture&&detached.options.alphabet===texture.style.alphabet,'actual MCP detach preserves the appearance recipe')
   const capture=await invoke('editor_capture')
   await writeFile(join(output,'mcp-cena.png'),Buffer.from(capture.content[0].data,'base64'))
   assert(capture.content[0].mimeType==='image/png'&&capture.content[0].data.length>10000,'MCP returns actual rendered scene as image content')

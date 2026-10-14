@@ -1,5 +1,5 @@
 import * as THREE from 'three'
-import { GLYPH_STYLE_KEYS, atmosphereStyle, createHistory, parseScene, textureStyle, validGlyphAlphabet, type AtmosphereStyle, type GlyphStyle, type SceneDoc, type TextureAsset } from '@ascii-engine/core'
+import { textureUsers, GLYPH_STYLE_KEYS, atmosphereStyle, createHistory, parseScene, textureStyle, validGlyphAlphabet, type AtmosphereStyle, type GlyphStyle, type SceneDoc, type TextureAsset } from '@ascii-engine/core'
 import { pomorog } from '@ascii-engine/core/pomorog'
 import { createTexturePreview } from './texturePreview'
 import { GLYPH_FAMILIES, defaultGlyphSize, glyphAlphabet, glyphLabel, modelGlyphColor } from './glyphCatalog'
@@ -13,7 +13,9 @@ export function createTextureStudio(root: HTMLElement, callbacks: {
   selected(): string | undefined
   select(id: string): void
   save(id: string, asset: TextureAsset): Promise<void>
-  apply(id: string, part: string, style: GlyphStyle, scope: TextureScope): Promise<void>
+  apply(id: string, part: string, style: GlyphStyle, scope: TextureScope, textureId?: string): Promise<void>
+  detach(id: string, part?: string): Promise<void>
+  remove(id: string): Promise<void>
   type(id: string): string | undefined
   typeName(id: string): string | undefined
   applyLighting(style: AtmosphereStyle): Promise<void>
@@ -32,7 +34,7 @@ export function createTextureStudio(root: HTMLElement, callbacks: {
     <div class="fx-toolbar"><select data-texture="asset" aria-label="Saved texture"></select><button data-texture="reset">Reset edits</button><button data-texture="undo" aria-label="Undo texture edit">↶</button><button data-texture="redo" aria-label="Redo texture edit">↷</button></div>
     <p class="fx-status" role="status">Choose an object to begin.</p><nav class="texture-controls-nav" aria-label="Texture controls"></nav><div class="fx-fields studio-fields texture-fields"></div>
     <details class="fx-files"><summary>Import or download file</summary><button data-texture="export">Download texture</button><label class="file">Open texture<input data-texture="import" type="file" accept=".json" hidden></label></details>
-    <footer class="studio-save"><span data-texture="saved-note">Not yet saved to Assets</span><div><button data-texture="apply" class="primary">Apply to object</button><button data-texture="save">Save to Assets</button><button data-texture="copy">Save copy</button><button data-texture="reveal">Show in Assets</button></div></footer>`
+    <footer class="studio-save"><span data-texture="saved-note">Not yet saved to Assets</span><p data-texture="users"></p><div><button data-texture="detach">Detach target</button><button data-texture="delete">Delete asset</button><button data-texture="apply" class="primary">Apply to object</button><button data-texture="save">Save to Assets</button><button data-texture="copy">Save copy</button><button data-texture="reveal">Show in Assets</button></div></footer>`
   const get = <T extends HTMLElement = HTMLElement>(key: string) => root.querySelector<T>(`[data-texture="${key}"]`)!
   const status = (message: string) => { root.querySelector('.fx-status')!.textContent = message }
   const target = () => callbacks.objects().find(item => item.id === objectId)?.object
@@ -44,6 +46,7 @@ export function createTextureStudio(root: HTMLElement, callbacks: {
     const edits = Object.fromEntries([...touched].filter(key => key in patch).map(key => [key, patch[key]]))
     return scope === 'type' || scope === 'global' ? edits : { gap: 0, ...edits }
   }
+  function applyPreview(nextPart: string, style: GlyphStyle, nextScope: TextureScope) { stage.apply(nextPart, style, nextScope, (nextScope === 'object' || nextScope === 'part') ? selectedKey : undefined) }
   function beginEdits() {
     touched.clear()
     const options = callbacks.document().objects.find(item => item.id === objectId)?.options
@@ -78,11 +81,16 @@ export function createTextureStudio(root: HTMLElement, callbacks: {
     get<HTMLButtonElement>('reveal').disabled = !saved
     get<HTMLButtonElement>('undo').disabled = !history.canUndo; get<HTMLButtonElement>('redo').disabled = !history.canRedo
     get<HTMLButtonElement>('apply').disabled = (scope !== 'global' && !target()) || saving
+    const users = selectedKey ? textureUsers(callbacks.document(), selectedKey) : []
+    get('users').textContent = selectedKey ? `Used by ${users.length} objects${users.length ? ': ' + users.map(item => item.name ?? item.id).join(', ') : ''}` : ''
+    get<HTMLButtonElement>('delete').disabled = !saved || saving
+    const options = callbacks.document().objects.find(item => item.id === objectId)?.options
+    get<HTMLButtonElement>('detach').disabled = scope === 'type' || scope === 'global' || !(scope === 'part' ? options?.parts?.[part]?.texture : options?.texture || Object.values(options?.parts ?? {}).some(part => part.texture))
     get('apply').textContent = scope === 'global' ? 'Apply globally' : scope === 'type' ? 'Apply to every copy' : scope === 'part' ? 'Apply to part' : 'Apply to object'
   }
   function edited(commit = true) {
     if (commit) history.commit(draft)
-    stage.apply(scope === 'object' ? '' : part, previewStyle(), scope); stage.setLighting(draft.previewLighting); savedNote()
+    applyPreview(scope === 'object' ? '' : part, previewStyle(), scope); stage.setLighting(draft.previewLighting); savedNote()
     status('Preview updated. Apply to update the selected object; Save to Assets keeps a reusable texture.')
   }
   function refreshTargets() {
@@ -285,13 +293,13 @@ export function createTextureStudio(root: HTMLElement, callbacks: {
   }
   async function showObject(id: string, nextPart = '') {
     assetOnly = false; recipeDraft = false; objectId = id; part = nextPart; scope = part ? 'part' : 'object'; baseline = appearance(); beginEdits(); draft = { name: 'My texture', style: startingStyle() }
-    selectedKey = undefined; history.reset(draft); render(); stage.apply(part, previewStyle(), scope); stage.setLighting(draft.previewLighting)
+    selectedKey = part ? callbacks.document().objects.find(item => item.id === id)?.options?.parts?.[part]?.texture : callbacks.document().objects.find(item => item.id === id)?.options?.texture; if (selectedKey) { draft = structuredClone(callbacks.document().textures![selectedKey]); recipeDraft = true } history.reset(draft); render(); applyPreview(part, previewStyle(), scope); stage.setLighting(draft.previewLighting)
     if (active) await stage.show(callbacks.document(), objectId)
     status(target() ? 'Adjust the letters in the preview, then apply or save.' : 'Add or import an object in the scene, then select it here.')
   }
-  function selectPart(value: string) { part = value; if (scope !== 'type' && scope !== 'global') scope = part ? 'part' : 'object'; baseline = appearance(); beginEdits(); if (!selectedKey && !recipeDraft) draft.style = startingStyle(); draft.cleared = []; history.reset(draft); render(); stage.apply(part, previewStyle(), scope); stage.setLighting(draft.previewLighting) }
-  function undo(redo = false) { const next = redo ? history.redo() : history.undo(); if (next) { draft = next; render(); stage.apply(part, previewStyle(), scope); stage.setLighting(draft.previewLighting) } }
-  function editAsset(key: string, withoutTarget = false) { const asset = callbacks.document().textures?.[key]; if (!asset) return; recipeDraft = true; if (withoutTarget) { assetOnly = true; objectId = ''; part = ''; scope = 'object' } selectedKey = key; beginEdits(); baseline = appearance(); draft = structuredClone(asset); history.reset(draft); render(); stage.apply(part, previewStyle(), scope); stage.setLighting(draft.previewLighting); if (active && withoutTarget) void stage.show(callbacks.document()); status('Saved texture opened. Choose a target to apply, or edit this asset only.') }
+  function selectPart(value: string) { part = value; if (scope !== 'type' && scope !== 'global') scope = part ? 'part' : 'object'; baseline = appearance(); beginEdits(); if (!selectedKey && !recipeDraft) draft.style = startingStyle(); draft.cleared = []; history.reset(draft); render(); applyPreview(part, previewStyle(), scope); stage.setLighting(draft.previewLighting) }
+  function undo(redo = false) { const next = redo ? history.redo() : history.undo(); if (next) { draft = next; render(); applyPreview(part, previewStyle(), scope); stage.setLighting(draft.previewLighting) } }
+  function editAsset(key: string, withoutTarget = false) { const asset = callbacks.document().textures?.[key]; if (!asset) return; recipeDraft = true; if (withoutTarget) { assetOnly = true; objectId = ''; part = ''; scope = 'object' } selectedKey = key; beginEdits(); baseline = appearance(); draft = structuredClone(asset); history.reset(draft); render(); applyPreview(part, previewStyle(), scope); stage.setLighting(draft.previewLighting); if (active && withoutTarget) void stage.show(callbacks.document()); status('Saved texture opened. Choose a target to apply, or edit this asset only.') }
   async function save(copy = false) {
     if (saving) return
     draft.name = get<HTMLInputElement>('name').value.trim()
@@ -305,16 +313,18 @@ export function createTextureStudio(root: HTMLElement, callbacks: {
   }
   async function apply() {
     if (scope !== 'global' && !target() || saving) return
-    try { parseScene({ version: 1, objects: [], textures: { draft: asset() } }); await callbacks.apply(objectId, scope === 'object' ? '' : part, previewStyle(), scope); stage.commit(); status('Texture applied. Return to the scene to see it; Ctrl Z in the scene undoes the change.') }
+    try { parseScene({ version: 1, objects: [], textures: { draft: asset() } }); const linkedId = scope === 'object' || scope === 'part' ? selectedKey : undefined; if (linkedId) await callbacks.save(linkedId, asset()); await callbacks.apply(objectId, scope === 'object' ? '' : part, previewStyle(), scope, linkedId); stage.commit(); status('Texture applied. Return to the scene to see it; Ctrl Z in the scene undoes the change.') }
     catch (error) { status(String(error)) }
   }
-  get<HTMLSelectElement>('object').onchange = e => { const id = (e.target as HTMLSelectElement).value; callbacks.select(id); if (assetOnly) { assetOnly = false; objectId = id; baseline = appearance(); beginEdits(); render(); void stage.show(callbacks.document(), id); stage.apply(part, previewStyle(), scope) } else void showObject(id) }
-  get<HTMLSelectElement>('scope').onchange = e => { scope = (e.target as HTMLSelectElement).value as TextureScope; baseline = appearance(); beginEdits(); if (!selectedKey && !recipeDraft) draft.style = startingStyle(); draft.cleared = []; history.reset(draft); render(); stage.apply(part, previewStyle(), scope) }
+  get<HTMLSelectElement>('object').onchange = e => { const id = (e.target as HTMLSelectElement).value; callbacks.select(id); if (assetOnly) { assetOnly = false; objectId = id; baseline = appearance(); beginEdits(); render(); void stage.show(callbacks.document(), id); applyPreview(part, previewStyle(), scope) } else void showObject(id) }
+  get<HTMLSelectElement>('scope').onchange = e => { scope = (e.target as HTMLSelectElement).value as TextureScope; baseline = appearance(); beginEdits(); if (!selectedKey && !recipeDraft) draft.style = startingStyle(); draft.cleared = []; history.reset(draft); render(); applyPreview(part, previewStyle(), scope) }
   get<HTMLSelectElement>('part').onchange = e => selectPart((e.target as HTMLSelectElement).value)
   get<HTMLSelectElement>('asset').onchange = e => editAsset((e.target as HTMLSelectElement).value)
   get<HTMLInputElement>('name').oninput = () => { draft.name = get<HTMLInputElement>('name').value; savedNote() }; get<HTMLInputElement>('name').onchange = () => history.commit(draft)
   get('reset').onclick = () => { draft.style = startingStyle(); draft.cleared = []; edited(); render() }
   get('undo').onclick = () => undo(); get('redo').onclick = () => undo(true)
+  get('detach').onclick = async () => { try { await callbacks.detach(objectId, scope === 'part' ? part : undefined); baseline = appearance(); beginEdits(); render(); status('Detached: the appearance is now a local snapshot.'); if (active) await stage.show(callbacks.document(), objectId) } catch (error) { status(String(error)) } }
+  get('delete').onclick = async () => { if (!selectedKey) return; const count = textureUsers(callbacks.document(), selectedKey).length; if (!confirm(count ? `Delete this texture and detach its ${count} users, preserving their appearance?` : 'Delete this texture asset?')) return; try { await callbacks.remove(selectedKey); selectedKey = undefined; render(); status('Texture deleted. Its users retain their appearance.') } catch (error) { status(String(error)) } }
   get('apply').onclick = () => { void apply() }; get('save').onclick = () => { void save() }; get('copy').onclick = () => { void save(true) }; get('reveal').onclick = callbacks.reveal
   get('export').onclick = () => {
     const url = URL.createObjectURL(new Blob([JSON.stringify({ version: 1, name: draft.name, texture: textureStyle(draft.style), ...(draft.previewLighting ? { previewLighting: draft.previewLighting } : {}) }, null, 2)], { type: 'application/json' })), link = document.createElement('a')
@@ -325,7 +335,7 @@ export function createTextureStudio(root: HTMLElement, callbacks: {
     try {
       const content = JSON.parse(await file.text()); if (content.version !== 1 || !content.texture) throw new Error('Invalid texture file.')
       const asset = { name: typeof content.name === 'string' ? content.name : file.name, style: content.texture, ...(content.previewLighting ? { previewLighting: content.previewLighting } : {}) }
-      parseScene({ version: 1, objects: [], textures: { imported: asset } }); beginEdits(); recipeDraft = true; draft = asset; selectedKey = undefined; history.reset(draft); render(); stage.apply(part, previewStyle(), scope); stage.setLighting(draft.previewLighting); status('Texture opened. Apply to the selection or save to Assets.')
+      parseScene({ version: 1, objects: [], textures: { imported: asset } }); beginEdits(); recipeDraft = true; draft = asset; selectedKey = undefined; history.reset(draft); render(); applyPreview(part, previewStyle(), scope); stage.setLighting(draft.previewLighting); status('Texture opened. Apply to the selection or save to Assets.')
     } catch (error) { status(String(error)) }
   }
   addEventListener('keydown', event => {
@@ -335,10 +345,10 @@ export function createTextureStudio(root: HTMLElement, callbacks: {
   root.closest('#editor-workspace')!.addEventListener('project-tab', event => {
     active = (event as CustomEvent).detail === 'textures'
     if (active) {
-      if (assetOnly) { render(); stage.apply(part, previewStyle(), scope); stage.setLighting(draft.previewLighting); void stage.show(callbacks.document()); return }
+      if (assetOnly) { render(); applyPreview(part, previewStyle(), scope); stage.setLighting(draft.previewLighting); void stage.show(callbacks.document()); return }
       const id = assetOnly ? '' : callbacks.selected() ?? objectId
       if (id !== objectId || !target()) void showObject(id)
-      else { render(); stage.apply(part, previewStyle(), scope); stage.setLighting(draft.previewLighting); void stage.show(callbacks.document(), objectId) }
+      else { render(); applyPreview(part, previewStyle(), scope); stage.setLighting(draft.previewLighting); void stage.show(callbacks.document(), objectId) }
     } else stage.hide()
   }, { signal: abort.signal })
   render()
