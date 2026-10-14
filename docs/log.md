@@ -4,6 +4,30 @@ Entries describe the state at each stage. Earlier limitations may have been
 resolved later; START.md and the editor guide describe the current scope.
 Historical filenames, reference IDs and captured interfaces are preserved.
 
+## 2026-10-14 — Editor consolidation stage 3: one appearance editor
+
+Texture Studio now edits part, object, shared asset/type and global scopes.
+Inspector reports effective technique, alphabet (including custom letters), size,
+color and per-field sources. The owner approved removal of its duplicate fields
+and save-to selector. Edit letters and toolbar pass selection through callbacks.
+Screen recipes are available with explicit legacy atlas/cell-size limits.
+Library recipes open without an implicit target. Studio headings distinguish new
+and saved assets; imported recipes remain intact when selecting parts/scopes.
+
+Plan correction: procedural declarations require an optional authored field mask
+on type styles. Only edited fields are promoted above model defaults; documents
+without masks retain old layering. Added validation, authoring/MCP descriptions,
+API docs and meaningful precedence tests. Actual MCP cancellation exposed and
+fixed type leakage from a previous candidate during document replacement.
+
+Validation: pnpm check passes 118 tests and builds; verify:textures 92,
+verify:authoring 72, verify:gltf 18 and actual stdio verify:api passed with dev.
+Pinned Orca walkthrough confirmed inspector/Studio color and unchanged document.
+Historical item world crop RMSE 0. [Captures and logs](captures/consolidation-stage3-2026-10-14/README.md).
+Orca captures still time out; inspected GPU Chromium images instead. No push.
+Linked textures and consolidated lighting are pending stages 4/5; water/terrain
+letters and file/panel routing remain stages 6/7. Native desktop unverified.
+
 ## 2026-10-14 — Editor consolidation stage 2: view-only Display
 
 Display now contains zoom, rotation, pause, PNG capture and live debug render

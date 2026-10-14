@@ -79,6 +79,7 @@ try {
     {op:'water.paint',points:[{x:1,z:-2},{x:0,z:0},{x:-3,z:2}],radius:1,mode:'terrain'},
     {op:'object.add',object:{id:'fire',prefab:'fogueira',position:[-3,0,-1]}},
     {op:'object.add',object:{id:'rock',prefab:'pedregulho',position:[0,1.2,-3]}},
+    {op:'scene.patch',patch:{style:{types:{pedregulho:{style:{size:.21},authored:{style:['size']}}}}}},
     {op:'texture.define',id:'mcp-symbols',name:'MCP arrow ink',style:{alphabet:' ↑↗→↘↓↙←↖',font:'"DejaVu Sans", sans-serif',fontWeight:700,open:true,spacing:1.2,palette:[0x55aaff,0xaaffdd],lighting:'scene',rotation:.15},previewLighting:{brightness:1.1,background:0x080a10}},
     {op:'texture.apply',id:'mcp-symbols',objectId:'rock'},
     {op:'object.scatter',prefab:'arvore',count:8,seed:123,bounds:{minX:4,maxX:8,minZ:-6,maxZ:2},scale:[.7,1.1]},

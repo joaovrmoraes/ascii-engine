@@ -3,6 +3,7 @@ import { illuminationGLSL, illuminationUniforms } from './illumination'
 import { SURFACE_ALPHA } from './surface'
 
 const WORLD_GLYPH_ALPHA = SURFACE_ALPHA.glyph
+export const SCREEN_ALPHABETS = { generic: ' .,:;-~=+*ox%#@', actor: ' .:-=+*x%#@', foliage: '.,;vcoax%#', stone: ' .:-=coO0#', wood: '.:|/\\lIvt', earth: ' .,:coO*', water: ' ._-~=~', wetgrass: ' .,;v/\\', bark: ':|/\\Il', snow: ' .,:;~+*coO', reflection: ' .,:-=+*ox%' }
 
 /**
  * Biome effects enter the screen pass through hooks, never by import.
@@ -23,7 +24,7 @@ export interface AsciiPassHook {
  * Material-specific alphabets follow the supplied 12:31 video reference.
  */
 export function createAsciiPass(hooks: AsciiPassHook[] = []) {
-  const alphabets = { generic: ' .,:;-~=+*ox%#@', actor: ' .:-=+*x%#@', foliage: '.,;vcoax%#', stone: ' .:-=coO0#', wood: '.:|/\\lIvt', earth: ' .,:coO*', water: ' ._-~=~', wetgrass: ' .,;v/\\', bark: ':|/\\Il', snow: ' .,:;~+*coO', reflection: ' .,:-=+*ox%' }
+  const alphabets = SCREEN_ALPHABETS
   let glyphs = ''
   const ranges: Record<string, [number, number]> = {}
   for (const [key, letters] of Object.entries(alphabets)) { ranges[key] = [glyphs.length, letters.length]; glyphs += letters }

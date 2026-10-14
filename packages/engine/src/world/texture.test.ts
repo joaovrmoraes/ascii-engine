@@ -26,6 +26,15 @@ describe('portable texture recipes', () => {
     expect(() => parseScene({ ...source, textures: { symbols: { ...recipe, previewLighting: { glyphs: { size: .3 } } } } })).toThrow('not a lighting field')
   })
   it('rejects foreign fields and techniques in a texture asset', () => {
-    for (const invalid of [{ glyph: 'screen' }, { glyph: 'particle' }, { background: 123 }]) expect(() => parseScene({ version: 1, objects: [], textures: { ink: { name: 'Ink', style: invalid } } })).toThrow()
+    for (const invalid of [{ glyph: 'particle' }, { background: 123 }]) expect(() => parseScene({ version: 1, objects: [], textures: { ink: { name: 'Ink', style: invalid } } })).toThrow()
+  })
+  it('accepts the legacy screen technique without migrating existing recipes', () => {
+    const doc = parseScene({ version: 1, objects: [], textures: { actor: { name: 'Character', style: { glyph: 'screen', surface: 'actor', color: 0x88cc44 } } } })
+    expect(doc.textures?.actor.style.glyph).toBe('screen')
+  })
+  it('validates optional type authoring masks without changing legacy type styles', () => {
+    const doc = { version: 1, objects: [], style: { types: { block: { style: { size: .2 }, authored: { style: ['size'] } } } } }
+    expect(parseScene(doc).style?.types?.block.authored?.style).toEqual(['size'])
+    expect(() => parseScene({ ...doc, style: { types: { block: { authored: { style: ['position'] } } } } })).toThrow('unknown glyph field')
   })
 })

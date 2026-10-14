@@ -137,7 +137,7 @@ const importFiles = (files: File[]) => {
 addEventListener('drop', (e) => { e.preventDefault(); const files = Array.from(e.dataTransfer?.files ?? []); if (files.length) importFiles(files) })
 canvas.addEventListener('editor-import-files', e => importFiles((e as CustomEvent<File[]>).detail))
 const panel = createPanel({ engine, view, viewControls, areas: AREAS, areaId, mode, viewer: publicDemo, hideArea: publicDemo && params.has('embed'), capture: () => captureNext = true, importFiles, changed: area.changed })
-const selection = player || publicDemo ? { refresh() {} } : createSelection(engine, canvas, document.getElementById('selection')!, { select: area.select, changed: area.changed, blocked: area.blocksSelection, objectFirst: area.id === 'sandbox' })
+const selection = player || publicDemo ? { refresh() {} } : createSelection(engine, canvas, document.getElementById('selection')!, { select: area.select, changed: area.changed, target: area.setAppearanceSelection, edit: area.editAppearance, blocked: area.blocksSelection, objectFirst: area.id === 'sandbox' })
 const status = document.getElementById('status')!
 const focus = new THREE.Vector3()
 let last = 0, frames = 0, sample = 0, fps = 0, captureNext = false

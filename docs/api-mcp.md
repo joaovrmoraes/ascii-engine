@@ -267,13 +267,22 @@ stdio transport and JSON Schema tool discovery.
 ## Texture resources
 
 `texture.define` stores `{name,style}` in `SceneDoc.textures`. `style` is a
-`GlyphStyle`: optional surface/body technique, family, size, RGB color,
+`GlyphStyle`: optional surface/body or legacy character screen technique, family, size, RGB color,
 custom alphabet/font/fontWeight, open, faces, rotation, palette, lighting,
 emissive/emissiveIntensity, spacing, density, strength, gap, contrast,
 toneOffset and shadowSteps. Optional `previewLighting` stores an AtmosphereStyle
 for the editor; texture.apply preserves the scene lighting. Omit fields to preserve more specific part styles.
 `texture.apply` merges a saved recipe into one object's options or a named
 part. Existing applications are independent snapshots.
+
+Character screen rendering uses the legacy atlas and scene `cellSize`;
+custom alphabets/fonts and world-letter layout controls apply to surface/body.
+The editor's type scope stores values in `style.types[id].style` / `.parts`,
+with optional `authored: {style: ["size", "color"], parts: {crown: ["alphabet"]}}`.
+Only these explicitly authored fields override model declarations, below
+instance/part overrides. Omitting the mask retains legacy type/node ordering.
+For a prefab without a prior type, this mask also enables its shared asset
+type on new placements and document reload. It can be written with scene.patch.
 
 ```json
 [

@@ -157,21 +157,17 @@ been validated; prefer embedded GLB or GLTF with explicit companions.
 
 ### Edit imported appearance and parts
 
-Select the model in **Hierarchy**, then use **ASCII appearance**:
+Select the model in **Hierarchy**. **ASCII appearance** reports the effective
+technique, family, actual alphabet, base size and color, with each value's source.
+Choose **part** or **Whole object**, then **Edit letters…** to open Texture Studio.
+**Apply to** in the Studio chooses this part, this object, every matching asset/type,
+or the global style. Editing only size/color preserves mixed part techniques.
+More specific instance/part overrides win. The global scope also displays the
+current global layer. **Model color**, followed by Apply, restores inherited RGB.
 
-- **Glyph family** chooses the letter ramp (Wood, Bark, Stone, Foliage, etc.).
-  It preserves the original material color; it does not replace image textures.
-- **Size (m)** changes surface cell width or body base letter size in world
-  meters. Blank inherits the default shown in the placeholder. For **Character
-  (screen)**, use the pixel-size control under **Display** instead.
-- **Color** overrides the model color. **Model color**, followed by Apply,
-  restores the inherited material color for the selected style layer.
-- **Apply appearance** saves changed fields. Adjusting only the whole object's
-  size or color preserves different techniques on its parts. Mixed values
-  are shown without choosing one technique for every part.
-- **save to** chooses this instance, all matching parts of this model's type,
-  or the global style. More specific instance/part overrides still win.
-  Imported files now have a shared type, so the all-copy scope is available.
+Legacy **Character (screen)** uses the original family atlas and the scene pixel
+cell size under **Atmosphere → Scene and glyphs**. Unsupported world font,
+alphabet and layout controls are disabled for this technique.
 
 For a tree, export a parent object with named **crown** and **trunk** objects
 or groups from Blender. A crown group may contain several leaf meshes.
@@ -186,8 +182,8 @@ infer which faces are a crown, trunk, handle or blade, and has no face-selection
 tool for splitting them. Separate the desired parts in the source model before
 export. Transform controls still move the placed object as a whole.
 
-Custom per-part alphabets, independent spacing, ink/gap controls and shadow
-steps remain outside this inspector. Family presets retain the Pomorog ramps.
+Custom per-part alphabets, spacing, ink/gap and shadow controls live in Texture
+Studio. Family presets retain the Pomorog ramps.
 
 ## Composition cameras
 
@@ -317,11 +313,12 @@ components retain their own authoring modules.
 Preview edits have their own **Undo/Redo** and Ctrl Z / Ctrl Shift Z. **Reset
 edits** restores the target's starting appearance with black gaps. Selecting
 another object or part starts a new texture; switching Studio modules preserves
-the draft. **Apply to object/part** copies the recipe onto that instance. Return
+the draft. **Apply** writes the selected part, object, shared type or global layer. Untouched inherited fields remain inherited. Return
 to the scene to undo that application with the normal scene history.
 
 Name the texture and choose **Save to Assets**. It appears in **Assets →
-Textures**; clicking a texture opens it in the Studio for the current target.
+Textures**; opening a texture from the library uses **No target · editing asset
+only**. Choose an object explicitly before applying.
 Choose **Apply** to use it. Saving updates the open preset; **Save copy** adds
 another. Texture assets live in `SceneDoc.textures`, survive browser drafts,
 project files, insertion and exports, and are shared within the open document.

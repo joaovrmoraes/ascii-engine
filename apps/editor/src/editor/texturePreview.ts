@@ -1,8 +1,9 @@
 import * as THREE from 'three'
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
-import { atmosphereStyle, buildScene, createEffectPrefabs, loadSceneAssets, type AddOptions, type AtmosphereStyle, type BuiltScene, type GlyphStyle, type SceneDoc } from '@ascii-engine/core'
+import { atmosphereStyle, buildScene, createEffectPrefabs, loadSceneAssets, type AddOptions, type AsciiStyle, type AtmosphereStyle, type BuiltScene, type GlyphStyle, type SceneDoc } from '@ascii-engine/core'
 import { createAsciiEngine } from '../engine'
 import { createPrefabs } from '../scene/prefabs'
+import type { TextureScope } from './textures'
 
 /** Owns its engine and model resources; the map stays paused during editing. */
 export function createTexturePreview(selectPart: (part: string) => void) {
@@ -17,6 +18,7 @@ export function createTexturePreview(selectPart: (part: string) => void) {
   let baseline: AddOptions = {}, span = 2, version = 0, paused = false, part = '', style: GlyphStyle = {}
   let lighting: AtmosphereStyle | undefined, baseLighting: AtmosphereStyle = {}
   let appliedSignature = ''
+  let scope: TextureScope = 'object', sourceStyle: Partial<AsciiStyle> | undefined
   const title = root.querySelector('span')!, abort = new AbortController()
   function ensure() {
     if (engine) return
@@ -45,16 +47,25 @@ export function createTexturePreview(selectPart: (part: string) => void) {
     engine.camera.zoom = 1; controls.target.copy(center)
     engine.frame(center, span, Math.PI / 7); controls.update()
   }
-  function apply(nextPart: string, nextStyle: GlyphStyle) {
-    part = nextPart; style = structuredClone(nextStyle)
+  function apply(nextPart: string, nextStyle: GlyphStyle, nextScope: TextureScope = nextPart ? 'part' : 'object') {
+    part = nextPart; style = structuredClone(nextStyle); scope = nextScope
     const object = scene?.placed[0]?.object
     if (!object || !engine) return
-    const signature = JSON.stringify([part, Object.entries(style).map(([key, value]) => [key, value === undefined ? { unset: true } : value])])
+    const signature = JSON.stringify([part, scope, Object.entries(style).map(([key, value]) => [key, value === undefined ? { unset: true } : value])])
     if (signature === appliedSignature) return
     // Re-add from its saved options so resetting a field or changing parts
     // cannot leave an earlier preview edit on the model.
-    engine.remove(object); engine.add(object, structuredClone(baseline))
-    if (part) engine.setPartStyle(object, part, style); else engine.setInstanceStyle(object, style)
+    engine.remove(object)
+    if (sourceStyle) engine.setStyle({ ...engine.exportStyle(), glyphs: structuredClone(sourceStyle.glyphs ?? {}), types: structuredClone(sourceStyle.types ?? {}) }, { replace: true })
+    if (scope === 'global') engine.setStyle({ glyphs: { ...engine.style.glyphs, ...style } })
+    else if (scope === 'type') {
+      const type = baseline.type ?? object.userData.prefab
+      const fields = Object.keys(style) as (keyof GlyphStyle)[]
+      engine.setTypeStyle(type, part ? { parts: { [part]: style }, authored: { parts: { [part]: fields } } } : { style, authored: { style: fields } })
+    }
+    engine.add(object, { ...structuredClone(baseline), ...(scope === 'type' ? { type: baseline.type ?? object.userData.prefab } : {}) })
+    if (scope === 'part' && part) engine.setPartStyle(object, part, style)
+    else if (scope === 'object') engine.setInstanceStyle(object, style)
     appliedSignature = signature
     canvas.dataset.part = part; canvas.dataset.style = JSON.stringify(style); canvas.dataset.options = JSON.stringify(engine.instanceStyle(object))
   }
@@ -84,13 +95,14 @@ export function createTexturePreview(selectPart: (part: string) => void) {
         assets = loaded
         scene = buildScene(engine!, source, { ...createPrefabs(engine!), ...loaded.library, ...createEffectPrefabs(engine!, source.effects) })
         baseline = structuredClone(engine!.instanceStyle(scene.placed[0].object) ?? {})
+        sourceStyle = engine!.exportStyle()
         baseLighting = atmosphereStyle(engine!.exportStyle()); setLighting(lighting)
-        apply(part, style); fit(); title.textContent = item.name ?? item.prefab; canvas.dataset.ready = id
+        apply(part, style, scope); fit(); title.textContent = item.name ?? item.prefab; canvas.dataset.ready = id
       } catch (error) { if (request === version) { title.textContent = String(error); canvas.dataset.error = String(error) } }
     },
     apply,
     setLighting,
-    commit() { const object = scene?.placed[0]?.object; if (object && engine) baseline = structuredClone(engine.instanceStyle(object) ?? {}) },
+    commit() { const object = scene?.placed[0]?.object; if (object && engine) { baseline = structuredClone(engine.instanceStyle(object) ?? {}); sourceStyle = engine.exportStyle() } },
     frame(dt: number) {
       if (root.hidden || !engine) return false
       if (engine.size.width !== canvas.clientWidth || engine.size.height !== canvas.clientHeight) {

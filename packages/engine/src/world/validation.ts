@@ -122,7 +122,7 @@ export function parseScene(input: unknown, library?: PrefabLibrary): SceneDoc {
       if (!id || typeof asset.name !== 'string' || !asset.name.trim()) fail(`textures.${id}`, 'needs an identifier and name')
       const appearance = record(asset.style, `textures.${id}.style`)
       for (const key of Object.keys(appearance)) if (!(GLYPH_STYLE_KEYS as readonly string[]).includes(key)) fail(`textures.${id}.style.${key}`, 'is not an appearance field')
-      if (appearance.glyph !== undefined && !['surface', 'body'].includes(String(appearance.glyph))) fail(`textures.${id}.style.glyph`, 'must use surface or body glyphs')
+      if (appearance.glyph !== undefined && !['surface', 'body', 'screen'].includes(String(appearance.glyph))) fail(`textures.${id}.style.glyph`, 'must use surface, body or screen glyphs')
       style(appearance, `textures.${id}.style`)
       if (asset.previewLighting !== undefined) {
         const lighting = record(asset.previewLighting, `textures.${id}.previewLighting`)
@@ -166,6 +166,15 @@ export function parseScene(input: unknown, library?: PrefabLibrary): SceneDoc {
         const t = record(raw, `style.types.${name}`)
         if (t.style) style(t.style, `style.types.${name}.style`)
         if (t.parts) style({ parts: t.parts }, `style.types.${name}`)
+        if (t.authored !== undefined) {
+          const authored = record(t.authored, `style.types.${name}.authored`)
+          const fields = (value: unknown, path: string) => {
+            const keys = array(value, path)
+            if (keys.length > GLYPH_STYLE_KEYS.length || keys.some(key => typeof key !== 'string' || !(GLYPH_STYLE_KEYS as readonly string[]).includes(key))) fail(path, 'contains an unknown glyph field')
+          }
+          if (authored.style !== undefined) fields(authored.style, `style.types.${name}.authored.style`)
+          if (authored.parts !== undefined) for (const [part, keys] of Object.entries(record(authored.parts, `style.types.${name}.authored.parts`))) fields(keys, `style.types.${name}.authored.parts.${part}`)
+        }
       }
       else if (k === 'fog' && v === null) continue
       else if (k === 'bodySceneLighting' || k === 'inkFog') { if (typeof v !== 'boolean') fail(`style.${k}`, 'must be a boolean') }

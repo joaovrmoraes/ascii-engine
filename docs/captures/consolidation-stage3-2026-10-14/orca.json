@@ -1,0 +1,434 @@
+{
+  "id": "44b78e41-5f9a-456e-9af3-0cd1582907cc",
+  "ok": true,
+  "result": {
+    "origin": "http://localhost:1440/?area=sandbox",
+    "refs": {
+      "e1": {
+        "name": "Isolated texture preview",
+        "role": "region"
+      },
+      "e10": {
+        "name": "New texture",
+        "role": "heading"
+      },
+      "e100": {
+        "name": "Keep current · mixed parts",
+        "role": "option"
+      },
+      "e101": {
+        "name": "Front faces",
+        "role": "option"
+      },
+      "e102": {
+        "name": "Front and back faces",
+        "role": "option"
+      },
+      "e103": {
+        "name": "Keep current · mixed parts",
+        "role": "option"
+      },
+      "e104": {
+        "name": "React to scene lights",
+        "role": "option"
+      },
+      "e105": {
+        "name": "Uniform local shading",
+        "role": "option"
+      },
+      "e11": {
+        "name": "Saved texture",
+        "role": "combobox"
+      },
+      "e12": {
+        "name": "Reset edits",
+        "role": "button"
+      },
+      "e13": {
+        "name": "Undo texture edit",
+        "role": "button"
+      },
+      "e14": {
+        "name": "Redo texture edit",
+        "role": "button"
+      },
+      "e15": {
+        "name": "Texture controls",
+        "role": "navigation"
+      },
+      "e16": {
+        "name": "Texture name",
+        "role": "textbox"
+      },
+      "e17": {
+        "name": "Letters",
+        "role": "button"
+      },
+      "e18": {
+        "name": "Letter visibility",
+        "role": "button"
+      },
+      "e19": {
+        "name": "Size and spacing",
+        "role": "button"
+      },
+      "e2": {
+        "name": "Asset library",
+        "role": "region"
+      },
+      "e20": {
+        "name": "Ink and contrast",
+        "role": "button"
+      },
+      "e21": {
+        "name": "Color palette",
+        "role": "button"
+      },
+      "e22": {
+        "name": "Material lighting",
+        "role": "button"
+      },
+      "e23": {
+        "name": "Preview lighting",
+        "role": "button"
+      },
+      "e24": {
+        "name": "Shading",
+        "role": "button"
+      },
+      "e25": {
+        "name": "Letters",
+        "role": "button"
+      },
+      "e26": {
+        "name": "Digits",
+        "role": "button"
+      },
+      "e27": {
+        "name": "Binary",
+        "role": "button"
+      },
+      "e28": {
+        "name": "Blocks",
+        "role": "button"
+      },
+      "e29": {
+        "name": "Arrows",
+        "role": "button"
+      },
+      "e3": {
+        "name": "← Back to scene",
+        "role": "button"
+      },
+      "e30": {
+        "name": "Use palette",
+        "role": "checkbox"
+      },
+      "e31": {
+        "name": "Customize preview lighting",
+        "role": "checkbox"
+      },
+      "e32": {
+        "name": "Apply to object",
+        "role": "button"
+      },
+      "e33": {
+        "name": "Save to Assets",
+        "role": "button"
+      },
+      "e34": {
+        "name": "Save copy",
+        "role": "button"
+      },
+      "e35": {
+        "name": "Show in Assets",
+        "role": "button"
+      },
+      "e36": {
+        "name": "Texture object",
+        "role": "combobox"
+      },
+      "e37": {
+        "name": "Texture part",
+        "role": "combobox"
+      },
+      "e38": {
+        "name": "Texture scope",
+        "role": "combobox"
+      },
+      "e39": {
+        "name": "Open a saved texture…",
+        "role": "option"
+      },
+      "e4": {
+        "name": "Studio workspace",
+        "role": "navigation"
+      },
+      "e40": {
+        "name": "My texture",
+        "role": "option"
+      },
+      "e41": {
+        "name": "Technique",
+        "role": "combobox"
+      },
+      "e42": {
+        "name": "Glyph family",
+        "role": "combobox"
+      },
+      "e43": {
+        "name": "Custom alphabet",
+        "role": "textbox"
+      },
+      "e44": {
+        "name": "Font family",
+        "role": "combobox"
+      },
+      "e45": {
+        "name": "Font weight",
+        "role": "combobox"
+      },
+      "e46": {
+        "name": "Body between letters",
+        "role": "combobox"
+      },
+      "e47": {
+        "name": "Body faces",
+        "role": "combobox"
+      },
+      "e48": {
+        "name": "Gap tint (surface) value",
+        "role": "spinbutton"
+      },
+      "e49": {
+        "name": "Gap tint (surface)",
+        "role": "slider"
+      },
+      "e5": {
+        "name": "Frame object",
+        "role": "button"
+      },
+      "e50": {
+        "name": "Letter size (m) value",
+        "role": "spinbutton"
+      },
+      "e51": {
+        "name": "Letter size (m)",
+        "role": "slider"
+      },
+      "e52": {
+        "name": "Spacing value",
+        "role": "spinbutton"
+      },
+      "e53": {
+        "name": "Spacing",
+        "role": "slider"
+      },
+      "e54": {
+        "name": "Density value",
+        "role": "spinbutton"
+      },
+      "e55": {
+        "name": "Density",
+        "role": "slider"
+      },
+      "e56": {
+        "name": "Letter rotation (degrees) value",
+        "role": "spinbutton"
+      },
+      "e57": {
+        "name": "Letter rotation (degrees)",
+        "role": "slider"
+      },
+      "e58": {
+        "name": "Model color",
+        "role": "button"
+      },
+      "e59": {
+        "name": "Ink strength value",
+        "role": "spinbutton"
+      },
+      "e6": {
+        "name": "Pause motion",
+        "role": "button"
+      },
+      "e60": {
+        "name": "Ink strength",
+        "role": "slider"
+      },
+      "e61": {
+        "name": "Contrast value",
+        "role": "spinbutton"
+      },
+      "e62": {
+        "name": "Contrast",
+        "role": "slider"
+      },
+      "e63": {
+        "name": "Light threshold value",
+        "role": "spinbutton"
+      },
+      "e64": {
+        "name": "Light threshold",
+        "role": "slider"
+      },
+      "e65": {
+        "name": "Shadow levels value",
+        "role": "spinbutton"
+      },
+      "e66": {
+        "name": "Shadow levels",
+        "role": "slider"
+      },
+      "e67": {
+        "name": "Lighting response",
+        "role": "combobox"
+      },
+      "e68": {
+        "name": "Self light intensity value",
+        "role": "spinbutton"
+      },
+      "e69": {
+        "name": "Self light intensity",
+        "role": "slider"
+      },
+      "e7": {
+        "name": "Effects",
+        "role": "button"
+      },
+      "e70": {
+        "name": "No target · editing asset only",
+        "role": "option"
+      },
+      "e71": {
+        "name": "Tree",
+        "role": "option"
+      },
+      "e72": {
+        "name": "Campfire (with fire and light)",
+        "role": "option"
+      },
+      "e73": {
+        "name": "pretzel.gltf",
+        "role": "option"
+      },
+      "e74": {
+        "name": "pretzel.gltf",
+        "role": "option"
+      },
+      "e75": {
+        "name": "Whole object · preserve mixed techniques",
+        "role": "option"
+      },
+      "e76": {
+        "name": "Pretzel_(no_toroidal)_1",
+        "role": "option"
+      },
+      "e77": {
+        "name": "This part",
+        "role": "option"
+      },
+      "e78": {
+        "name": "This object",
+        "role": "option"
+      },
+      "e79": {
+        "name": "Every pretzel.gltf",
+        "role": "option"
+      },
+      "e8": {
+        "name": "Atmosphere",
+        "role": "button"
+      },
+      "e80": {
+        "name": "Global style",
+        "role": "option"
+      },
+      "e81": {
+        "name": "Keep current · Surface glyphs",
+        "role": "option"
+      },
+      "e82": {
+        "name": "Surface glyphs",
+        "role": "option"
+      },
+      "e83": {
+        "name": "Glyph body",
+        "role": "option"
+      },
+      "e84": {
+        "name": "Character (screen)",
+        "role": "option"
+      },
+      "e85": {
+        "name": "Keep current · mixed parts",
+        "role": "option"
+      },
+      "e86": {
+        "name": "Earth",
+        "role": "option"
+      },
+      "e87": {
+        "name": "Stone",
+        "role": "option"
+      },
+      "e88": {
+        "name": "Wood",
+        "role": "option"
+      },
+      "e89": {
+        "name": "Bark",
+        "role": "option"
+      },
+      "e9": {
+        "name": "Textures",
+        "role": "button"
+      },
+      "e90": {
+        "name": "Foliage",
+        "role": "option"
+      },
+      "e91": {
+        "name": "Snow",
+        "role": "option"
+      },
+      "e92": {
+        "name": "Wet grass",
+        "role": "option"
+      },
+      "e93": {
+        "name": "Character",
+        "role": "option"
+      },
+      "e94": {
+        "name": "Keep current · mixed parts",
+        "role": "option"
+      },
+      "e95": {
+        "name": "Regular",
+        "role": "option"
+      },
+      "e96": {
+        "name": "Bold",
+        "role": "option"
+      },
+      "e97": {
+        "name": "Keep object recipe",
+        "role": "option"
+      },
+      "e98": {
+        "name": "Letters only · no solid body",
+        "role": "option"
+      },
+      "e99": {
+        "name": "Dark occluder",
+        "role": "option"
+      }
+    },
+    "snapshot": "- generic\n  - region \"Isolated texture preview\" [ref=e1]\n    - Canvas \"Texture on selected object\"\n    - generic\n      - strong\n        - StaticText \"Texture preview\"\n      - StaticText \"pretzel.gltf\"\n    - paragraph\n      - StaticText \"Drag to orbit · right drag to pan · scroll to zoom · click a part to edit\"\n    - generic\n      - button \"Frame object\" [ref=e5]\n      - button \"Pause motion\" [ref=e6]\n- StaticText \"Texture studio · isolated preview · the map is paused\"\n- generic\n  - banner\n    - button \"← Back to scene\" [ref=e3]\n    - strong\n      - StaticText \"Studio\"\n    - navigation \"Studio workspace\" [ref=e4]\n      - button \"Effects\" [ref=e7]\n      - button \"Atmosphere\" [ref=e8]\n      - button \"Textures\" [ref=e9]\n    - StaticText \"Live preview\"\n  - region \"Asset library\" [ref=e2]\n    - generic\n      - generic\n        - heading \"New texture\" [level=2, ref=e10]\n        - paragraph\n          - StaticText \"Select an object or part, adjust its letters and save a reusable appearance.\"\n        - group \"Preview object\"\n          - Legend\n            - StaticText \"Preview object\"\n          - LabelText\n            - StaticText \"Object\"\n            - combobox \"Texture object\" [expanded=false, ref=e36]: pretzel.gltf\n              - MenuListPopup\n                - option \"No target · editing asset only\" [ref=e70]\n                - option \"Tree\" [ref=e71]\n                - option \"Campfire (with fire and light)\" [ref=e72]\n                - option \"pretzel.gltf\" [ref=e73]\n                - option \"pretzel.gltf\" [selected, ref=e74]\n          - LabelText\n            - StaticText \"Part\"\n            - combobox \"Texture part\" [expanded=false, ref=e37]: Whole object · preserve mixed techniques\n              - MenuListPopup\n                - option \"Whole object · preserve mixed techniques\" [selected, ref=e75]\n                - option \"Pretzel_(no_toroidal)_1\" [ref=e76]\n          - LabelText\n            - StaticText \"Apply to\"\n            - combobox \"Texture scope\" [expanded=false, ref=e38]: This object\n              - MenuListPopup\n                - option \"This part\" [disabled, ref=e77]\n                - option \"This object\" [selected, ref=e78]\n                - option \"Every pretzel.gltf\" [ref=e79]\n                - option \"Global style\" [ref=e80]\n          - paragraph\n            - StaticText \"Edits appear in the isolated preview. Apply when ready to update the scene.\"\n        - LabelText\n          - StaticText \"Texture name\"\n          - textbox \"Texture name\" [ref=e16]: My texture\n            - StaticText \"My texture\"\n        - combobox \"Saved texture\" [expanded=false, ref=e11]: Open a saved texture…\n          - MenuListPopup\n            - option \"Open a saved texture…\" [selected, ref=e39]\n            - option \"My texture\" [ref=e40]\n        - button \"Reset edits\" [ref=e12]\n        - button \"Undo texture edit\" [disabled, ref=e13]\n          - StaticText \"↶\"\n        - button \"Redo texture edit\" [disabled, ref=e14]\n          - StaticText \"↷\"\n        - status\n          - StaticText \"Adjust the letters in the preview, then apply or save.\"\n        - navigation \"Texture controls\" [ref=e15]\n          - button \"Letters\" [ref=e17]\n          - button \"Letter visibility\" [ref=e18]\n          - button \"Size and spacing\" [ref=e19]\n          - button \"Ink and contrast\" [ref=e20]\n          - button \"Color palette\" [ref=e21]\n          - button \"Material lighting\" [ref=e22]\n          - button \"Preview lighting\" [ref=e23]\n        - group \"Letters\"\n          - Legend\n            - StaticText \"Letters\"\n          - paragraph\n            - StaticText \"Characters run from sparse to dense. A whole-object edit keeps different part techniques unless you choose one.\"\n          - LabelText\n            - StaticText \"Technique\"\n            - combobox \"Technique\" [expanded=false, ref=e41]: Keep current · Surface glyphs\n              - MenuListPopup\n                - option \"Keep current · Surface glyphs\" [selected, ref=e81]\n                - option \"Surface glyphs\" [ref=e82]\n                - option \"Glyph body\" [ref=e83]\n                - option \"Character (screen)\" [ref=e84]\n          - LabelText\n            - StaticText \"Glyph family\"\n            - combobox \"Glyph family\" [expanded=false, ref=e42]: Keep current · mixed parts\n              - MenuListPopup\n                - option \"Keep current · mixed parts\" [selected, ref=e85]\n                - option \"Earth\" [ref=e86]\n                - option \"Stone\" [ref=e87]\n                - option \"Wood\" [ref=e88]\n                - option \"Bark\" [ref=e89]\n                - option \"Foliage\" [ref=e90]\n                - option \"Snow\" [ref=e91]\n                - option \"Wet grass\" [ref=e92]\n                - option \"Character\" [ref=e93]\n          - LabelText\n            - StaticText \"Custom alphabet\"\n            - textbox \"Custom alphabet\" [ref=e43]\n          - StaticText \" .,:;-~=+*ox%#\"\n          - button \"Shading\" [ref=e24]\n          - button \"Letters\" [ref=e25]\n          - button \"Digits\" [ref=e26]\n          - button \"Binary\" [ref=e27]\n          - button \"Blocks\" [ref=e28]\n          - button \"Arrows\" [ref=e29]\n          - LabelText\n            - StaticText \"Font family\"\n            - combobox \"Font family\" [ref=e44]\n          - paragraph\n            - StaticText \"Uses fonts installed on the viewing device. Missing fonts use the fallback family.\"\n          - LabelText\n            - StaticText \"Font weight\"\n            - combobox \"Font weight\" [expanded=false, ref=e45]: Keep current · mixed parts\n              - MenuListPopup\n                - option \"Keep current · mixed parts\" [selected, ref=e94]\n                - option \"Regular\" [ref=e95]\n                - option \"Bold\" [ref=e96]\n        - group \"Letter visibility\"\n          - Legend\n            - StaticText \"Letter visibility\"\n          - paragraph\n            - StaticText \"Letters only removes the solid body and lets the world behind show through the gaps.\"\n          - LabelText\n            - StaticText \"Body between letters\"\n            - combobox \"Body between letters\" [expanded=false, ref=e46]: Keep object recipe\n              - MenuListPopup\n                - option \"Keep object recipe\" [selected, ref=e97]\n                - option \"Letters only · no solid body\" [ref=e98]\n                - option \"Dark occluder\" [ref=e99]\n          - LabelText\n            - StaticText \"Body faces\"\n            - combobox \"Body faces\" [expanded=false, ref=e47]: Keep current · mixed parts\n              - MenuListPopup\n                - option \"Keep current · mixed parts\" [selected, ref=e100]\n                - option \"Front faces\" [ref=e101]\n                - option \"Front and back faces\" [ref=e102]\n          - LabelText\n            - StaticText \"Gap tint (surface)\"\n            - spinbutton \"Gap tint (surface) value\" [ref=e48]: 0\n              - StaticText \"0\"\n            - slider \"Gap tint (surface)\" [ref=e49]: 0\n          - paragraph\n            - StaticText \"Gap tint affects surfaces with an occluder. Body faces affects glyph bodies.\"\n        - group \"Size and spacing\"\n          - Legend\n            - StaticText \"Size and spacing\"\n          - paragraph\n            - StaticText \"World meters keep letters attached to the object as the camera moves.\"\n          - LabelText\n            - StaticText \"Letter size (m)\"\n            - spinbutton \"Letter size (m) value\" [ref=e50]: 0.18000000715255737\n              - StaticText \"0.18\"\n            - slider \"Letter size (m)\" [ref=e51]: 0.18000000715255737\n          - LabelText\n            - StaticText \"Spacing\"\n            - spinbutton \"Spacing value\" [ref=e52]: 1\n              - StaticText \"1\"\n            - slider \"Spacing\" [ref=e53]: 1\n          - LabelText\n            - StaticText \"Density\"\n            - spinbutton \"Density value\" [ref=e54]: 1\n              - StaticText \"1\"\n            - slider \"Density\" [ref=e55]: 1\n          - LabelText\n            - StaticText \"Letter rotation (degrees)\"\n            - spinbutton \"Letter rotation (degrees) value\" [ref=e56]: 0\n              - StaticText \"0\"\n            - slider \"Letter rotation (degrees)\" [ref=e57]: 0\n        - group \"Ink and contrast\"\n          - Legend\n            - StaticText \"Ink and contrast\"\n          - LabelText\n            - StaticText \"Glyph color\"\n            - ColorWell \"Texture color\": #d1894b\n            - button \"Model color\" [ref=e58]\n          - LabelText\n            - StaticText \"Ink strength\"\n            - spinbutton \"Ink strength value\" [ref=e59]: 1\n              - StaticText \"1\"\n            - slider \"Ink strength\" [ref=e60]: 1\n          - LabelText\n            - StaticText \"Contrast\"\n            - spinbutton \"Contrast value\" [ref=e61]: 1\n              - StaticText \"1\"\n            - slider \"Contrast\" [ref=e62]: 1\n          - LabelText\n            - StaticText \"Light threshold\"\n            - spinbutton \"Light threshold value\" [ref=e63]: 0\n              - StaticText \"0\"\n            - slider \"Light threshold\" [ref=e64]: 0\n          - LabelText\n            - StaticText \"Shadow levels\"\n            - spinbutton \"Shadow levels value\" [ref=e65]: 6\n              - StaticText \"6\"\n            - slider \"Shadow levels\" [ref=e66]: 6\n        - group \"Color palette\"\n          - Legend\n            - StaticText \"Color palette\"\n          - paragraph\n            - StaticText \"Replaces the base glyph color. Colors run from shadow to light; each letter keeps one flat color.\"\n          - checkbox \"Use palette\" [checked=false, ref=e30]\n        - group \"Material lighting\"\n          - Legend\n            - StaticText \"Material lighting\"\n          - paragraph\n            - StaticText \"Self light makes letters glow; use scene lights to illuminate other objects.\"\n          - LabelText\n            - StaticText \"Lighting response\"\n            - combobox \"Lighting response\" [expanded=false, ref=e67]: Keep current · mixed parts\n              - MenuListPopup\n                - option \"Keep current · mixed parts\" [selected, ref=e103]\n                - option \"React to scene lights\" [ref=e104]\n                - option \"Uniform local shading\" [ref=e105]\n          - LabelText\n            - StaticText \"Self light color\"\n            - ColorWell \"Self light color\": #000000\n          - LabelText\n            - StaticText \"Self light intensity\"\n            - spinbutton \"Self light intensity value\" [ref=e68]: 1\n              - StaticText \"1\"\n            - slider \"Self light intensity\" [ref=e69]: 1\n        - group \"Preview lighting\"\n          - Legend\n            - StaticText \"Preview lighting\"\n          - paragraph\n            - StaticText \"Studio lights are saved with this texture for previewing. Apply lighting to scene is a separate action.\"\n          - checkbox \"Customize preview lighting\" [checked=false, ref=e31]\n        - group\n          - DisclosureTriangle \"Import or download file\" [expanded=false]\n            - StaticText \"Import or download file\"\n        - sectionfooter\n          - StaticText \"Changes not yet saved to Assets\"\n          - button \"Apply to object\" [ref=e32]\n          - button \"Save to Assets\" [ref=e33]\n          - button \"Save copy\" [ref=e34]\n          - button \"Show in Assets\" [disabled, ref=e35]",
+    "browserPageId": "2f12dd1f-17bf-4272-8c88-548057dfb5e6"
+  },
+  "_meta": {
+    "runtimeId": "327bd229-b588-4def-b562-15b9bd27a70c"
+  }
+}

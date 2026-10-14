@@ -5,6 +5,7 @@ import { createTexturePreview } from './texturePreview'
 import { GLYPH_FAMILIES, defaultGlyphSize, glyphAlphabet, glyphLabel, modelGlyphColor } from './glyphCatalog'
 
 interface TextureDraft extends TextureAsset { cleared?: (keyof GlyphStyle)[] }
+export type TextureScope = 'part' | 'object' | 'type' | 'global'
 
 export function createTextureStudio(root: HTMLElement, callbacks: {
   document(): SceneDoc
@@ -12,18 +13,21 @@ export function createTextureStudio(root: HTMLElement, callbacks: {
   selected(): string | undefined
   select(id: string): void
   save(id: string, asset: TextureAsset): Promise<void>
-  apply(id: string, part: string, style: GlyphStyle): Promise<void>
+  apply(id: string, part: string, style: GlyphStyle, scope: TextureScope): Promise<void>
+  type(id: string): string | undefined
+  typeName(id: string): string | undefined
   applyLighting(style: AtmosphereStyle): Promise<void>
   saveLighting(name: string, style: AtmosphereStyle): Promise<void>
   reveal(): void
 }) {
   let objectId = '', part = '', draft: TextureDraft = { name: 'My texture', style: {} }, baseline: GlyphStyle = {}
   let initialLayer: GlyphStyle = {}
+  let scope: TextureScope = 'object', assetOnly = false, recipeDraft = false
   const touched = new Set<keyof GlyphStyle>()
   let selectedKey: string | undefined, active = false, saving = false
   const abort = new AbortController(), history = createHistory(draft, 60), stage = createTexturePreview(selectPart)
   root.innerHTML = `<div class="fx-heading"><h2>Create texture</h2><p>Select an object or part, adjust its letters and save a reusable appearance.</p></div>
-    <fieldset class="texture-target"><legend>Preview object</legend><label>Object<select data-texture="object" aria-label="Texture object"></select></label><label>Part<select data-texture="part" aria-label="Texture part"></select></label><p class="empty-note">Edits appear in the isolated preview. Apply when ready to update the scene.</p></fieldset>
+    <fieldset class="texture-target"><legend>Preview object</legend><label>Object<select data-texture="object" aria-label="Texture object"></select></label><label>Part<select data-texture="part" aria-label="Texture part"></select></label><label>Apply to<select data-texture="scope" aria-label="Texture scope"></select></label><p class="empty-note">Edits appear in the isolated preview. Apply when ready to update the scene.</p></fieldset>
     <label class="fx-name">Texture name<input data-texture="name" aria-label="Texture name" value="My texture"></label>
     <div class="fx-toolbar"><select data-texture="asset" aria-label="Saved texture"></select><button data-texture="reset">Reset edits</button><button data-texture="undo" aria-label="Undo texture edit">↶</button><button data-texture="redo" aria-label="Redo texture edit">↷</button></div>
     <p class="fx-status" role="status">Choose an object to begin.</p><nav class="texture-controls-nav" aria-label="Texture controls"></nav><div class="fx-fields studio-fields texture-fields"></div>
@@ -36,12 +40,15 @@ export function createTextureStudio(root: HTMLElement, callbacks: {
   function previewStyle(): GlyphStyle {
     const patch: GlyphStyle = { ...draft.style, ...Object.fromEntries((draft.cleared ?? []).map(key => [key, undefined])) }
     for (const key of touched) if (!(key in patch)) Object.assign(patch, { [key]: initialLayer[key] })
-    return patch
+    if (selectedKey || recipeDraft) return patch
+    const edits = Object.fromEntries([...touched].filter(key => key in patch).map(key => [key, patch[key]]))
+    return scope === 'type' || scope === 'global' ? edits : { gap: 0, ...edits }
   }
   function beginEdits() {
     touched.clear()
     const options = callbacks.document().objects.find(item => item.id === objectId)?.options
-    initialLayer = textureStyle((part ? options?.parts?.[part] : options) ?? {})
+    const type = callbacks.document().style?.types?.[callbacks.type(objectId) ?? '']
+    initialLayer = textureStyle(scope === 'global' ? callbacks.document().style?.glyphs ?? {} : scope === 'type' ? (part ? type?.parts?.[part] : type?.style) ?? {} : (part ? options?.parts?.[part] : options) ?? {})
   }
   function clear(key: keyof GlyphStyle) { touched.add(key); delete draft.style[key]; draft.cleared = [...new Set([...(draft.cleared ?? []), key])] }
   function retain(key: keyof GlyphStyle) { touched.add(key); draft.cleared = draft.cleared?.filter(field => field !== key) }
@@ -54,30 +61,32 @@ export function createTextureStudio(root: HTMLElement, callbacks: {
   }
 
   function appearance() {
+    if (scope === 'global') return textureStyle(callbacks.document().style?.glyphs ?? {})
     const object = target(), node = part ? object?.getObjectByName(part) : object
     const styles: GlyphStyle[] = []
     node?.traverse(child => { if (child instanceof THREE.Mesh && child.userData.glyphResolved) styles.push(child.userData.glyphResolved) })
     const common: GlyphStyle = {}
     if (styles.length) for (const key of GLYPH_STYLE_KEYS) { const value = styles[0][key]; if (styles.every(s => JSON.stringify(s[key]) === JSON.stringify(value))) Object.assign(common, { [key]: value }) }
     // The texture module authors world-attached mesh techniques.
-    if (common.glyph && !['surface', 'body'].includes(common.glyph)) delete common.glyph
+    if (common.glyph && !['surface', 'body', 'screen'].includes(common.glyph)) delete common.glyph
     return { ...textureStyle(common), gap: 0 }
   }
   function savedNote() {
+    root.querySelector('h2')!.textContent = selectedKey ? `Edit texture: ${draft.name}` : 'New texture'
     const saved = selectedKey ? callbacks.document().textures?.[selectedKey] : undefined
     get('saved-note').textContent = saved && JSON.stringify(saved) === JSON.stringify(asset()) ? 'Saved in Assets → Textures' : 'Changes not yet saved to Assets'
     get<HTMLButtonElement>('reveal').disabled = !saved
     get<HTMLButtonElement>('undo').disabled = !history.canUndo; get<HTMLButtonElement>('redo').disabled = !history.canRedo
-    get<HTMLButtonElement>('apply').disabled = !target() || saving
-    get('apply').textContent = part ? 'Apply to part' : 'Apply to object'
+    get<HTMLButtonElement>('apply').disabled = (scope !== 'global' && !target()) || saving
+    get('apply').textContent = scope === 'global' ? 'Apply globally' : scope === 'type' ? 'Apply to every copy' : scope === 'part' ? 'Apply to part' : 'Apply to object'
   }
   function edited(commit = true) {
     if (commit) history.commit(draft)
-    stage.apply(part, previewStyle()); stage.setLighting(draft.previewLighting); savedNote()
+    stage.apply(scope === 'object' ? '' : part, previewStyle(), scope); stage.setLighting(draft.previewLighting); savedNote()
     status('Preview updated. Apply to update the selected object; Save to Assets keeps a reusable texture.')
   }
   function refreshTargets() {
-    const objects = get<HTMLSelectElement>('object'); objects.replaceChildren(new Option('Choose an object…', ''))
+    const objects = get<HTMLSelectElement>('object'); objects.replaceChildren(new Option('No target · editing asset only', ''))
     for (const item of callbacks.objects()) objects.append(new Option(item.object.name || item.id, item.id))
     objects.value = objectId
     const parts = get<HTMLSelectElement>('part'); parts.replaceChildren(new Option('Whole object · preserve mixed techniques', ''))
@@ -88,6 +97,11 @@ export function createTextureStudio(root: HTMLElement, callbacks: {
       if (containsMesh) names.add(node.name)
     })
     names.forEach(name => parts.append(new Option(glyphLabel(name), name))); parts.value = part
+    const scopes = get<HTMLSelectElement>('scope'), type = callbacks.type(objectId)
+    scopes.replaceChildren(new Option('This part', 'part'), new Option('This object', 'object'), new Option(`Every ${callbacks.typeName(objectId) ?? 'object of this type'}${part ? ` · ${glyphLabel(part)}` : ''}`, 'type'), new Option('Global style', 'global'))
+    scopes.options[0].disabled = !part; scopes.options[2].disabled = !type
+    if (scope === 'part' && !part || scope === 'type' && !type) scope = 'object'
+    scopes.value = scope
     const assets = get<HTMLSelectElement>('asset'); assets.replaceChildren(new Option('Open a saved texture…', ''))
     for (const [id, asset] of Object.entries(callbacks.document().textures ?? {})) assets.append(new Option(asset.name, id))
     assets.value = selectedKey ?? ''
@@ -133,7 +147,7 @@ export function createTextureStudio(root: HTMLElement, callbacks: {
       row.append(output, input); box.append(row)
     }
     const letters = group('Letters', 'Characters run from sparse to dense. A whole-object edit keeps different part techniques unless you choose one.')
-    select(letters, 'Technique', 'glyph', ['surface', 'body'].map(key => [key, glyphLabel(key)]))
+    select(letters, 'Technique', 'glyph', ['surface', 'body', 'screen'].map(key => [key, glyphLabel(key)]))
     select(letters, 'Glyph family', 'surface', GLYPH_FAMILIES.map(key => [key, glyphLabel(key)]))
     const alphabetRow = document.createElement('label'); alphabetRow.textContent = 'Custom alphabet'
     const alphabet = document.createElement('input'); alphabet.type = 'text'; alphabet.maxLength = 256; alphabet.dataset.textureField = 'alphabet'; alphabet.setAttribute('aria-label', 'Custom alphabet')
@@ -174,6 +188,10 @@ export function createTextureStudio(root: HTMLElement, callbacks: {
     const layout = group('Size and spacing', 'World meters keep letters attached to the object as the camera moves.')
     const size = defaultGlyphSize(effective)
     slider(layout, 'size', 'Letter size (m)', size, .01, 1, .01)
+    if (effective.glyph === 'screen') {
+      layout.querySelectorAll<HTMLInputElement>('[data-texture-field=size],[data-texture-number=size]').forEach(input => input.disabled = true)
+      const note = document.createElement('p'); note.className = 'empty-note'; note.textContent = 'Screen letter size uses scene cell size in Atmosphere.'; layout.append(note)
+    }
     slider(layout, 'spacing', 'Spacing', 1, .5, 4, .05); slider(layout, 'density', 'Density', 1, .05, 1, .05)
     slider(layout, 'rotation', 'Letter rotation (degrees)', 0, -180, 180, 1)
     const ink = group('Ink and contrast')
@@ -208,6 +226,13 @@ export function createTextureStudio(root: HTMLElement, callbacks: {
     glow.oninput = () => { retain('emissive'); draft.style.emissive = parseInt(glow.value.slice(1), 16); edited(false) }; glow.onchange = () => edited(); glowRow.append(glow); response.append(glowRow)
     slider(response, 'emissiveIntensity', 'Self light intensity', 1, 0, 4, .05)
     renderLighting(group('Preview lighting', 'Studio lights are saved with this texture for previewing. Apply lighting to scene is a separate action.'))
+    if (effective.glyph === 'screen') {
+      fields.querySelectorAll<HTMLInputElement | HTMLSelectElement>('[data-texture-field]').forEach(input => {
+        if (!['glyph', 'surface', 'color', 'emissive', 'emissiveIntensity'].includes(input.dataset.textureField!)) input.disabled = true
+      })
+      fields.querySelectorAll<HTMLInputElement>('[data-texture-number],[data-texture-palette]').forEach(input => input.disabled = true)
+      const note = document.createElement('p'); note.className = 'empty-note'; note.textContent = 'Character screen rendering uses the legacy atlas. Custom alphabets, fonts and world-letter controls apply to surface/body techniques.'; letters.append(note)
+    }
   }
   function renderLighting(box: HTMLElement) {
     const toggleRow = document.createElement('label'); toggleRow.textContent = 'Customize preview lighting'
@@ -259,14 +284,14 @@ export function createTextureStudio(root: HTMLElement, callbacks: {
     box.append(actions)
   }
   async function showObject(id: string, nextPart = '') {
-    objectId = id; part = nextPart; baseline = appearance(); beginEdits(); draft = { name: 'My texture', style: startingStyle() }
-    selectedKey = undefined; history.reset(draft); render(); stage.apply(part, previewStyle()); stage.setLighting(draft.previewLighting)
+    assetOnly = false; recipeDraft = false; objectId = id; part = nextPart; scope = part ? 'part' : 'object'; baseline = appearance(); beginEdits(); draft = { name: 'My texture', style: startingStyle() }
+    selectedKey = undefined; history.reset(draft); render(); stage.apply(part, previewStyle(), scope); stage.setLighting(draft.previewLighting)
     if (active) await stage.show(callbacks.document(), objectId)
     status(target() ? 'Adjust the letters in the preview, then apply or save.' : 'Add or import an object in the scene, then select it here.')
   }
-  function selectPart(value: string) { part = value; baseline = appearance(); beginEdits(); draft.style = startingStyle(); draft.cleared = []; selectedKey = undefined; history.reset(draft); render(); stage.apply(part, previewStyle()); stage.setLighting(draft.previewLighting) }
-  function undo(redo = false) { const next = redo ? history.redo() : history.undo(); if (next) { draft = next; render(); stage.apply(part, previewStyle()); stage.setLighting(draft.previewLighting) } }
-  function editAsset(key: string) { const asset = callbacks.document().textures?.[key]; if (!asset) return; selectedKey = key; beginEdits(); baseline = appearance(); draft = structuredClone(asset); history.reset(draft); render(); stage.apply(part, previewStyle()); stage.setLighting(draft.previewLighting); status('Saved texture opened. Apply to use it on the selected object or part.') }
+  function selectPart(value: string) { part = value; if (scope !== 'type' && scope !== 'global') scope = part ? 'part' : 'object'; baseline = appearance(); beginEdits(); if (!selectedKey && !recipeDraft) draft.style = startingStyle(); draft.cleared = []; history.reset(draft); render(); stage.apply(part, previewStyle(), scope); stage.setLighting(draft.previewLighting) }
+  function undo(redo = false) { const next = redo ? history.redo() : history.undo(); if (next) { draft = next; render(); stage.apply(part, previewStyle(), scope); stage.setLighting(draft.previewLighting) } }
+  function editAsset(key: string, withoutTarget = false) { const asset = callbacks.document().textures?.[key]; if (!asset) return; recipeDraft = true; if (withoutTarget) { assetOnly = true; objectId = ''; part = ''; scope = 'object' } selectedKey = key; beginEdits(); baseline = appearance(); draft = structuredClone(asset); history.reset(draft); render(); stage.apply(part, previewStyle(), scope); stage.setLighting(draft.previewLighting); if (active && withoutTarget) void stage.show(callbacks.document()); status('Saved texture opened. Choose a target to apply, or edit this asset only.') }
   async function save(copy = false) {
     if (saving) return
     draft.name = get<HTMLInputElement>('name').value.trim()
@@ -279,11 +304,12 @@ export function createTextureStudio(root: HTMLElement, callbacks: {
     finally { saving = false; root.querySelectorAll<HTMLButtonElement>('.studio-save button').forEach(button => button.disabled = false); savedNote() }
   }
   async function apply() {
-    if (!target() || saving) return
-    try { parseScene({ version: 1, objects: [], textures: { draft: asset() } }); await callbacks.apply(objectId, part, previewStyle()); stage.commit(); status('Texture applied. Return to the scene to see it; Ctrl Z in the scene undoes the change.') }
+    if (scope !== 'global' && !target() || saving) return
+    try { parseScene({ version: 1, objects: [], textures: { draft: asset() } }); await callbacks.apply(objectId, scope === 'object' ? '' : part, previewStyle(), scope); stage.commit(); status('Texture applied. Return to the scene to see it; Ctrl Z in the scene undoes the change.') }
     catch (error) { status(String(error)) }
   }
-  get<HTMLSelectElement>('object').onchange = e => { const id = (e.target as HTMLSelectElement).value; callbacks.select(id); void showObject(id) }
+  get<HTMLSelectElement>('object').onchange = e => { const id = (e.target as HTMLSelectElement).value; callbacks.select(id); if (assetOnly) { assetOnly = false; objectId = id; baseline = appearance(); beginEdits(); render(); void stage.show(callbacks.document(), id); stage.apply(part, previewStyle(), scope) } else void showObject(id) }
+  get<HTMLSelectElement>('scope').onchange = e => { scope = (e.target as HTMLSelectElement).value as TextureScope; baseline = appearance(); beginEdits(); if (!selectedKey && !recipeDraft) draft.style = startingStyle(); draft.cleared = []; history.reset(draft); render(); stage.apply(part, previewStyle(), scope) }
   get<HTMLSelectElement>('part').onchange = e => selectPart((e.target as HTMLSelectElement).value)
   get<HTMLSelectElement>('asset').onchange = e => editAsset((e.target as HTMLSelectElement).value)
   get<HTMLInputElement>('name').oninput = () => { draft.name = get<HTMLInputElement>('name').value; savedNote() }; get<HTMLInputElement>('name').onchange = () => history.commit(draft)
@@ -299,7 +325,7 @@ export function createTextureStudio(root: HTMLElement, callbacks: {
     try {
       const content = JSON.parse(await file.text()); if (content.version !== 1 || !content.texture) throw new Error('Invalid texture file.')
       const asset = { name: typeof content.name === 'string' ? content.name : file.name, style: content.texture, ...(content.previewLighting ? { previewLighting: content.previewLighting } : {}) }
-      parseScene({ version: 1, objects: [], textures: { imported: asset } }); beginEdits(); draft = asset; selectedKey = undefined; history.reset(draft); render(); stage.apply(part, previewStyle()); stage.setLighting(draft.previewLighting); status('Texture opened. Apply to the selection or save to Assets.')
+      parseScene({ version: 1, objects: [], textures: { imported: asset } }); beginEdits(); recipeDraft = true; draft = asset; selectedKey = undefined; history.reset(draft); render(); stage.apply(part, previewStyle(), scope); stage.setLighting(draft.previewLighting); status('Texture opened. Apply to the selection or save to Assets.')
     } catch (error) { status(String(error)) }
   }
   addEventListener('keydown', event => {
@@ -309,9 +335,10 @@ export function createTextureStudio(root: HTMLElement, callbacks: {
   root.closest('#editor-workspace')!.addEventListener('project-tab', event => {
     active = (event as CustomEvent).detail === 'textures'
     if (active) {
-      const id = callbacks.selected() ?? objectId
+      if (assetOnly) { render(); stage.apply(part, previewStyle(), scope); stage.setLighting(draft.previewLighting); void stage.show(callbacks.document()); return }
+      const id = assetOnly ? '' : callbacks.selected() ?? objectId
       if (id !== objectId || !target()) void showObject(id)
-      else { render(); stage.apply(part, previewStyle()); stage.setLighting(draft.previewLighting); void stage.show(callbacks.document(), objectId) }
+      else { render(); stage.apply(part, previewStyle(), scope); stage.setLighting(draft.previewLighting); void stage.show(callbacks.document(), objectId) }
     } else stage.hide()
   }, { signal: abort.signal })
   render()

@@ -160,7 +160,7 @@ try {
 
   await action(`ui('#hierarchy [data-object-id="object-2"]'); ui('[data-field="Position x"]', '-2.5')`)
   await check('transform edited in inspector is serialized', 'area.document().objects[1].position[0] === -2.5')
-  await action(`ui('#selection [data-k="part"]', 'crown'); ui('#selection [data-k="size"]', '.24'); ui('#selection [data-k="apply"]')`)
+  await action(`ui('#selection [data-k="part"]', 'crown'); ui('#selection [data-k="edit-letters"]'); ui('[data-texture-number=size]', '.24'); ui('[data-texture=apply]'); ui('[data-k=close-studio]')`)
   await check('part style is serialized', 'area.document().objects[1].options.parts.crown.size === .24')
   await evaluate('window.expected = area.document()')
   await action('await area.openDocument(JSON.parse(JSON.stringify(expected)))')

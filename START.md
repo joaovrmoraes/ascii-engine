@@ -99,7 +99,11 @@ properties. Editor global/type/instance styles can override them. Named
 groups and meshes are part boundaries; an undivided mesh is not automatically
 segmented into semantic parts. `GlyphStyle.size` controls surface cells and
 body base size in metres; `color` optionally overrides the model's RGB colour.
-The inspector writes only changed fields, preserving mixed part techniques.
+The inspector reports effective appearance and per-field sources. Edit letters opens
+Texture Studio on the selected part/object; its Apply to selector writes only changed
+fields to part, object, shared asset/type or global style, preserving mixed techniques.
+Optional type authored field masks promote explicit editor choices above procedural
+node declarations; absent masks retain legacy document ordering.
 
 ### 3.2 Water as a component (owner requirement)
 

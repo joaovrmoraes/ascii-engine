@@ -1,8 +1,22 @@
 import { describe, expect, it } from 'vitest'
-import { mergeGlyphStyles, nodeGlyphStyle, resolveGlyphStyle } from './style'
+import { glyphStyleSources, mergeGlyphStyles, nodeGlyphStyle, resolveGlyphStyle } from './style'
 
 describe('glyph style layers', () => {
+  it('reports per-field origins without changing resolution or treating undefined as an override', () => {
+    const layers = { defaults: { glyph: 'surface' as const }, global: { size: .17, color: 0xffffff }, type: { style: { size: .2 } }, instance: { color: 0x44bb66, size: undefined } }
+    expect(glyphStyleSources(layers)).toEqual({ glyph: 'model default', size: 'type', color: 'instance' })
+    expect(resolveGlyphStyle(layers)).toEqual({ glyph: 'surface', size: .2, color: 0x44bb66 })
+  })
   const tree = { style: { glyph: 'surface' as const, surface: 'bark' as const }, parts: { crown: { glyph: 'body' as const, surface: 'foliage' as const } } }
+  it('only promotes explicitly authored type fields, preserving legacy declarations and instance precedence', () => {
+    const type = { style: { size: .22 }, parts: { crown: { size: .19 } } }
+    const node = { size: .12, glyph: 'body' as const }
+    expect(resolveGlyphStyle({ type, node, part: 'crown' }).size).toBe(.12)
+    const authored = { ...type, authored: { style: ['size' as const] } }
+    expect(resolveGlyphStyle({ type: authored, node, part: 'crown' })).toEqual({ size: .22, glyph: 'body' })
+    expect(resolveGlyphStyle({ type: authored, node, part: 'crown', instance: { size: .4 } }).size).toBe(.4)
+    expect(resolveGlyphStyle({ type: { ...authored, authored: { style: ['size'], parts: { crown: ['size'] } } }, node, part: 'crown' }).size).toBe(.19)
+  })
 
   it('gives crown and trunk of one tree different styles', () => {
     expect(resolveGlyphStyle({ type: tree, part: 'crown' })).toEqual({ glyph: 'body', surface: 'foliage' })

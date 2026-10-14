@@ -69,16 +69,16 @@ try {
   await check('Textures is a separate module with an isolated object', 'document.body.classList.contains("texture-studio-active") && !document.querySelector("#texture-studio").hidden && document.querySelector("#effect-preview").hidden')
   await check('inspector and studio share family names and stable IDs', `(() => {
     const options = selector => Array.from(document.querySelectorAll(selector)).filter(o => o.value).map(o => [o.value, o.textContent]);
-    const inspector = options('#selection [data-k=surface] option');
-    return JSON.stringify(inspector) === JSON.stringify(options('#texture-studio [data-texture-field=surface] option')) &&
+    const inspector = options('#texture-studio [data-texture-field=surface] option');
+    return !document.querySelector('#selection [data-k=surface]') && !!document.querySelector('#selection [data-k=edit-letters]') &&
       inspector.some(([id, label]) => id === 'wetgrass' && label === 'Wet grass') &&
       inspector.some(([id, label]) => id === 'actor' && label === 'Character');
   })()`)
   for (const [id, part] of [['block', ''], ['tree', 'crown'], ['tree', 'trunk'], ['import', 'crown'], ['import', 'trunk']]) {
     await action(`ui('[data-k=close-studio]'); select('${id}'); ui('#selection [data-k=part]', '${part}');
-      window.catalogColor = document.querySelector('#selection [data-k=color]').value;
-      window.catalogSize = document.querySelector('#selection [data-k=size]').value || parseFloat(document.querySelector('#selection [data-k=size]').placeholder);
-      window.catalogLetters = document.querySelector('#selection [data-k=letters]').textContent;
+      window.catalogColor = document.querySelector('#selection [data-summary=color]').dataset.value;
+      window.catalogSize = parseFloat(document.querySelector('#selection [data-summary=size]').dataset.value);
+      window.catalogLetters = document.querySelector('#selection [data-summary=alphabet]').textContent;
       ui('[data-k=create-texture]')`)
     await until(`document.querySelector('#texture-preview canvas').dataset.ready === '${id}'`)
     await check(`${id}/${part || 'object'}: panels agree on inherited color, size and alphabet`, `
@@ -96,7 +96,7 @@ try {
     await area.openDocument(actor); select('block'); ui('[data-k=create-texture]')`)
   await until('document.querySelector("#texture-preview canvas").dataset.ready === "block"')
   await check('inherited character body size matches the renderer default in both panels', `
-    parseFloat(document.querySelector('#selection [data-k=size]').placeholder) === .155 &&
+    parseFloat(document.querySelector('#selection [data-summary=size]').dataset.value) === .155 &&
     Number(document.querySelector('#texture-studio [data-texture-number=size]').value) === .155`)
   await action(`ui('[data-k=close-studio]'); await area.openDocument(catalogScene); select('block');
     window.before = JSON.stringify(area.document()); ui('[data-k=create-texture]')`)
@@ -125,7 +125,7 @@ try {
   await action(`tx('apply')`)
   await check('apply persists the texture on only the selected object', 'area.document().objects[0].options.alphabet===" .:-+#@" && area.document().objects[0].options.color===0x72bece && !area.document().objects[1].options.alphabet')
   await check('inspector and studio agree on an explicit RGB override', `
-    document.querySelector('#selection [data-k=color]').value === '#72bece' &&
+    document.querySelector('#selection [data-summary=color]').dataset.value === '#72bece' &&
     document.querySelector('#texture-studio [data-texture-field=color]').value === '#72bece'`)
   await action(`ui('[data-k="close-studio"]'); ui('[data-k="undo"]')`); await until('!area.document().objects[0].options.alphabet');
   await action(`ui('[data-k="redo"]')`); await until('area.document().objects[0].options.alphabet===" .:-+#@"');
@@ -235,6 +235,35 @@ try {
   await action(`tx('apply-lighting')`);await until('area.document().style.moon.color===0x33ff88');console.log('PASS explicit apply transfers preview lighting to scene');
   await action(`ui('[data-k="close-studio"]');ui('[data-k="undo"]')`);await until('area.document().style.moon.color===sceneLightBefore');console.log('PASS scene undo restores applied preview lights');
   await action(`await area.openDocument(symbolsDoc)`);await check('expanded texture survives project reopen','Object.values(area.document().textures).some(t=>t.name===\"Emerald symbols\"&&t.style.open&&t.previewLighting.moon.color===0x33ff88)');
+
+  await action(`window.select = id => ui('#hierarchy [data-object-id="'+id+'"]'); ui('[data-k=close-studio]'); await area.openDocument({version:1,name:'Appearance scopes',objects:[
+    {id:'scope-a',prefab:'bloco',position:[-1,0,0]},{id:'scope-b',prefab:'bloco',position:[1,0,0]}],
+    textures:{sample:{name:'Sample texture',style:{alphabet:'XY',color:0x88cc44}}}});
+    select('scope-a');ui('[data-k=create-texture]');tx('scope','type');tf('glyph','body');tf('surface','stone');tf('size','.22');tf('color','#8866cc');tx('apply')`)
+  await check('type scope applies all appearance fields to every copy', `['scope-a','scope-b'].every(id=>{
+    let style;object(id).traverse(n=>{if(n.isMesh)style=n.userData.glyphResolved});return style.glyph==='body'&&style.size===.22&&style.color===0x8866cc;
+  })`)
+  await action(`ui('[data-k=close-studio]');select('scope-a');ui('[data-k=create-texture]');tf('size','.4');tx('apply')`)
+  await check('object scope stays local and preserves inherited type fields', `
+    area.document().objects[0].options.size===.4 && area.document().objects[0].options.color===undefined &&
+    area.document().objects[1].options.size===undefined`)
+  await action(`tx('scope','global');tf('alphabet','01');tx('apply')`)
+  await check('global scope exposes and saves the global layer', `area.document().style.glyphs.alphabet==='01' &&
+    !area.document().objects.some(o=>o.options.alphabet)`)
+  await action(`ui('[data-k=close-studio]');select('scope-a');ui('[data-k=create-texture]');tf('glyph','screen')`)
+  await check('screen technique keeps the scene cell size and identifies unavailable world controls', `
+    document.querySelector('[data-texture-number=size]').disabled && document.querySelector('[data-texture-field=alphabet]').disabled`)
+  await action(`tx('apply');tx('name','Legacy character');tx('save')`)
+  await check('screen appearance applies and saves as a portable recipe', `
+    area.document().objects[0].options.glyph==='screen' && Object.values(area.document().textures).some(t=>t.name==='Legacy character'&&t.style.glyph==='screen')`)
+  await action(`ui('[data-k=close-studio]');ui('.asset-card[data-texture=sample]')`)
+  await check('opening a texture asset does not silently target the last object', `
+    document.querySelector('[data-texture=object]').value==='' && document.querySelector('[data-texture=apply]').disabled &&
+    document.querySelector('#texture-studio h2').textContent==='Edit texture: Sample texture'`)
+  await action(`tx('object','scope-b')`)
+  await until('document.querySelector("#texture-preview canvas").dataset.ready==="scope-b"')
+  await check('an explicit asset target keeps the opened appearance recipe', `
+    document.querySelector('[data-texture-field=alphabet]').value==='XY' && document.querySelector('[data-texture-field=color]').value==='#88cc44'`)
 
   await writeFile(output+'/test-scene.ascii.json',JSON.stringify(await evaluate('area.document()'),null,2))
   await writeFile(output+'/result.json',JSON.stringify({errors,passed:errors.length===0},null,2))

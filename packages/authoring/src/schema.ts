@@ -18,7 +18,7 @@ const stroke = z.object({ brush: z.enum(['raise', 'lower', 'smooth', 'flatten', 
 /** JSON is intentional for complete engine documents/recipes: parseScene is authoritative. */
 export const commandSchema = z.discriminatedUnion('op', [
   z.object({ op: z.literal('scene.replace'), document: json }).strict(),
-  z.object({ op: z.literal('scene.patch'), patch: json.describe('Recursive merge; arrays replace arrays. All SceneDoc fields are accessible.'), unset: z.array(z.enum(['terrain', 'waters', 'carpet', 'assets', 'effects', 'atmospheres', 'textures', 'cameras', 'activeCamera', 'environment', 'style'])).optional() }).strict(),
+  z.object({ op: z.literal('scene.patch'), patch: json.describe('Recursive merge; arrays replace arrays. All SceneDoc fields are accessible, including optional style.types[id].authored field lists above model declarations.'), unset: z.array(z.enum(['terrain', 'waters', 'carpet', 'assets', 'effects', 'atmospheres', 'textures', 'cameras', 'activeCamera', 'environment', 'style'])).optional() }).strict(),
   z.object({ op: z.literal('object.add'), object: json.describe('PlacedObject: prefab and position [x,y,z]; optional id, rotation3 in radians, scale3, options.parts.') }).strict(),
   z.object({ op: z.literal('object.update'), id: key, patch: json }).strict(),
   z.object({ op: z.literal('object.remove'), ids: z.array(key).min(1).max(20000) }).strict(),
@@ -31,7 +31,7 @@ export const commandSchema = z.discriminatedUnion('op', [
   z.object({ op: z.literal('effect.define'), id: key.regex(/^fx:custom-/), effect: json.describe('Complete EffectDef: name, duration, optional loop, emitters and light. See engine_reference effects.') }).strict(),
   z.object({ op: z.literal('asset.define'), id: key, name: z.string().min(1), source: z.string().startsWith('data:') }).strict(),
   z.object({ op: z.literal('resource.remove'), kind: z.enum(['assets', 'effects', 'atmospheres', 'textures']), id: key }).strict(),
-  z.object({ op: z.literal('texture.define'), id: key, name: z.string().trim().min(1), style: json.describe('GlyphStyle recipe for an object or part; fields can be omitted to preserve mixed techniques.'), previewLighting: json.optional().describe('Optional studio lights. Applying the texture preserves scene lighting.') }).strict(),
+  z.object({ op: z.literal('texture.define'), id: key, name: z.string().trim().min(1), style: json.describe('GlyphStyle recipe: surface/body world letters or legacy character screen. Omitted fields preserve mixed techniques. Screen uses scene cellSize and the legacy atlas.'), previewLighting: json.optional().describe('Optional studio lights. Applying the texture preserves scene lighting.') }).strict(),
   z.object({ op: z.literal('texture.apply'), id: key, objectId: key, part: key.optional() }).strict(),
   z.object({ op: z.literal('atmosphere.define'), id: key, name: z.string().trim().min(1), style: json.describe('Lighting to save to Assets; omitted fields come from the current scene.') }).strict(),
   z.object({ op: z.literal('atmosphere.apply'), id: key }).strict(),

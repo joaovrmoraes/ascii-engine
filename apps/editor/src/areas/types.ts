@@ -30,6 +30,8 @@ export interface Area {
   importFiles?(files: File[]): Promise<void>
   select?(object?: THREE.Object3D): void
   changed?(): void
+  setAppearanceSelection?(object?: THREE.Object3D, part?: string): void
+  editAppearance?(object: THREE.Object3D, part?: string): void
   pan?(x: number, z: number, y?: number): void
   document?(): import('@ascii-engine/core').SceneDoc
   openDocument?(doc: unknown): Promise<void>

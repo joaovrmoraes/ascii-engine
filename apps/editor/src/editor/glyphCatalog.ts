@@ -1,5 +1,5 @@
 import * as THREE from 'three'
-import { BODY_RAMPS, SURFACE_ALPHABETS, SURFACE_CELL, type GlyphStyle, type SurfaceKind } from '@ascii-engine/core'
+import { BODY_RAMPS, SCREEN_ALPHABETS, SURFACE_ALPHABETS, SURFACE_CELL, type GlyphStyle, type SurfaceKind } from '@ascii-engine/core'
 
 /** Editor vocabulary; saved family, part and terrain identifiers remain unchanged. */
 export const GLYPH_FAMILIES = ['earth', 'stone', 'wood', 'bark', 'foliage', 'snow', 'wetgrass', 'actor'] as const satisfies readonly SurfaceKind[]
@@ -31,6 +31,7 @@ export function defaultGlyphSize(style: GlyphStyle): number {
 }
 
 export function glyphAlphabet(style: GlyphStyle): string {
+  if (style.glyph === 'screen') return SCREEN_ALPHABETS[style.surface as keyof typeof SCREEN_ALPHABETS] ?? SCREEN_ALPHABETS.actor
   if (style.alphabet !== undefined) return style.alphabet
   return style.glyph === 'body'
     ? BODY_RAMPS[bodyRamp(style.surface)]

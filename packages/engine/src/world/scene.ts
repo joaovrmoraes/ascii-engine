@@ -112,7 +112,7 @@ export function buildScene(engine: AsciiEngine, source: SceneDoc, library: Prefa
     if (carpet) engine.remove(carpet.mesh, { dispose: true })
   }
   try {
-    for (const [name, prefab] of Object.entries(library)) if (prefab.style) engine.setTypeStyle(name, prefab.style)
+    for (const [name, prefab] of Object.entries(library)) if (prefab.style || doc.style?.types?.[name]?.authored) engine.setTypeStyle(name, prefab.style ?? {})
     if (doc.style) engine.setStyle(doc.style)
     terrain = doc.terrain ? createTerrain(doc.terrain) : undefined
     if (terrain) engine.add(terrain.mesh)
@@ -138,7 +138,7 @@ export function buildScene(engine: AsciiEngine, source: SceneDoc, library: Prefa
     object.name = item.name ?? prefab.title
     object.userData.sceneId = item.id
     object.userData.prefab = item.prefab
-    try { engine.add(object, { type: prefab.style ? item.prefab : undefined, ...item.options }) }
+    try { engine.add(object, { type: prefab.style || doc.style?.types?.[item.prefab]?.authored ? item.prefab : undefined, ...item.options }) }
     catch (error) { prefab.dispose?.(object); engine.remove(object, { dispose: true }); throw error }
     placed.push({ doc: item, object })
     return object

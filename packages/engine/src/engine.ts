@@ -3,7 +3,7 @@ import { createAsciiPass, type AsciiPassHook } from './ascii'
 import { ABSENT, createIllumination, MAX_INK_LIGHTS } from './illumination'
 import type { LightObstacle } from './exploration'
 import { DEFAULT_ASCII_STYLE, engineStyle, type AsciiStyle } from './config'
-import { nodeGlyphStyle, resolveGlyphStyle, type GlyphStyle, type ObjectTypeStyle } from './style'
+import { glyphStyleSources, nodeGlyphStyle, resolveGlyphStyle, type GlyphStyle, type ObjectTypeStyle } from './style'
 import type { SurfaceKind } from './surface'
 import { bodyUniforms, glyphBody, removeGlyphBody, updateGlyphBodies, updateSkinnedBody, type BodyRamp } from './techniques/body'
 import { createCarpet, type Carpet, type GroundCover } from './techniques/carpet'
@@ -189,6 +189,7 @@ export function createAsciiEngine(canvas: HTMLCanvasElement, options: AsciiEngin
         if (!style_.glyph) missing.push(node.name || node.type)
         else {
           node.userData.glyphResolved = style_; node.userData.glyphPart = part
+          node.userData.glyphSources = glyphStyleSources({ defaults, global: style.glyphs, type, part, node: nodeStyle, instance: instanceStyle, instanceParts: instance.parts })
           // A body is the whole part (or whole object): one spacing hash.
           const key = `${part ?? ''}|${JSON.stringify(style_)}`
           let group = groups.get(key)
@@ -367,7 +368,11 @@ export function createAsciiEngine(canvas: HTMLCanvasElement, options: AsciiEngin
     /** Registers or changes an object type; `part` changes that part in every instance. */
     setTypeStyle(typeName: string, typeStyle: ObjectTypeStyle) {
       const previous = types[typeName]
-      types[typeName] = { style: { ...previous?.style, ...typeStyle.style }, parts: { ...previous?.parts } }
+      types[typeName] = { style: { ...previous?.style, ...typeStyle.style }, parts: { ...previous?.parts },
+        ...(previous?.authored || typeStyle.authored ? { authored: {
+          style: [...new Set([...(previous?.authored?.style ?? []), ...(typeStyle.authored?.style ?? [])])],
+          parts: { ...previous?.authored?.parts, ...Object.fromEntries(Object.entries(typeStyle.authored?.parts ?? {}).map(([part, keys]) => [part, [...new Set([...(previous?.authored?.parts?.[part] ?? []), ...keys])]])) },
+        } } : {}) }
       for (const [part, partStyle] of Object.entries(typeStyle.parts ?? {})) types[typeName].parts![part] = { ...previous?.parts?.[part], ...partStyle }
       for (const entry of entries.values()) if (entry.options.type === typeName) { unapply(entry); apply(entry) }
     },

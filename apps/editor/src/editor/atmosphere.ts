@@ -23,6 +23,7 @@ export function createAtmosphereStudio(root: HTMLElement, engine: AsciiEngine, c
   const get = <T extends HTMLElement>(key: string) => root.querySelector<T>(`[data-studio="${key}"]`)!
   const hex = (value: number) => '#' + Math.round(value).toString(16).padStart(6, '0')
   function savedNote() {
+    root.querySelector('h2')!.textContent = selectedKey ? `Edit atmosphere: ${get<HTMLInputElement>('name').value}` : 'New atmosphere'
     get<HTMLButtonElement>('reveal').disabled = !selectedKey
     const saved = selectedKey && callbacks.definitions()[selectedKey]
     const same = saved && saved.name === get<HTMLInputElement>('name').value.trim() && JSON.stringify(saved.style) === JSON.stringify(portable())

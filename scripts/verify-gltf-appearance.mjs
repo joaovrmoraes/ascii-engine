@@ -93,9 +93,19 @@ try {
   await send('Runtime.enable'); await send('Page.enable'); await send('Emulation.setFocusEmulationEnabled', { enabled: true })
   await send('Page.navigate', { url: 'http://localhost:1440/?area=sandbox' })
   await until('!!window.area && !!document.querySelector("canvas[data-ready]")')
-  await evaluate(`window.ui = (selector, value) => { const el = document.querySelector(selector); if (!el) throw new Error(selector); if (value === undefined) el.click(); else { el.value = value; el.dispatchEvent(new Event('change')); } };
-    window.edit = (key,value) => ui('#selection [data-k="'+key+'"]',value);
-    window.selectObject = id => ui('#hierarchy [data-object-id="'+id+'"]');
+  await evaluate(`window.ui = (selector, value) => { const el = document.querySelector(selector); if (!el) throw new Error(selector); if (value === undefined) el.click(); else { el.value = value; el.dispatchEvent(new Event('input')); el.dispatchEvent(new Event('change')); } };
+    window.editPart = ''; window.editScope = 'instance';
+    window.edit = (key,value) => {
+      if (key === 'part') { editPart = value; ui(document.body.classList.contains('texture-studio-active') ? '[data-texture=part]' : '#selection [data-k=part]',value); return }
+      if (key === 'scope') editScope = value;
+      if (!document.body.classList.contains('texture-studio-active')) { ui('#selection [data-k=edit-letters]'); if (editPart) ui('[data-texture=part]',editPart); }
+      const scope = editScope === 'instance' ? (editPart ? 'part' : 'object') : editScope; if (document.querySelector('[data-texture=scope]').value !== scope) ui('[data-texture=scope]',scope);
+      if (key === 'scope') return;
+      if (key === 'apply') { ui('[data-texture=apply]'); ui('[data-k=close-studio]'); return }
+      if (key === 'inherit-color') { ui('[data-texture=model-color]'); return }
+      ui(key === 'size' ? '[data-texture-number=size]' : '[data-texture-field='+key+']',value);
+    };
+    window.selectObject = id => { ui('[data-k=close-studio]'); editPart = ''; ui('#hierarchy [data-object-id="'+id+'"]'); };
     window.object = id => engine.scene.children.find(o=>o.userData.sceneId===id);
     window.mesh = id => { let found; object(id).traverse(n=>{if(!found && n.isMesh) found=n}); return found };
     window.pixels = () => {engine.render(0);return engine.renderer.domElement.toDataURL()};`)
@@ -114,7 +124,7 @@ try {
     await check(`${id}: model color can be restored`, `mesh(${q}).userData.glyphResolved.color===undefined && mesh(${q}).material.color.getHex()!==0x26bb55`)
     await evaluate(`edit('glyph','body');edit('size','.15');edit('apply');window.small=mesh(${q}).children.find(n=>n.isPoints).geometry.attributes.position.count;edit('size','.35');edit('apply');edit('color','#ff3366');edit('apply')`)
     await check(`${id}: body size and color affect glyph sprites`, `mesh(${q}).children.find(n=>n.isPoints).geometry.attributes.position.count < small && mesh(${q}).children.find(n=>n.isPoints).material.uniforms.tint.value.getHex()===0xff3366`)
-    await check(`${id}: imported model supports the type scope`, `!document.querySelector('#selection [data-k=scope] option[value=type]').disabled`)
+    await check(`${id}: imported model supports the type scope`, `!document.querySelector('[data-texture=scope] option[value=type]').disabled`)
   }
   await shot('imported-models')
 

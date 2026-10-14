@@ -41,6 +41,7 @@ export async function createSandbox(engine: AsciiEngine, options: AreaOptions = 
   }
   const placement = createPlacementPreview(engine, () => library)
   let name = initial?.name ?? 'My map', selected: THREE.Object3D | undefined, selectedWater = -1, busy = false, automationLocked = false
+  let appearanceObject: THREE.Object3D | undefined, appearancePart = ''
   let cameraEditor: ReturnType<typeof createSceneCameras> | undefined
   let initialCamera = initial?.cameras?.[initial.activeCamera ?? '']
   const snapshot = (): SceneDoc => ({ ...scene.toJSON(), ...cameraEditor?.document(), name })
@@ -220,7 +221,7 @@ export async function createSandbox(engine: AsciiEngine, options: AreaOptions = 
       card.title = `Open ${asset.name} in the Texture studio`; card.style.setProperty('--asset-color', '#96bfbe')
       const thumbnail = document.createElement('span'); thumbnail.className = 'asset-thumbnail texture-thumbnail'; thumbnail.textContent = asset.style.alphabet ?? '@#*:'
       const label = document.createElement('span'); label.textContent = asset.name; card.append(thumbnail, label)
-      card.onclick = () => { ui!.showStudio('textures'); textureStudio!.editAsset(key) }; grid.append(card)
+      card.onclick = () => { textureStudio!.editAsset(key, true); ui!.showStudio('textures') }; grid.append(card)
     }
     if (!grid.childElementCount) { const hint = document.createElement('p'); hint.className = 'empty-library'; hint.textContent = assetCategory === 'Imported' ? 'Use Import model to add your GLB and GLTF files.' : assetCategory === 'Atmospheres' ? 'Create an atmosphere in the Studio and choose Save to Assets.' : assetCategory === 'Textures' ? 'Select an object, open Textures in the Studio and choose Save to Assets.' : 'No assets found.'; grid.append(hint) }
   }
@@ -377,6 +378,8 @@ export async function createSandbox(engine: AsciiEngine, options: AreaOptions = 
       document: snapshot,
       objects: () => scene.placed.map(item => ({ id: item.doc.id!, object: item.object })),
       selected: () => scene.placed.find(item => item.object === selected)?.doc.id,
+      type: id => { const object = scene.placed.find(item => item.doc.id === id)?.object; return object ? engine.instanceStyle(object)?.type ?? object.userData.prefab : undefined },
+      typeName: id => { const object = scene.placed.find(item => item.doc.id === id)?.object, type = object && (engine.instanceStyle(object)?.type ?? object.userData.prefab); return type ? library[type]?.title ?? type : undefined },
       select: id => choose(scene.placed.find(item => item.doc.id === id)?.object),
       reveal: () => revealAssets('Textures'),
       async applyLighting(style) { engine.setStyle({ ...structuredClone(style), bodySceneLighting: true, inkFog: true }); changed() },
@@ -391,11 +394,20 @@ export async function createSandbox(engine: AsciiEngine, options: AreaOptions = 
         await replace(doc); if (chosen) choose(scene.placed.find(item => item.doc.id === chosen)?.object)
         selectAssetCategory('Textures'); changed()
       },
-      async apply(id, part, style) {
+      async apply(id, part, style, scope) {
+        if (scope === 'global') { engine.setStyle({ glyphs: { ...engine.style.glyphs, ...style } }); changed(); return }
         const object = scene.placed.find(item => item.doc.id === id)?.object
         if (!object) throw new Error('Select an object before applying a texture.')
         if (part && !object.getObjectByName(part)) throw new Error('Part not found: ' + part)
-        if (part) engine.setPartStyle(object, part, style); else engine.setInstanceStyle(object, style)
+        if (scope === 'type') {
+          const type = engine.instanceStyle(object)?.type ?? object.userData.prefab
+          if (!type) throw new Error('This object has no shared type.')
+          const fields = Object.keys(style) as (keyof typeof style)[]
+          engine.setTypeStyle(type, part ? { parts: { [part]: style }, authored: { parts: { [part]: fields } } } : { style, authored: { style: fields } })
+          for (const item of scene.placed) if (item.doc.prefab === type && !engine.instanceStyle(item.object)?.type) {
+            const options = { ...engine.instanceStyle(item.object), type }; engine.setInstanceStyle(item.object, options)
+          }
+        } else if (part) engine.setPartStyle(object, part, style); else engine.setInstanceStyle(object, style)
         choose(object); changed()
       },
     })
@@ -415,7 +427,7 @@ export async function createSandbox(engine: AsciiEngine, options: AreaOptions = 
     opener.onchange = () => { const file = opener.files?.[0]; opener.value = ''; if (file) run(async () => { await replace(JSON.parse(await file.text())); setMode('translate'); changed() }) }
     el('library').onclick = () => { ui!.showProject('assets'); assetCategory = 'All'; assetQuery = ''; el<HTMLInputElement>('asset-search').value = ''; refreshLibrary(); el('asset-search').focus() }
     el('create-camera').onclick = () => { cameraEditor!.view(null); setMode('translate', true); cameraEditor!.add() }
-    el('create-texture').onclick = () => { const part = document.querySelector<HTMLSelectElement>('#selection [data-k="part"]')?.value ?? ''; textureStudio!.open(undefined, part); ui!.showStudio('textures') }
+    el('create-texture').onclick = () => { textureStudio!.open(selected?.userData.sceneId, appearanceObject === selected ? appearancePart : ''); ui!.showStudio('textures') }
     el('create-effect').onclick = () => { ui!.showProject('effects'); effectEditor!.newEffect() }
     el<HTMLInputElement>('search').oninput = e => { hierarchyQuery = (e.target as HTMLInputElement).value; refreshHierarchy() }
     el<HTMLInputElement>('asset-search').oninput = e => { assetQuery = (e.target as HTMLInputElement).value; refreshLibrary() }
@@ -588,6 +600,8 @@ export async function createSandbox(engine: AsciiEngine, options: AreaOptions = 
     cameraView: () => player ? initialCamera : preview ? cameraEditor?.activeCamera() ?? cameraEditor?.current() : cameraEditor?.current(),
     renderPreview: dt => textureStudio?.frame(dt) || effectEditor?.frame(dt) || false,
     capturePreview: () => textureStudio?.capture() ?? effectEditor?.capture(),
+    setAppearanceSelection(object, part) { appearanceObject = object; appearancePart = part ?? '' },
+    editAppearance(object, part) { textureStudio?.open(object.userData.sceneId, part); ui?.showStudio('textures') },
     async openDocument(doc) { await replace(doc); changed() },
     authoring: player ? undefined : {
       replace,
@@ -599,8 +613,8 @@ export async function createSandbox(engine: AsciiEngine, options: AreaOptions = 
         if (snapshot().cameras?.[id]) return { camera: snapshot().cameras![id] }
         const placed = scene.placed.find(p => p.doc.id === id)
         if (!placed) throw new Error('Object not found: ' + id)
-        const parts: { name: string; glyph: unknown; surface: unknown }[] = []
-        placed.object.traverse(node => { if (node instanceof THREE.Mesh) parts.push({ name: node.name, glyph: node.userData.glyph, surface: node.userData.surface }) })
+        const parts: { name: string; glyph: unknown; surface: unknown; style: unknown; sources: unknown }[] = []
+        placed.object.traverse(node => { if (node instanceof THREE.Mesh) parts.push({ name: node.name, glyph: node.userData.glyphResolved?.glyph, surface: node.userData.glyphResolved?.surface, style: node.userData.glyphResolved, sources: node.userData.glyphSources }) })
         return { object: snapshot().objects.find(o => o.id === id), parts, options: engine.instanceStyle(placed.object), animationClips: placed.object.userData.animationClips ?? [] }
       },
       disturbWater(index,x,z,strength,radius) { const water=scene.waters[index]; if(!water) throw new Error('Water not found: '+index); water.disturb(x,z,strength,radius) },

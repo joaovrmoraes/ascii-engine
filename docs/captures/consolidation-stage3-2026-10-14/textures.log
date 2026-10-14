@@ -1,0 +1,93 @@
+$ node scripts/verify-textures.mjs .cache/consolidation-stage3-textures-final
+PASS standalone core has no game types/effects and accepts a consumer effect library
+PASS Textures is a separate module with an isolated object
+PASS inspector and studio share family names and stable IDs
+PASS block/object: panels agree on inherited color, size and alphabet
+PASS tree/crown: panels agree on inherited color, size and alphabet
+PASS tree/crown: panels share the selected part label
+PASS tree/trunk: panels agree on inherited color, size and alphabet
+PASS tree/trunk: panels share the selected part label
+PASS import/crown: panels agree on inherited color, size and alphabet
+PASS import/crown: panels share the selected part label
+PASS import/trunk: panels agree on inherited color, size and alphabet
+PASS import/trunk: panels share the selected part label
+PASS reading the shared catalog leaves the document unchanged
+PASS inherited character body size matches the renderer default in both panels
+PASS custom alphabets change rendered letters
+PASS rendered surface size
+PASS rendered surface spacing
+PASS rendered surface density
+PASS rendered surface strength
+PASS rendered surface contrast
+PASS rendered surface toneOffset
+PASS rendered surface shadowSteps
+PASS rendered surface color
+PASS preview edits leave the source scene unchanged
+PASS texture history undoes RGB
+PASS texture history redoes RGB
+PASS apply persists the texture on only the selected object
+PASS inspector and studio agree on an explicit RGB override
+PASS scene undo/redo restores the applied texture
+PASS saved texture is portable in the document and library
+PASS portable texture download
+PASS portable texture import restores the recipe
+PASS rendered body alphabet
+PASS rendered body size
+PASS rendered body spacing
+PASS rendered body density
+PASS rendered body strength
+PASS rendered body contrast
+PASS rendered body toneOffset
+PASS rendered body shadowSteps
+PASS rendered body color
+PASS crown appearance preserves trunk technique
+PASS switching parts preserves the committed crown in the preview
+PASS saved texture applies to both meshes in an imported named part
+PASS Effects owns its stage after switching modules
+PASS Atmosphere returns to the map and releases isolated stages
+PASS save/reopen keeps assets, object texture and part overrides
+PASS browser draft reload keeps textures
+PASS model color clears an existing RGB override in preview
+PASS texture redo preserves model-color reset
+PASS applying cleared alphabet and RGB restores model defaults
+PASS expanded rendered block alphabet
+PASS expanded rendered block font
+PASS expanded rendered block fontWeight
+PASS expanded rendered block rotation
+PASS expanded rendered block lighting
+PASS expanded rendered block emissive
+PASS expanded rendered block emission intensity
+PASS expanded rendered block palette stops
+PASS expanded rendered block letters only
+PASS colored preview light block
+PASS preview light intensity block
+PASS uniform local shading ignores main light color block
+PASS expanded rendered import alphabet
+PASS expanded rendered import font
+PASS expanded rendered import fontWeight
+PASS expanded rendered import rotation
+PASS expanded rendered import lighting
+PASS expanded rendered import emissive
+PASS expanded rendered import emission intensity
+PASS expanded rendered import palette stops
+PASS expanded rendered import letters only
+PASS rendered body back-face visibility
+PASS colored preview light import
+PASS preview light intensity import
+PASS uniform local shading ignores main light color import
+PASS font/palette/visibility/light editing preserves the source document
+PASS saved texture stores Unicode, font, open mode and independent preview lights
+PASS extended file import/export preserves fonts, Unicode, visibility and lighting
+PASS applying the texture preserves scene lights
+PASS studio lights can be saved separately as an atmosphere
+PASS explicit apply transfers preview lighting to scene
+PASS scene undo restores applied preview lights
+PASS expanded texture survives project reopen
+PASS type scope applies all appearance fields to every copy
+PASS object scope stays local and preserves inherited type fields
+PASS global scope exposes and saves the global layer
+PASS screen technique keeps the scene cell size and identifies unavailable world controls
+PASS screen appearance applies and saves as a portable recipe
+PASS opening a texture asset does not silently target the last object
+PASS an explicit asset target keeps the opened appearance recipe
+PASS no runtime or shader errors

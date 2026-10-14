@@ -68,6 +68,8 @@ export function validGlyphAlphabet(value: unknown): value is string {
 export interface ObjectTypeStyle {
   style?: GlyphStyle
   parts?: Record<string, GlyphStyle>
+  /** Fields explicitly authored above model declarations; absent retains legacy layering. */
+  authored?: { style?: (keyof GlyphStyle)[]; parts?: Record<string, (keyof GlyphStyle)[]> }
 }
 
 /** Later layers win; `undefined` fields never erase earlier ones. */
@@ -97,17 +99,26 @@ export interface StyleLayers {
  * Most specific wins:
  * global preset → object type → type of part → node data → instance → part of the instance.
  */
-export function resolveGlyphStyle(layers: StyleLayers): GlyphStyle {
+function glyphLayers(layers: StyleLayers): [string, GlyphStyle | undefined][] {
   const part = layers.part
-  return mergeGlyphStyles(
-    layers.defaults,
-    layers.global,
-    layers.type?.style,
-    part ? layers.type?.parts?.[part] : undefined,
-    layers.node,
-    layers.instance,
-    part ? layers.instanceParts?.[part] : undefined,
-  )
+  const authored = (style: GlyphStyle | undefined, fields?: (keyof GlyphStyle)[]) => fields ? Object.fromEntries(fields.map(key => [key, style?.[key]])) : undefined
+  return [['model default', layers.defaults], ['global', layers.global], ['type', layers.type?.style],
+    ['type part', part ? layers.type?.parts?.[part] : undefined], ['model part', layers.node],
+    ['authored type', authored(layers.type?.style, layers.type?.authored?.style)],
+    ['authored type part', part ? authored(layers.type?.parts?.[part], layers.type?.authored?.parts?.[part]) : undefined],
+    ['instance', layers.instance], ['instance part', part ? layers.instanceParts?.[part] : undefined]]
+}
+export function resolveGlyphStyle(layers: StyleLayers): GlyphStyle {
+  return mergeGlyphStyles(...glyphLayers(layers).map(([, style]) => style))
+}
+
+/** Per-field provenance follows the exact same ordered layers as rendering. */
+export function glyphStyleSources(layers: StyleLayers): Partial<Record<keyof GlyphStyle, string>> {
+  const sources: Partial<Record<keyof GlyphStyle, string>> = {}
+  for (const [name, style] of glyphLayers(layers)) {
+    if (style) for (const key of GLYPH_STYLE_KEYS) if (style[key] !== undefined) sources[key] = name
+  }
+  return sources
 }
 
 /** Style written on a node: `userData.glyph` (technique) and `userData.glyphStyle` (the rest). */
