@@ -346,6 +346,11 @@ both `docs/index.html` and `docs/watch.html` from the README. GitHub Actions
 publishes the gallery and five map demos at `/ascii-engine/sandbox/` on main
 pushes. The public menu contains only Dark Forest, Rain Marsh, Snow Pines,
 Old Mine and Sunken Cathedral, with camera, letter/light and capture controls.
+The gallery embeds one responsive viewer with five map buttons. Switching a
+button changes only the iframe. Its `embed=1` URL hides the duplicate area row;
+camera, letter/light, pause and capture controls remain. A current-map link
+opens the standalone five-map viewer separately. README map links
+remain usable on GitHub, where interactive frames are not rendered.
 Authoring URLs fall back to Dark Forest. Scene editing, file import, per-object
 selection and the authoring API belong to the local editor.
 `pnpm pages:build` assembles tracked docs and the public build in ignored

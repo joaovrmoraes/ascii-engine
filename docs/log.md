@@ -4,6 +4,32 @@ Entries describe the state at each stage. Earlier limitations may have been
 resolved later; START.md and the editor guide describe the current scope.
 Historical filenames, reference IDs and captured interfaces are preserved.
 
+## 2026-10-14 — Embedded map switching in the Pages gallery
+
+The owner requested an iframe so visitors can click between the five demos
+without leaving the presentation. The gallery now contains one viewer with
+Dark Forest, Rain Marsh, Snow Pines, Old Mine and Sunken Cathedral buttons.
+
+- Map buttons replace only the iframe document and update its selected button,
+  description, title and separate-window link. The owner also requested removal
+  of the duplicate area row: public `embed=1` views omit it. The separate-window
+  link opens the standalone viewer with its five-map menu.
+- Kept plain links in the README and derive gallery choices/descriptions from
+  them. Added small viewer CSS/JS files; the local preview serves their MIME
+  types and embeds the published public demos.
+- Kept the public five-map restriction and visualization controls. Engine,
+  scene recipes, saved documents and historical baselines are unchanged.
+- Extended the real browser verifier with embedded map switching, keyboard
+  activation, control reloads, viewer interaction, both routes and mobile layout.
+
+Validation: pnpm check passed (114 tests, boundary guard, types/build). The
+production artifact passed 37 GPU/browser checks, with no page exceptions,
+failed HTTP responses or local WebSockets. The 390px gallery viewport has no
+horizontal overflow; this does not validate touch gestures on physical devices.
+Orca confirmed switching and absence of the area row. Its full-window screenshot
+timed out; the desktop image was captured with cdpshot and inspected instead.
+See [embedded viewer evidence](captures/embedded-map-viewer-2026-10-14/README.md).
+
 ## 2026-10-14 — Five-map public viewer and hosting branch
 
 The owner clarified that the public demo should expose only Dark Forest,

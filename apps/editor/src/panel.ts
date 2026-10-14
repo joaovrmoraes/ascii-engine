@@ -10,6 +10,7 @@ interface PanelOptions {
   importFiles: (files: File[]) => void
   changed?: () => void
   viewer?: boolean
+  hideArea?: boolean
 }
 
 /**
@@ -17,11 +18,11 @@ interface PanelOptions {
  * brightness (the player's "Image" controls), zoom and rotation.
  * Changing area or mode reloads with the URL, so every view is shareable.
  */
-export function createPanel({ engine, view, areas, areaId, mode, capture, importFiles, changed, viewer = false }: PanelOptions) {
+export function createPanel({ engine, view, areas, areaId, mode, capture, importFiles, changed, viewer = false, hideArea = false }: PanelOptions) {
   const root = document.getElementById('panel')!
   const go = (key: string, value: string) => { const p = new URLSearchParams(location.search); p.set(key, value); location.search = p.toString() }
   root.innerHTML = `
-    <label>area <select data-k="area">${Object.entries(areas).map(([id, a]) => `<option value="${id}"${id === areaId ? ' selected' : ''}>${a.title}</option>`).join('')}</select></label>
+    ${hideArea ? '' : `<label>area <select data-k="area">${Object.entries(areas).map(([id, a]) => `<option value="${id}"${id === areaId ? ' selected' : ''}>${a.title}</option>`).join('')}</select></label>`}
     <label>mode <select data-k="mode">${[['letters', 'glyphs'], ['screen', 'screen (legacy)'], ['raw', 'without screen pass']].map(([v, t]) => `<option value="${v}"${v === mode ? ' selected' : ''}>${t}</option>`).join('')}</select></label>
     <label>size <input data-k="cell" type="range" min="5" max="12" step="1"><output></output></label>
     <label>light <input data-k="light" type="range" min=".65" max="1.4" step=".05"><output></output></label>
@@ -32,7 +33,7 @@ export function createPanel({ engine, view, areas, areaId, mode, capture, import
     <button data-k="save">[ save preset .json ]</button>
     <label class="file">[ load preset .json ]<input data-k="load" type="file" accept=".json" hidden></label>`}`
   const input = (k: string) => root.querySelector<HTMLInputElement>(`[data-k="${k}"]`)!
-  root.querySelector<HTMLSelectElement>('[data-k="area"]')!.onchange = (e) => go('area', (e.target as HTMLSelectElement).value)
+  if (!hideArea) root.querySelector<HTMLSelectElement>('[data-k="area"]')!.onchange = (e) => go('area', (e.target as HTMLSelectElement).value)
   root.querySelector<HTMLSelectElement>('[data-k="mode"]')!.onchange = (e) => go('ascii', (e.target as HTMLSelectElement).value)
   const bind = (k: string, get: () => number, set: (v: number) => void, fmt = (v: number) => v.toFixed(2)) => {
     const el = input(k), out = el.nextElementSibling as HTMLOutputElement

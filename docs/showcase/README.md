@@ -48,6 +48,14 @@ Published gallery URL:
 https://joaovrmoraes.github.io/ascii-engine/watch.html.
 The generator derives chapter navigation and video sources from the README;
 it supports local historical MP4s and external release assets.
+It also derives the embedded viewer's five map buttons and descriptions from
+the README links. The iframe switches maps without navigating the gallery;
+the selected button, description and separate-window link follow the chosen map.
+Embedded URLs use `embed=1` to hide the duplicate area row. The separate-window
+link opens the standalone viewer with its five-map menu.
+`live-demos.js` and `live-demos.css` provide the viewer behavior and layout.
+The local README preview embeds the published demos; the Pages artifact uses
+the same origin and preserves the chosen map when a viewer control reloads it.
 
 The live demos are at https://joaovrmoraes.github.io/ascii-engine/sandbox/.
 The menu is limited to Dark Forest, Rain Marsh, Snow Pines, Old Mine and

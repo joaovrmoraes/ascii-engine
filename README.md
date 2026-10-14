@@ -9,13 +9,14 @@ and movement of the things they form.
 
 ## Try in your browser
 
-Open the five live map demos on GitHub Pages. No installation is needed.
+Use the map buttons in the [live gallery](https://joaovrmoraes.github.io/ascii-engine/#try-in-your-browser)
+to switch between five demos inside the page. No installation is needed.
 
 - [Dark Forest](https://joaovrmoraes.github.io/ascii-engine/sandbox/?area=dark_forest): explore the forest, animated characters and combat effects.
-- [Sunken Cathedral](https://joaovrmoraes.github.io/ascii-engine/sandbox/?area=sunken_cathedral): explore ruins, reflected water and interior lighting.
 - [Rain Marsh](https://joaovrmoraes.github.io/ascii-engine/sandbox/?area=rain_marsh): explore rain, wetlands and water ripples.
 - [Snow Pines](https://joaovrmoraes.github.io/ascii-engine/sandbox/?area=snow_pines): explore snowy branches, falling snow and tracks.
 - [Old Mine](https://joaovrmoraes.github.io/ascii-engine/sandbox/?area=old_mine): explore tunnels and lantern lighting.
+- [Sunken Cathedral](https://joaovrmoraes.github.io/ascii-engine/sandbox/?area=sunken_cathedral): explore ruins, reflected water and interior lighting.
 
 Drag to rotate the demo camera, scroll to zoom and use the controls to adjust
 letters and light or pause the animation. The demo menu contains these five

@@ -91,9 +91,69 @@ try {
   await until('!!document.querySelector("#try-in-your-browser")')
   check(await evaluate('document.querySelectorAll("video").length === 7'), 'gallery retains seven video chapters')
   check(await evaluate(`['dark_forest', 'sunken_cathedral', 'rain_marsh', 'snow_pines', 'old_mine'].every(id =>
-    !!document.querySelector('#try-in-your-browser + p + ul a[href$="?area=' + id + '"]'))`),
-    'gallery exposes direct links to all five map demos')
-  await shot('gallery')
+    !!document.querySelector('[data-demo-map="' + id + '"]')) &&
+    document.querySelectorAll('[data-demo-map]').length === 5`),
+    'gallery exposes exactly five map buttons')
+  check(await evaluate('document.querySelectorAll("iframe").length === 1'),
+    'gallery embeds one reusable demo frame')
+  await evaluate('document.querySelector("#live-demo-frame").scrollIntoView({block:"center"})')
+  await until(`document.querySelector('#live-demo-frame').contentWindow.area?.id === 'dark_forest' &&
+    !!document.querySelector('#live-demo-frame').contentDocument.querySelector('canvas[data-ready]')`)
+  check(await evaluate(`!document.querySelector('#live-demo-frame').contentDocument.querySelector('[data-k=area]') &&
+    !new URL(document.querySelector('#live-demo-open').href).searchParams.has('embed')`),
+    'embedded controls omit the area menu and the separate link opens the standalone viewer')
+  const galleryURL = await evaluate('location.href')
+  const ready = id => `document.querySelector('#live-demo-frame').contentWindow.area?.id === '${id}' &&
+    !!document.querySelector('#live-demo-frame').contentDocument.querySelector('canvas[data-ready]')`
+  for (const id of ['rain_marsh', 'snow_pines', 'old_mine', 'sunken_cathedral', 'dark_forest']) {
+    await evaluate(`document.querySelector('[data-demo-map="${id}"]').click()`)
+    await until(ready(id))
+    check(await evaluate('location.href') === galleryURL &&
+      await evaluate(`document.querySelector('[data-demo-map="${id}"]').getAttribute('aria-pressed') === 'true' &&
+        new URL(document.querySelector('#live-demo-open').href).searchParams.get('area') === '${id}'`),
+      `embedded ${id} switches without leaving the gallery`)
+  }
+  await evaluate(`document.querySelector('[data-demo-map=sunken_cathedral]').click()`)
+  await until(ready('sunken_cathedral'))
+  await evaluate(`const frame = document.querySelector('#live-demo-frame');
+    const mode = frame.contentDocument.querySelector('[data-k=mode]');
+    mode.value = 'letters'; mode.dispatchEvent(new Event('change'))`)
+  await until(`document.querySelector('#live-demo-frame').contentWindow.location.search.includes('ascii=letters') &&
+    ${ready('sunken_cathedral')}`)
+  await until(`document.querySelector('[data-demo-map=sunken_cathedral]').getAttribute('aria-pressed') === 'true'`)
+  check(await evaluate('location.href') === galleryURL,
+    'embedded control reloads keep the selected map and gallery URL')
+  await shot('gallery-cathedral')
+  await evaluate(`document.querySelector('#live-demo-frame').contentDocument.querySelector('[data-k=pause]').click()`)
+  check(await evaluate('document.querySelector("#live-demo-frame").contentWindow.view.paused'),
+    'embedded viewer controls remain interactive')
+  await evaluate(`document.querySelector('[data-demo-map=dark_forest]').click()`)
+  await until(ready('dark_forest'))
+  check(await evaluate(`document.querySelector('[data-demo-map=dark_forest]').getAttribute('aria-pressed') === 'true'`),
+    'map buttons still switch after navigation inside the frame')
+  await evaluate(`document.querySelector('[data-demo-map=rain_marsh]').focus()`)
+  await send('Input.dispatchKeyEvent', {
+    type: 'keyDown', key: 'Enter', code: 'Enter', windowsVirtualKeyCode: 13,
+    text: '\r', unmodifiedText: '\r',
+  })
+  await send('Input.dispatchKeyEvent', { type: 'keyUp', key: 'Enter', code: 'Enter', windowsVirtualKeyCode: 13 })
+  await until(ready('rain_marsh'))
+  check(await evaluate(`document.querySelector('[data-demo-map=rain_marsh]').getAttribute('aria-pressed') === 'true'`),
+    'keyboard activation switches the embedded map')
+  await send('Emulation.setDeviceMetricsOverride', {
+    width: 390, height: 844, deviceScaleFactor: 1, mobile: true,
+  })
+  check(await evaluate('document.documentElement.scrollWidth <= innerWidth'),
+    'embedded gallery fits a mobile viewport without horizontal overflow')
+  await shot('gallery-mobile')
+  await send('Emulation.clearDeviceMetricsOverride')
+
+  await send('Page.navigate', { url: new URL('watch.html', base).href })
+  await until('!!document.querySelector("#live-demo-frame")')
+  await evaluate('document.querySelector("#live-demo-frame").scrollIntoView({block:"center"})')
+  await until(ready('dark_forest'))
+  check(await evaluate('document.querySelectorAll("[data-demo-map]").length === 5'),
+    'the video gallery also embeds the five-map viewer')
 
   await openArea('dark_forest')
   check(await evaluate(`JSON.stringify(Array.from(document.querySelector('[data-k=area]').options,
