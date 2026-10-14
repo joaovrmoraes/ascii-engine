@@ -4,28 +4,33 @@ Entries describe the state at each stage. Earlier limitations may have been
 resolved later; START.md and the editor guide describe the current scope.
 Historical filenames, reference IDs and captured interfaces are preserved.
 
-## 2026-10-14 — Texture Studio release preparation
+## 2026-10-14 — Texture Studio release publication
 
 The owner explicitly authorized committing the validated texture work to main
-and publishing a GitHub release. The repository had no previous tags or
-releases; selected v0.1.0 — Texture Studio as its first source release.
+and publishing a GitHub release. Published the repository's first source
+release, v0.1.0 — Texture Studio, from feature commit 2c42abf.
 
 - Added [versioned release notes](releases/v0.1.0.md) with the editing workflow,
   glyph/font/visibility/color controls, independent preview lights, reusable
   assets, automation, compatibility and concrete current limits.
 - Reused the actual [Orca screenshot](captures/texture-controls-2026-10-14/orca-window.png)
-  and prepared the validated Blue hatch / Emerald symbols texture files plus
+  and attached the validated Blue hatch / Emerald symbols texture files plus
   the portable multipart example scene as downloadable release assets.
 - Fetched origin/main before integration; it matched the feature branch's
-  starting commit, 07eee6a. The main checkout had no uncommitted changes, so
-  integration can fast-forward without overwriting other work.
+  starting commit, 07eee6a. Fast-forwarded the clean main checkout and pushed
+  main and the annotated v0.1.0 tag atomically, without overwriting other work.
 
 Validation reviewed: pnpm check (109 tests, types/build), 71 texture WebGL
 assertions, full authoring/API regressions, Orca and cdpshot evidence, and
 git diff --check. This publication stage changes documentation only beyond
 the already validated implementation. Native desktop execution and arbitrary
 decoder-dependent models remain unverified; no reference files were changed.
-Publication target: [v0.1.0](https://github.com/joaovrmoraes/ascii-engine/releases/tag/v0.1.0).
+Verified the published release is neither draft nor prerelease, all three
+assets are uploaded, and its screenshot URL serves image/png with HTTP 200.
+At publication, remote main and the peeled tag both resolved to 2c42abf;
+both local checkouts were clean. This follow-up records publication without
+changing the release tag or runtime implementation.
+Published release: [v0.1.0](https://github.com/joaovrmoraes/ascii-engine/releases/tag/v0.1.0).
 
 ## 2026-10-14 — Expanded texture, visibility and lighting controls
 
