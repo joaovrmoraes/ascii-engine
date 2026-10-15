@@ -4,6 +4,55 @@ Entries describe the state at each stage. Earlier limitations may have been
 resolved later; START.md and the editor guide describe the current scope.
 Historical filenames, reference IDs and captured interfaces are preserved.
 
+## 2026-10-15 — Simulation performance study, Phase 1
+
+Committed the owner's WebAssembly study plan unchanged as d48998a. After owner
+confirmation, recorded the 15% qualification, 2× step gain, 15% full-frame gain,
+p95, parity and JS fallback gates in Proposed ADR 0004 before any numbers.
+The separate untracked editor consolidation plan was not changed.
+
+Added opt-in core CPU sections and asynchronous GPU queries, with water step
+separate from texture/geometry preparation. Disabled profiling creates no
+clocks/queries. Added three seeded dev-only URL fixtures, fixed 1/60 steps and
+camera/viewport, isolated from the sandbox and IndexedDB. The default editor
+clock, simulation algorithms, document format and published builds are unchanged.
+pnpm bench captures raw frames, draw calls, GPU ranges and full environment;
+pnpm bench:report generates per-scene percentiles and qualification tables.
+
+Investigated scheduled rAF timestamps hiding dispatch jitter. Preserved the
+preliminary rounds and clock diagnostic, then committed actual callback wall
+timing separately from native rAF cadence before the final two rounds. Source
+d105af5 was clean for both: 600 warm-up + 600 measured frames, five fresh loads
+per scene per round, 18,000 measured frames total. Full-frame p50 differences
+are 0.00% water, 0.03% particles and 0.00% skinning. All GPU samples completed,
+without disjoint/dropped queries or visibility changes; final state hashes
+match across all ten loads of each scene.
+
+Skinning qualifies at 14.015 ms p50 / 16.935 ms p95, 84.12% of the frame; GPU
+skinning is the appropriate later comparison to consider. Water step is 6.00%
+and effects 3.06%. Water preparation is 17.97% but includes Three.js geometry
+updates, so its aggregate does not establish a numeric WASM kernel. Candidate
+CPU medians repeat within 2.50%. Remaining render submission varies 5.65–11.43%;
+that residual is not treated as a stable kernel. Full-frame medians are paced
+near 60 Hz; no adoption speedup has been demonstrated.
+
+Validation: pnpm check passes (164 tests, formatting, boundaries, type checks
+and editor build). Clean-source benchmark smoke passes exact profiling on/off
+state and screenshot parity in all three scenes, with zero IndexedDB calls.
+pnpm compare still fails four historical baselines that also fail before this
+work; no baselines changed. Controlled old/new comparison with matching clocks
+gives RMSE 0 in reference and all five areas. The temporary comparison server
+was stopped. Orca used explicit isolated editor page
+4d61c29e-ae0f-4880-a018-3d0e6313dbfe; the owner confirmed the benchmark lake is
+visible. Automated Orca reads/captures timed out with runtime_unavailable;
+page-only isolated Chromium captures provide saved visual evidence. No owner
+draft was read or modified by the benchmarks; no desktop captures were taken.
+
+[Report and raw data](captures/benchmarks-2026-10-15/README.md),
+[method, captures and validation logs](captures/benchmarks-2026-10-15/study-notes.md).
+ADR 0004 remains Proposed. Stopped after Phase 1, before JS optimization or
+GPU/WASM prototypes. No toolchain installation and no push.
+
 ## 2026-10-15 — Generated Pages formatting and editor test teardown
 
 Excluded docs/index.html and docs/watch.html from Prettier with their generator

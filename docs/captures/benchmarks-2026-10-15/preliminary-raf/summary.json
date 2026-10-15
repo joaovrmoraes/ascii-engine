@@ -1,0 +1,468 @@
+{
+  "rounds": [
+    "round-1",
+    "round-2"
+  ],
+  "stable": true,
+  "results": [
+    {
+      "scene": "water",
+      "summary": {
+        "frameMs": {
+          "p50": 16.665000000000873,
+          "p95": 16.67000000000189,
+          "p99": 16.67000000000189
+        },
+        "frameCpuMs": {
+          "p50": 4.704999998211861,
+          "p95": 6.220000000670552,
+          "p99": 7.5150000005960464
+        },
+        "renderCpuMs": {
+          "p50": 4.410000000149012,
+          "p95": 5.820000000298023,
+          "p99": 7.110000001266599
+        },
+        "sceneCpuMs": {
+          "p50": 0.24000000022351742,
+          "p95": 0.64499999769032,
+          "p99": 1.0149999987334013
+        },
+        "waterStep": {
+          "p50": 0.9949999991804361,
+          "p95": 1.450000001117587,
+          "p99": 1.6199999991804361
+        },
+        "waterUpload": {
+          "p50": 2.949999999254942,
+          "p95": 3.974999999627471,
+          "p99": 4.975000001490116
+        },
+        "skinning": {
+          "p50": 0,
+          "p95": 0,
+          "p99": 0
+        },
+        "effects": {
+          "p50": 0,
+          "p95": 0.004999998956918716,
+          "p99": 0.005000000819563866
+        },
+        "carpet": {
+          "p50": 0,
+          "p95": 0.005000000819563866,
+          "p99": 0.009999999776482582
+        },
+        "bodyUniforms": {
+          "p50": 0,
+          "p95": 0.005000000819563866,
+          "p99": 0.005000000819563866
+        },
+        "renderRest": {
+          "p50": 0.4299999997019768,
+          "p95": 0.580000001937151,
+          "p99": 0.7099999990314245
+        },
+        "drawCalls": {
+          "p50": 7,
+          "p95": 7,
+          "p99": 7
+        },
+        "triangles": {
+          "p50": 34850,
+          "p95": 34850,
+          "p99": 34850
+        },
+        "points": {
+          "p50": 0,
+          "p95": 0,
+          "p99": 0
+        },
+        "gpuMs": {
+          "p50": 8.947656,
+          "p95": 10.149427,
+          "p99": 10.87177
+        }
+      },
+      "frameP50Difference": 0,
+      "targets": [
+        {
+          "subsystem": "waterStep",
+          "p50": 0.9949999991804361,
+          "p95": 1.450000001117587,
+          "p99": 1.6199999991804361,
+          "share": 0.05970597054787783,
+          "roundP50Difference": 0.010050251030511938,
+          "qualifies": false,
+          "qualification": "Below 15%"
+        },
+        {
+          "subsystem": "waterUpload",
+          "p50": 2.949999999254942,
+          "p95": 3.974999999627471,
+          "p99": 4.975000001490116,
+          "share": 0.1770177017254598,
+          "roundP50Difference": 0.0050804398764113965,
+          "qualifies": false,
+          "qualification": "Mixed geometry/upload; kernel not established"
+        },
+        {
+          "subsystem": "skinning",
+          "p50": 0,
+          "p95": 0,
+          "p99": 0,
+          "share": 0,
+          "roundP50Difference": 0,
+          "qualifies": false,
+          "qualification": "Below 15%"
+        },
+        {
+          "subsystem": "effects",
+          "p50": 0,
+          "p95": 0.004999998956918716,
+          "p99": 0.005000000819563866,
+          "share": 0,
+          "roundP50Difference": 0,
+          "qualifies": false,
+          "qualification": "Below 15%"
+        },
+        {
+          "subsystem": "carpet",
+          "p50": 0,
+          "p95": 0.005000000819563866,
+          "p99": 0.009999999776482582,
+          "share": 0,
+          "roundP50Difference": 0,
+          "qualifies": false,
+          "qualification": "Below 15%"
+        },
+        {
+          "subsystem": "bodyUniforms",
+          "p50": 0,
+          "p95": 0.005000000819563866,
+          "p99": 0.005000000819563866,
+          "share": 0,
+          "roundP50Difference": 0,
+          "qualifies": false,
+          "qualification": "Below 15%"
+        },
+        {
+          "subsystem": "renderRest",
+          "p50": 0.4299999997019768,
+          "p95": 0.580000001937151,
+          "p99": 0.7099999990314245,
+          "share": 0.02580258024014127,
+          "roundP50Difference": 0.03468209098210621,
+          "qualifies": false,
+          "qualification": "Below 15%"
+        }
+      ]
+    },
+    {
+      "scene": "particles",
+      "summary": {
+        "frameMs": {
+          "p50": 16.665000000000873,
+          "p95": 16.67000000000189,
+          "p99": 16.67000000000189
+        },
+        "frameCpuMs": {
+          "p50": 0.8999999985098839,
+          "p95": 1.224999999627471,
+          "p99": 1.349999999627471
+        },
+        "renderCpuMs": {
+          "p50": 0.875,
+          "p95": 1.199999999254942,
+          "p99": 1.3200000002980232
+        },
+        "sceneCpuMs": {
+          "p50": 0.020000001415610313,
+          "p95": 0.030000001192092896,
+          "p99": 0.03500000201165676
+        },
+        "waterStep": {
+          "p50": 0,
+          "p95": 0,
+          "p99": 0
+        },
+        "waterUpload": {
+          "p50": 0,
+          "p95": 0,
+          "p99": 0
+        },
+        "skinning": {
+          "p50": 0,
+          "p95": 0,
+          "p99": 0
+        },
+        "effects": {
+          "p50": 0.5,
+          "p95": 0.8100000005215406,
+          "p99": 0.9099999982863665
+        },
+        "carpet": {
+          "p50": 0,
+          "p95": 0.005000000819563866,
+          "p99": 0.009999999776482582
+        },
+        "bodyUniforms": {
+          "p50": 0,
+          "p95": 0.005000000819563866,
+          "p99": 0.005000000819563866
+        },
+        "renderRest": {
+          "p50": 0.34500000067055225,
+          "p95": 0.47499999962747097,
+          "p99": 0.5350000001490116
+        },
+        "drawCalls": {
+          "p50": 4,
+          "p95": 4,
+          "p99": 4
+        },
+        "triangles": {
+          "p50": 10804,
+          "p95": 10804,
+          "p99": 10804
+        },
+        "points": {
+          "p50": 1804,
+          "p95": 1876,
+          "p99": 1893
+        },
+        "gpuMs": {
+          "p50": 11.071406,
+          "p95": 11.646562,
+          "p99": 11.768802
+        }
+      },
+      "frameP50Difference": 0,
+      "targets": [
+        {
+          "subsystem": "waterStep",
+          "p50": 0,
+          "p95": 0,
+          "p99": 0,
+          "share": 0,
+          "roundP50Difference": 0,
+          "qualifies": false,
+          "qualification": "Below 15%"
+        },
+        {
+          "subsystem": "waterUpload",
+          "p50": 0,
+          "p95": 0,
+          "p99": 0,
+          "share": 0,
+          "roundP50Difference": 0,
+          "qualifies": false,
+          "qualification": "Below 15%"
+        },
+        {
+          "subsystem": "skinning",
+          "p50": 0,
+          "p95": 0,
+          "p99": 0,
+          "share": 0,
+          "roundP50Difference": 0,
+          "qualifies": false,
+          "qualification": "Below 15%"
+        },
+        {
+          "subsystem": "effects",
+          "p50": 0.5,
+          "p95": 0.8100000005215406,
+          "p99": 0.9099999982863665,
+          "share": 0.03000300030002843,
+          "roundP50Difference": 0.07999999821186066,
+          "qualifies": false,
+          "qualification": "Below 15%"
+        },
+        {
+          "subsystem": "carpet",
+          "p50": 0,
+          "p95": 0.005000000819563866,
+          "p99": 0.009999999776482582,
+          "share": 0,
+          "roundP50Difference": 0,
+          "qualifies": false,
+          "qualification": "Below 15%"
+        },
+        {
+          "subsystem": "bodyUniforms",
+          "p50": 0,
+          "p95": 0.005000000819563866,
+          "p99": 0.005000000819563866,
+          "share": 0,
+          "roundP50Difference": 0,
+          "qualifies": false,
+          "qualification": "Below 15%"
+        },
+        {
+          "subsystem": "renderRest",
+          "p50": 0.34500000067055225,
+          "p95": 0.47499999962747097,
+          "p99": 0.5350000001490116,
+          "share": 0.020702070247256777,
+          "roundP50Difference": 0.17647058340143995,
+          "qualifies": false,
+          "qualification": "Below 15%"
+        }
+      ]
+    },
+    {
+      "scene": "skinning",
+      "summary": {
+        "frameMs": {
+          "p50": 16.665000000000873,
+          "p95": 16.670000000000073,
+          "p99": 16.67000000000189
+        },
+        "frameCpuMs": {
+          "p50": 14.480000000447035,
+          "p95": 16.359999999403954,
+          "p99": 18.179999999701977
+        },
+        "renderCpuMs": {
+          "p50": 14.434999998658895,
+          "p95": 16.31499999947846,
+          "p99": 18.144999999552965
+        },
+        "sceneCpuMs": {
+          "p50": 0.04000000096857548,
+          "p95": 0.06000000052154064,
+          "p99": 0.07000000029802322
+        },
+        "waterStep": {
+          "p50": 0,
+          "p95": 0,
+          "p99": 0
+        },
+        "waterUpload": {
+          "p50": 0,
+          "p95": 0,
+          "p99": 0
+        },
+        "skinning": {
+          "p50": 13.714999999850988,
+          "p95": 15.56000000052154,
+          "p99": 17.28500000014901
+        },
+        "effects": {
+          "p50": 0,
+          "p95": 0.004999998956918716,
+          "p99": 0.005000000819563866
+        },
+        "carpet": {
+          "p50": 0.004999998956918716,
+          "p95": 0.005000000819563866,
+          "p99": 0.009999999776482582
+        },
+        "bodyUniforms": {
+          "p50": 0,
+          "p95": 0.005000000819563866,
+          "p99": 0.009999999776482582
+        },
+        "renderRest": {
+          "p50": 0.7100000027567148,
+          "p95": 0.8650000020861626,
+          "p99": 1.0800000000745058
+        },
+        "drawCalls": {
+          "p50": 51,
+          "p95": 51,
+          "p99": 51
+        },
+        "triangles": {
+          "p50": 13108,
+          "p95": 13108,
+          "p99": 13108
+        },
+        "points": {
+          "p50": 18179,
+          "p95": 18179,
+          "p99": 18179
+        },
+        "gpuMs": {
+          "p50": 7.857604,
+          "p95": 8.977552,
+          "p99": 9.868437
+        }
+      },
+      "frameP50Difference": 0,
+      "targets": [
+        {
+          "subsystem": "waterStep",
+          "p50": 0,
+          "p95": 0,
+          "p99": 0,
+          "share": 0,
+          "roundP50Difference": 0,
+          "qualifies": false,
+          "qualification": "Below 15%"
+        },
+        {
+          "subsystem": "waterUpload",
+          "p50": 0,
+          "p95": 0,
+          "p99": 0,
+          "share": 0,
+          "roundP50Difference": 0,
+          "qualifies": false,
+          "qualification": "Below 15%"
+        },
+        {
+          "subsystem": "skinning",
+          "p50": 13.714999999850988,
+          "p95": 15.56000000052154,
+          "p99": 17.28500000014901,
+          "share": 0.8229822982208382,
+          "roundP50Difference": 0.022218175038317533,
+          "qualifies": true,
+          "qualification": "Qualifies; compare GPU skinning"
+        },
+        {
+          "subsystem": "effects",
+          "p50": 0,
+          "p95": 0.004999998956918716,
+          "p99": 0.005000000819563866,
+          "share": 0,
+          "roundP50Difference": 0,
+          "qualifies": false,
+          "qualification": "Below 15%"
+        },
+        {
+          "subsystem": "carpet",
+          "p50": 0.004999998956918716,
+          "p95": 0.005000000819563866,
+          "p99": 0.009999999776482582,
+          "share": 0.0003000299404091482,
+          "roundP50Difference": 0,
+          "qualifies": false,
+          "qualification": "Below 15%"
+        },
+        {
+          "subsystem": "bodyUniforms",
+          "p50": 0,
+          "p95": 0.005000000819563866,
+          "p99": 0.009999999776482582,
+          "share": 0,
+          "roundP50Difference": 0,
+          "qualifies": false,
+          "qualification": "Below 15%"
+        },
+        {
+          "subsystem": "renderRest",
+          "p50": 0.7100000027567148,
+          "p95": 0.8650000020861626,
+          "p99": 1.0800000000745058,
+          "share": 0.0426042605914598,
+          "roundP50Difference": 0.02105262981777596,
+          "qualifies": false,
+          "qualification": "Below 15%"
+        }
+      ]
+    }
+  ]
+}

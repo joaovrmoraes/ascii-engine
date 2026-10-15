@@ -1,0 +1,377 @@
+[
+  {
+    "scene": "water",
+    "runs": [
+      {
+        "round": "round-1",
+        "run": 1,
+        "warmup": 600,
+        "measured": 600,
+        "gpuSamples": 600,
+        "stateHash": "df981f46",
+        "visibilityChanges": 0,
+        "disjointEvents": 0,
+        "droppedQueries": 0,
+        "maximumCpuAccountingErrorMs": 0.0
+      },
+      {
+        "round": "round-1",
+        "run": 2,
+        "warmup": 600,
+        "measured": 600,
+        "gpuSamples": 600,
+        "stateHash": "df981f46",
+        "visibilityChanges": 0,
+        "disjointEvents": 0,
+        "droppedQueries": 0,
+        "maximumCpuAccountingErrorMs": 0.0
+      },
+      {
+        "round": "round-1",
+        "run": 3,
+        "warmup": 600,
+        "measured": 600,
+        "gpuSamples": 600,
+        "stateHash": "df981f46",
+        "visibilityChanges": 0,
+        "disjointEvents": 0,
+        "droppedQueries": 0,
+        "maximumCpuAccountingErrorMs": 0.0
+      },
+      {
+        "round": "round-1",
+        "run": 4,
+        "warmup": 600,
+        "measured": 600,
+        "gpuSamples": 600,
+        "stateHash": "df981f46",
+        "visibilityChanges": 0,
+        "disjointEvents": 0,
+        "droppedQueries": 0,
+        "maximumCpuAccountingErrorMs": 0.0
+      },
+      {
+        "round": "round-1",
+        "run": 5,
+        "warmup": 600,
+        "measured": 600,
+        "gpuSamples": 600,
+        "stateHash": "df981f46",
+        "visibilityChanges": 0,
+        "disjointEvents": 0,
+        "droppedQueries": 0,
+        "maximumCpuAccountingErrorMs": 0.0
+      },
+      {
+        "round": "round-2",
+        "run": 1,
+        "warmup": 600,
+        "measured": 600,
+        "gpuSamples": 600,
+        "stateHash": "df981f46",
+        "visibilityChanges": 0,
+        "disjointEvents": 0,
+        "droppedQueries": 0,
+        "maximumCpuAccountingErrorMs": 0.0
+      },
+      {
+        "round": "round-2",
+        "run": 2,
+        "warmup": 600,
+        "measured": 600,
+        "gpuSamples": 600,
+        "stateHash": "df981f46",
+        "visibilityChanges": 0,
+        "disjointEvents": 0,
+        "droppedQueries": 0,
+        "maximumCpuAccountingErrorMs": 0.0
+      },
+      {
+        "round": "round-2",
+        "run": 3,
+        "warmup": 600,
+        "measured": 600,
+        "gpuSamples": 600,
+        "stateHash": "df981f46",
+        "visibilityChanges": 0,
+        "disjointEvents": 0,
+        "droppedQueries": 0,
+        "maximumCpuAccountingErrorMs": 0.0
+      },
+      {
+        "round": "round-2",
+        "run": 4,
+        "warmup": 600,
+        "measured": 600,
+        "gpuSamples": 600,
+        "stateHash": "df981f46",
+        "visibilityChanges": 0,
+        "disjointEvents": 0,
+        "droppedQueries": 0,
+        "maximumCpuAccountingErrorMs": 0.0
+      },
+      {
+        "round": "round-2",
+        "run": 5,
+        "warmup": 600,
+        "measured": 600,
+        "gpuSamples": 600,
+        "stateHash": "df981f46",
+        "visibilityChanges": 0,
+        "disjointEvents": 0,
+        "droppedQueries": 0,
+        "maximumCpuAccountingErrorMs": 0.0
+      }
+    ]
+  },
+  {
+    "scene": "particles",
+    "runs": [
+      {
+        "round": "round-1",
+        "run": 1,
+        "warmup": 600,
+        "measured": 600,
+        "gpuSamples": 600,
+        "stateHash": "b595c690",
+        "visibilityChanges": 0,
+        "disjointEvents": 0,
+        "droppedQueries": 0,
+        "maximumCpuAccountingErrorMs": 0.0
+      },
+      {
+        "round": "round-1",
+        "run": 2,
+        "warmup": 600,
+        "measured": 600,
+        "gpuSamples": 600,
+        "stateHash": "b595c690",
+        "visibilityChanges": 0,
+        "disjointEvents": 0,
+        "droppedQueries": 0,
+        "maximumCpuAccountingErrorMs": 0.0
+      },
+      {
+        "round": "round-1",
+        "run": 3,
+        "warmup": 600,
+        "measured": 600,
+        "gpuSamples": 600,
+        "stateHash": "b595c690",
+        "visibilityChanges": 0,
+        "disjointEvents": 0,
+        "droppedQueries": 0,
+        "maximumCpuAccountingErrorMs": 0.0
+      },
+      {
+        "round": "round-1",
+        "run": 4,
+        "warmup": 600,
+        "measured": 600,
+        "gpuSamples": 600,
+        "stateHash": "b595c690",
+        "visibilityChanges": 0,
+        "disjointEvents": 0,
+        "droppedQueries": 0,
+        "maximumCpuAccountingErrorMs": 0.0
+      },
+      {
+        "round": "round-1",
+        "run": 5,
+        "warmup": 600,
+        "measured": 600,
+        "gpuSamples": 600,
+        "stateHash": "b595c690",
+        "visibilityChanges": 0,
+        "disjointEvents": 0,
+        "droppedQueries": 0,
+        "maximumCpuAccountingErrorMs": 0.0
+      },
+      {
+        "round": "round-2",
+        "run": 1,
+        "warmup": 600,
+        "measured": 600,
+        "gpuSamples": 600,
+        "stateHash": "b595c690",
+        "visibilityChanges": 0,
+        "disjointEvents": 0,
+        "droppedQueries": 0,
+        "maximumCpuAccountingErrorMs": 0.0
+      },
+      {
+        "round": "round-2",
+        "run": 2,
+        "warmup": 600,
+        "measured": 600,
+        "gpuSamples": 600,
+        "stateHash": "b595c690",
+        "visibilityChanges": 0,
+        "disjointEvents": 0,
+        "droppedQueries": 0,
+        "maximumCpuAccountingErrorMs": 0.0
+      },
+      {
+        "round": "round-2",
+        "run": 3,
+        "warmup": 600,
+        "measured": 600,
+        "gpuSamples": 600,
+        "stateHash": "b595c690",
+        "visibilityChanges": 0,
+        "disjointEvents": 0,
+        "droppedQueries": 0,
+        "maximumCpuAccountingErrorMs": 0.0
+      },
+      {
+        "round": "round-2",
+        "run": 4,
+        "warmup": 600,
+        "measured": 600,
+        "gpuSamples": 600,
+        "stateHash": "b595c690",
+        "visibilityChanges": 0,
+        "disjointEvents": 0,
+        "droppedQueries": 0,
+        "maximumCpuAccountingErrorMs": 0.0
+      },
+      {
+        "round": "round-2",
+        "run": 5,
+        "warmup": 600,
+        "measured": 600,
+        "gpuSamples": 600,
+        "stateHash": "b595c690",
+        "visibilityChanges": 0,
+        "disjointEvents": 0,
+        "droppedQueries": 0,
+        "maximumCpuAccountingErrorMs": 0.0
+      }
+    ]
+  },
+  {
+    "scene": "skinning",
+    "runs": [
+      {
+        "round": "round-1",
+        "run": 1,
+        "warmup": 600,
+        "measured": 600,
+        "gpuSamples": 600,
+        "stateHash": "9c18f5c9",
+        "visibilityChanges": 0,
+        "disjointEvents": 0,
+        "droppedQueries": 0,
+        "maximumCpuAccountingErrorMs": 0.0
+      },
+      {
+        "round": "round-1",
+        "run": 2,
+        "warmup": 600,
+        "measured": 600,
+        "gpuSamples": 600,
+        "stateHash": "9c18f5c9",
+        "visibilityChanges": 0,
+        "disjointEvents": 0,
+        "droppedQueries": 0,
+        "maximumCpuAccountingErrorMs": 0.0
+      },
+      {
+        "round": "round-1",
+        "run": 3,
+        "warmup": 600,
+        "measured": 600,
+        "gpuSamples": 600,
+        "stateHash": "9c18f5c9",
+        "visibilityChanges": 0,
+        "disjointEvents": 0,
+        "droppedQueries": 0,
+        "maximumCpuAccountingErrorMs": 0.0
+      },
+      {
+        "round": "round-1",
+        "run": 4,
+        "warmup": 600,
+        "measured": 600,
+        "gpuSamples": 600,
+        "stateHash": "9c18f5c9",
+        "visibilityChanges": 0,
+        "disjointEvents": 0,
+        "droppedQueries": 0,
+        "maximumCpuAccountingErrorMs": 0.0
+      },
+      {
+        "round": "round-1",
+        "run": 5,
+        "warmup": 600,
+        "measured": 600,
+        "gpuSamples": 600,
+        "stateHash": "9c18f5c9",
+        "visibilityChanges": 0,
+        "disjointEvents": 0,
+        "droppedQueries": 0,
+        "maximumCpuAccountingErrorMs": 0.0
+      },
+      {
+        "round": "round-2",
+        "run": 1,
+        "warmup": 600,
+        "measured": 600,
+        "gpuSamples": 600,
+        "stateHash": "9c18f5c9",
+        "visibilityChanges": 0,
+        "disjointEvents": 0,
+        "droppedQueries": 0,
+        "maximumCpuAccountingErrorMs": 0.0
+      },
+      {
+        "round": "round-2",
+        "run": 2,
+        "warmup": 600,
+        "measured": 600,
+        "gpuSamples": 600,
+        "stateHash": "9c18f5c9",
+        "visibilityChanges": 0,
+        "disjointEvents": 0,
+        "droppedQueries": 0,
+        "maximumCpuAccountingErrorMs": 0.0
+      },
+      {
+        "round": "round-2",
+        "run": 3,
+        "warmup": 600,
+        "measured": 600,
+        "gpuSamples": 600,
+        "stateHash": "9c18f5c9",
+        "visibilityChanges": 0,
+        "disjointEvents": 0,
+        "droppedQueries": 0,
+        "maximumCpuAccountingErrorMs": 0.0
+      },
+      {
+        "round": "round-2",
+        "run": 4,
+        "warmup": 600,
+        "measured": 600,
+        "gpuSamples": 600,
+        "stateHash": "9c18f5c9",
+        "visibilityChanges": 0,
+        "disjointEvents": 0,
+        "droppedQueries": 0,
+        "maximumCpuAccountingErrorMs": 0.0
+      },
+      {
+        "round": "round-2",
+        "run": 5,
+        "warmup": 600,
+        "measured": 600,
+        "gpuSamples": 600,
+        "stateHash": "9c18f5c9",
+        "visibilityChanges": 0,
+        "disjointEvents": 0,
+        "droppedQueries": 0,
+        "maximumCpuAccountingErrorMs": 0.0
+      }
+    ]
+  }
+]

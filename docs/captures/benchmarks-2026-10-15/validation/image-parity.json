@@ -1,0 +1,20 @@
+[
+  {
+    "scene": "water",
+    "profilingOnSha256": "5149a9d65418b453d2b2ac60d9373bb160162fd8a80d5a54aa814847fe116b8b",
+    "profilingOffSha256": "5149a9d65418b453d2b2ac60d9373bb160162fd8a80d5a54aa814847fe116b8b",
+    "capture": "water.png"
+  },
+  {
+    "scene": "particles",
+    "profilingOnSha256": "11586c49d0e9e8d98c90f1cdb7ab765ef43921cd183685e85278c87d526b3ed5",
+    "profilingOffSha256": "11586c49d0e9e8d98c90f1cdb7ab765ef43921cd183685e85278c87d526b3ed5",
+    "capture": "particles.png"
+  },
+  {
+    "scene": "skinning",
+    "profilingOnSha256": "1d428db2a305dfbb57f7ab5ffc30ff9b1128569a8ea0e2e7ebe3d3ba6574ff58",
+    "profilingOffSha256": "1d428db2a305dfbb57f7ab5ffc30ff9b1128569a8ea0e2e7ebe3d3ba6574ff58",
+    "capture": "skinning.png"
+  }
+]

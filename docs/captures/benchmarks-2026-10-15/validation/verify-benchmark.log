@@ -1,0 +1,4 @@
+$ node scripts/bench.mjs --verify --out=.cache/bench-study/accepted
+PASS fixed-step state and profiling on/off parity; no IndexedDB: water
+PASS fixed-step state and profiling on/off parity; no IndexedDB: particles
+PASS fixed-step state and profiling on/off parity; no IndexedDB: skinning

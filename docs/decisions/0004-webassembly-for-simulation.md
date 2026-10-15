@@ -65,3 +65,35 @@ write WASM/GPU alternatives, install a toolchain or claim the adoption threshold
 have been met. Record the measurements and candidate qualifications, then stop
 for owner review before Phase 2. The confirmed original study plan is preserved
 byte for byte in `docs/wasm-performance-study-plan.md`.
+
+## Phase 1 measurements
+
+Measured source: `d105af5`, two rounds of five fresh loads per scene, each with
+600 warm-up and 600 measured frames. The [report](../captures/benchmarks-2026-10-15/README.md)
+contains subsystem p50/p95, frame shares, p99, raw data and environment. See
+[provenance and validation](../captures/benchmarks-2026-10-15/study-notes.md) for
+the retained preliminary clock diagnostic and visual comparison limitations.
+
+| Reference scene / target                          | CPU p50 / p95 ms | Median frame share | Phase 1 qualification                                  |
+| ------------------------------------------------- | ---------------: | -----------------: | ------------------------------------------------------ |
+| Water / shallow-water step                        |    1.000 / 1.485 |              6.00% | Below 15%                                              |
+| Water / combined texture and geometry preparation |    2.995 / 4.495 |             17.97% | Mixed Three.js updates; numeric kernel not established |
+| Particles / effects                               |    0.510 / 0.825 |              3.06% | Below 15%; JS object state                             |
+| Skinning / skinned vertex math                    |  14.015 / 16.935 |             84.12% | Qualifies; consider GPU skinning comparison            |
+
+Full-frame p50 differences between rounds are 0.00%, 0.03% and 0.00%; candidate
+section p50 differences are at most 2.50%. Remaining submission varies by
+5.65–11.43%, so no stable kernel or speedup is inferred from that residual.
+All 18,000 measured frames have valid GPU samples and no visibility changes;
+each scene's final state hash agrees across its ten runs.
+
+`pnpm check` passes. Historical `pnpm compare` baselines fail in the same four
+areas before and after this work; they were not changed. A controlled comparison
+with identical clocks gives RMSE 0 in all six existing areas. Benchmark profiling
+on/off has exact state and screenshot parity. The owner confirmed the lake is
+visible in Orca; automated Orca reads/captures still time out.
+
+The scenes' full-frame p50 is paced near 60 Hz. Qualification does not demonstrate
+the required 15% full-frame improvement. No optimized JS, GPU/WASM alternative,
+adoption gain, cross-implementation parity or fallback comparison was performed.
+Status remains **Proposed**, stopped for owner review before Phase 2.
