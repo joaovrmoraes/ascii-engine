@@ -1,0 +1,84 @@
+{
+  "affinity": [
+    {
+      "pid": 2135841,
+      "mainThreadCpu": 6,
+      "allowed": "6",
+      "probeMs": 150,
+      "probeTicks": 15,
+      "unchangedOtherThreads": 16,
+      "scope": "active benchmark page main thread only; spares excluded"
+    }
+  ],
+  "summary": {
+    "cpu": {
+      "p50": 4.594999998807907,
+      "p95": 7.425000000745058,
+      "p99": 7.689999997615814
+    },
+    "gpu": {
+      "p50": 4.438489,
+      "p95": 7.347552,
+      "p99": 7.601614
+    },
+    "waterStep": {
+      "p50": 0.7450000010430813,
+      "p95": 1.205000001937151,
+      "p99": 1.4299999997019768
+    },
+    "waterUpload": {
+      "p50": 2.9400000013411045,
+      "p95": 5.115000002086163,
+      "p99": 5.324999999254942
+    },
+    "skinning": {
+      "p50": 0,
+      "p95": 0,
+      "p99": 0
+    },
+    "effects": {
+      "p50": 0,
+      "p95": 0.004999998956918716,
+      "p99": 0.005000002682209015
+    },
+    "carpet": {
+      "p50": 0,
+      "p95": 0.005000002682209015,
+      "p99": 0.010000001639127731
+    },
+    "bodyUniforms": {
+      "p50": 0,
+      "p95": 0.005000002682209015,
+      "p99": 0.009999997913837433
+    },
+    "renderRest": {
+      "p50": 0.7950000017881393,
+      "p95": 1.1849999986588955,
+      "p99": 1.3899999968707561
+    }
+  },
+  "fingerprint": {
+    "hash": "a902d504",
+    "values": 116523,
+    "skinnedPoints": 0,
+    "time": 20.000000000000146,
+    "visibleWaterHash": "46f3835e"
+  },
+  "gpuQueue": {
+    "limit": 2,
+    "scheduler": "task",
+    "peak": 2,
+    "completedFrames": 1200,
+    "pollCallbacks": 3556,
+    "totalSchedulerCpuMs": 59.92500011250377,
+    "completionClock": "CPU-observed asynchronous fence completion; includes polling delay",
+    "polling": "non-nested 1 ms timers and task submissions; no spin or blocking GPU wait"
+  },
+  "gpu": {
+    "available": true,
+    "status": "ready",
+    "disjointEvents": 0,
+    "dropped": 0
+  },
+  "warning": "One diagnostic run; not accepted benchmark evidence"
+}

@@ -120,7 +120,16 @@ export async function benchmarkBrowser({ blockStorage = true, uncapped = false }
     async pinRenderer(cpu) {
       if (cpu === undefined) return null
       if (!Number.isInteger(cpu) || cpu < 0) throw new Error('Invalid renderer CPU')
-      const pinned = []
+      const candidates = []
+      const ticks = async pid => {
+        const stat = await readFile(`/proc/${pid}/stat`, 'utf8').catch(() => '')
+        if (!stat) return -1
+        const fields = stat
+          .slice(stat.lastIndexOf(')') + 2)
+          .trim()
+          .split(/\s+/)
+        return Number(fields[11]) + Number(fields[12])
+      }
       for (const pid of await readdir('/proc')) {
         if (!/^\d+$/.test(pid)) continue
         const command = await readFile(`/proc/${pid}/cmdline`, 'utf8').catch(() => '')
@@ -133,14 +142,54 @@ export async function benchmarkBrowser({ blockStorage = true, uncapped = false }
           argv.includes('--top-chrome-webui')
         )
           continue
-        execFileSync('taskset', ['-pc', String(cpu), pid], { encoding: 'utf8' })
-        const status = await readFile(`/proc/${pid}/status`, 'utf8')
-        const allowed = /^Cpus_allowed_list:\s+(.+)$/m.exec(status)?.[1]
-        if (allowed !== String(cpu)) throw new Error('Renderer affinity was not applied')
-        pinned.push({ pid: Number(pid), mainThreadCpu: cpu, allowed })
+        candidates.push({ pid, before: await ticks(pid) })
       }
-      if (!pinned.length) throw new Error('No isolated benchmark renderer found')
-      return pinned
+      // Identify this page's executing renderer, not a spare that will later inherit its mask.
+      // The probe precedes all warm-up, changes no simulation state, and is not a timed sample.
+      await evaluate(
+        `(()=>{const until=performance.now()+150;while(performance.now()<until){};return benchmark.ready})()`,
+      )
+      const ranked = await Promise.all(
+        candidates.map(async candidate => ({
+          ...candidate,
+          delta: (await ticks(candidate.pid)) - candidate.before,
+        })),
+      )
+      ranked.sort((a, b) => b.delta - a.delta)
+      const active = ranked[0]
+      if (!active || active.delta < 5 || (ranked[1] && active.delta < ranked[1].delta * 2))
+        throw new Error('Could not identify the active benchmark renderer unambiguously')
+      const masks = async () => {
+        const result = {}
+        for (const tid of await readdir(`/proc/${active.pid}/task`)) {
+          const status = await readFile(`/proc/${active.pid}/task/${tid}/status`, 'utf8').catch(
+            () => '',
+          )
+          if (status) result[tid] = /^Cpus_allowed_list:\s+(.+)$/m.exec(status)?.[1]
+        }
+        return result
+      }
+      const before = await masks()
+      execFileSync('taskset', ['-pc', String(cpu), active.pid], { encoding: 'utf8' })
+      const after = await masks()
+      if (after[active.pid] !== String(cpu)) throw new Error('Renderer affinity was not applied')
+      let unchangedOtherThreads = 0
+      for (const [tid, mask] of Object.entries(before)) {
+        if (tid === active.pid || after[tid] === undefined) continue
+        if (after[tid] !== mask) throw new Error('Affinity changed a non-main thread')
+        unchangedOtherThreads++
+      }
+      return [
+        {
+          pid: Number(active.pid),
+          mainThreadCpu: cpu,
+          allowed: after[active.pid],
+          probeMs: 150,
+          probeTicks: active.delta,
+          unchangedOtherThreads,
+          scope: 'active benchmark page main thread only; spares excluded',
+        },
+      ]
     },
     async check() {
       if (errors.length) throw new Error(errors.join('\n'))

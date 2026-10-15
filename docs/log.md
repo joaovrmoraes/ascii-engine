@@ -4,6 +4,32 @@ Entries describe the state at each stage. Earlier limitations may have been
 resolved later; START.md and the editor guide describe the current scope.
 Historical filenames, reference IDs and captured interfaces are preserved.
 
+## 2026-10-15 — Identify only the active benchmark renderer for affinity
+
+Stopped the first affinity attempt during round 1/run 2. Pinning spare
+renderers could promote a pinned spare and cause later compositor/worker
+threads to inherit its mask, confounding frame scheduling. Completed raw
+samples/environment remain under spare-affinity-diagnostic/; the incomplete
+run is excluded. The owned benchmark was deliberately stopped by its hidden
+step guard, allowing the runner's finally block to close its own browser.
+
+The corrected control measures renderer CPU ticks around a 150 ms page CPU
+probe before warm-up, identifies the executing process unambiguously, excludes
+spares/extensions and pins only that main TID. The probe advances no scene
+state and belongs to no measured frame. /proc verifies its mask and unchanged
+masks for all surviving pre-existing non-main threads. GPU/browser processes
+and machine power stay unchanged. The corrected smoke identifies one active
+PID, verifies 16 other threads unchanged and records step p50 0.745 ms.
+
+Validation: pnpm check and active-only pinned profiling on/off state/image
+parity pass, with no IndexedDB calls. All standard inputs, counts and gates
+remain fixed. Fresh complete water pairs use this corrected control. The
+prior smoke/verification and stopped attempt remain available as diagnostics.
+[Active smoke](captures/benchmarks-2026-10-15/phase-2/active-pin-smoke.json),
+[active state/image check](captures/benchmarks-2026-10-15/phase-2/active-affinity-verification/verification/parity.json),
+[stopped attempt](captures/benchmarks-2026-10-15/phase-2/spare-affinity-diagnostic/README.md).
+The engine/editor are unchanged and water pause remains disabled. No push.
+
 ## 2026-10-15 — Control benchmark renderer CPU residency
 
 Added optional --renderer-cpu=6. The runner applies/verifies taskset masks on

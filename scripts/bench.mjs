@@ -91,7 +91,7 @@ const environment = {
   rendererAffinityScope:
     rendererCpu === undefined
       ? 'OS default'
-      : 'isolated renderer main thread only; GPU/browser/other threads unchanged',
+      : 'active benchmark page main thread only; spare/GPU/browser/other existing threads unchanged',
   framePacing: uncapped ? 'uncapped' : 'display',
   scheduler: uncapped ? 'task-with-gpu-backpressure' : 'rAF',
   cpu: { model: cpus()[0].model, logicalCores: cpus().length },
