@@ -4,6 +4,21 @@ Entries describe the state at each stage. Earlier limitations may have been
 resolved later; START.md and the editor guide describe the current scope.
 Historical filenames, reference IDs and captured interfaces are preserved.
 
+## 2026-10-15 — Consolidation review, group 3: sandbox modules
+
+Proposed the split before editing. Extracted library/cards, hierarchy, object
+inspector, terrain tools/painting, Studio callbacks, file/import operations and
+interaction. The sandbox coordinator shrank from roughly 59 KB to 19 KB;
+its typed context keeps current scene/selection references and document/history
+operations explicit. Default scene moved to a shared editor scene factory.
+Core behavior, DOM selectors and persistence ownership remain unchanged.
+
+Validation: pnpm check (147 tests), verify:authoring (81 checks), and isolated
+pinned Orca selection/inspector/library checks passed. Drag/gizmos, brushes,
+imports, undo/redo, reload and studios use their existing browser scenarios.
+[Unchanged panels](captures/editor-review-fix-2026-10-15/modular-panels.png).
+Owner draft untouched. No push.
+
 ## 2026-10-15 — Consolidation review, group 2: shared Apply warning
 
 A changed shared recipe labels Apply with its complete affected-object count.

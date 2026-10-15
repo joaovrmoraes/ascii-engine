@@ -235,6 +235,12 @@ without loading document/renderer implementations. Vite imports the development
 bridge through `@ascii-engine/automation/bridge`. See
 [ADR 0003](docs/decisions/0003-package-boundaries.md).
 
+Sandbox document/history coordination lives in areas/sandbox.ts. Its editor
+modules in editor/sandbox/ own library cards, hierarchy, object inspector,
+terrain painting, Studio callbacks, file operations and pointer/keyboard input.
+A typed context exposes live scene references and document/history operations;
+modules do not own a second document or persistence path.
+
 File separates Open map (replace) from Import into this map (items, models,
 texture and atmosphere JSON). Save retains the portable document; Export opens
 Web, native desktop or Pomorog targets. Web/desktop jobs use the loopback bridge

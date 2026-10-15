@@ -1,32 +1,31 @@
-import { glyphLabel } from '../editor/glyphCatalog'
-import * as THREE from 'three'
-import { textureUsers, detachTexture, linkTexture, buildScene, createTerrainData, createHistory, createEffectPrefabs, emptyScene, createWaterPaint, paintWater, loadSceneAssets, parseScene, waterEdge, type AsciiEngine, type Brush, type BuiltScene, type SceneDoc } from '@ascii-engine/core'
+import { buildScene,createEffectPrefabs,createHistory,linkTexture,loadSceneAssets,parseScene,type AsciiEngine,type Brush,type BuiltScene,type SceneDoc } from '@ascii-engine/core'
 import { pomorog } from '@ascii-engine/core/pomorog'
-import { createPrefabs } from '../scene/prefabs'
-import { downloadDocument, importModelFiles, readImportedResource, insertSceneItem } from '../scene/files'
-import { readDraft, saveDraft } from '../scene/storage'
-import type { Area, AreaOptions } from './types'
+import * as THREE from 'three'
 import '../authoring.css'
-import { createWorkspace, type Workspace } from '../editor/workspace'
-import { createGizmos, type Gizmos } from '../editor/gizmos'
-import { assetInfo, icon } from '../editor/icons'
-import { fillAtmosphereSelect, matchingAtmosphere } from '../editor/atmospheres'
 import { createAtmosphereStudio } from '../editor/atmosphere'
-import { createPlacementPreview } from '../editor/placement'
 import { createSceneCameras } from '../editor/cameras'
 import { createEffectEditor } from '../editor/effects'
-import { createTextureStudio } from '../editor/textures'
-import { renderWaterInspector } from '../editor/waterInspector'
-import { terrainLetterFields } from '../editor/letterControls'
-import { downloadStylePreset, loadStylePreset } from '../editor/stylePresets'
 import { createExportDialog } from '../editor/exportDialog'
+import { type Gizmos } from '../editor/gizmos'
+import { createPlacementPreview } from '../editor/placement'
+import type { SandboxContext } from '../editor/sandbox/context'
+import { bindFiles,exportItem as exportItemModule,importSceneFiles } from '../editor/sandbox/files'
+import { refreshHierarchy as refreshHierarchyModule } from '../editor/sandbox/hierarchy'
+import { renderInspector,syncTransformFields as syncTransformFieldsModule } from '../editor/sandbox/inspector'
+import { beginPlacement as beginPlacementModule,bindSceneInput,bindSceneToolbar,placeAt as placeAtModule,refreshHint as refreshHintModule,setMode as setModeModule } from '../editor/sandbox/interaction'
+import { refreshLibrary as refreshLibraryModule } from '../editor/sandbox/library'
+import { bindStudios } from '../editor/sandbox/studios'
+import { bindTerrain,refreshTools as refreshToolsModule } from '../editor/sandbox/terrain'
+import { createTextureStudio } from '../editor/textures'
+import { createWorkspace,type Workspace } from '../editor/workspace'
+import { defaultScene } from '../scene/defaultScene'
+import { createPrefabs } from '../scene/prefabs'
+import { readDraft,saveDraft } from '../scene/storage'
+import type { Area,AreaOptions } from './types'
+export { defaultScene } from '../scene/defaultScene'
 
 type Tool = 'select' | Brush | 'water' | 'place' | 'erase'
-export function defaultScene(): SceneDoc {
-  return { ...emptyScene('My map'), terrain: createTerrainData(32, 129), carpet: { count: 60000, seed: 48017 }, objects: [
-    { prefab: 'fogueira', position: [0, 0, 0] }, { prefab: 'arvore', position: [-4, 0, -3] }, { prefab: 'pedregulho', position: [3, 0, -2] },
-  ] }
-}
+
 
 /** The editor and exported player build the very same portable document. */
 export async function createSandbox(engine: AsciiEngine, options: AreaOptions = {}): Promise<Area> {
@@ -132,457 +131,88 @@ export async function createSandbox(engine: AsciiEngine, options: AreaOptions = 
     message(`Texture linked.${result.replaced.length ? ' Replaced local fields: ' + result.replaced.join(', ') + '.' : ''}`)
     return result.replaced
   }
-  function exportItem() {
-    if (!selected) return
-    const doc = snapshot(), item = doc.objects[scene.placed.findIndex(p => p.object === selected)]
-    downloadDocument({ version: 1, name: item.name || item.prefab, style: doc.style, textures: doc.textures, objects: [{ ...item, position: [0, 0, 0] }], assets: doc.assets?.[item.prefab] ? { [item.prefab]: doc.assets[item.prefab] } : undefined, effects: doc.effects?.[item.prefab] ? { [item.prefab]: doc.effects[item.prefab] } : undefined }, 'item.json')
-  }
+  function exportItem() { return exportItemModule(ctx) }
   function refreshHistory() {
     if (!toolbar) return
     toolbar.querySelector<HTMLButtonElement>('[data-k="undo"]')!.disabled = !history.canUndo
     toolbar.querySelector<HTMLButtonElement>('[data-k="redo"]')!.disabled = !history.canRedo
   }
-  function refreshHint() {
-    if (cameraEditor?.viewed) { ui?.hint('Camera view · adjust framing in the inspector · Back to navigation enables scene editing'); return }
-    if (preview) { ui?.hint(cameraEditor?.activeCamera() ? 'Preview through the initial camera · Back to editing to adjust' : 'Preview without a saved camera · create a camera to set the framing'); return }
-    if (transformMode === 'orbit') { ui?.hint('Orbit · drag sideways and up/down · right drag to pan · scroll to zoom'); return }
-    if (tool.kind === 'water') ui?.hint('Water · drag to paint · Shift erases water · adjust the radius to create lakes or channels', true)
-    else if (tool.kind === 'place') ui?.hint(`Place ${library[tool.prefab]?.title ?? 'object'} · click to place · W/E/R to adjust · Enter confirms · Esc cancels`, true)
-    else if (tool.kind !== 'select') ui?.hint('Drag on the terrain to paint · Shift reverses height · Esc returns to selection', true)
-    else ui?.hint(selected ? 'Drag the axes to transform · W move · E rotate · R scale · F focus' : 'Drag an asset into the scene · O orbit in 3D · right drag to pan · scroll to zoom')
-  }
-  function setMode(mode: typeof transformMode, cancelPlacement = false) {
-    if (cameraEditor?.selected && mode === 'scale') mode = 'translate'
-    const placing = tool.kind === 'place' && mode !== 'hand' && mode !== 'orbit' && !cancelPlacement
-    if (placing) placement.lock(); else placement.clear()
-    transformMode = mode; if (!placing) tool.kind = 'select'; gizmos?.cursor()
-    if (mode !== 'hand' && mode !== 'orbit') gizmos?.mode(mode)
-    gizmos?.attach(mode !== 'hand' && mode !== 'orbit' ? (placing ? placement.object : selected) : undefined)
-    ui?.root.querySelectorAll<HTMLButtonElement>('[data-mode]').forEach(button => { const active = button.dataset.mode === mode; button.classList.toggle('active', active); button.setAttribute('aria-pressed', String(active)) })
-    refreshTools(); refreshHint()
-  }
-  function beginPlacement(prefab: string) {
-    if (busy || preview) return
-    cameraEditor?.view(null)
-    tool.prefab = prefab; tool.kind = 'place'; gizmos?.attach(); ui?.selectPane('object')
-    placement.show(prefab, focus.clone().setY(scene.terrain?.heightAt(focus.x, focus.z) ?? 0))
-    if (transformMode === 'hand' || transformMode === 'orbit') transformMode = 'translate'
-    gizmos?.mode(transformMode); gizmos?.attach(placement.object)
-    gizmos?.cursor()
-    // Preserve card identity so a real second click can open its editor.
-    ui?.root.querySelectorAll<HTMLElement>('.asset-card[data-prefab]').forEach(card => card.classList.toggle('active', card.dataset.prefab === prefab))
-    refreshHint()
-  }
-  function placeAt(prefab: string, point: THREE.Vector3, repeat = false) {
-    if (busy || preview) return
-    const ghost = placement.object, seed = placement.seed(prefab)
-    const rotation3: [number, number, number] | undefined = ghost ? [ghost.rotation.x, ghost.rotation.y, ghost.rotation.z] : undefined
-    const scale3 = ghost?.scale.toArray() as [number, number, number] | undefined
-    if (placement.locked && ghost) point = ghost.position.clone()
-    const y = placement.locked ? point.y : scene.terrain?.heightAt(point.x, point.z) ?? 0
-    placement.clear(); gizmos?.attach()
-    const object = scene.place({ prefab, seed, rotation3, scale3, position: [point.x, y, point.z] })
-    choose(object); changed()
-    if (repeat) beginPlacement(prefab)
-    else { setMode('translate'); gizmos?.cursor() }
-  }
+  function refreshHint() { return refreshHintModule(ctx) }
+  function setMode(mode: typeof transformMode, cancelPlacement = false) { return setModeModule(ctx, mode, cancelPlacement) }
+  function beginPlacement(prefab: string) { return beginPlacementModule(ctx, prefab) }
+  function placeAt(prefab: string, point: THREE.Vector3, repeat = false) { return placeAtModule(ctx, prefab, point, repeat) }
   const normalized = (text: string) => text.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase()
-  function refreshLibrary() {
-    if (!ui) return
-    const doc = snapshot(), atmospheres = doc.atmospheres ?? {}
-    const categories = ui.get('[data-k="categories"]')
-    categories.replaceChildren()
-    for (const category of ['All', 'Nature', 'Buildings', 'Shapes', 'Effects', 'Atmospheres', 'Textures', 'Imported']) {
-      const button = document.createElement('button'); button.innerHTML = icon('folder')
-      const text = document.createElement('span'); text.textContent = category; button.append(text)
-      const count = Object.keys(library).filter(key => category === 'All' || assetInfo(key).category === category).length + (category === 'All' || category === 'Atmospheres' ? Object.keys(atmospheres).length : 0) + (category === 'All' || category === 'Textures' ? Object.keys(doc.textures ?? {}).length : 0)
-      const badge = document.createElement('small'); badge.textContent = String(count); button.append(badge)
-      button.className = category === assetCategory ? 'active' : ''; button.onclick = () => { assetCategory = category; refreshLibrary() }; categories.append(button)
-    }
-    const grid = ui.get('[data-k="assets"]'); grid.replaceChildren()
-    for (const [key, prefab] of Object.entries(library)) {
-      const info = assetInfo(key)
-      if (assetCategory !== 'All' && info.category !== assetCategory || !normalized(prefab.title).includes(normalized(assetQuery))) continue
-      const card = document.createElement('button'); card.className = 'asset-card'; card.draggable = true; card.dataset.prefab = key
-      card.title = `Drag ${prefab.title} into the scene or click to place`; card.style.setProperty('--asset-color', info.color)
-      card.innerHTML = `<span class="asset-thumbnail">${icon(info.icon)}</span>`
-      const label = document.createElement('span'); label.textContent = prefab.title.replace('shape: ', '').replace('effect: ', '').replace(' (with fire and light)', ''); card.append(label)
-      card.classList.toggle('active', key === tool.prefab && tool.kind === 'place')
-      card.onclick = () => beginPlacement(key)
-      if (doc.effects?.[key]) {
-        card.title += '; double-click to edit the effect'
-        card.ondblclick = () => { effectEditor!.edit(key); ui!.showStudio('effects') }
-      }
-      card.ondragstart = event => { if (!event.dataTransfer) return; tool.prefab = key; event.dataTransfer.setData('application/x-ascii-prefab', key); event.dataTransfer.effectAllowed = 'copy'; gizmos?.attach(); refreshHint() }
-      card.ondragend = () => { placement.clear(); gizmos?.cursor(); ui!.get('#placement-label').hidden = true; if (tool.kind === 'select' && transformMode !== 'hand' && transformMode !== 'orbit') gizmos?.attach(selected) }
-      grid.append(card)
-    }
-    for (const [key, asset] of Object.entries(atmospheres)) {
-      if (assetCategory !== 'All' && assetCategory !== 'Atmospheres' || !normalized(asset.name).includes(normalized(assetQuery))) continue
-      const card = document.createElement('button'); card.className = 'asset-card'; card.dataset.atmosphere = key
-      card.title = `Click to select ${asset.name}; double-click to edit; Apply to change the scene`; card.style.setProperty('--asset-color', '#b4a6cf')
-      card.innerHTML = `<span class="asset-thumbnail">${icon('spark')}</span>`
-      const label = document.createElement('span'); label.textContent = asset.name; card.append(label)
-      card.onclick = () => { placement.clear(); tool.kind = 'select'; gizmos?.attach(selected); gizmos?.cursor(); refreshHint(); grid.querySelectorAll('.active').forEach(card => card.classList.remove('active')); card.classList.add('active'); grid.querySelector('[data-resource-action]')?.remove(); const action = document.createElement('button'); action.dataset.resourceAction = 'apply-atmosphere'; action.textContent = `Apply ${asset.name} to scene`; action.onclick = () => atmosphereStudio!.applyAsset(key); grid.append(action) }
-      card.ondblclick = () => { atmosphereStudio!.applyAsset(key); ui!.showStudio('atmosphere') }
-      grid.append(card)
-    }
-    for (const [key, asset] of Object.entries(doc.textures ?? {})) {
-      if (assetCategory !== 'All' && assetCategory !== 'Textures' || !normalized(asset.name).includes(normalized(assetQuery))) continue
-      const card = document.createElement('button'); card.className = 'asset-card'; card.dataset.texture = key
-      card.title = `Click to select ${asset.name}; double-click to edit; drag onto an object or part to link`; card.draggable = true; card.style.setProperty('--asset-color', '#96bfbe')
-      const thumbnail = document.createElement('span'); thumbnail.className = 'asset-thumbnail texture-thumbnail'; thumbnail.textContent = asset.style.alphabet ?? '@#*:'
-      const label = document.createElement('span'); label.textContent = asset.name; card.append(thumbnail, label)
-      card.onclick = () => { grid.querySelectorAll('.active').forEach(card => card.classList.remove('active')); card.classList.add('active'); message(`Texture selected: ${asset.name}. Drag onto an object or part; double-click to edit.`) }; card.ondblclick = () => { textureStudio!.editAsset(key, true); ui!.showStudio('textures') }; card.ondragstart = event => { event.dataTransfer?.setData('application/x-ascii-texture', key); if (event.dataTransfer) event.dataTransfer.effectAllowed = 'link' }; grid.append(card)
-    }
-    if (!grid.childElementCount) { const hint = document.createElement('p'); hint.className = 'empty-library'; hint.textContent = assetCategory === 'Imported' ? 'Use Import model to add your GLB and GLTF files.' : assetCategory === 'Atmospheres' ? 'Create an atmosphere in the Studio and choose Save to Assets.' : assetCategory === 'Textures' ? 'Select an object, open Textures in the Studio and choose Save to Assets.' : 'No assets found.'; grid.append(hint) }
-  }
-  function refreshTools() {
-    if (!ui) return
-    if (!library[tool.prefab]) { tool.prefab = 'arvore'; if (tool.kind === 'place') tool.kind = 'select' }
-    const layers = box.querySelector<HTMLSelectElement>('[data-k="layer"]')!
-    layers.replaceChildren(...(scene.terrain?.data.layers ?? []).map((l, i) => new Option(glyphLabel(l.name), String(i))))
-    layers.value = String(tool.layer); layers.disabled = !scene.terrain
-    box.querySelectorAll<HTMLButtonElement>('[data-brush]').forEach(button => { button.disabled = !scene.terrain; const active = tool.kind === button.dataset.brush; button.classList.toggle('active', active); button.setAttribute('aria-pressed', String(active)) })
-    box.querySelector('[data-k="water-mode"]')!.closest('label')!.hidden=tool.kind!=='water'
-    const erase=ui.get<HTMLButtonElement>('[data-object-tool=erase]')
-    erase.classList.toggle('active',tool.kind==='erase');erase.setAttribute('aria-pressed',String(tool.kind==='erase'))
-    ui.get('[data-k="no-terrain"]').hidden = !!scene.terrain
-    ui.get<HTMLSelectElement>('[data-k="weather"]').value = snapshot().environment?.weather ?? 'none'
-    ui.get<HTMLInputElement>('[data-k="weather-intensity"]').value = String(snapshot().environment?.intensity ?? 1)
-    fillAtmosphereSelect(ui.get<HTMLSelectElement>('[data-k="atmosphere"]'), snapshot(), matchingAtmosphere(snapshot(), engine.style) ?? 'current')
-    const root=box.querySelector<HTMLElement>('[data-k=terrain-letters]')!
-    const layer=scene.terrain?.data.layers[tool.layer]
-    root.hidden=!layer
-    if(layer) terrainLetterFields(root,layer,patch=>run(async()=>{const doc=snapshot();doc.terrain!.layers[tool.layer]={...doc.terrain!.layers[tool.layer],...patch};await replace(doc);changed()}))
-    refreshLibrary()
-  }
-  function syncTransformFields() {
-    if (!selected || !ui) return
-    for (const [property, label] of [['position', 'Position'], ['rotation', 'Rotation'], ['scale', 'Scale']] as const) for (const axis of ['x', 'y', 'z'] as const) {
-      const input = ui.inspector.querySelector<HTMLInputElement>(`[data-field="${label} ${axis}"]`)
-      if (input) input.value = String(Number((selected[property][axis] * (property === 'rotation' ? 180 / Math.PI : 1)).toFixed(3)))
-    }
-  }
-  function refreshHierarchy() {
-    if (!hierarchy) return
-    const list = hierarchy.querySelector('[data-k="objects"]')!
-    list.replaceChildren()
-    ui!.get('[data-k="scene-name"]').textContent = name
-    ui!.get('[data-k="count"]').textContent = String(scene.placed.length + scene.waters.length + (scene.terrain ? 1 : 0) + (cameraEditor?.entries().length ?? 0))
-    if (scene.terrain && normalized('Terrain').includes(normalized(hierarchyQuery))) {
-      const button = document.createElement('button'); button.innerHTML = icon('terrain') + '<span>Terrain</span>'; button.className = 'hierarchy-object terrain-row'
-      button.onclick = () => { choose(); ui!.selectPane('terrain') }; list.append(button)
-    }
-    for (const { object, doc } of scene.placed) {
-      const title = object.name || library[doc.prefab].title
-      if (!normalized(title).includes(normalized(hierarchyQuery))) continue
-      const button = document.createElement('button'); button.innerHTML = icon(assetInfo(doc.prefab).icon)
-      const label = document.createElement('span'); label.textContent = title.replace(' (with fire and light)', ''); button.append(label)
-      button.className = `hierarchy-object${object === selected ? ' active' : ''}${!object.visible ? ' muted' : ''}`; button.dataset.objectId = doc.id
-      button.onclick = () => choose(object); button.ondblclick = () => { focus.copy(object.position); focus.y += .8 }; list.append(button)
-    }
-    for (const { id, object, active } of cameraEditor?.entries() ?? []) {
-      if (!normalized(object.name).includes(normalized(hierarchyQuery))) continue
-      const button = document.createElement('button'); button.className = `hierarchy-object${object === selected ? ' active' : ''}`; button.dataset.cameraId = id; button.innerHTML = icon('camera')
-      const label = document.createElement('span'); label.textContent = object.name + (active ? ' · initial' : ''); button.append(label); button.onclick = () => choose(object); list.append(button)
-    }
-    scene.waters.forEach((water, i) => {
-      const title = snapshot().waters?.[i].name || `${water.shape.kind === 'paint' ? 'Water' : water.shape.kind === 'pond' ? 'Lake' : 'Stream'} ${i + 1}`
-      if (!normalized(title).includes(normalized(hierarchyQuery))) return
-      const button = document.createElement('button'); button.innerHTML = icon('water'); const label=document.createElement('span');label.textContent=title;button.append(label)
-      button.dataset.waterIndex=String(i); button.className = `hierarchy-object${selectedWater === i ? ' active' : ''}`; button.classList.toggle('muted',!water.mesh.visible); button.onclick = () => { choose(); selectedWater = i; ui!.selectPane('object'); refreshHierarchy() }; list.append(button)
-    })
-    const inspector = ui!.inspector; inspector.replaceChildren()
-    const field = (label: string, value: string, change: (value: string) => void, type = 'number') => {
-      const row = document.createElement('label'); row.textContent = label
-      const input = document.createElement('input'); input.type = type; input.value = value; input.step = '.1'; input.dataset.field = label
-      input.onchange = () => { if (type === 'number' && !Number.isFinite(input.valueAsNumber)) return; run(() => change(input.value)) }; row.append(input); inspector.append(row)
-    }
-    const actions = document.createElement('div'); actions.className = 'object-actions'
-    const button = (label: string, action: () => void | Promise<void>) => { if (!actions.parentNode) inspector.append(actions); const b = document.createElement('button'); b.textContent = label; b.onclick = () => run(action); actions.append(b) }
-    if (cameraEditor?.selected) cameraEditor.inspector(inspector)
-    else if (selected) {
-      const object = selected
-      field('Name', object.name, value => { object.name = value; changed() }, 'text')
-      const row = document.createElement('label'), visible = document.createElement('input'); row.textContent = 'Visible'; visible.type = 'checkbox'; visible.checked = object.visible
-      visible.onchange = () => { object.visible = visible.checked; gizmos?.attach(object.visible ? object : undefined); changed() }; row.append(visible); inspector.append(row)
-      const component = document.createElement('div'); component.className = 'component-title'; component.innerHTML = icon('move') + ' Transform'; inspector.append(component)
-      for (const [property, label] of [['position', 'Position'], ['rotation', 'Rotation'], ['scale', 'Scale']] as const) {
-        const row = document.createElement('div'); row.className = 'vector-row'
-        const title = document.createElement('span'); title.textContent = label; row.append(title)
-        for (const axis of ['x', 'y', 'z'] as const) {
-          const cell = document.createElement('label'); cell.className = `axis-${axis}`; cell.textContent = axis.toUpperCase()
-          const input = document.createElement('input'); input.type = 'number'; input.step = property === 'rotation' ? '5' : '.1'; input.dataset.field = `${label} ${axis}`; input.setAttribute('aria-label', `${label} ${axis}`)
-          input.value = String(Number((object[property][axis] * (property === 'rotation' ? 180 / Math.PI : 1)).toFixed(3)))
-          input.onchange = () => {
-            const value = input.valueAsNumber
-            if (!Number.isFinite(value) || property === 'scale' && (value <= 0 || value > 1000)) { syncTransformFields(); return }
-            object[property][axis] = value * (property === 'rotation' ? Math.PI / 180 : 1)
-            if (property === 'scale') engine.setInstanceStyle(object, {})
-            changed()
-          }
-          cell.append(input); row.append(cell)
-        }
-        inspector.append(row)
-      }
-      const clips = object.userData.animationClips as string[] | undefined
-      if (clips?.length) {
-        const select = document.createElement('select'); select.append(new Option('Animation stopped', ''))
-        clips.forEach(clip => select.append(new Option(clip, clip)))
-        const index = scene.placed.findIndex(p => p.object === object); select.value = scene.placed[index].doc.animation ?? (scene.placed[index].doc.animation === null ? '' : clips[0])
-        select.onchange = () => run(async () => { const doc = snapshot(); doc.objects[index].animation = select.value || null; await replace(doc); choose(scene.placed[index].object); changed() }); inspector.append(select)
-      }
-      button('Focus [F]', () => { focus.copy(object.position); focus.y += .8 })
-      button('Duplicate [Ctrl D]', duplicate); button('Export this item', exportItem)
-    } else if (selectedWater >= 0) {
-      const indexOfWater = selectedWater
-      renderWaterInspector(inspector, {index:selectedWater,scene,snapshot,replace,changed,run,field,button,focus,message,
-        reselect:()=>{selectedWater=indexOfWater},
-        paint:()=>{tool.kind='water';gizmos?.attach();ui?.selectPane('terrain');refreshTools();refreshHint()},
-      })
-    } else { const hint = document.createElement('p'); hint.className = 'inspector-empty'; hint.innerHTML = icon('cursor') + '<strong>No object selected</strong><span>Click an object in the scene to edit its properties.</span><span>To add an object, drag an asset from the library below onto the map.</span>'; inspector.append(hint) }
-    if (selected || selectedWater >= 0) button('Delete [Delete]', removeSelected)
-  }
+  function refreshLibrary() { return refreshLibraryModule(ctx) }
+  function refreshTools() { return refreshToolsModule(ctx) }
+  function syncTransformFields() { return syncTransformFieldsModule(ctx) }
+  function refreshHierarchy() { return refreshHierarchyModule(ctx) }
 
+  const ctx: SandboxContext = {
+    get appearanceObject() { return appearanceObject },
+    get appearancePart() { return appearancePart },
+    get applyTexture() { return applyTexture },
+    get assetCategory() { return assetCategory }, set assetCategory(value) { assetCategory = value },
+    get assetQuery() { return assetQuery }, set assetQuery(value) { assetQuery = value },
+    get atmosphereStudio() { return atmosphereStudio }, set atmosphereStudio(value) { atmosphereStudio = value },
+    get beginPlacement() { return beginPlacement },
+    get box() { return box },
+    get busy() { return busy },
+    get cameraEditor() { return cameraEditor }, set cameraEditor(value) { cameraEditor = value },
+    get canvas() { return canvas },
+    get changed() { return changed },
+    get choose() { return choose },
+    get duplicate() { return duplicate },
+    get effectEditor() { return effectEditor }, set effectEditor(value) { effectEditor = value },
+    get engine() { return engine },
+    get exportDialog() { return exportDialog }, set exportDialog(value) { exportDialog = value },
+    get exportItem() { return exportItem },
+    get focus() { return focus },
+    get gizmos() { return gizmos }, set gizmos(value) { gizmos = value },
+    get hierarchy() { return hierarchy },
+    get hierarchyQuery() { return hierarchyQuery }, set hierarchyQuery(value) { hierarchyQuery = value },
+    get library() { return library },
+    get message() { return message },
+    get name() { return name }, set name(value) { name = value },
+    get normalized() { return normalized },
+    get options() { return options },
+    get placeAt() { return placeAt },
+    get placement() { return placement },
+    get preview() { return preview }, set preview(value) { preview = value },
+    get refreshHierarchy() { return refreshHierarchy },
+    get refreshHint() { return refreshHint },
+    get refreshLibrary() { return refreshLibrary },
+    get refreshTools() { return refreshTools },
+    get removeSelected() { return removeSelected },
+    renderInspector: () => renderInspector(ctx),
+    get replace() { return replace },
+    get run() { return run },
+    get scene() { return scene },
+    get selected() { return selected },
+    get selectedWater() { return selectedWater }, set selectedWater(value) { selectedWater = value },
+    get setMode() { return setMode },
+    get sidebar() { return sidebar },
+    get signal() { return signal },
+    get snapshot() { return snapshot },
+    get syncTransformFields() { return syncTransformFields },
+    get textureStudio() { return textureStudio }, set textureStudio(value) { textureStudio = value },
+    get tool() { return tool },
+    get transformMode() { return transformMode }, set transformMode(value) { transformMode = value },
+    get ui() { return ui },
+    get undo() { return undo }
+  }
   if (!player) {
-    ui = createWorkspace(); toolbar = ui.toolbar; hierarchy = ui.hierarchy; sidebar = ui.sidebar; box = ui.tools
-    function selectAssetCategory(category: string) { assetCategory = category; assetQuery = ''; ui!.get<HTMLInputElement>('[data-k="asset-search"]').value = ''; refreshLibrary() }
-    function revealAssets(category: string) { ui!.showProject('assets'); selectAssetCategory(category) }
-    atmosphereStudio = createAtmosphereStudio(ui.studioRoot, engine, changed, {
-      reveal: () => revealAssets('Atmospheres'),
-      definitions: () => snapshot().atmospheres ?? {},
-      async save(key, asset) { const doc = snapshot(); doc.atmospheres = { ...doc.atmospheres, [key]: asset }; await replace(doc); selectAssetCategory('Atmospheres'); changed() },
-    })
-    effectEditor = createEffectEditor(ui.effectRoot, {
-      reveal: () => revealAssets('Effects'),
-      definitions: () => snapshot().effects ?? {},
-      async save(key, definition) { const doc = snapshot(); doc.effects = { ...doc.effects, [key]: definition }; await replace(doc); selectAssetCategory('Effects'); changed() },
-      place(key) { ui!.showProject('assets'); assetCategory = 'Effects'; beginPlacement(key) },
-    })
-    textureStudio = createTextureStudio(ui.textureRoot, {
-      document: snapshot,
-      objects: () => scene.placed.map(item => ({ id: item.doc.id!, object: item.object })),
-      selected: () => scene.placed.find(item => item.object === selected)?.doc.id,
-      type: id => { const object = scene.placed.find(item => item.doc.id === id)?.object; return object ? engine.instanceStyle(object)?.type ?? object.userData.prefab : undefined },
-      typeName: id => { const object = scene.placed.find(item => item.doc.id === id)?.object, type = object && (engine.instanceStyle(object)?.type ?? object.userData.prefab); return type ? library[type]?.title ?? type : undefined },
-      select: id => choose(scene.placed.find(item => item.doc.id === id)?.object),
-      reveal: () => revealAssets('Textures'),
-      async saveLighting(name, style) {
-        const chosen = selected?.userData.sceneId, doc = snapshot()
-        doc.atmospheres = { ...doc.atmospheres, [`atmosphere-${crypto.randomUUID()}`]: { name, style: structuredClone(style) } }
-        await replace(doc); if (chosen) choose(scene.placed.find(item => item.doc.id === chosen)?.object)
-        selectAssetCategory('Atmospheres'); changed()
-      },
-      async save(id, asset) {
-        const chosen = selected?.userData.sceneId, doc = snapshot(); doc.textures = { ...doc.textures, [id]: asset }
-        await replace(doc); if (chosen) choose(scene.placed.find(item => item.doc.id === chosen)?.object)
-        selectAssetCategory('Textures'); changed()
-      },
-      async detach(id, part) {
-        const doc = snapshot(), item = doc.objects.find(item => item.id === id)
-        if (!item) throw new Error('Object not found: ' + id)
-        item.options = detachTexture(item.options ?? {}, doc.textures ?? {}, part)
-        await replace(doc); choose(scene.placed.find(item => item.doc.id === id)?.object); changed()
-      },
-      async remove(id) {
-        const doc = snapshot()
-        for (const item of textureUsers(doc, id)) item.options = detachTexture(item.options ?? {}, doc.textures ?? {})
-        delete doc.textures![id]; await replace(doc); changed()
-      },
-      async apply(id, part, style, scope, textureId) {
-        if (scope === 'global') { engine.setStyle({ glyphs: { ...engine.style.glyphs, ...style } }); changed(); return }
-        const object = scene.placed.find(item => item.doc.id === id)?.object
-        if (!object) throw new Error('Select an object before applying a texture.')
-        if (part && !object.getObjectByName(part)) throw new Error('Part not found: ' + part)
-        if (textureId) return applyTexture(object, textureId, part || undefined)
-        if (scope === 'type') {
-          const type = engine.instanceStyle(object)?.type ?? object.userData.prefab
-          if (!type) throw new Error('This object has no shared type.')
-          const fields = Object.keys(style) as (keyof typeof style)[]
-          engine.setTypeStyle(type, part ? { parts: { [part]: style }, authored: { parts: { [part]: fields } } } : { style, authored: { style: fields } })
-          for (const item of scene.placed) if (item.doc.prefab === type && !engine.instanceStyle(item.object)?.type) {
-            const options = { ...engine.instanceStyle(item.object), type }; engine.setInstanceStyle(item.object, options)
-          }
-        } else if (part) engine.setPartStyle(object, part, style); else engine.setInstanceStyle(object, style)
-        choose(object); changed()
-      },
-    })
-    cameraEditor = createSceneCameras(engine, { viewChanged: () => { refreshHierarchy(); refreshHint() }, changed, select: choose, focus: () => focus.clone() }); cameraEditor.load(scene.toJSON())
-    gizmos = createGizmos(engine, { change: () => { if (tool.kind === 'place') placement.lock(); else { cameraEditor?.syncSelected(); syncTransformFields() } }, commit: () => { if (tool.kind !== 'place') changed() }, allowed: () => !busy && !preview && !cameraEditor?.viewed && !document.body.classList.contains('studio-mode') && (tool.kind === 'select' || tool.kind === 'place') && transformMode !== 'hand' && transformMode !== 'orbit' })
-    for (const surface of [ui.sidebar, ui.hierarchy]) {
-      surface.addEventListener('dragover', event => { if ((event as DragEvent).dataTransfer?.types.includes('application/x-ascii-texture')) event.preventDefault() }, { signal: signal.signal })
-      surface.addEventListener('drop', event => {
-        const e = event as DragEvent, id = e.dataTransfer?.getData('application/x-ascii-texture')
-        const objectId = (e.target as HTMLElement).closest<HTMLElement>('[data-object-id]')?.dataset.objectId
-        const object = objectId ? scene.placed.find(item => item.doc.id === objectId)?.object : selected
-        if (!id || !object || !snapshot().textures?.[id]) return
-        e.preventDefault(); e.stopPropagation()
-        const part = surface === ui!.sidebar && appearanceObject === object ? appearancePart : undefined
-        applyTexture(object, id, part)
-      }, { signal: signal.signal })
-    }
-    const el = <T extends HTMLElement>(key: string) => ui!.get<T>(`[data-k="${key}"]`)
-    el<HTMLInputElement>('name').value = name
-    el<HTMLInputElement>('name').onchange = e => { name = (e.target as HTMLInputElement).value || 'Untitled'; changed() }
-    el('new').onclick = () => run(async () => { await replace(defaultScene()); focus.set(0, .8, 0); setMode('translate'); changed() })
-    el('item').onclick = () => run(async () => { await replace(emptyScene('My item')); focus.set(0, .8, 0); setMode('translate'); changed() })
-    const save = () => downloadDocument(snapshot())
-    exportDialog = createExportDialog(snapshot)
-    const exportScene = () => exportDialog!.open()
-    el('save').onclick = save; el('save-short').onclick = save
-    el('export').onclick = exportScene; el('export-short').onclick = exportScene
-    el('undo').onclick = () => run(() => undo()); el('redo').onclick = () => run(() => undo(true))
-    const opener = el<HTMLInputElement>('open')
-    opener.onchange = () => { const file = opener.files?.[0]; opener.value = ''; if (file) run(async () => { await replace(JSON.parse(await file.text())); setMode('translate'); changed() }) }
-    el('library').onclick = () => { ui!.showProject('assets'); assetCategory = 'All'; assetQuery = ''; el<HTMLInputElement>('asset-search').value = ''; refreshLibrary(); el('asset-search').focus() }
-    el('create-camera').onclick = () => { cameraEditor!.view(null); setMode('translate', true); cameraEditor!.add() }
-    el('create-texture').onclick = () => { textureStudio!.open(selected?.userData.sceneId, appearanceObject === selected ? appearancePart : ''); ui!.showStudio('textures') }
-    el('create-effect').onclick = () => { ui!.showProject('effects'); effectEditor!.newEffect() }
-    el<HTMLInputElement>('search').oninput = e => { hierarchyQuery = (e.target as HTMLInputElement).value; refreshHierarchy() }
-    el<HTMLInputElement>('asset-search').oninput = e => { assetQuery = (e.target as HTMLInputElement).value; refreshLibrary() }
-    ui.root.querySelectorAll<HTMLButtonElement>('[data-mode]').forEach(button => { button.onclick = () => setMode(button.dataset.mode as typeof transformMode) })
-    el<HTMLSelectElement>('space').onchange = e => gizmos!.space((e.target as HTMLSelectElement).value as 'world' | 'local')
-    el('snap').onclick = () => { const on = el('snap').getAttribute('aria-pressed') !== 'true'; el('snap').setAttribute('aria-pressed', String(on)); el('snap').classList.toggle('active', on); gizmos!.snap(on) }
-    el('frame').onclick = () => { focus.copy(selected?.position ?? new THREE.Vector3()); focus.y += .8 }
-    el('reset-view').onclick = () => { cameraEditor!.view(null); canvas.dispatchEvent(new Event('editor-view-reset')) };
-    ui.root.querySelector<HTMLButtonElement>('[data-object-tool=erase]')!.onclick=()=>{placement.clear();tool.kind='erase';gizmos?.attach();refreshTools();refreshHint()}
-    el('cancel').onclick = () => setMode('translate', true)
-    el('preview').onclick = () => {
-      placement.clear(); preview = !preview; document.body.classList.toggle('previewing', preview)
-      el('preview').innerHTML = icon(preview ? 'cursor' : 'play') + (preview ? ' Back to editing' : ' Preview')
-      for (const panel of [hierarchy, sidebar, ui!.assets, ui!.get('.scene-tools')]) panel.inert = preview
-      gizmos!.cursor(); canvas.dispatchEvent(new CustomEvent('editor-preview', { detail: preview })); refreshHint()
-    }
-    el('pause').onclick = () => options.viewControls?.toggle()
-    const unsubscribePause = options.viewControls?.subscribe(paused => { el('pause').classList.toggle('active', paused); el('pause').setAttribute('aria-pressed', String(paused)) })
-    signal.signal.addEventListener('abort', () => unsubscribePause?.(), { once: true })
-    el('save-style').onclick = () => downloadStylePreset(engine)
-    el<HTMLInputElement>('load-style').onchange = e => {
-      const input = e.target as HTMLInputElement, file = input.files?.[0]; input.value = ''
-      if (file) run(async () => { await loadStylePreset(engine, file); atmosphereStudio?.refresh(); changed() })
-    }
-    const brushes: [Tool, string, string][] = [['raise', 'Raise', 'terrain'], ['lower', 'Lower', 'terrain'], ['smooth', 'Smooth', 'rock'], ['flatten', 'Flatten', 'grid'], ['paint', 'Paint', 'cursor'], ['water', 'Water', 'water']]
-    box.innerHTML = `<div class="component-title">${icon('terrain')} Terrain tools</div><p data-k="no-terrain" class="empty-note" hidden>This item has no terrain. Use File → New map.</p><div class="brush-grid">${brushes.map(([key, title, symbol]) => `<button data-brush="${key}">${icon(symbol)}${title}</button>`).join('')}</div><label>Radius<input data-k="radius" type="range" min=".5" max="8" step=".25"></label><label>Water<select data-k="water-mode"><option value="terrain">Follow terrain</option><option value="level">Flat level (lake)</option></select></label><label>Strength<input data-k="strength" type="range" min=".01" max=".4" step=".01"></label><label>Layer<select data-k="layer"></select></label><button data-k="grow">Regrow grass</button><p class="empty-note">Drag over the terrain. Undo each stroke with Ctrl Z.</p><div data-k="terrain-letters"></div>`
-    box.querySelectorAll<HTMLButtonElement>('[data-brush]').forEach(button => { button.onclick = () => { placement.clear(); tool.kind = button.dataset.brush as Tool; gizmos!.attach(); refreshTools(); refreshHint() } })
-    for (const key of ['radius', 'strength'] as const) { const input = el<HTMLInputElement>(key); input.value = String(tool[key]); input.oninput = () => { tool[key] = Number(input.value) } }
-    el<HTMLSelectElement>('water-mode').onchange = e => { tool.waterMode = (e.target as HTMLSelectElement).value as 'terrain' | 'level'; selectedWater = -1 }
-    el<HTMLSelectElement>('layer').onchange = e => { tool.layer = Number((e.target as HTMLSelectElement).value); refreshTools() }
-    el('grow').onclick = () => run(() => { scene.regrow(); changed() })
-    ui.environment.innerHTML = `<div class="component-title">${icon('spark')} Scene environment</div><label>Weather<select data-k="weather"><option value="none">No precipitation</option><option value="rain">Rain</option><option value="snow">Snow</option></select></label><label>Weather intensity<input data-k="weather-intensity" type="range" min="0" max="1" step=".05" aria-label="Weather intensity"></label><label>Atmosphere<select data-k="atmosphere"><option value="moon">Moonlight</option><option value="dusk">Dusk</option><option value="ember">Ember</option></select></label><button data-k="open-studio">Open atmosphere studio</button><p class="empty-note">Settings saved with the map.</p>`
-    el<HTMLSelectElement>('weather').onchange = e => run(async () => { const doc = snapshot(); doc.environment = { ...doc.environment, weather: (e.target as HTMLSelectElement).value as 'none' | 'rain' | 'snow' }; await replace(doc); changed() })
-    el<HTMLInputElement>('weather-intensity').onchange=e=>run(async()=>{const doc=snapshot();doc.environment={weather:doc.environment?.weather ?? 'none',intensity:(e.target as HTMLInputElement).valueAsNumber};await replace(doc);changed()})
-    el<HTMLSelectElement>('atmosphere').onchange = e => { const value = (e.target as HTMLSelectElement).value; if (value.startsWith('asset:')) atmosphereStudio!.applyAsset(value.slice(6)); else if (value !== 'current') atmosphereStudio!.setPreset(value as 'moon' | 'dusk' | 'ember') }
-    el('open-studio').onclick = () => { atmosphereStudio!.refresh(); ui!.showStudio('atmosphere') }
-    ui.root.addEventListener('project-tab', event => { const pane = (event as CustomEvent).detail; if (pane !== 'assets') { placement.clear(); gizmos?.attach(); gizmos?.cursor() } else gizmos?.attach(selected); if (pane === 'atmosphere') atmosphereStudio!.refresh() }, { signal: signal.signal })
-    const modelImport = el<HTMLInputElement>('model-import')
-    modelImport.onchange = () => { const files = Array.from(modelImport.files ?? []); modelImport.value = ''; if (files.length) canvas.dispatchEvent(new CustomEvent('editor-import-files', { detail: files })) }
-    refreshTools(); refreshHierarchy(); refreshHistory(); setMode('translate'); message(note || 'Everything saved in this browser')
-
-    const raycaster = new THREE.Raycaster(), ndc = new THREE.Vector2(), plane = new THREE.Plane(new THREE.Vector3(0, 1, 0), 0)
-    let painting = false, strokeChanged = false, flattenHeight = 0
-    let previousWaterPoint: THREE.Vector3 | undefined, lastRegrow = 0
-    let strokeWater: BuiltScene['waters'][number] | undefined
-    function groundAt(e: { clientX: number; clientY: number }) {
-      const rect = canvas.getBoundingClientRect(); ndc.set((e.clientX - rect.left) / rect.width * 2 - 1, -(e.clientY - rect.top) / rect.height * 2 + 1)
-      raycaster.setFromCamera(ndc, engine.camera)
-      return scene.terrain ? raycaster.intersectObject(scene.terrain.mesh)[0]?.point : raycaster.ray.intersectPlane(plane, new THREE.Vector3())
-    }
-    canvas.addEventListener('dragover', e => {
-      if (e.dataTransfer?.types.includes('application/x-ascii-texture') && !busy && !preview) { e.preventDefault(); e.dataTransfer.dropEffect = 'link'; return }
-      if (!e.dataTransfer?.types.includes('application/x-ascii-prefab') || busy || preview) return
-      e.preventDefault(); e.dataTransfer.dropEffect = 'copy'
-      const point = groundAt(e); gizmos!.cursor(); placement.show(tool.prefab, point ?? undefined)
-      const label = ui!.get('#placement-label'); label.hidden = !point; label.textContent = `+ ${library[tool.prefab]?.title ?? 'Object'}`; label.style.left = `${e.clientX + 18}px`; label.style.top = `${e.clientY + 18}px`
-    }, { signal: signal.signal })
-    canvas.addEventListener('dragleave', () => { placement.clear(); gizmos!.cursor(); ui!.get('#placement-label').hidden = true }, { signal: signal.signal })
-    canvas.addEventListener('drop', e => {
-      const texture = e.dataTransfer?.getData('application/x-ascii-texture')
-      if (texture) { e.preventDefault(); e.stopPropagation(); const rect = canvas.getBoundingClientRect(), hit = engine.pick((e.clientX - rect.left) / rect.width * 2 - 1, 1 - (e.clientY - rect.top) / rect.height * 2); if (hit && scene.placed.some(item => item.object === hit.object)) { applyTexture(hit.object, texture, hit.part) } return }
-      const key = e.dataTransfer?.getData('application/x-ascii-prefab')
-      if (!key || !library[key]) return
-      e.preventDefault(); e.stopPropagation(); const point = groundAt(e)
-      gizmos!.cursor(); ui!.get('#placement-label').hidden = true
-      if (point) run(() => placeAt(key, point))
-    }, { signal: signal.signal })
-    canvas.addEventListener('pointermove', e => { if (!preview && !document.body.classList.contains('studio-mode') && tool.kind !== 'select' && !e.altKey && e.buttons === 0) { const point = groundAt(e); if (tool.kind === 'place') { if (!gizmos!.hovered && !gizmos!.consumed) placement.show(tool.prefab, point ?? undefined); gizmos!.attach(placement.object); gizmos!.cursor() } else gizmos!.cursor(point ?? undefined, tool.radius) } }, { signal: signal.signal })
-    canvas.addEventListener('pointerleave', () => { if (!placement.locked) placement.clear(); gizmos!.cursor() }, { signal: signal.signal })
-    function act(e: PointerEvent, first: boolean) {
-      let p = groundAt(e)
-      if (painting && !first && tool.kind === 'water' && !strokeWater?.shape.mask?.heights) p = raycaster.ray.intersectPlane(new THREE.Plane(new THREE.Vector3(0, 1, 0), -flattenHeight), new THREE.Vector3())
-      if (!p) { previousWaterPoint = undefined; return }
-      if (first) flattenHeight = p.y
-      let kind = tool.kind
-      if (e.shiftKey && (kind === 'raise' || kind === 'lower')) kind = kind === 'raise' ? 'lower' : 'raise'
-      if (kind === 'place' && first) { placeAt(tool.prefab, p, e.shiftKey); strokeChanged = false }
-      else if (kind === 'erase' && first) { const hit = engine.pick(ndc.x, ndc.y); if (hit && scene.placed.some(v => v.object === hit.object)) { scene.remove(hit.object); choose(); strokeChanged = true } }
-      else if (kind === 'water' && scene.terrain) {
-        const terrain = scene.terrain
-        if (first) {
-          previousWaterPoint = undefined
-          strokeWater = scene.waters[selectedWater]?.shape.kind === 'paint' ? scene.waters[selectedWater] : scene.waters.find(w => w.shape.kind === 'paint' && !!w.shape.mask?.heights === (tool.waterMode === 'terrain'))
-          if (!strokeWater && !e.shiftKey) {
-            const shape = createWaterPaint(terrain.data.size, terrain.data.resolution)
-            if (tool.waterMode === 'terrain') shape.mask!.heights = terrain.data.heights.map(height => height + .045)
-            strokeWater = scene.addWater({ shape, level: tool.waterMode === 'terrain' ? 0 : p.y - .05 })
-          }
-        }
-        if (!strokeWater) return
-        if (paintWater(strokeWater.shape, previousWaterPoint ?? p, p, tool.radius, e.shiftKey)) {
-          strokeWater.refresh()
-          if (!e.shiftKey && !strokeWater.shape.mask?.heights) {
-            const { size, resolution, heights } = terrain.data, level = strokeWater.mesh.position.y
-            for (let z = 0; z < resolution; z++) for (let x = 0; x < resolution; x++) {
-              const edge = waterEdge(strokeWater.shape, x / (resolution - 1) * size - size / 2, z / (resolution - 1) * size - size / 2)
-              if (edge > -.2) heights[z * resolution + x] = Math.min(heights[z * resolution + x], level - Math.max(-.05, Math.min(.65, edge * .8 + .08)))
-            }
-            terrain.refresh()
-          }
-          strokeChanged = true
-          if (performance.now() - lastRegrow > 150) { scene.regrow(); lastRegrow = performance.now() }
-        }
-        previousWaterPoint = p.clone(); gizmos!.cursor(p, tool.radius)
-      } else if (scene.terrain && !['select', 'place', 'erase', 'water'].includes(kind)) {
-        scene.terrain.apply({ brush: kind as Brush, x: p.x, z: p.z, radius: tool.radius, strength: kind === 'paint' ? tool.strength * 4 : tool.strength, layer: tool.layer, height: flattenHeight }); strokeChanged = true
-      }
-    }
-    addEventListener('pointerdown', e => { if (busy || preview || cameraEditor?.viewed || document.body.classList.contains('studio-mode') || e.altKey || (tool.kind === 'place' && gizmos!.hovered) || tool.kind === 'select' || e.target !== canvas || e.button !== 0) return; e.stopPropagation(); painting = true; strokeChanged = false; act(e, true) }, { capture: true, signal: signal.signal })
-    addEventListener('pointermove', e => { if (painting) { e.stopPropagation(); act(e, false) } }, { capture: true, signal: signal.signal })
-    function syncWaterSlopes() {
-      const terrain = scene.terrain; if (!terrain) return
-      for (const water of scene.waters) {
-        const { shape } = water, mask = shape.mask; if (!mask?.heights) continue
-        const n = mask.resolution, c = Math.cos(shape.angle), s = Math.sin(shape.angle)
-        for (let z = 0; z < n; z++) for (let x = 0; x < n; x++) {
-          const lx = (x / (n - 1) - .5) * shape.size * 2, lz = (z / (n - 1) - .5) * shape.size * 2
-          mask.heights[z * n + x] = terrain.heightAt(shape.x + c * lx - s * lz, shape.z + s * lx + c * lz) + .045 - water.mesh.position.y
-        }
-        water.refresh()
-      }
-    }
-    const endStroke = (e: Event) => { if (painting) { e.stopPropagation(); painting = false; if (strokeChanged) { syncWaterSlopes(); scene.regrow(); changed() } } }
-    addEventListener('pointerup', endStroke, { capture: true, signal: signal.signal }); addEventListener('pointercancel', endStroke, { capture: true, signal: signal.signal })
-    canvas.addEventListener('pointerup', e => {
-      if (busy || preview || cameraEditor?.viewed || document.body.classList.contains('studio-mode') || gizmos?.consumed || transformMode === 'orbit' || transformMode === 'hand' || e.altKey || e.shiftKey || tool.kind !== 'select' || e.button !== 0) return
-      const hit = cameraEditor?.pick(e); if (hit) { e.stopImmediatePropagation(); choose(hit) }
-    }, { capture: true, signal: signal.signal })
-    addEventListener('keydown', e => {
-      if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 's' && document.body.classList.contains('studio-mode')) {
-        e.preventDefault(); if (!ui!.effectRoot.hidden) void effectEditor!.save(); else if (!ui!.textureRoot.hidden) void textureStudio!.save(); else void atmosphereStudio!.save(); return
-      }
-      if (e.target instanceof HTMLElement && (e.target.matches('input,select,textarea') || e.target.isContentEditable)) return
-      if (e.key === 'Escape') { if (gizmos?.dragging) gizmos.cancel(); else setMode('translate', true); return }
-      if (preview || busy) return
-      if (e.key === 'Enter' && tool.kind === 'place' && placement.object) { e.preventDefault(); placeAt(tool.prefab, placement.object.position.clone(), e.shiftKey); return }
-      const modifier = e.ctrlKey || e.metaKey
-      if (modifier && e.key.toLowerCase() === 'z') { e.preventDefault(); run(() => undo(e.shiftKey)) }
-      else if (modifier && e.key.toLowerCase() === 's') { e.preventDefault(); downloadDocument(snapshot()) }
-      else if (document.body.classList.contains('studio-mode')) return
-      else if (modifier && e.key.toLowerCase() === 'd') { e.preventDefault(); run(duplicate) }
-      else if (!modifier && !e.altKey && ['q', 'o', 'w', 'e', 'r'].includes(e.key.toLowerCase())) { e.preventDefault(); setMode(({ q: 'hand', o: 'orbit', w: 'translate', e: 'rotate', r: 'scale' } as const)[e.key.toLowerCase() as 'q' | 'o' | 'w' | 'e' | 'r']) }
-      else if (e.key === 'Delete') run(removeSelected)
-      else if (e.key.toLowerCase() === 'f' && selected) focus.copy(selected.position).add(new THREE.Vector3(0, .8, 0))
-    }, { signal: signal.signal })
+    ui = createWorkspace();
+    toolbar = ui.toolbar;
+    hierarchy = ui.hierarchy;
+    sidebar = ui.sidebar;
+    box = ui.tools
+    bindStudios(ctx); bindFiles(ctx); bindSceneToolbar(ctx); bindTerrain(ctx);
+    refreshTools();
+    refreshHierarchy();
+    refreshHistory();
+    setMode('translate');
+    message(note || 'Everything saved in this browser')
+    bindSceneInput(ctx)
   }
   return {
     id: 'sandbox', title: 'Editor visual', hero: new THREE.Vector3(100, 0, 100),
@@ -616,25 +246,7 @@ export async function createSandbox(engine: AsciiEngine, options: AreaOptions = 
       disturbWater(index,x,z,strength,radius) { const water=scene.waters[index]; if(!water) throw new Error('Water not found: '+index); water.disturb(x,z,strength,radius) },
       view(point, studio, cameraId) { if (cameraId !== undefined) cameraEditor?.view(cameraId); if (point) focus.set(...point); if (studio === 'scene') ui?.showProject('assets'); else if (studio) ui?.showStudio(studio) },
     },
-    async importFiles(files) {
-      if (busy) throw new Error('Wait for the current scene to finish opening.')
-      message('Importing resources…')
-      const hasModels=files.some(file=>/\.(glb|gltf)$/i.test(file.name))
-      const imported=hasModels ? await importModelFiles(files) : {}
-      let doc=snapshot(), category=hasModels ? 'Imported' : 'All'
-      const resources=files.filter(file=>/\.json$/i.test(file.name))
-      if(!hasModels && !resources.length) throw new Error('Choose an item, texture, atmosphere, GLB or GLTF file.')
-      for(const file of resources) {
-        const resource=readImportedResource(JSON.parse(await file.text()),file.name)
-        if(resource.kind==='item') doc=insertSceneItem(doc,resource.document,[focus.x,scene.terrain?.heightAt(focus.x,focus.z) ?? 0,focus.z],Object.fromEntries(Object.entries(library).map(([key,prefab])=>[key,prefab.style])))
-        else if(resource.kind==='texture') { (doc.textures ??= {})[`texture-${crypto.randomUUID()}`]=resource.asset;category='Textures' }
-        else { (doc.atmospheres ??= {})[`atmosphere-${crypto.randomUUID()}`]=resource.asset;category='Atmospheres' }
-      }
-      if(hasModels) doc.assets = { ...doc.assets, ...imported }
-      for (const [prefab, asset] of Object.entries(imported)) doc.objects.push({ id: crypto.randomUUID(), prefab, name: asset.name, position: [focus.x, scene.terrain?.heightAt(focus.x, focus.z) ?? 0, focus.z] })
-      await replace(doc); if(hasModels) choose(scene.placed.at(-1)?.object); changed()
-      if(ui){assetCategory=category;refreshLibrary()}
-    },
+    importFiles(files) { return importSceneFiles(ctx, files) },
     update(time) { scene.update(time); placement.update(time) },
     dispose() {
       placement.clear(); signal.abort(); cameraEditor?.dispose(); effectEditor?.dispose(); textureStudio?.dispose(); gizmos?.dispose(); scene.dispose(); assets.dispose()
