@@ -1,3 +1,45 @@
+## 2026-10-15 — Default live water pausing with full offline/parity simulation
+
+The editor wrapper and exported player now default to pause with a 4 m margin.
+The generic core remains update-all. Display has a session-only checkbox and
+runtime getter/setter; URL overrides remain configurable. Offline/parity URLs
+force full simulation even against explicit pause, with a disabled Display
+control. No SceneDoc/schema/preset format change. The editor guide and START
+explain frozen hidden integration, current-dt resume without catch-up, continuing
+shader/rain/explicit calls, and determinism for the same initial state, steps,
+inputs, camera path and projection/viewport.
+
+`pnpm check` passes (189 tests). Native pointer clicks toggle the live checkbox;
+its getter returns a copy and invalid setters preserve the prior policy. The
+actual web export initializes pause by default, accepts full live simulation,
+and forces full simulation offline. No desktop/Tauri command was run. All
+content tests use isolated temporary profiles; the owner draft is untouched.
+
+All seven existing area/GLTF stationary images have RMSE 0 between full/pause.
+Four visible waters compare 665,640 values at 1,200 fixed steps with maximum
+error 0 and image RMSE 0. A repeated 180-step camera path compares 332,820 values
+with maximum error 0; pause versus full intentionally differs by up to
+0.033150047 per value (mixed fields), demonstrating skipped hidden time.
+[Results](captures/benchmarks-2026-10-15/capacity/policy-validation/results.json),
+[example full](captures/benchmarks-2026-10-15/capacity/policy-validation/rain_marsh-off.png),
+[example paused](captures/benchmarks-2026-10-15/capacity/policy-validation/rain_marsh-pause.png).
+
+`pnpm verify:display` passes. `pnpm compare` keeps precisely the four historical
+failures: reference .0410, forest .0410, snow .0437 and cathedral .0490; marsh
+.1133 and mine .0348 pass. Baselines are unchanged.
+[Compare log](captures/benchmarks-2026-10-15/capacity/policy-validation/compare.log).
+
+Orca testing uses explicit page `3e2777fa-782a-49be-a647-92ea35fab1eb` in the
+review-fix profile. It confirms default, off and on policies/URL. A raw click
+reported success without changing state; DOM off and semantic checkbox check
+on work, while native CDP clicks independently pass. The live Sandbox page
+capture now succeeds after explicit selection/focus; the exact earlier static
+benchmark capture timeout cause is unconfirmed. Inspected, page-only captures:
+[Orca](captures/benchmarks-2026-10-15/capacity/policy-validation/orca-display.png),
+[cdpshot](captures/benchmarks-2026-10-15/capacity/policy-validation/cdpshot-display-00.png),
+[Orca control evidence](captures/benchmarks-2026-10-15/capacity/policy-validation/orca-controls.json).
+No desktop/private-window screenshot and no push.
+
 ## 2026-10-15 — Measured JS capacity and reproducible SVG figures
 
 The capacity matrix is complete: 42 axis points reference 40 distinct two-round

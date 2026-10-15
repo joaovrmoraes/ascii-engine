@@ -115,7 +115,7 @@ for (const [name, { path, limit = LIMIT }] of Object.entries(VIEWS)) {
   if (names.length && !names.includes(name)) continue
   const current = join(diffs, `${name}-atual.png`),
     base = join(baseline, `${name}.png`)
-  await capture(BASE + path, current)
+  await capture(BASE + path + '&parity=1', current)
   if (update || !existsSync(base)) {
     copyFileSync(current, base)
     console.log(`${name.padEnd(10)} base gravada`)

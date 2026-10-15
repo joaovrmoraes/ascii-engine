@@ -1740,3 +1740,14 @@ body.texture-studio-active #app > canvas {
   justify-content: flex-end;
   gap: 10px;
 }
+
+/* Runtime scheduling belongs to Display rather than the scene document. */
+#panel .water-policy-control {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+#panel .water-policy-control input {
+  width: auto;
+  margin: 0;
+}

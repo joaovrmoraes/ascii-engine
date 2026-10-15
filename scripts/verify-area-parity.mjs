@@ -31,7 +31,7 @@ try {
       ['after', 1440],
     ]) {
       await browser.navigate(
-        `http://localhost:${port}/?area=${scene}&pause=3&peaceful=1`,
+        `http://localhost:${port}/?area=${scene}&pause=3&peaceful=1&parity=1`,
         '!!window.engine && !!window.view && engine.time >= 3-1e-6',
       )
       await browser.evaluate(

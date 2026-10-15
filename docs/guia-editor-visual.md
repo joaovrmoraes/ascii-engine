@@ -154,6 +154,26 @@ The file stores `waters[].physics` and the initial surface; waves/flow
 restart on reopening. Simulation does not modify terrain or write each
 frame to history. Pause freezes movement.
 
+**Display → Pause offscreen water** is enabled by default in the live editor
+and exported player. **Simulate water** remains the document's physics setting;
+Display controls when the engine schedules that simulation. A whole water bound
+must leave the camera frustum plus a 4 m margin before physics, geometry/texture
+preparation and actor contacts pause. Visible water keeps the same appearance.
+
+Returning water resumes with the current frame step, without recovering hidden
+time. Shader/ring clocks and explicit rain/disturb calls continue; wind phase
+can jump, and depth/flow queries read the current paused state. Identical initial
+state, seed, fixed steps, external inputs and camera path (including projection
+and viewport) repeat deterministically. A different view history can change
+physical water state.
+
+The Display checkbox is a session setting and keeps scene history/preset data
+unchanged. Use `?water-policy=off` for full live simulation, including exported
+players; `?water-policy=pause` explicitly selects pausing. Offline and ordinary
+parity views (`?offline=1` / `?parity=1`) force full simulation and disable the
+checkbox. The generic core defaults to full simulation; integrators can switch
+with `engine.setOffscreenWaterPolicy(...)`.
+
 ## Create and reuse items
 
 **File → New item** opens a document without terrain. Compose shapes,

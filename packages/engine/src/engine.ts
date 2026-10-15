@@ -105,8 +105,9 @@ const BODY_RAMPS: Partial<Record<SurfaceKind, BodyRamp>> = {
  * (`engine.add(mesh, { glyph: 'body' })`), whole or part by part.
  */
 export function createAsciiEngine(canvas: HTMLCanvasElement, options: AsciiEngineOptions = {}) {
-  const waterUpdateGate = options.offscreenWater
-    ? createWaterUpdateGate(options.offscreenWater)
+  let offscreenWaterPolicy = options.offscreenWater ? { ...options.offscreenWater } : undefined
+  let waterUpdateGate = offscreenWaterPolicy
+    ? createWaterUpdateGate(offscreenWaterPolicy)
     : undefined
   const renderer = new THREE.WebGLRenderer({
     canvas,
@@ -458,6 +459,16 @@ export function createAsciiEngine(canvas: HTMLCanvasElement, options: AsciiEngin
     waterScene,
     particleScene,
     lights: { hemisphere, moon, fill },
+    /** Runtime scheduling policy; absent means every loaded water simulates. */
+    get offscreenWaterPolicy(): OffscreenWaterPolicy | undefined {
+      return offscreenWaterPolicy ? { ...offscreenWaterPolicy } : undefined
+    },
+    /** Switching policy affects future steps only; paused time is never recovered. */
+    setOffscreenWaterPolicy(policy?: OffscreenWaterPolicy) {
+      const gate = policy ? createWaterUpdateGate(policy) : undefined
+      offscreenWaterPolicy = policy ? { ...policy } : undefined
+      waterUpdateGate = gate
+    },
     get style() {
       return style
     },

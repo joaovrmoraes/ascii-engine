@@ -594,18 +594,32 @@ checked with scripts/verify-simulation.mjs against the preserved original core.
 --scenes=skinning,water-scale-8-off` selects workloads without changing the
 Phase 1 defaults. Phase 2 evidence is retained in the dated capture directory.
 
-`createAsciiEngine(canvas, { offscreenWater: { mode: 'pause', margin: 4 } })`
-opts into camera-dependent scheduling. The default remains absent/update-all.
-A water's entire world-space bounding sphere must miss the frustum enlarged
-by 4 metres before engine-driven integration, geometry/texture preparation and
-actor contacts skip. Bounds are conservative and include parent transforms.
-On return it advances only the current dt, with no catch-up; visible waters
-retain identical states and images. Shader/ring clocks continue globally, so
-wind phase can jump on return. Explicit rain/disturb/refresh API calls still
-modify hidden waters. Paused/offscreen simulation therefore depends on camera
-history and external calls. This runtime policy is not stored in SceneDoc,
-not enabled in the editor/player and not suitable as an implicit deterministic
-v0.2 default. Enabling it by default requires the owner's separate decision.
+The generic core defaults to full simulation. The editor wrapper and exported
+player default to `{ offscreenWater: { mode: 'pause', margin: 4 } }`, following
+the owner's capacity-study decision. A water's entire transformed bounding
+sphere must miss the camera frustum enlarged by 4 world metres before
+engine-driven integration, geometry/texture preparation and actor contacts skip.
+Visible waters retain identical arrays and images. On return only the current
+dt advances; there is no catch-up for hidden time. Global shader/ring clocks
+continue, so wind phase can jump. Explicit rain/disturb/refresh calls still
+modify hidden waters, and depth/flow queries read their current paused state.
+
+The same initial state, seed, fixed steps, external inputs and camera path
+(including projection/viewport) remain deterministic. Different view histories
+can produce different physical water states. This is a runtime/session policy,
+outside SceneDoc and style presets; legacy document data is unchanged.
+**Display → Pause offscreen water** changes it live without adding history.
+Exported players accept `?water-policy=off` or `?water-policy=pause`; integrators
+can call `engine.setOffscreenWaterPolicy(undefined)` for full simulation or
+pass a pause policy. `engine.offscreenWaterPolicy` returns a copy.
+
+Offline and ordinary parity views use `?offline=1` / `?parity=1`: the wrapper
+forces full simulation even if explicit pause was requested, and disables the
+Display override. The generic core stays full unless the consumer opts in.
+Benchmarks default to full simulation; explicit pause cases and targeted
+scheduling tests deliberately exercise the policy. Regular `pnpm compare` and
+area parity captures force full simulation. There is no alternate offline
+simulation backend.
 
 `pnpm bench --uncapped --renderer-cpu=6` optionally pins only the main thread
 of the active benchmark page to a P core. A 150 ms CPU probe identifies the

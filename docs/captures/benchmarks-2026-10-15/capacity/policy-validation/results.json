@@ -1,0 +1,466 @@
+{
+  "stationary": [
+    {
+      "scene": "reference",
+      "state": [
+        {
+          "time": 3,
+          "waters": 0
+        },
+        {
+          "time": 3,
+          "policy": {
+            "mode": "pause",
+            "margin": 4
+          },
+          "waters": 0
+        }
+      ],
+      "imageRmse": 0,
+      "clock": "fixed 1/60 s rAF; pause=3; peaceful; async GLTF waits for models"
+    },
+    {
+      "scene": "dark_forest",
+      "state": [
+        {
+          "time": 3,
+          "waters": 0
+        },
+        {
+          "time": 3,
+          "policy": {
+            "mode": "pause",
+            "margin": 4
+          },
+          "waters": 0
+        }
+      ],
+      "imageRmse": 0,
+      "clock": "fixed 1/60 s rAF; pause=3; peaceful; async GLTF waits for models"
+    },
+    {
+      "scene": "rain_marsh",
+      "state": [
+        {
+          "time": 3,
+          "waters": 1
+        },
+        {
+          "time": 3,
+          "policy": {
+            "mode": "pause",
+            "margin": 4
+          },
+          "waters": 1
+        }
+      ],
+      "imageRmse": 0,
+      "clock": "fixed 1/60 s rAF; pause=3; peaceful; async GLTF waits for models"
+    },
+    {
+      "scene": "snow_pines",
+      "state": [
+        {
+          "time": 3,
+          "waters": 0
+        },
+        {
+          "time": 3,
+          "policy": {
+            "mode": "pause",
+            "margin": 4
+          },
+          "waters": 0
+        }
+      ],
+      "imageRmse": 0,
+      "clock": "fixed 1/60 s rAF; pause=3; peaceful; async GLTF waits for models"
+    },
+    {
+      "scene": "old_mine",
+      "state": [
+        {
+          "time": 3,
+          "waters": 0
+        },
+        {
+          "time": 3,
+          "policy": {
+            "mode": "pause",
+            "margin": 4
+          },
+          "waters": 0
+        }
+      ],
+      "imageRmse": 0,
+      "clock": "fixed 1/60 s rAF; pause=3; peaceful; async GLTF waits for models"
+    },
+    {
+      "scene": "sunken_cathedral",
+      "state": [
+        {
+          "time": 3,
+          "waters": 1
+        },
+        {
+          "time": 3,
+          "policy": {
+            "mode": "pause",
+            "margin": 4
+          },
+          "waters": 1
+        }
+      ],
+      "imageRmse": 0,
+      "clock": "fixed 1/60 s rAF; pause=3; peaceful; async GLTF waits for models"
+    },
+    {
+      "scene": "gltf",
+      "state": [
+        {
+          "time": 3,
+          "waters": 0
+        },
+        {
+          "time": 3,
+          "policy": {
+            "mode": "pause",
+            "margin": 4
+          },
+          "waters": 0
+        }
+      ],
+      "imageRmse": 0,
+      "clock": "fixed 1/60 s rAF; pause=3; peaceful; async GLTF waits for models"
+    }
+  ],
+  "contexts": [
+    {
+      "query": "area=sandbox&pause=1",
+      "actual": "pause",
+      "profile": "isolated temporary Chromium profile; owner IndexedDB untouched"
+    },
+    {
+      "query": "area=reference&player=1&pause=1",
+      "actual": "pause",
+      "profile": "isolated temporary Chromium profile; owner IndexedDB untouched"
+    },
+    {
+      "query": "area=reference&player=1&pause=1&water-policy=off",
+      "actual": "off",
+      "profile": "isolated temporary Chromium profile; owner IndexedDB untouched"
+    },
+    {
+      "query": "area=reference&pause=1&offline=1&water-policy=pause",
+      "actual": "off",
+      "profile": "isolated temporary Chromium profile; owner IndexedDB untouched"
+    },
+    {
+      "query": "area=reference&pause=1&parity=1&water-policy=pause",
+      "actual": "off",
+      "profile": "isolated temporary Chromium profile; owner IndexedDB untouched"
+    },
+    {
+      "exportedPlayer": true,
+      "query": "pause=1",
+      "actual": "pause"
+    },
+    {
+      "exportedPlayer": true,
+      "query": "pause=1&water-policy=off",
+      "actual": "off"
+    },
+    {
+      "exportedPlayer": true,
+      "query": "pause=1&water-policy=pause&offline=1",
+      "actual": "off"
+    },
+    {
+      "query": "bench=water-scale&water-policy=pause&parity=1",
+      "configuration": {
+        "name": "water-scale",
+        "seed": 4242,
+        "carpetSeed": 48017,
+        "cover": 1800,
+        "dt": 0.016666666666666666,
+        "waterCount": 2,
+        "waterResolution": 129,
+        "waterCells": 33282,
+        "waterWidth": 28,
+        "spacing": 64,
+        "mapWidth": 1024,
+        "expectedVisible": 1,
+        "reflection": true,
+        "externalImpulses": false,
+        "waterPolicy": "off"
+      },
+      "diagnostics": {
+        "waterCalls": [
+          3,
+          3
+        ],
+        "visibleCreatures": 0,
+        "visibleWaters": 1,
+        "simulationResolutions": [
+          129,
+          129
+        ],
+        "reflectionLevels": [
+          0.0514753692150116
+        ]
+      }
+    },
+    {
+      "query": "bench=water-scale&water-policy=pause&offline=1",
+      "configuration": {
+        "name": "water-scale",
+        "seed": 4242,
+        "carpetSeed": 48017,
+        "cover": 1800,
+        "dt": 0.016666666666666666,
+        "waterCount": 2,
+        "waterResolution": 129,
+        "waterCells": 33282,
+        "waterWidth": 28,
+        "spacing": 64,
+        "mapWidth": 1024,
+        "expectedVisible": 1,
+        "reflection": true,
+        "externalImpulses": false,
+        "waterPolicy": "off"
+      },
+      "diagnostics": {
+        "waterCalls": [
+          3,
+          3
+        ],
+        "visibleCreatures": 0,
+        "visibleWaters": 1,
+        "simulationResolutions": [
+          129,
+          129
+        ],
+        "reflectionLevels": [
+          0.0514753692150116
+        ]
+      }
+    }
+  ],
+  "cameraPath": {
+    "dt": 0.016666666666666666,
+    "steps": 180,
+    "camera": "water 0 for 60 steps; water 1 for 60; water 0 for 60",
+    "values": 332820,
+    "repeatMaximum": 0,
+    "pauseVsFullMaximum": 0.033150047063827515,
+    "states": [
+      {
+        "fingerprint": {
+          "hash": "99722c9a",
+          "values": 233010,
+          "skinnedPoints": 0,
+          "time": 2.9999999999999942,
+          "visibleWaterHash": "9dc240fa"
+        },
+        "diagnostics": {
+          "waterCalls": [
+            121,
+            60
+          ],
+          "visibleCreatures": 0,
+          "visibleWaters": 1,
+          "simulationResolutions": [
+            129,
+            129
+          ],
+          "reflectionLevels": [
+            0.05296088832616806
+          ]
+        }
+      },
+      {
+        "fingerprint": {
+          "hash": "99722c9a",
+          "values": 233010,
+          "skinnedPoints": 0,
+          "time": 2.9999999999999942,
+          "visibleWaterHash": "9dc240fa"
+        },
+        "diagnostics": {
+          "waterCalls": [
+            121,
+            60
+          ],
+          "visibleCreatures": 0,
+          "visibleWaters": 1,
+          "simulationResolutions": [
+            129,
+            129
+          ],
+          "reflectionLevels": [
+            0.05296088832616806
+          ]
+        }
+      },
+      {
+        "fingerprint": {
+          "hash": "418a57fd",
+          "values": 233010,
+          "skinnedPoints": 0,
+          "time": 2.9999999999999942,
+          "visibleWaterHash": "d35aee8f"
+        },
+        "diagnostics": {
+          "waterCalls": [
+            181,
+            181
+          ],
+          "visibleCreatures": 0,
+          "visibleWaters": 1,
+          "simulationResolutions": [
+            129,
+            129
+          ],
+          "reflectionLevels": [
+            0.05304415601491928
+          ]
+        }
+      }
+    ],
+    "behavior": "Same initial state, seed, fixed steps, external inputs and camera path repeat exactly. Hidden waters skip integration/preparation; return advances only current dt, without catch-up."
+  },
+  "nativeToggle": [
+    {
+      "policy": null,
+      "checked": false,
+      "url": "?area=sandbox&pause=1&water-policy=off"
+    },
+    {
+      "policy": {
+        "mode": "pause",
+        "margin": 4
+      },
+      "checked": true,
+      "url": "?area=sandbox&pause=1&water-policy=pause"
+    }
+  ],
+  "toggle": {
+    "original": {
+      "mode": "pause",
+      "margin": 4
+    },
+    "on": {
+      "mode": "pause",
+      "margin": 4
+    },
+    "immutable": true,
+    "rejected": true,
+    "url": "?area=sandbox&pause=1&water-policy=pause"
+  },
+  "visibleWaters": {
+    "waters": 4,
+    "steps": 1200,
+    "dt": 0.016666666666666666,
+    "values": 665640,
+    "maximumAbsoluteDifference": 0,
+    "imageRmse": 0,
+    "metadata": [
+      {
+        "configuration": {
+          "name": "water-scale",
+          "seed": 4242,
+          "carpetSeed": 48017,
+          "cover": 1800,
+          "dt": 0.016666666666666666,
+          "waterCount": 4,
+          "waterResolution": 129,
+          "waterCells": 66564,
+          "waterWidth": 28,
+          "spacing": 32,
+          "mapWidth": 1024,
+          "expectedVisible": 4,
+          "reflection": true,
+          "externalImpulses": false,
+          "waterPolicy": "off"
+        },
+        "diagnostics": {
+          "waterCalls": [
+            1201,
+            1201,
+            1201,
+            1201
+          ],
+          "visibleCreatures": 0,
+          "visibleWaters": 4,
+          "simulationResolutions": [
+            129,
+            129,
+            129,
+            129
+          ],
+          "reflectionLevels": [
+            0.10360088090598583,
+            0.10354073050618172,
+            0.0028401993513107286,
+            0.002897203743457793
+          ]
+        },
+        "fingerprint": {
+          "hash": "bfcc17e1",
+          "values": 465984,
+          "skinnedPoints": 0,
+          "time": 20.000000000000146,
+          "visibleWaterHash": "46f3835e"
+        }
+      },
+      {
+        "configuration": {
+          "name": "water-scale",
+          "seed": 4242,
+          "carpetSeed": 48017,
+          "cover": 1800,
+          "dt": 0.016666666666666666,
+          "waterCount": 4,
+          "waterResolution": 129,
+          "waterCells": 66564,
+          "waterWidth": 28,
+          "spacing": 32,
+          "mapWidth": 1024,
+          "expectedVisible": 4,
+          "reflection": true,
+          "externalImpulses": false,
+          "waterPolicy": "pause"
+        },
+        "diagnostics": {
+          "waterCalls": [
+            1201,
+            1201,
+            1201,
+            1201
+          ],
+          "visibleCreatures": 0,
+          "visibleWaters": 4,
+          "simulationResolutions": [
+            129,
+            129,
+            129,
+            129
+          ],
+          "reflectionLevels": [
+            0.10360088090598583,
+            0.10354073050618172,
+            0.0028401993513107286,
+            0.002897203743457793
+          ]
+        },
+        "fingerprint": {
+          "hash": "bfcc17e1",
+          "values": 465984,
+          "skinnedPoints": 0,
+          "time": 20.000000000000146,
+          "visibleWaterHash": "46f3835e"
+        }
+      }
+    ]
+  }
+}

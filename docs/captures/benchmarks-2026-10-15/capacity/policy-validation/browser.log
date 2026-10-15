@@ -1,0 +1,41 @@
+Stationary parity reference 0
+Stationary parity dark_forest 0
+Stationary parity rain_marsh 0
+Stationary parity snow_pines 0
+Stationary parity old_mine 0
+Stationary parity sunken_cathedral 0
+Stationary parity gltf 0
+All-visible numeric/image parity {
+  waters: 4,
+  steps: 1200,
+  dt: 0.016666666666666666,
+  values: 665640,
+  maximumAbsoluteDifference: 0,
+  imageRmse: 0,
+  metadata: [
+    {
+      configuration: [Object],
+      diagnostics: [Object],
+      fingerprint: [Object]
+    },
+    {
+      configuration: [Object],
+      diagnostics: [Object],
+      fingerprint: [Object]
+    }
+  ]
+}
+Policy verification complete {
+  dt: 0.016666666666666666,
+  steps: 180,
+  camera: 'water 0 for 60 steps; water 1 for 60; water 0 for 60',
+  values: 332820,
+  repeatMaximum: 0,
+  pauseVsFullMaximum: 0.033150047063827515,
+  states: [
+    { fingerprint: [Object], diagnostics: [Object] },
+    { fingerprint: [Object], diagnostics: [Object] },
+    { fingerprint: [Object], diagnostics: [Object] }
+  ],
+  behavior: 'Same initial state, seed, fixed steps, external inputs and camera path repeat exactly. Hidden waters skip integration/preparation; return advances only current dt, without catch-up.'
+}

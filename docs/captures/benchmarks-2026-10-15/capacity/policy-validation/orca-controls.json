@@ -1,0 +1,29 @@
+{
+  "browserPageId": "3e2777fa-782a-49be-a647-92ea35fab1eb",
+  "profile": "isolated review-fix profile; only session/view controls changed",
+  "before": {
+    "area": "sandbox",
+    "policy": {
+      "mode": "pause",
+      "margin": 4
+    },
+    "control": true
+  },
+  "off": {
+    "url": "http://localhost:1440/?area=sandbox&water-policy=off",
+    "area": "sandbox",
+    "policy": null,
+    "checked": false
+  },
+  "on": {
+    "url": "http://localhost:1440/?area=sandbox&water-policy=pause",
+    "area": "sandbox",
+    "policy": {
+      "mode": "pause",
+      "margin": 4
+    },
+    "checked": true
+  },
+  "screenshot": "orca-display.png",
+  "notes": "Every targeted command used --page. Raw click reported success without changing checkbox state; DOM click off and semantic check on updated state/URL. Native CDP pointer input independently passes in an isolated Chromium. Live Sandbox viewport capture succeeds after explicit page selection/focus; exact cause of earlier static benchmark capture timeouts was not isolated. No desktop capture."
+}

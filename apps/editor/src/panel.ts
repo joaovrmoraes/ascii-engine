@@ -1,5 +1,6 @@
 import type { AsciiEngine } from '@ascii-engine/core'
 import type { ViewControls } from './editor/viewControls'
+import { fullWaterSimulation } from './waterPolicy'
 import { downloadStylePreset, loadStylePreset } from './editor/stylePresets'
 
 interface PanelOptions {
@@ -38,6 +39,7 @@ export function createPanel({
   hideArea = false,
 }: PanelOptions) {
   const root = document.getElementById('panel')!
+  const fullSimulation = fullWaterSimulation(new URLSearchParams(location.search))
   const authoring = areaId === 'sandbox'
   root.classList.toggle('authoring-display', authoring)
   const go = (key: string, value: string) => {
@@ -65,6 +67,7 @@ export function createPanel({
     }
     <label>${authoring ? 'Zoom' : 'zoom'} <input data-k="zoom" type="range" min="${authoring ? '.18' : '.75'}" max="${authoring ? '4' : '1.5'}" step=".05"><output></output></label>
     <label>${authoring ? 'Rotation' : 'rotation'} <input data-k="angle" type="range" min="-3.14" max="3.14" step=".05"><output></output></label>
+    <label class="water-policy-control" title="Outside the view plus 4 m, water simulation pauses and resumes without catching up. Session setting; offline/parity views simulate all waters.">Pause offscreen water <input data-k="water-policy" type="checkbox"${fullSimulation ? ' disabled' : ''}></label>
     <button data-k="pause">${authoring ? 'Pause' : '[ pause ]'}</button> <button data-k="shot">${authoring ? 'Capture PNG' : '[ capture ]'}</button>
     ${authoring ? '<p class="empty-note">View settings stay in this session. Edit scene exposure and screen cell size in Atmosphere.</p>' : ''}
     ${
@@ -144,6 +147,17 @@ export function createPanel({
       },
     ),
   ]
+  const waterPolicy = input('water-policy')
+  waterPolicy.onchange = () => {
+    if (fullSimulation) {
+      waterPolicy.checked = false
+      return
+    }
+    engine.setOffscreenWaterPolicy(waterPolicy.checked ? { mode: 'pause', margin: 4 } : undefined)
+    const params = new URLSearchParams(location.search)
+    params.set('water-policy', waterPolicy.checked ? 'pause' : 'off')
+    history.replaceState(null, '', '?' + params)
+  }
   const pause = root.querySelector<HTMLButtonElement>('[data-k="pause"]')!
   pause.onclick = viewControls.toggle
   const showPause = () => {
@@ -184,6 +198,7 @@ export function createPanel({
   }
   const refresh = () => {
     shows.forEach(show => show())
+    waterPolicy.checked = !!engine.offscreenWaterPolicy
     showPause()
     input('mode').value = legacyScreenComparison
       ? 'legacy-screen'

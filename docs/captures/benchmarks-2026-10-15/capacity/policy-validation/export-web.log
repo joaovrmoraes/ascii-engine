@@ -1,0 +1,31 @@
+$ pnpm --filter @ascii-engine/editor exec vite build
+vite v6.4.4 building for production...
+transforming...
+../../node_modules/.pnpm/zod@4.6.5/node_modules/zod/v4/core/regexes.js (74:0): A comment
+
+"/** Anchors a pattern source. The interpolation lives here rather than at the call site because
+ * esbuild will not drop a `@__PURE__` call whose own argument interpolates a variable, but it
+ * will drop `anchor(dateSource)`. Keeping it inline pinned `date` into every bundle. */"
+
+in "../../node_modules/.pnpm/zod@4.6.5/node_modules/zod/v4/core/regexes.js" contains an annotation that Rollup cannot interpret due to the position of the comment. The comment will be removed to avoid issues.
+../../node_modules/.pnpm/zod@4.6.5/node_modules/zod/v4/core/util.js (400:0): A comment
+
+"// Wrapped in a `@__PURE__` IIFE: esbuild never tree-shakes a top-level initializer that contains a member access on `Number`, so the bare object literal survived into every bundle."
+
+in "../../node_modules/.pnpm/zod@4.6.5/node_modules/zod/v4/core/util.js" contains an annotation that Rollup cannot interpret due to the position of the comment. The comment will be removed to avoid issues.
+✓ 223 modules transformed.
+rendering chunks...
+computing gzip size...
+dist/index.html                      3.28 kB │ gzip:   1.04 kB
+dist/assets/index-7kgZHBnq.css      26.74 kB │ gzip:   6.39 kB
+dist/assets/client-C1iqv6NR.js     121.42 kB │ gzip:  36.22 kB
+dist/assets/index-C-ufafZd.js      424.58 kB │ gzip: 144.49 kB
+dist/assets/transport-C6m2nnua.js  737.06 kB │ gzip: 198.27 kB
+
+(!) Some chunks are larger than 500 kB after minification. Consider:
+- Using dynamic import() to code-split the application
+- Use build.rollupOptions.output.manualChunks to improve chunking: https://rollupjs.org/configuration-options/#output-manualchunks
+- Adjust chunk size limit for this warning via build.chunkSizeWarningLimit.
+✓ built in 1.89s
+web: /home/joao/orca/workspaces/ascii-engine/threadfin/.cache/capacity/player-export/web (serve the folder, for example: python -m http.server -d "/home/joao/orca/workspaces/ascii-engine/threadfin/.cache/capacity/player-export/web")
+ready: player-export

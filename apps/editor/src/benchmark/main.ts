@@ -1,12 +1,13 @@
 import { CPU_SUBSYSTEMS, type RenderSample } from '@ascii-engine/core'
 import { Vector3 } from 'three'
 import { createAsciiEngine } from '../engine'
+import { fullWaterSimulation } from '../waterPolicy'
 import { BENCHMARK_DT, BENCHMARK_SCENES, createBenchmarkScene, type BenchmarkScene } from './scenes'
 
 const params = new URLSearchParams(location.search)
 const name = params.get('bench') as BenchmarkScene
 if (!BENCHMARK_SCENES.includes(name)) throw new Error('Unknown benchmark scene')
-const waterPolicy = params.get('water-policy') ?? 'off'
+const waterPolicy = fullWaterSimulation(params) ? 'off' : (params.get('water-policy') ?? 'off')
 if (!['off', 'pause'].includes(waterPolicy)) throw new Error('Unknown water policy')
 const canvas = document.querySelector('canvas')!
 const engine = createAsciiEngine(canvas, {
