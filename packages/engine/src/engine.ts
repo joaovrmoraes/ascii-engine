@@ -29,8 +29,11 @@ import { surfaceMaterial } from './techniques/surface'
 import { createWater, type WaterOptions, type WaterShape } from './techniques/water'
 import { createRainStreaks, type RainStreaks } from './weather/rain'
 import { createEffectSystem, type EffectDef, type EffectSystem } from './fx/effects'
+import { createRenderProfiler, type EngineStats, type WaterUpdateTimings } from './profiling'
 
 export interface AsciiEngineOptions {
+  /** Optional CPU sections, draw counters and asynchronous GPU elapsed queries. */
+  profiling?: boolean
   style?: Partial<AsciiStyle>
   /** Optional recipes supplied by the consumer. The engine registers no game library. */
   effects?: readonly EffectDef[]
@@ -68,7 +71,7 @@ export interface WaterSource {
   /** Distance (m) from a point to the water, 0 inside. */
   distance(x: number, z: number): number
   reflectionLevel?(x: number, z: number): number
-  updateDynamics?(dt: number, time: number): void
+  updateDynamics?(dt: number, time: number, timings?: WaterUpdateTimings): void
   interact?(id: string, position: THREE.Vector3, radius?: number): void
   look: { reflection: { enabled: boolean } }
   uniforms: {
@@ -104,6 +107,7 @@ export function createAsciiEngine(canvas: HTMLCanvasElement, options: AsciiEngin
     antialias: false,
     powerPreference: 'high-performance',
   })
+  const profiler = options.profiling ? createRenderProfiler(renderer) : undefined
   const maxRatio = options.maxPixelRatio ?? 1.5
   renderer.setPixelRatio(Math.max(1, Math.min(window.devicePixelRatio, maxRatio)))
   // The screen pass applies gamma itself.
@@ -856,9 +860,13 @@ export function createAsciiEngine(canvas: HTMLCanvasElement, options: AsciiEngin
       }
     },
     resize,
+    get stats(): EngineStats | undefined {
+      return profiler
+    },
 
     /** One frame. `dt` is clamped to [0, .08] (a negative step once blew up poses). */
     render(dt: number, options: { redraw?: boolean } = {}) {
+      profiler?.begin()
       if (canvas.clientWidth !== width || canvas.clientHeight !== height) resize()
       dt = options.redraw ? 0 : THREE.MathUtils.clamp(dt, 0, 0.08)
       time += dt
@@ -880,8 +888,11 @@ export function createAsciiEngine(canvas: HTMLCanvasElement, options: AsciiEngin
       if (skinnedLetters.length) {
         // Bones are usually siblings of the mesh: settle the whole graph first.
         scene.updateMatrixWorld()
+        profiler?.startSection()
         for (const points of skinnedLetters) updateSkinnedBody(points)
+        profiler?.endSection('skinning')
       }
+      profiler?.startSection()
       updateGlyphBodies(
         bodies,
         camera,
@@ -892,6 +903,8 @@ export function createAsciiEngine(canvas: HTMLCanvasElement, options: AsciiEngin
         hearth.on ? hearth.power : 0,
         style.bodyAmbient,
       )
+      profiler?.endSection('bodyUniforms')
+      profiler?.startSection()
       const hero = actors.hero ?? new THREE.Vector3(100, 0, 100)
       for (const carpet of carpets)
         carpet.update(
@@ -903,10 +916,13 @@ export function createAsciiEngine(canvas: HTMLCanvasElement, options: AsciiEngin
           style.inkTint ? 'moon' : style.atmosphere,
           style.brightness,
         )
+      profiler?.endSection('carpet')
+      profiler?.startSection()
       if (effects && effectLetters) {
         effectLetters.clear()
         effects.update(dt, time, camera, options.redraw)
       }
+      profiler?.endSection('effects')
       // Effects update their PointLights first. Sharing these uniforms makes
       // their colour/reach work on bodies, carpets, surfaces and particles.
       const ink = illumination.uniforms
@@ -980,7 +996,7 @@ export function createAsciiEngine(canvas: HTMLCanvasElement, options: AsciiEngin
         if (!options.redraw) {
           if (actors.hero) water.interact?.('hero', actors.hero)
           if (actors.foe) water.interact?.('foe', actors.foe)
-          water.updateDynamics?.(dt, time)
+          water.updateDynamics?.(dt, time, profiler?.timings)
         }
         water.uniforms.time.value = time
         if (water.uniforms.waterViewDirection)
@@ -1016,15 +1032,18 @@ export function createAsciiEngine(canvas: HTMLCanvasElement, options: AsciiEngin
           water.uniforms.reflection.value = previous.uniforms.reflection.value
           water.uniforms.reflectionMatrix.value.copy(previous.uniforms.reflectionMatrix.value)
         } else {
+          profiler?.startGpu()
           water.reflection.render(renderer, scene, camera)
           mirrors.set(level, water)
         }
         if (water.uniforms.reflectionOn) water.uniforms.reflectionOn.value = 1
       }
       ascii.material.uniforms.debugScreen.value = debug.screen ? 1 : 0
+      profiler?.startGpu()
       if (debug.raw) {
         renderer.setRenderTarget(null)
         renderer.render(scene, camera)
+        profiler?.end()
         return
       }
       renderer.setRenderTarget(target)
@@ -1036,9 +1055,11 @@ export function createAsciiEngine(canvas: HTMLCanvasElement, options: AsciiEngin
       renderer.render(waterScene, camera)
       renderer.render(particleScene, camera)
       renderer.autoClear = true
+      profiler?.end()
     },
 
     dispose() {
+      profiler?.dispose()
       effects?.dispose()
       for (const entry of entries.values()) unapply(entry)
       for (const carpet of carpets) carpet.dispose()

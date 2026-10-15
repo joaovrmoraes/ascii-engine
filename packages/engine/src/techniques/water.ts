@@ -1,4 +1,5 @@
 import * as THREE from 'three'
+import type { WaterUpdateTimings } from '../profiling'
 import { waterMaskEdge, type WaterMask } from '../world/waterPaint'
 import { surfaceAlpha } from '../surface'
 import { surfaceAtlas, SURFACE_ALPHABETS, SURFACE_RANGES } from './surface'
@@ -661,10 +662,16 @@ export function createWater(shape: WaterShape, options: WaterOptions = {}) {
     get dynamics() {
       return dynamics
     },
-    updateDynamics(dt: number, time: number) {
+    updateDynamics(dt: number, time: number, timings?: WaterUpdateTimings) {
       if (physics.enabled && dt > 0) {
+        const started = timings ? performance.now() : 0
         dynamics.step(dt)
+        const stepped = timings ? performance.now() : 0
         upload(time)
+        if (timings) {
+          timings.waterStep += stepped - started
+          timings.waterUpload += performance.now() - stepped
+        }
       }
     },
     heightAt(x: number, z: number) {
