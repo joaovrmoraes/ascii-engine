@@ -49,7 +49,7 @@ const report = [
   '',
   'Methodology amendment: the original display-paced measurements were limited by presentation cadence near 16.665 ms. Their frame shares and repeatability do not establish workload cost. The original [vsync report](vsync-report.md), [summary](vsync-summary.json) and round-1/round-2 raw data are preserved. The measurements below disable GPU vsync and the frame-rate limit; qualification uses these uncapped results and the observed CPU/GPU bottleneck.',
   '',
-  '1920×1080 CSS pixels, DPR 1, dt 1/60 s, unchanged fixed camera and seeded scenes. Chromium adds --disable-gpu-vsync and --disable-frame-rate-limit. Each round uses five fresh scene loads with 600 warm-up and 600 measured frames per run by default. Frame time is the performance.now() interval between actual simulation/render submissions with at most two GPU frames in flight. Asynchronous WebGL fences apply backpressure and all frames drain at the end; CPU frame N can overlap GPU frame N-1. Completion-observation intervals, native rAF cadence, CPU work, GPU ranges and scheduler CPU cost are also recorded. No gl.finish, synchronous GPU wait or per-frame CPU/GPU serialization is used. Completion observation includes polling delay; neither metric claims physical scanout time.',
+  '1920×1080 CSS pixels, DPR 1, dt 1/60 s, unchanged fixed camera and seeded scenes. Chromium adds --disable-gpu-vsync and --disable-frame-rate-limit. Each round uses five fresh scene loads with 600 warm-up and 600 measured frames per run by default. The uncapped harness submits free-running MessageChannel tasks instead of requestAnimationFrame; rafIntervalMs is null. Frame time is the performance.now() interval between actual simulation/render steps with at most two GPU frames in flight. Asynchronous fences apply backpressure and all frames drain at the end; CPU frame N can overlap GPU frame N-1. Completion-observation intervals, latency, CPU/GPU ranges, scheduler cost and sustained mean frame time are reported separately. No gl.finish, synchronous GPU wait or per-frame CPU/GPU serialization is used. Completion observation includes polling delay; neither metric claims physical scanout time.',
   '',
   'Percentiles use nearest rank over equally sized runs. Frame share = subsystem CPU p50 / uncapped frame p50; CPU share = subsystem CPU p50 / active CPU frame p50. Classification compares active CPU p50 with GPU-range p50: at least 20% separation means CPU- or GPU-dominant, otherwise mixed; missing GPU timing means unknown. This is a descriptive inference, not proof of an exclusive bottleneck. CPU submission can include driver backpressure. CPU/GPU overlap and must not be added. A target requires numeric-array work, at least 15% of the uncapped frame and evidence of a CPU bottleneck. A CPU speedup in a GPU-limited scene is not a measured frame gain. Water upload includes Three.js geometry updates; its aggregate does not establish a portable kernel.',
   '',
@@ -64,7 +64,13 @@ for (const scene of scenes) {
   )
   if (data.some(d => d.runs.some(run => !run.metadata.frameClock?.startsWith('performance.now'))))
     throw new Error('These rounds only measure scheduled rAF cadence; use the wall-clock rounds')
-  if (data.some(d => d.runs.some(run => run.metadata.gpuQueue?.limit !== 2)))
+  if (
+    data.some(d =>
+      d.runs.some(
+        run => run.metadata.gpuQueue?.limit !== 2 || run.metadata.gpuQueue?.scheduler !== 'task',
+      ),
+    )
+  )
     throw new Error(
       'Uncapped submission alone is not completed-frame throughput; use bounded GPU queue rounds',
     )
@@ -86,7 +92,9 @@ for (const scene of scenes) {
     b = data[1].summary,
     delta = relativeDifference(a.frameMs.p50, b.frameMs.p50),
     bottleneck = classifyBottleneck(stats.frameCpuMs.p50, stats.gpuMs.p50),
-    pacedStats = paced.results.find(result => result.scene === scene).summary
+    pacedStats = paced.results.find(result => result.scene === scene).summary,
+    meanFrameMs = rows.reduce((sum, row) => sum + row.frameMs, 0) / rows.length,
+    meanCompletedFrameMs = rows.reduce((sum, row) => sum + row.completedFrameMs, 0) / rows.length
   if (delta > 0.05) stable = false
   report.push(
     `## ${scene}`,
@@ -96,6 +104,8 @@ for (const scene of scenes) {
     `**Bottleneck classification: ${bottleneck}**. Active CPU / GPU p50 ratio: ${stats.gpuMs.p50 ? (stats.frameCpuMs.p50 / stats.gpuMs.p50).toFixed(2) : 'unavailable'}. Original paced frame p50/p95: ${fmt(pacedStats.frameMs.p50)} / ${fmt(pacedStats.frameMs.p95)} ms (context only).`,
     '',
     `Asynchronously observed GPU-completion interval p50/p95: ${fmt(stats.completedFrameMs.p50)} / ${fmt(stats.completedFrameMs.p95)} ms. In-flight frame latency p50/p95: ${fmt(stats.gpuLatencyMs.p50)} / ${fmt(stats.gpuLatencyMs.p95)} ms (latency is not throughput). Fence/scheduler CPU p50/p95: ${fmt(stats.schedulerCpuMs.p50)} / ${fmt(stats.schedulerCpuMs.p95)} ms, reported separately from active scene CPU.`,
+    '',
+    `Sustained mean step / completion interval: ${fmt(meanFrameMs)} / ${fmt(meanCompletedFrameMs)} ms per frame. These means are additional throughput context, not relabeled p50 values.`,
     '',
     `Round frame p50: ${fmt(a.frameMs.p50)} vs ${fmt(b.frameMs.p50)} ms; symmetric difference **${(delta * 100).toFixed(2)}%** (${delta <= 0.05 ? 'within 5%' : 'UNSTABLE; investigate before concluding'}).`,
     '',
@@ -137,6 +147,8 @@ for (const scene of scenes) {
   results.push({
     scene,
     summary: stats,
+    meanFrameMs,
+    meanCompletedFrameMs,
     pacedSummary: pacedStats,
     bottleneck,
     frameP50Difference: delta,
@@ -174,6 +186,8 @@ report.push(
   'See [uncapped study notes](uncapped-notes.md) for validation, visual evidence and measurement limitations; [original notes](study-notes.md) describe the prior paced stage.',
   '',
   'A partial [submission-only diagnostic](submission-diagnostic/README.md) is also preserved: simply removing the cap allowed CPU callbacks to outrun GPU completion and drop timer queries. Those data are excluded; every accepted uncapped run bounds the queue to two and completes all GPU frames and available timer samples.',
+  '',
+  'A complete [rAF-bounded experiment](raf-bounded-diagnostic/README.md) also remains available: water callback p50 failed repeatability (6.40%) despite stable CPU/GPU medians and mean throughput. The accepted method removes rAF/compositor scheduling from uncapped render steps; that failure is not silently reported as a pass or discarded.',
   '',
 )
 await writeFile(

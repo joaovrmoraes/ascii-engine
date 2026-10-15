@@ -71,7 +71,7 @@ async function run(warmup = 600, frames = 600) {
   hasRun = true
   const samples: (RenderSample & {
     frameMs: number
-    rafIntervalMs: number
+    rafIntervalMs: number | null
     frameCpuMs: number
     sceneCpuMs: number
     gpuMs: number | null
@@ -123,15 +123,19 @@ async function run(warmup = 600, frames = 600) {
   document.addEventListener('visibilitychange', visibility)
   try {
     await new Promise<void>((resolve, reject) => {
-      // Poll outside rAF so an idle poll does not request another compositor frame.
+      // Uncapped render steps use tasks, independently of compositor/rAF cadence.
       // Each message task starts a fresh 1 ms timer, avoiding nested timer clamping.
       if (pollChannel)
-        pollChannel.port1.onmessage = () => {
+        pollChannel.port1.onmessage = event => {
+          if (event.data === 'step') {
+            step(performance.now())
+            return
+          }
           pollTimer = window.setTimeout(() => {
             try {
               pollFence()
               if (pending.length >= gpuQueueLimit) pollChannel.port2.postMessage(null)
-              else animation = requestAnimationFrame(step)
+              else pollChannel.port2.postMessage('step')
             } catch (error) {
               reject(error)
             }
@@ -150,7 +154,7 @@ async function run(warmup = 600, frames = 600) {
           const entered = performance.now()
           if (samples.length) {
             samples.at(-1)!.frameMs = entered - previousWall
-            samples.at(-1)!.rafIntervalMs = now - previous
+            samples.at(-1)!.rafIntervalMs = gpuQueueLimit ? null : now - previous
           }
           previous = now
           previousWall = entered
@@ -200,25 +204,31 @@ async function run(warmup = 600, frames = 600) {
           for (const sample of engine.stats?.takeGpuSamples() ?? [])
             gpuSamples.set(sample.frame, sample.ms)
           count++
-          animation = requestAnimationFrame(step)
+          if (pollChannel) pollChannel.port2.postMessage('step')
+          else animation = requestAnimationFrame(step)
         } catch (error) {
           reject(error)
         }
       }
-      animation = requestAnimationFrame(step)
+      if (pollChannel) pollChannel.port2.postMessage('step')
+      else animation = requestAnimationFrame(step)
     })
     // Drain completed GPU work asynchronously; no extra simulation steps or gl.finish().
     const deadline = performance.now() + 10000
     while (pending.length) {
       if (performance.now() > deadline) throw new Error('GPU fence completion timed out')
-      await new Promise<void>(resolve => requestAnimationFrame(() => resolve()))
+      await new Promise<void>(resolve =>
+        gpuQueueLimit ? window.setTimeout(resolve, 1) : requestAnimationFrame(() => resolve()),
+      )
       pollFence()
       for (const sample of engine.stats?.takeGpuSamples() ?? [])
         gpuSamples.set(sample.frame, sample.ms)
     }
     // Poll asynchronously after the final submission; do not simulate extra steps or gl.finish().
     for (let i = 0; i < 60 && engine.stats?.gpu.available; i++) {
-      await new Promise<void>(resolve => requestAnimationFrame(() => resolve()))
+      await new Promise<void>(resolve =>
+        gpuQueueLimit ? window.setTimeout(resolve, 1) : requestAnimationFrame(() => resolve()),
+      )
       for (const sample of engine.stats.takeGpuSamples()) gpuSamples.set(sample.frame, sample.ms)
       if (gpuSamples.has(samples.at(-1)!.frame)) break
     }
@@ -232,15 +242,18 @@ async function run(warmup = 600, frames = 600) {
       camera,
       warmup,
       frames,
-      frameClock: 'performance.now callback interval; rAF cadence recorded separately',
+      frameClock: gpuQueueLimit
+        ? 'performance.now free-running task interval; asynchronous bounded GPU queue; no rAF pacing'
+        : 'performance.now callback interval; rAF cadence recorded separately',
       gpuQueue: {
         limit: gpuQueueLimit,
+        scheduler: gpuQueueLimit ? 'task' : 'rAF',
         peak: peakGpuQueue,
         completedFrames: completed.size,
         pollCallbacks,
         totalSchedulerCpuMs,
         completionClock: 'CPU-observed asynchronous fence completion; includes polling delay',
-        polling: 'non-nested 1 ms timers between rAF submissions; no spin or blocking GPU wait',
+        polling: 'non-nested 1 ms timers and task submissions; no spin or blocking GPU wait',
       },
       samples,
       fingerprint: fingerprint(),

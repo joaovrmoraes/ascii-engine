@@ -65,6 +65,7 @@ const environment = {
     encoding: 'utf8',
   }).trim(),
   framePacing: uncapped ? 'uncapped' : 'display',
+  scheduler: uncapped ? 'task-with-gpu-backpressure' : 'rAF',
   cpu: { model: cpus()[0].model, logicalCores: cpus().length },
   os: {
     platform: platform(),
@@ -126,10 +127,14 @@ const flatten = sample => ({
 })
 const scenes = ['water', 'particles', 'skinning'],
   results = Object.fromEntries(scenes.map(name => [name, { scene: name, columns, runs: [] }]))
+const validFrameClock = sample =>
+  (uncapped ? sample.rafIntervalMs === null : Number.isFinite(sample.rafIntervalMs)) &&
+  sample.frameMs >= sample.frameCpuMs
 function validateQueue(result) {
   if (!uncapped) return
   if (
     result.gpuQueue.limit !== 2 ||
+    result.gpuQueue.scheduler !== 'task' ||
     result.gpuQueue.peak > 2 ||
     result.gpuQueue.completedFrames !== result.warmup + result.frames ||
     result.samples.some(sample => sample.completedFrameMs === null)
@@ -156,11 +161,7 @@ try {
         const result = await browser.evaluate('benchmark.run(60,180)')
         await browser.check()
         validateQueue(result)
-        if (
-          result.samples.some(
-            sample => !Number.isFinite(sample.rafIntervalMs) || sample.frameMs < sample.frameCpuMs,
-          )
-        )
+        if (result.samples.some(sample => !validFrameClock(sample)))
           throw new Error('Frame wall interval does not contain its active CPU work')
         if (
           result.viewport.width !== 1920 ||
@@ -219,9 +220,7 @@ try {
           result.samples.length !== frames ||
           result.visibilityChanges ||
           !result.browser.isolated ||
-          result.samples.some(
-            sample => !Number.isFinite(sample.rafIntervalMs) || sample.frameMs < sample.frameCpuMs,
-          )
+          result.samples.some(sample => !validFrameClock(sample))
         )
           throw new Error('Invalid benchmark run')
         validateQueue(result)

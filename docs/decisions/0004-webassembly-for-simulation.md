@@ -84,6 +84,15 @@ Before collecting the additional rounds:
   overlap GPU frame N-1; do not call gl.finish or serialize every CPU/GPU frame.
   Record actual step intervals, CPU-observed completion intervals, latency and
   fence/scheduler overhead separately. All measured GPU frames must complete.
+  A subsequent complete rAF-bounded experiment failed water submission p50
+  repeatability (6.40%) while completion p50 varied 1.08%, CPU 1.05% and GPU
+  0.38%. Preserve it in raf-bounded-diagnostic/. The final uncapped scheduler
+  uses free-running MessageChannel tasks, not rAF, so the benchmark loop is
+  independent of compositor callback cadence. Keep rAF for the ordinary editor
+  and paced benchmark. Record rafIntervalMs as null in task mode; do not invent
+  rAF timestamps. Collect two fresh rounds with unchanged counts/thresholds.
+  Also report mean step/completion intervals as throughput context, without
+  substituting means for the specified percentiles or hiding the failed gate.
 - Collect two uncapped rounds, each five fresh loads and 600 measured frames
   per scene after 600 warm-up frames. Check uncapped full-frame p50 repeatability
   within 5%; preserve and investigate unstable rounds.

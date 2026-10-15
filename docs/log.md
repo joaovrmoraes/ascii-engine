@@ -4,6 +4,25 @@ Entries describe the state at each stage. Earlier limitations may have been
 resolved later; START.md and the editor guide describe the current scope.
 Historical filenames, reference IDs and captured interfaces are preserved.
 
+## 2026-10-15 — Remove residual rAF pacing from the uncapped harness
+
+Two complete rAF-bounded rounds finished all 18,000 frames and GPU queries, but
+water submission p50 failed repeatability at 6.40%. CPU medians varied 1.05%,
+GPU 0.38% and observed completion 1.08%; alternating short/long submissions
+changed their median more than the actual work or sustained throughput. Kept
+the complete raw data, failed report and logs in raf-bounded-diagnostic/.
+
+The final uncapped harness submits MessageChannel tasks, retaining asynchronous
+two-frame GPU backpressure and fixed dt. It no longer requests a compositor
+animation frame for each benchmark step. Default editor and paced fixtures
+retain rAF. Task-mode native rAF timestamps are null. Updated the ADR method
+before fresh rounds with unchanged run counts, percentiles and decision limits;
+added sustained mean step/completion time as explicitly separate context.
+Validation: pnpm check passes (167 tests). Task-mode smoke completes every GPU
+frame/query in all three scenes; profiling on/off state matches, and screenshots
+are byte-identical to each other and to the original paced captures.
+No simulation optimization or alternate implementation. No Phase 2 and no push.
+
 ## 2026-10-15 — Uncapped throughput: bound GPU work before measuring
 
 The first partial uncapped round exposed a measurement failure: particles

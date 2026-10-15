@@ -578,3 +578,7 @@ The uncapped harness bounds in-flight GPU frames to two through nonblocking
 WebGL fences, keeping CPU/GPU overlap while preventing a queue of uncompleted
 frames from being mistaken for throughput. It also reports observed completion
 intervals, latency and scheduler overhead; GPU work drains before each run ends.
+Uncapped render steps use free-running MessageChannel tasks, independent of rAF
+compositor cadence; ordinary editor and paced benchmark retain rAF. Unsupported
+rAF cadence in task mode is recorded as null. Earlier failed submission/rAF
+experiments remain as diagnostic evidence; the report requires the task mode.
