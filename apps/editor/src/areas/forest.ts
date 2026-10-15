@@ -5,7 +5,7 @@ import { cap, createCamp, createKit, createTree, log, rock } from '../scene/pomo
 import { createAdventurer } from '../pomorog/models'
 import { damp, smooth, turn } from '../pomorog/motion'
 import { loopLength, paceAt, solveBaseSpeed } from '../pomorog/pacing'
-import type { Area, AreaOptions } from './types'
+import { usesLegacyScreenComparison, type Area, type AreaOptions } from './types'
 import { createEncounters } from './encounters'
 
 /**
@@ -96,12 +96,12 @@ export function createForest(engine: AsciiEngine, options: AreaOptions = {}): Ar
   floorMaterial.customProgramCacheKey = () => 'forest-world-floor'
   const floor = new THREE.Mesh(new THREE.PlaneGeometry(64, 64), floorMaterial)
   floor.rotation.x = -Math.PI / 2; floor.position.y = -.07; floor.receiveShadow = true
-  engine.add(floor, options.screen ? { glyph: 'screen', surface: 'earth' } : { type: 'ground' })
+  engine.add(floor, usesLegacyScreenComparison(options) ? { glyph: 'screen', surface: 'earth' } : { type: 'ground' })
 
   // Camp at s = 0, on the inner side of the ring.
   const camp = new THREE.Vector3(), campSeat = new THREE.Vector3()
   const campGroup = createCamp(kit)
-  engine.add(campGroup, options.screen ? { glyph: 'screen' } : {})
+  engine.add(campGroup, usesLegacyScreenComparison(options) ? { glyph: 'screen' } : {})
   const fireLetters = engine.createParticles(1600)
   engine.add(fireLetters.mesh, { glyph: 'particle' })
   const fire = createCampfire(fireLetters, camp)
@@ -117,7 +117,7 @@ export function createForest(engine: AsciiEngine, options: AreaOptions = {}): Ar
   engine.setLights({ hearth: camp })
 
   const carpet = engine.createCarpet(proceduralForestCover(soilUniforms))
-  if (!options.screen) engine.add(carpet.mesh, { glyph: 'carpet' })
+  if (!usesLegacyScreenComparison(options)) engine.add(carpet.mesh, { glyph: 'carpet' })
 
   function seeded(index: number) {
     let seed = (Math.imul(index + 7919, 2654435761) ^ 0x5bd1e995) >>> 0
@@ -240,9 +240,9 @@ export function createForest(engine: AsciiEngine, options: AreaOptions = {}): Ar
       }
     }
     // Trees keep their own per-part styles; the rest is declared on each node.
-    for (const tree of trees) engine.add(tree.root, options.screen ? { glyph: 'screen', parts: { trunk: { surface: 'bark' }, crown: { surface: 'foliage' } } } : { type: 'tree' })
-    engine.add(group, options.screen ? { glyph: 'screen' } : {})
-    if (water && options.screen) water.look.reflection.enabled = false
+    for (const tree of trees) engine.add(tree.root, usesLegacyScreenComparison(options) ? { glyph: 'screen', parts: { trunk: { surface: 'bark' }, crown: { surface: 'foliage' } } } : { type: 'tree' })
+    engine.add(group, usesLegacyScreenComparison(options) ? { glyph: 'screen' } : {})
+    if (water && usesLegacyScreenComparison(options)) water.look.reflection.enabled = false
     return { index, group, trees, water, shape: spec }
   }
 
@@ -253,7 +253,7 @@ export function createForest(engine: AsciiEngine, options: AreaOptions = {}): Ar
 
   // The traveller: screen pass, walking the circuit with the Pomorog pace.
   const player = createAdventurer()
-  engine.add(player.root, options.screen ? { glyph: 'screen', surface: 'actor' } : { type: 'hero' })
+  engine.add(player.root, usesLegacyScreenComparison(options) ? { glyph: 'screen', surface: 'actor' } : { type: 'hero' })
   player.root.position.copy(campSeat)
   if (options.at) { const p = loop.point(options.at); player.root.position.set(p.x, 0, p.z); player.root.rotation.y = Math.atan2(p.tx, p.tz) }
   const lantern = new THREE.PointLight(0xffce83, 7, 9, 1.65); engine.scene.add(lantern)
@@ -264,7 +264,7 @@ export function createForest(engine: AsciiEngine, options: AreaOptions = {}): Ar
   engine.setActors({ hero: player.root.position })
   // Walks between encounters, as in the demo (seconds of hunting).
   const WALKS = [6, 16, 12, 18, 14]
-  const encounters = createEncounters(engine, player, options.screen ? undefined : carpet)
+  const encounters = createEncounters(engine, player, usesLegacyScreenComparison(options) ? undefined : carpet)
   let walked = 0, walkIndex = 0
   const toward = new THREE.Vector3()
 

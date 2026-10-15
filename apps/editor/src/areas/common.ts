@@ -4,7 +4,7 @@ import { type AsciiEngine, type GlyphCloud } from '@ascii-engine/core'
 import { createCamp, createKit, type Kit } from '../scene/pomorogKit'
 import { createAdventurer } from '../pomorog/models'
 import { damp, smooth, turn } from '../pomorog/motion'
-import type { AreaOptions } from './types'
+import { usesLegacyScreenComparison, type AreaOptions } from './types'
 
 /**
  * Pieces shared by the fixed Pomorog maps (`environment.ts` + `scene.ts`):
@@ -58,7 +58,7 @@ export function createFixedMapActors(engine: AsciiEngine, options: AreaOptions, 
   const kit: Kit = createKit()
   const campGroup = createCamp(kit, route.leanTo ?? false)
   campGroup.position.copy(CAMP)
-  engine.add(campGroup, options.screen ? { glyph: 'screen' } : {})
+  engine.add(campGroup, usesLegacyScreenComparison(options) ? { glyph: 'screen' } : {})
   const fireLetters = engine.createParticles(1600)
   engine.add(fireLetters.mesh, { glyph: 'particle' })
   const fire = createCampfire(fireLetters, CAMP)
@@ -66,7 +66,7 @@ export function createFixedMapActors(engine: AsciiEngine, options: AreaOptions, 
   engine.setLights({ hearth: CAMP })
 
   const player = createAdventurer()
-  engine.add(player.root, options.screen ? { glyph: 'screen', surface: 'actor' } : { type: 'hero' })
+  engine.add(player.root, usesLegacyScreenComparison(options) ? { glyph: 'screen', surface: 'actor' } : { type: 'hero' })
   player.root.position.set(-.8, 0, 2.7)
   const lanternPower = route.lantern ?? 7
   const lantern = new THREE.PointLight(0xffce83, lanternPower, 9, 1.65); engine.scene.add(lantern)

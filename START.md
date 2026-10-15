@@ -519,3 +519,12 @@ renderer entries cannot reach optional presets or application code.
 
 Headless captures: `.claude/skills/pomorog-ascii-visual/scripts/cdpshot.mjs`
 (Chromium with GPU and `--use-angle=gl`). Validate in **Orca Browser** too.
+
+Display debug modes use engine.setRenderMode in every area, preserving authored
+techniques. `?ascii=debug-screen` selects the screen-grid diagnostic. Historical
+recipes are explicit Legacy screen comparison (`?ascii=legacy-screen`);
+`?ascii=screen` stays a compatibility alias outside the sandbox. AreaOptions
+legacyScreenComparison names that recipe; screen remains a deprecated alias.
+The current pnpm compare views use default glyphs, with no ascii=screen flag.
+Entering/leaving legacy comparison rebuilds its recipe; normal debug switches
+remain live and never write scene appearance.

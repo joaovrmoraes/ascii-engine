@@ -1,0 +1,11 @@
+{
+  "id": "33bd31a1-6bec-48fb-9c0b-b1b0bad1dcc8",
+  "ok": true,
+  "result": {
+    "result": "{\"debug\":\"screen\",\"documentUnchanged\":true,\"restored\":\"glyphs\"}",
+    "origin": "http://localhost:1440/?area=sandbox"
+  },
+  "_meta": {
+    "runtimeId": "38cf1741-6edd-47a2-b539-0f58b1abc24e"
+  }
+}

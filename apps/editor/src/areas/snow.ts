@@ -3,7 +3,7 @@ import { createSnowField, pomorogSnow, snowAccumulation, snowMeltRadius } from '
 import { type AsciiEngine, type GroundCover, type SurfaceKind } from '@ascii-engine/core'
 import { declare } from '../scene/pomorogKit'
 import { CAMP, createFixedMapActors } from './common'
-import type { Area, AreaOptions } from './types'
+import { usesLegacyScreenComparison, type Area, type AreaOptions } from './types'
 
 /**
  * Snow Pines (Pomorog `snowEnvironment.ts`): snow floor with footprints and a
@@ -81,7 +81,7 @@ export function createSnow(engine: AsciiEngine, options: AreaOptions = {}): Area
     if (snow.cover(x, z, 0) < .8 || Math.abs(x) < 2.4) continue
     mesh(cube, 0x8e947c, 'wood', root, x, .12, z, .025, .24, .025).rotation.z = (random() - .5) * .55
   }
-  engine.add(root, options.screen ? { glyph: 'screen' } : {})
+  engine.add(root, usesLegacyScreenComparison(options) ? { glyph: 'screen' } : {})
 
   // Snow crust letters on the field, dry grass where the fire melted it.
   const pickOf = (list: number[], r: () => number) => list[Math.floor(r() * list.length)]
@@ -95,7 +95,7 @@ export function createSnow(engine: AsciiEngine, options: AreaOptions = {}): Area
     },
   }
   const carpet = engine.createCarpet(cover)
-  if (!options.screen) engine.add(carpet.mesh, { glyph: 'carpet' })
+  if (!usesLegacyScreenComparison(options)) engine.add(carpet.mesh, { glyph: 'carpet' })
 
   const actors = createFixedMapActors(engine, options, {
     route: [[-.8, 3.8], [.4, 2], [.9, -.4], [-.2, -3.2], [-1.3, -4.9], [.8, -2.9], [2.1, .4], [1.5, 3.8], [-1, 4.7]],

@@ -18,6 +18,7 @@
     "verify:api": "node scripts/verify-api.mjs",
     "verify:pages": "node scripts/verify-pages.mjs",
     "verify:composition": "node scripts/verify-composition.mjs",
+    "verify:display": "node scripts/verify-display.mjs",
     "verify:export": "node scripts/verify-export.mjs",
     "verify:authoring": "node scripts/verify-authoring.mjs",
     "verify:textures": "node scripts/verify-textures.mjs",

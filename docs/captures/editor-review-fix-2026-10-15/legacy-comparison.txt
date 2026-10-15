@@ -1,0 +1,4 @@
+Old Mine, ascii=screen, frozen at 3 seconds; 1200x600+0+80 world crop.
+Control served from an isolated source archive at commit 578dec6 on port 1445.
+Updated scene served from this worktree on port 1440.
+RMSE 0.0000627474. No baseline updates.

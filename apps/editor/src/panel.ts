@@ -9,6 +9,7 @@ interface PanelOptions {
   areas: Record<string, { title: string }>
   areaId: string
   mode: string
+  legacyScreenComparison?: boolean
   capture: () => void
   importFiles: (files: File[]) => void
   changed?: () => void
@@ -19,16 +20,17 @@ interface PanelOptions {
 /**
  * Live adjustments (seed of phase 4): area, letter mode, cell size and
  * brightness (the player's "Image" controls), zoom and rotation.
- * Changing area or mode reloads with the URL, so every view is shareable.
+ * Debug modes update the current renderer. Changing area or entering/leaving
+ * the historical comparison rebuilds its scene recipe through the URL.
  */
-export function createPanel({ engine, view, viewControls, areas, areaId, mode, capture, importFiles, changed, viewer = false, hideArea = false }: PanelOptions) {
+export function createPanel({ engine, view, viewControls, areas, areaId, mode, legacyScreenComparison = false, capture, importFiles, changed, viewer = false, hideArea = false }: PanelOptions) {
   const root = document.getElementById('panel')!
   const authoring = areaId === 'sandbox'
   root.classList.toggle('authoring-display', authoring)
   const go = (key: string, value: string) => { const p = new URLSearchParams(location.search); p.set(key, value); location.search = p.toString() }
   root.innerHTML = `
     ${hideArea || authoring ? '' : `<label>area <select data-k="area">${Object.entries(areas).map(([id, a]) => `<option value="${id}"${id === areaId ? ' selected' : ''}>${a.title}</option>`).join('')}</select></label>`}
-    <label>${authoring ? 'Debug render' : 'mode'} <select data-k="mode">${(authoring ? [['letters', 'Glyphs'], ['screen', 'Screen grid (debug)'], ['raw', 'Without screen pass (debug)']] : [['letters', 'glyphs'], ['screen', 'screen (legacy)'], ['raw', 'without screen pass']]).map(([v, t]) => `<option value="${v}"${v === mode ? ' selected' : ''}>${t}</option>`).join('')}</select></label>
+    <label>Debug render <select data-k="mode">${[['letters', 'Glyphs'], ['screen', 'Screen grid (debug)'], ['raw', 'Without screen pass (debug)'], ...authoring ? [] : [['legacy-screen', 'Legacy screen comparison']]].map(([v, t]) => `<option value="${v}"${v === mode ? ' selected' : ''}>${t}</option>`).join('')}</select></label>
     ${authoring ? '' : `<label>size <input data-k="cell" type="range" min="5" max="12" step="1"><output></output></label>
     <label>light <input data-k="light" type="range" min=".65" max="1.4" step=".05"><output></output></label>`}
     <label>${authoring ? 'Zoom' : 'zoom'} <input data-k="zoom" type="range" min="${authoring ? '.18' : '.75'}" max="${authoring ? '4' : '1.5'}" step=".05"><output></output></label>
@@ -42,8 +44,15 @@ export function createPanel({ engine, view, viewControls, areas, areaId, mode, c
   if (!hideArea && !authoring) root.querySelector<HTMLSelectElement>('[data-k="area"]')!.onchange = (e) => go('area', (e.target as HTMLSelectElement).value)
   root.querySelector<HTMLSelectElement>('[data-k="mode"]')!.onchange = e => {
     const value = (e.target as HTMLSelectElement).value
-    if (authoring) engine.setRenderMode(value === 'letters' ? 'glyphs' : value === 'raw' ? 'raw' : 'screen')
-    else go('ascii', value)
+    if (value === 'legacy-screen' || legacyScreenComparison) {
+      go('ascii', value === 'screen' ? 'debug-screen' : value); return
+    }
+    engine.setRenderMode(value === 'letters' ? 'glyphs' : value === 'raw' ? 'raw' : 'screen')
+    if (!authoring) {
+      const params = new URLSearchParams(location.search)
+      params.set('ascii', value === 'screen' ? 'debug-screen' : value)
+      history.replaceState(null, '', '?' + params)
+    }
   }
   const bind = (k: string, get: () => number, set: (v: number) => void, fmt = (v: number) => v.toFixed(2)) => {
     const el = input(k), out = el.nextElementSibling as HTMLOutputElement
@@ -79,7 +88,7 @@ export function createPanel({ engine, view, viewControls, areas, areaId, mode, c
   }
   const refresh = () => {
     shows.forEach(show => show()); showPause()
-    if (authoring) input('mode').value = engine.renderMode === 'glyphs' ? 'letters' : engine.renderMode
+    input('mode').value = legacyScreenComparison ? 'legacy-screen' : engine.renderMode === 'glyphs' ? 'letters' : engine.renderMode
   }
   refresh()
   return { refresh }

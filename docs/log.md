@@ -4,6 +4,24 @@ Entries describe the state at each stage. Earlier limitations may have been
 resolved later; START.md and the editor guide describe the current scope.
 Historical filenames, reference IDs and captured interfaces are preserved.
 
+## 2026-10-15 — Consolidation review, group 6: explicit debug/comparison
+
+Inspected compare.mjs and baseline metadata: current comparison views have no
+ascii=screen parameter. The reference documents that historical URL, so it and
+the old AreaOptions.screen alias remain. Renamed the primary area option to
+legacyScreenComparison and labeled its UI Legacy screen comparison. Normal
+Display modes use setRenderMode live in reference and all five maps, preserving
+object techniques; debug-screen and legacy-screen URLs distinguish the paths.
+Entering/leaving the legacy recipe rebuilds only that comparison scene.
+
+Validation: pnpm check, verify:display (21 checks) over six areas, isolated Orca
+sandbox debug/document checks, and old/new legacy captures against a source
+archive of 578dec6. Visible Old Mine at 3 s has world RMSE 0.0000627474;
+no baseline regeneration. [Before](captures/editor-review-fix-2026-10-15/legacy-screen-before.png),
+[after](captures/editor-review-fix-2026-10-15/legacy-screen-after.png),
+[live debug](captures/editor-review-fix-2026-10-15/live-debug-screen.png).
+No legacy controls removed, owner draft untouched, no push.
+
 ## 2026-10-15 — Consolidation review, group 5: texture registry lifetime
 
 Adopted the reviewed preexisting keepUsed/setTextures/buildScene edits. A new

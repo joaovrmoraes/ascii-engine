@@ -4,7 +4,7 @@ import { createRain, stormAt, type AsciiEngine, type AsciiPassHook, type GroundC
 import { createTree, declare } from '../scene/pomorogKit'
 import { createShoreDetails } from '../scene/shoreDetails'
 import { createFixedMapActors, legacyFloor } from './common'
-import type { Area, AreaOptions } from './types'
+import { usesLegacyScreenComparison, type Area, type AreaOptions } from './types'
 
 /**
  * Rain Marsh (Pomorog `swampEnvironment.ts`, `swampWater.ts`, `rain.ts`,
@@ -114,12 +114,12 @@ export function createMarsh(engine: AsciiEngine, options: AreaOptions = {}): Are
   }
   const banks = createShoreDetails(ISLANDS, boardwalk)
   root.add(banks.group)
-  engine.add(root, options.screen ? { glyph: 'screen' } : {})
+  engine.add(root, usesLegacyScreenComparison(options) ? { glyph: 'screen' } : {})
 
   const trees = [[-4.0, -.4, 3.9], [4.5, -2.2, 4.2], [-4.8, -6, 4.6], [4.1, -7.2, 4.7], [-6.7, 5.4, 4.1], [6.8, 6.5, 4.4], [.6, -10, 4.5]]
     .map(([x, z, h], i) => {
       const tree = createTree(x, z, h, 931 + i * 137, true)
-      engine.add(tree.root, options.screen ? { glyph: 'screen', parts: { trunk: { surface: 'bark' }, crown: { surface: 'foliage' } } } : { type: 'tree' })
+      engine.add(tree.root, usesLegacyScreenComparison(options) ? { glyph: 'screen', parts: { trunk: { surface: 'bark' }, crown: { surface: 'foliage' } } } : { type: 'tree' })
       return tree
     })
 
@@ -134,7 +134,7 @@ export function createMarsh(engine: AsciiEngine, options: AreaOptions = {}): Are
     },
   }
   const carpet = engine.createCarpet(cover)
-  if (!options.screen) engine.add(carpet.mesh, { glyph: 'carpet' })
+  if (!usesLegacyScreenComparison(options)) engine.add(carpet.mesh, { glyph: 'carpet' })
 
   const actors = createFixedMapActors(engine, options, {
     route: [[-.3, 3.4], [1.3, 3.4], [2.2, 1.2], [.7, -1.2], [-.4, -3.7], [-2.6, -4.1], [-.5, -1.7], [1.2, 1.2], [1.3, 4.95], [-2.5, 4.95], [-1.4, 3.1]],

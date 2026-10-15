@@ -2,7 +2,9 @@ import type * as THREE from 'three'
 
 export interface AreaOptions {
   viewControls?: import('../editor/viewControls').ViewControls
-  /** Everything in the old screen pass (before/after comparisons). */
+  /** Historical scene recipe, only for visual comparison; separate from Display debug. */
+  legacyScreenComparison?: boolean
+  /** @deprecated Compatibility alias for legacyScreenComparison. */
   screen?: boolean
   /** Stay at the bonfire. */
   camp?: boolean
@@ -43,4 +45,9 @@ export interface Area {
   cameraView?(): import('@ascii-engine/core').SceneCamera | undefined
   renderPreview?(dt: number): boolean
   capturePreview?(): string | undefined
+}
+
+/** Preserve existing callers without confusing the recipe with a debug post-pass. */
+export function usesLegacyScreenComparison(options: AreaOptions) {
+  return options.legacyScreenComparison ?? options.screen ?? false
 }

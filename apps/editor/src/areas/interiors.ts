@@ -3,7 +3,7 @@ import { type AsciiEngine, type GroundCover, type LightObstacle } from '@ascii-e
 import { pomorogInterior } from '@ascii-engine/core/pomorog'
 import { createKit, rock } from '../scene/pomorogKit'
 import { createFixedMapActors } from './common'
-import type { Area, AreaOptions } from './types'
+import { usesLegacyScreenComparison, type Area, type AreaOptions } from './types'
 
 /**
  * Interiors (Pomorog `environment.ts`, mine and cathedral branches): lit
@@ -200,9 +200,9 @@ function createInterior(engine: AsciiEngine, options: AreaOptions, locationId: '
       add(new THREE.OctahedronGeometry(.08), 0xe6c777, x, 1.87, -5.2, .6, 1.5, .6)
     }
   }
-  engine.add(root, options.screen ? { glyph: 'screen' } : {})
+  engine.add(root, usesLegacyScreenComparison(options) ? { glyph: 'screen' } : {})
   const carpet = engine.createCarpet(locationId === 'old_mine' ? mineCover : cathedralCover)
-  if (!options.screen) engine.add(carpet.mesh, { glyph: 'carpet' })
+  if (!usesLegacyScreenComparison(options)) engine.add(carpet.mesh, { glyph: 'carpet' })
   const actors = createFixedMapActors(engine, options, {
     route: [[-.7, 3.8], [-.7, .6], [-.5, -3.1], [.6, -3.5], [1.7, .4], [1.6, 5.6], [-.7, 5.6]],
     lantern: 19,

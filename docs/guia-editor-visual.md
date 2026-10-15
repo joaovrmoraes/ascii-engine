@@ -462,3 +462,9 @@ When an edited recipe has other linked users, Apply shows **Apply to N users**
 and asks before changing that shared texture. Choose Save copy for a separate
 recipe or Detach to edit only the current target. Detach preserves its appearance
 and ends shared-resource editing for the next Apply.
+
+Display debug modes now work live in every area. **Screen grid (debug)** is a
+renderer diagnostic and preserves object techniques. **Legacy screen comparison**
+rebuilds the old recipe for historical comparison; it is not the same mode.
+Use `?ascii=debug-screen` for debug and `?ascii=legacy-screen` for comparison.
+The older `?ascii=screen` URL remains a comparison alias outside the sandbox.

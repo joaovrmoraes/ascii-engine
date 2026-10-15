@@ -11,7 +11,7 @@ import { createGltfDemo, importFile } from './areas/gltfDemo'
 import { createSandbox } from './areas/sandbox'
 import { createEffectsArea } from './areas/effects'
 import type { GlyphModel } from '@ascii-engine/core'
-import type { Area, AreaOptions } from './areas/types'
+import { usesLegacyScreenComparison, type Area, type AreaOptions } from './areas/types'
 import { buildReferenceScene } from './scene/reference'
 import { buildTerrainScene } from './scene/terrain'
 import type { AsciiEngine, AsciiPassHook } from '@ascii-engine/core'
@@ -27,7 +27,7 @@ import { createViewControls } from './editor/viewControls'
 import { createSelection } from './selection'
 
 /**
- * ASCII Engine editor. URL: ?area=<id>, ?ascii=screen|raw, ?angle=<rad>,
+ * ASCII Engine editor. URL: ?area=<id>, ?ascii=debug-screen|raw|legacy-screen, ?angle=<rad>,
  * ?zoom=<.75–1.5>, ?pause=<seconds>, ?camp=1, ?hunt=<seconds>, ?at=<metres>, ?peaceful=1, ?cell=<px>, ?light=<.65–1.4>.
  */
 const publicDemo = import.meta.env.VITE_PUBLIC_DEMO === 'true'
@@ -43,7 +43,7 @@ export const AREAS: Record<string, AreaEntry> = publicDemo ? demoAreas : {
   sandbox: { title: 'Scene: terrain and prefabs', create: createSandbox },
   effects: { title: 'Effects (system)', create: createEffectsArea },
   gltf: { title: 'GLTF import (demo)', create: createGltfDemo },
-  reference: { title: 'Reference scene', create: (engine, options) => buildReferenceScene(engine, options.screen) },
+  reference: { title: 'Reference scene', create: (engine, options) => buildReferenceScene(engine, usesLegacyScreenComparison(options)) },
   terrain: { title: 'Terrain (demo)', create: (engine) => buildTerrainScene(engine) },
 }
 
@@ -73,7 +73,9 @@ const areaId = publicDemo
   : requestedArea ?? game?.area ?? (sceneDoc ? 'sandbox' : params.get('scene') ?? 'sandbox')
 const entry = AREAS[areaId] ?? AREAS.dark_forest
 const engine = createAsciiEngine(canvas, { hooks: entry.hooks, style: game?.style })
-const mode = params.get('ascii') ?? 'letters'
+const requestedMode = params.get('ascii') ?? 'letters'
+const legacyScreenComparison = areaId !== 'sandbox' && (requestedMode === 'screen' || requestedMode === 'legacy-screen')
+const mode = legacyScreenComparison ? 'legacy-screen' : requestedMode === 'debug-screen' ? 'screen' : requestedMode
 engine.debug.raw = mode === 'raw'
 const view = {
   angle: Number(params.get('angle') ?? 0), zoom: Number(params.get('zoom') ?? game?.zoom ?? (areaId === 'sandbox' && !player ? .8 : .9)),
@@ -81,11 +83,12 @@ const view = {
   paused: false, pauseAt: params.has('pause') ? Number(params.get('pause')) : Infinity,
 }
 const viewControls = createViewControls(view)
-const area = await Promise.resolve().then(() => entry.create(engine, { viewControls, screen: mode === 'screen', camp: params.has('camp'), hunt: params.has('hunt') ? Number(params.get('hunt')) : undefined, at: params.has('at') ? Number(params.get('at')) : undefined, peaceful: params.has('peaceful'), scene: sceneDoc })).catch(error => {
+const area = await Promise.resolve().then(() => entry.create(engine, { viewControls, legacyScreenComparison, camp: params.has('camp'), hunt: params.has('hunt') ? Number(params.get('hunt')) : undefined, at: params.has('at') ? Number(params.get('at')) : undefined, peaceful: params.has('peaceful'), scene: sceneDoc })).catch(error => {
   const message = document.createElement('p'); message.textContent = `Could not open the scene: ${error}`; message.style.cssText = 'position:fixed;inset:20px;z-index:10;background:#141219;padding:20px'; document.body.append(message)
   throw error
 })
-if (area.id === 'sandbox' && !player) engine.setRenderMode(mode === 'letters' ? 'glyphs' : mode === 'raw' ? 'raw' : 'screen')
+engine.setRenderMode(mode === 'raw' ? 'raw' : mode === 'screen' ? 'screen' : 'glyphs')
+canvas.dataset.legacyScreenComparison = String(legacyScreenComparison)
 if (params.has('cell')) engine.setStyle({ cellSize: Number(params.get('cell')) })
 if (params.has('light')) engine.setStyle({ brightness: Number(params.get('light')) })
 
@@ -136,7 +139,7 @@ const importFiles = (files: File[]) => {
 }
 addEventListener('drop', (e) => { e.preventDefault(); const files = Array.from(e.dataTransfer?.files ?? []); if (files.length) importFiles(files) })
 canvas.addEventListener('editor-import-files', e => importFiles((e as CustomEvent<File[]>).detail))
-const panel = createPanel({ engine, view, viewControls, areas: AREAS, areaId, mode, viewer: publicDemo, hideArea: publicDemo && params.has('embed'), capture: () => captureNext = true, importFiles, changed: area.changed })
+const panel = createPanel({ engine, view, viewControls, areas: AREAS, areaId, mode, legacyScreenComparison, viewer: publicDemo, hideArea: publicDemo && params.has('embed'), capture: () => captureNext = true, importFiles, changed: area.changed })
 const selection = player || publicDemo ? { refresh() {} } : createSelection(engine, canvas, document.getElementById('selection')!, { select: area.select, changed: area.changed, target: area.setAppearanceSelection, edit: area.editAppearance, blocked: area.blocksSelection, objectFirst: area.id === 'sandbox' })
 const status = document.getElementById('status')!
 const focus = new THREE.Vector3()
