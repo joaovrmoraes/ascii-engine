@@ -47,6 +47,14 @@ does not require choosing WASM when GPU execution is more suitable.
   fixture parameters and timer resolution. Preserve default renderer behavior.
 - Two rounds must have full-frame p50 values within 5%; investigate unstable
   results and report subsystem variation and timer precision as well.
+  Relative round difference uses the absolute p50 difference divided by their
+  arithmetic mean. Percentiles use nearest rank over equally sized runs.
+
+Candidate classification is fixed before the main runs: water step and skinned
+vertex math can qualify as numeric CPU work. The combined water upload also
+updates Three.js geometry and submits buffer changes; its aggregate alone does
+not prove a transferable numeric kernel. Effects manipulate JS object state;
+carpet/body uniforms and render submission do not meet the numeric-array rule.
 
 ## Scope and stopping point
 

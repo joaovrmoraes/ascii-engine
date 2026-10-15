@@ -511,6 +511,8 @@ pnpm dev                 # editor: http://localhost:1440
 pnpm format              # format versioned source, configuration and documentation
 pnpm format:check        # check formatting without writing
 pnpm check               # formatting + package boundaries + typecheck + tests + build
+pnpm bench --round=round-1 # fixed-step CPU/GPU study; repeat with round-2
+pnpm bench:report         # summarize the two rounds; stop after Phase 1
 pnpm tauri dev           # desktop editor
 node scripts/preview-readme.mjs  # local README/video preview: localhost:4178
 ```
@@ -541,3 +543,25 @@ legacyScreenComparison names that recipe; screen remains a deprecated alias.
 The current pnpm compare views use default glyphs, with no ascii=screen flag.
 Entering/leaving legacy comparison rebuilds its recipe; normal debug switches
 remain live and never write scene appearance.
+
+The opt-in study routes `/?bench=water`, `/?bench=particles` and
+`/?bench=skinning` use a separate benchmark entry in the dev server, not the
+sandbox. They never load its IndexedDB draft or authoring adapters. Each fresh
+page advances by exactly 1/60 s when `benchmark.run(warmup, frames)` is called;
+the ordinary editor clock and published builds are unchanged. Only these
+benchmark documents receive isolation headers for high-resolution timers.
+
+Core `createAsciiEngine(canvas, { profiling: true })` exposes `engine.stats`:
+CPU sections, summed render draw calls and asynchronous GPU elapsed queries.
+Profiling is disabled by default, with no clocks/queries created. Water step
+and CPU texture/geometry preparation are separate; actual GPU transfer/submission
+belongs to the remaining render. Skinning measures vertex math, with scene-graph
+preparation left in the remainder. GPU ranges overlap CPU work; do not add them.
+
+`pnpm bench` uses 1920×1080 at DPR 1, 600 warm-up and 600 measured frames on five
+fresh loads per scene, serially. Results, environment and raw samples go under
+`docs/captures/benchmarks-<date>/<round>/`; existing rounds are not overwritten.
+`pnpm bench --verify --out=.cache/bench-study` checks exact state/visual parity
+with profiling on/off and forbids IndexedDB calls. The report applies the
+owner-confirmed [ADR 0004](docs/decisions/0004-webassembly-for-simulation.md),
+which remains Proposed. This is Phase 1 only, without WASM or JS optimization.
