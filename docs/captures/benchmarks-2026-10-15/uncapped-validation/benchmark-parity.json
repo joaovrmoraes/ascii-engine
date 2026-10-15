@@ -1,0 +1,779 @@
+{
+  "environment": {
+    "timestamp": "2026-10-15T15:54:37.090Z",
+    "sourceCommit": "af0413faaeba79437c1da8f45f846dd088a8a46d",
+    "trackedChanges": "",
+    "framePacing": "uncapped",
+    "scheduler": "task-with-gpu-backpressure",
+    "cpu": {
+      "model": "12th Gen Intel(R) Core(TM) i5-12450H",
+      "logicalCores": 12
+    },
+    "os": {
+      "platform": "linux",
+      "release": "7.2.3-arch1-3",
+      "arch": "x64",
+      "distribution": "NAME=\"Omarchy\"\nPRETTY_NAME=\"Omarchy\"\nID=omarchy\nID_LIKE=arch\nBUILD_ID=\"4.0.4\"\nVERSION_ID=\"4.0.4\"\nANSI_COLOR=\"38;2;158;206;106\"\nHOME_URL=\"https://omarchy.org/\"\nDOCUMENTATION_URL=\"https://learn.omacom.io/2/the-omarchy-manual\"\nSUPPORT_URL=\"https://discord.gg/tXFUdasqhY\"\nBUG_REPORT_URL=\"https://github.com/basecamp/omarchy/issues\"\nLOGO=omarchy"
+    },
+    "memoryBytes": 24901357568,
+    "power": {
+      "profile": "performance",
+      "governor": "powersave",
+      "driver": "intel_pstate",
+      "energyPreference": "performance"
+    },
+    "chromium": {
+      "protocolVersion": "1.3",
+      "product": "Chrome/152.0.7977.82",
+      "revision": "@d04cdb24d67b081f6cf80200ffc5233f44b61109",
+      "userAgent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/152.0.0.0 Safari/537.36",
+      "jsVersion": "15.2.124.21"
+    },
+    "flags": [
+      "--headless=new",
+      "--no-sandbox",
+      "--use-angle=gl",
+      "--enable-gpu",
+      "--ignore-gpu-blocklist",
+      "--hide-scrollbars",
+      "--window-size=1920,1080",
+      "--force-device-scale-factor=1",
+      "--disable-gpu-vsync",
+      "--disable-frame-rate-limit",
+      "--remote-debugging-port=0",
+      "--user-data-dir=<isolated temporary profile>",
+      "about:blank"
+    ]
+  },
+  "checks": [
+    {
+      "scene": "water",
+      "fingerprint": {
+        "hash": "ce79ad6d",
+        "values": 128526,
+        "skinnedPoints": 0,
+        "time": 3.9999999999999907
+      },
+      "parity": "exact",
+      "storageCalls": 0,
+      "metrics": [
+        {
+          "profile": "on",
+          "summary": {
+            "frameMs": {
+              "p50": 11.024999998509884,
+              "p95": 13.25,
+              "p99": 14.575000001117587
+            },
+            "rafIntervalMs": {
+              "p50": null,
+              "p95": null,
+              "p99": null
+            },
+            "frameCpuMs": {
+              "p50": 5.025000000372529,
+              "p95": 7.769999999552965,
+              "p99": 8.955000000074506
+            },
+            "renderCpuMs": {
+              "p50": 4.674999998882413,
+              "p95": 7.35499999858439,
+              "p99": 8.18999999947846
+            },
+            "sceneCpuMs": {
+              "p50": 0.2800000011920929,
+              "p95": 0.9450000002980232,
+              "p99": 1.2300000004470348
+            },
+            "waterStep": {
+              "p50": 0.849999999627471,
+              "p95": 1.2549999989569187,
+              "p99": 1.400000000372529
+            },
+            "waterUpload": {
+              "p50": 3.2350000012665987,
+              "p95": 5.2349999994039536,
+              "p99": 5.58500000089407
+            },
+            "skinning": {
+              "p50": 0,
+              "p95": 0,
+              "p99": 0
+            },
+            "effects": {
+              "p50": 0,
+              "p95": 0.004999998956918716,
+              "p99": 0.005000000819563866
+            },
+            "carpet": {
+              "p50": 0.005000000819563866,
+              "p95": 0.015000000596046448,
+              "p99": 0.020000001415610313
+            },
+            "bodyUniforms": {
+              "p50": 0.004999998956918716,
+              "p95": 0.005000000819563866,
+              "p99": 0.009999999776482582
+            },
+            "renderRest": {
+              "p50": 0.5500000007450581,
+              "p95": 0.8450000006705523,
+              "p99": 1.5850000008940697
+            },
+            "drawCalls": {
+              "p50": 7,
+              "p95": 7,
+              "p99": 7
+            },
+            "triangles": {
+              "p50": 34850,
+              "p95": 34850,
+              "p99": 34850
+            },
+            "points": {
+              "p50": 0,
+              "p95": 0,
+              "p99": 0
+            },
+            "gpuMs": {
+              "p50": 6.83302,
+              "p95": 9.777864,
+              "p99": 9.983281
+            },
+            "schedulerCpuMs": {
+              "p50": 0.06499999947845936,
+              "p95": 0.10999999940395355,
+              "p99": 0.13999999687075615
+            },
+            "completedFrameMs": {
+              "p50": 11.035000000149012,
+              "p95": 13.244999999180436,
+              "p99": 14.775000000372529
+            },
+            "gpuLatencyMs": {
+              "p50": 21.690000001341105,
+              "p95": 25,
+              "p99": 26.445000000298023
+            }
+          },
+          "gpuQueue": {
+            "limit": 2,
+            "scheduler": "task",
+            "peak": 2,
+            "completedFrames": 240,
+            "pollCallbacks": 1207,
+            "totalSchedulerCpuMs": 16.835000028833747,
+            "completionClock": "CPU-observed asynchronous fence completion; includes polling delay",
+            "polling": "non-nested 1 ms timers and task submissions; no spin or blocking GPU wait"
+          },
+          "gpu": {
+            "available": true,
+            "status": "ready",
+            "disjointEvents": 0,
+            "dropped": 0
+          }
+        },
+        {
+          "profile": "off",
+          "summary": {
+            "frameMs": {
+              "p50": 10.89500000141561,
+              "p95": 13.084999999031425,
+              "p99": 15.009999999776483
+            },
+            "rafIntervalMs": {
+              "p50": null,
+              "p95": null,
+              "p99": null
+            },
+            "frameCpuMs": {
+              "p50": 4.730000000447035,
+              "p95": 7.685000000521541,
+              "p99": 8.66499999910593
+            },
+            "renderCpuMs": {
+              "p50": 0,
+              "p95": 0,
+              "p99": 0
+            },
+            "sceneCpuMs": {
+              "p50": 4.730000000447035,
+              "p95": 7.685000000521541,
+              "p99": 8.66499999910593
+            },
+            "waterStep": {
+              "p50": 0,
+              "p95": 0,
+              "p99": 0
+            },
+            "waterUpload": {
+              "p50": 0,
+              "p95": 0,
+              "p99": 0
+            },
+            "skinning": {
+              "p50": 0,
+              "p95": 0,
+              "p99": 0
+            },
+            "effects": {
+              "p50": 0,
+              "p95": 0,
+              "p99": 0
+            },
+            "carpet": {
+              "p50": 0,
+              "p95": 0,
+              "p99": 0
+            },
+            "bodyUniforms": {
+              "p50": 0,
+              "p95": 0,
+              "p99": 0
+            },
+            "renderRest": {
+              "p50": 0,
+              "p95": 0,
+              "p99": 0
+            },
+            "drawCalls": {
+              "p50": 0,
+              "p95": 0,
+              "p99": 0
+            },
+            "triangles": {
+              "p50": 0,
+              "p95": 0,
+              "p99": 0
+            },
+            "points": {
+              "p50": 0,
+              "p95": 0,
+              "p99": 0
+            },
+            "gpuMs": {
+              "p50": null,
+              "p95": null,
+              "p99": null
+            },
+            "schedulerCpuMs": {
+              "p50": 0.06500000134110451,
+              "p95": 0.09999999962747097,
+              "p99": 0.1250000037252903
+            },
+            "completedFrameMs": {
+              "p50": 10.904999999329448,
+              "p95": 13.115000000223517,
+              "p99": 15.490000000223517
+            },
+            "gpuLatencyMs": {
+              "p50": 21.549999998882413,
+              "p95": 24.484999999403954,
+              "p99": 25.080000000074506
+            }
+          },
+          "gpuQueue": {
+            "limit": 2,
+            "scheduler": "task",
+            "peak": 2,
+            "completedFrames": 240,
+            "pollCallbacks": 1309,
+            "totalSchedulerCpuMs": 16.790000027045608,
+            "completionClock": "CPU-observed asynchronous fence completion; includes polling delay",
+            "polling": "non-nested 1 ms timers and task submissions; no spin or blocking GPU wait"
+          },
+          "gpu": {
+            "available": false,
+            "status": "profiling-disabled"
+          }
+        }
+      ]
+    },
+    {
+      "scene": "particles",
+      "fingerprint": {
+        "hash": "4030392a",
+        "values": 24036,
+        "skinnedPoints": 0,
+        "time": 3.9999999999999907
+      },
+      "parity": "exact",
+      "storageCalls": 0,
+      "metrics": [
+        {
+          "profile": "on",
+          "summary": {
+            "frameMs": {
+              "p50": 16.695000000298023,
+              "p95": 17.96499999985099,
+              "p99": 18.529999999329448
+            },
+            "rafIntervalMs": {
+              "p50": null,
+              "p95": null,
+              "p99": null
+            },
+            "frameCpuMs": {
+              "p50": 0.8599999994039536,
+              "p95": 1.299999998882413,
+              "p99": 1.5
+            },
+            "renderCpuMs": {
+              "p50": 0.8249999992549419,
+              "p95": 1.2550000008195639,
+              "p99": 1.4550000000745058
+            },
+            "sceneCpuMs": {
+              "p50": 0.03500000014901161,
+              "p95": 0.054999999701976776,
+              "p99": 0.06499999947845936
+            },
+            "waterStep": {
+              "p50": 0,
+              "p95": 0,
+              "p99": 0
+            },
+            "waterUpload": {
+              "p50": 0,
+              "p95": 0,
+              "p99": 0
+            },
+            "skinning": {
+              "p50": 0,
+              "p95": 0,
+              "p99": 0
+            },
+            "effects": {
+              "p50": 0.48000000044703484,
+              "p95": 0.8249999992549419,
+              "p99": 0.9250000007450581
+            },
+            "carpet": {
+              "p50": 0.009999999776482582,
+              "p95": 0.014999998733401299,
+              "p99": 0.019999999552965164
+            },
+            "bodyUniforms": {
+              "p50": 0,
+              "p95": 0.005000000819563866,
+              "p99": 0.009999999776482582
+            },
+            "renderRest": {
+              "p50": 0.3349999990314245,
+              "p95": 0.4750000014901161,
+              "p99": 0.5649999994784594
+            },
+            "drawCalls": {
+              "p50": 4,
+              "p95": 4,
+              "p99": 4
+            },
+            "triangles": {
+              "p50": 10804,
+              "p95": 10804,
+              "p99": 10804
+            },
+            "points": {
+              "p50": 1759,
+              "p95": 1871,
+              "p99": 1916
+            },
+            "gpuMs": {
+              "p50": 13.269375,
+              "p95": 14.25375,
+              "p99": 14.932395
+            },
+            "schedulerCpuMs": {
+              "p50": 0.10999999940395355,
+              "p95": 0.1749999988824129,
+              "p99": 0.20500000566244125
+            },
+            "completedFrameMs": {
+              "p50": 16.71499999985099,
+              "p95": 18.009999999776483,
+              "p99": 18.984999999403954
+            },
+            "gpuLatencyMs": {
+              "p50": 33.330000000074506,
+              "p95": 35.25499999895692,
+              "p99": 35.93500000052154
+            }
+          },
+          "gpuQueue": {
+            "limit": 2,
+            "scheduler": "task",
+            "peak": 2,
+            "completedFrames": 240,
+            "pollCallbacks": 3418,
+            "totalSchedulerCpuMs": 27.30000000819564,
+            "completionClock": "CPU-observed asynchronous fence completion; includes polling delay",
+            "polling": "non-nested 1 ms timers and task submissions; no spin or blocking GPU wait"
+          },
+          "gpu": {
+            "available": true,
+            "status": "ready",
+            "disjointEvents": 0,
+            "dropped": 0
+          }
+        },
+        {
+          "profile": "off",
+          "summary": {
+            "frameMs": {
+              "p50": 16.46499999985099,
+              "p95": 17.855000000447035,
+              "p99": 18.27500000037253
+            },
+            "rafIntervalMs": {
+              "p50": null,
+              "p95": null,
+              "p99": null
+            },
+            "frameCpuMs": {
+              "p50": 0.875,
+              "p95": 1.3149999994784594,
+              "p99": 1.5599999986588955
+            },
+            "renderCpuMs": {
+              "p50": 0,
+              "p95": 0,
+              "p99": 0
+            },
+            "sceneCpuMs": {
+              "p50": 0.875,
+              "p95": 1.3149999994784594,
+              "p99": 1.5599999986588955
+            },
+            "waterStep": {
+              "p50": 0,
+              "p95": 0,
+              "p99": 0
+            },
+            "waterUpload": {
+              "p50": 0,
+              "p95": 0,
+              "p99": 0
+            },
+            "skinning": {
+              "p50": 0,
+              "p95": 0,
+              "p99": 0
+            },
+            "effects": {
+              "p50": 0,
+              "p95": 0,
+              "p99": 0
+            },
+            "carpet": {
+              "p50": 0,
+              "p95": 0,
+              "p99": 0
+            },
+            "bodyUniforms": {
+              "p50": 0,
+              "p95": 0,
+              "p99": 0
+            },
+            "renderRest": {
+              "p50": 0,
+              "p95": 0,
+              "p99": 0
+            },
+            "drawCalls": {
+              "p50": 0,
+              "p95": 0,
+              "p99": 0
+            },
+            "triangles": {
+              "p50": 0,
+              "p95": 0,
+              "p99": 0
+            },
+            "points": {
+              "p50": 0,
+              "p95": 0,
+              "p99": 0
+            },
+            "gpuMs": {
+              "p50": null,
+              "p95": null,
+              "p99": null
+            },
+            "schedulerCpuMs": {
+              "p50": 0.11999999918043613,
+              "p95": 0.19499999843537807,
+              "p99": 0.22000000067055225
+            },
+            "completedFrameMs": {
+              "p50": 16.46499999985099,
+              "p95": 17.859999999403954,
+              "p99": 18.294999999925494
+            },
+            "gpuLatencyMs": {
+              "p50": 32.48499999940395,
+              "p95": 35.07499999925494,
+              "p99": 35.894999999552965
+            }
+          },
+          "gpuQueue": {
+            "limit": 2,
+            "scheduler": "task",
+            "peak": 2,
+            "completedFrames": 240,
+            "pollCallbacks": 3283,
+            "totalSchedulerCpuMs": 30.00000000745058,
+            "completionClock": "CPU-observed asynchronous fence completion; includes polling delay",
+            "polling": "non-nested 1 ms timers and task submissions; no spin or blocking GPU wait"
+          },
+          "gpu": {
+            "available": false,
+            "status": "profiling-disabled"
+          }
+        }
+      ]
+    },
+    {
+      "scene": "skinning",
+      "fingerprint": {
+        "hash": "68b9b037",
+        "values": 61485,
+        "skinnedPoints": 18179,
+        "time": 3.9999999999999907
+      },
+      "parity": "exact",
+      "storageCalls": 0,
+      "metrics": [
+        {
+          "profile": "on",
+          "summary": {
+            "frameMs": {
+              "p50": 14.900000000372529,
+              "p95": 16.25,
+              "p99": 20.40000000037253
+            },
+            "rafIntervalMs": {
+              "p50": null,
+              "p95": null,
+              "p99": null
+            },
+            "frameCpuMs": {
+              "p50": 14.589999999850988,
+              "p95": 15.769999999552965,
+              "p99": 20
+            },
+            "renderCpuMs": {
+              "p50": 14.52000000141561,
+              "p95": 15.669999999925494,
+              "p99": 19.950000001117587
+            },
+            "sceneCpuMs": {
+              "p50": 0.05000000074505806,
+              "p95": 0.09500000067055225,
+              "p99": 0.14499999955296516
+            },
+            "waterStep": {
+              "p50": 0,
+              "p95": 0,
+              "p99": 0
+            },
+            "waterUpload": {
+              "p50": 0,
+              "p95": 0,
+              "p99": 0
+            },
+            "skinning": {
+              "p50": 13.695000000298023,
+              "p95": 14.544999999925494,
+              "p99": 19
+            },
+            "effects": {
+              "p50": 0,
+              "p95": 0.004999998956918716,
+              "p99": 0.005000000819563866
+            },
+            "carpet": {
+              "p50": 0.009999999776482582,
+              "p95": 0.015000000596046448,
+              "p99": 0.019999999552965164
+            },
+            "bodyUniforms": {
+              "p50": 0.004999998956918716,
+              "p95": 0.009999999776482582,
+              "p99": 0.014999998733401299
+            },
+            "renderRest": {
+              "p50": 0.775000000372529,
+              "p95": 1.069999998435378,
+              "p99": 1.3600000012665987
+            },
+            "drawCalls": {
+              "p50": 51,
+              "p95": 51,
+              "p99": 51
+            },
+            "triangles": {
+              "p50": 13108,
+              "p95": 13108,
+              "p99": 13108
+            },
+            "points": {
+              "p50": 18179,
+              "p95": 18179,
+              "p99": 18179
+            },
+            "gpuMs": {
+              "p50": 4.73651,
+              "p95": 8.202552,
+              "p99": 8.995156
+            },
+            "schedulerCpuMs": {
+              "p50": 0.02499999850988388,
+              "p95": 0.030000003054738045,
+              "p99": 0.04000000096857548
+            },
+            "completedFrameMs": {
+              "p50": 14.894999999552965,
+              "p95": 16.24500000104308,
+              "p99": 20.399999998509884
+            },
+            "gpuLatencyMs": {
+              "p50": 29.794999999925494,
+              "p95": 32.455000000074506,
+              "p99": 36.82000000029802
+            }
+          },
+          "gpuQueue": {
+            "limit": 2,
+            "scheduler": "task",
+            "peak": 2,
+            "completedFrames": 240,
+            "pollCallbacks": 246,
+            "totalSchedulerCpuMs": 5.945000035688281,
+            "completionClock": "CPU-observed asynchronous fence completion; includes polling delay",
+            "polling": "non-nested 1 ms timers and task submissions; no spin or blocking GPU wait"
+          },
+          "gpu": {
+            "available": true,
+            "status": "ready",
+            "disjointEvents": 0,
+            "dropped": 0
+          }
+        },
+        {
+          "profile": "off",
+          "summary": {
+            "frameMs": {
+              "p50": 14.620000001043081,
+              "p95": 16.074999999254942,
+              "p99": 19.66000000014901
+            },
+            "rafIntervalMs": {
+              "p50": null,
+              "p95": null,
+              "p99": null
+            },
+            "frameCpuMs": {
+              "p50": 14.294999999925494,
+              "p95": 15.679999999701977,
+              "p99": 19.505000000819564
+            },
+            "renderCpuMs": {
+              "p50": 0,
+              "p95": 0,
+              "p99": 0
+            },
+            "sceneCpuMs": {
+              "p50": 14.294999999925494,
+              "p95": 15.679999999701977,
+              "p99": 19.505000000819564
+            },
+            "waterStep": {
+              "p50": 0,
+              "p95": 0,
+              "p99": 0
+            },
+            "waterUpload": {
+              "p50": 0,
+              "p95": 0,
+              "p99": 0
+            },
+            "skinning": {
+              "p50": 0,
+              "p95": 0,
+              "p99": 0
+            },
+            "effects": {
+              "p50": 0,
+              "p95": 0,
+              "p99": 0
+            },
+            "carpet": {
+              "p50": 0,
+              "p95": 0,
+              "p99": 0
+            },
+            "bodyUniforms": {
+              "p50": 0,
+              "p95": 0,
+              "p99": 0
+            },
+            "renderRest": {
+              "p50": 0,
+              "p95": 0,
+              "p99": 0
+            },
+            "drawCalls": {
+              "p50": 0,
+              "p95": 0,
+              "p99": 0
+            },
+            "triangles": {
+              "p50": 0,
+              "p95": 0,
+              "p99": 0
+            },
+            "points": {
+              "p50": 0,
+              "p95": 0,
+              "p99": 0
+            },
+            "gpuMs": {
+              "p50": null,
+              "p95": null,
+              "p99": null
+            },
+            "schedulerCpuMs": {
+              "p50": 0.02500000037252903,
+              "p95": 0.03999999910593033,
+              "p99": 0.05000000074505806
+            },
+            "completedFrameMs": {
+              "p50": 14.615000000223517,
+              "p95": 15.974999999627471,
+              "p99": 19.665000000968575
+            },
+            "gpuLatencyMs": {
+              "p50": 29.269999999552965,
+              "p95": 32.269999999552965,
+              "p99": 37.92999999970198
+            }
+          },
+          "gpuQueue": {
+            "limit": 2,
+            "scheduler": "task",
+            "peak": 2,
+            "completedFrames": 240,
+            "pollCallbacks": 250,
+            "totalSchedulerCpuMs": 7.069999998435378,
+            "completionClock": "CPU-observed asynchronous fence completion; includes polling delay",
+            "polling": "non-nested 1 ms timers and task submissions; no spin or blocking GPU wait"
+          },
+          "gpu": {
+            "available": false,
+            "status": "profiling-disabled"
+          }
+        }
+      ]
+    }
+  ]
+}

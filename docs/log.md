@@ -4,6 +4,45 @@ Entries describe the state at each stage. Earlier limitations may have been
 resolved later; START.md and the editor guide describe the current scope.
 Historical filenames, reference IDs and captured interfaces are preserved.
 
+## 2026-10-15 — Uncapped Phase 1 results and bottleneck review
+
+Completed two fresh task-scheduled rounds on clean source af0413f: five loads
+per scene per round, 600 warm-up and 600 measured frames each, fixed dt 1/60,
+18,000 measured frames total. GPU vsync/frame-rate limiting are disabled and
+MessageChannel render steps are independent of rAF. Nonblocking fences retain
+two GPU frames in flight, preserving CPU/GPU overlap and draining every frame.
+Every GPU timer completed, with no dropped/disjoint queries or visibility
+changes. Final states and fixture configurations match the original paced study.
+
+Uncapped frame p50/p95: water 10.890/13.450 ms, particles 16.805/18.330 ms,
+skinning 14.820/16.675 ms. Observed completion p50 agrees with each render-step
+p50; sustained mean step/completion differs by less than 0.01 ms. Round p50
+differences are 2.71%, 1.52% and 2.69%, within the unchanged 5% gate. Earlier
+uncapped submission and rAF scheduling failures remain preserved as diagnostics.
+
+CPU/GPU p50 confirms GPU-dominant measured work for water (4.885/6.934 ms) and
+particles (0.860/13.326 ms), CPU-dominant skinning (14.510/4.589 ms). Water step
+is 1.005 ms, 9.23% of the uncapped frame. Its original 20.9% share of active CPU
+does not establish frame gains while GPU work dominates. Only skinned vertex
+math qualifies: 13.715 ms, 92.54% of the frame. Added bottleneck-aware decisions
+for every target to the report and Proposed ADR 0004. CPU/GPU ranges overlap;
+GPU dominance does not attribute all browser/compositor overhead to GPU work.
+
+Validation: pnpm check passes (167 tests, formatting, boundaries, types/build).
+Clean-source profiling on/off smoke passes all three scenes with zero IndexedDB
+calls; PNGs match each other and the original paced captures byte for byte.
+Orca used explicit page 4d61c29e-ae0f-4880-a018-3d0e6313dbfe in the separate
+review profile: water completed 120 fixed steps and its page-only screenshot
+succeeded after advancing the task fixture. No desktop/personal content appears.
+pnpm compare retains the same four historical baseline failures; no baseline
+or non-benchmark renderer/scene code changed. The owner's draft and untracked
+editor consolidation plan remain untouched.
+
+[Current tables/raw data](captures/benchmarks-2026-10-15/README.md),
+[uncapped method, validation and captures](captures/benchmarks-2026-10-15/uncapped-notes.md).
+Stopped before Phase 2. No JS optimization, WASM/GPU prototype, toolchain install
+or push. The 2× step/15% frame/p95/parity/fallback adoption gates remain untested.
+
 ## 2026-10-15 — Remove residual rAF pacing from the uncapped harness
 
 Two complete rAF-bounded rounds finished all 18,000 frames and GPU queries, but

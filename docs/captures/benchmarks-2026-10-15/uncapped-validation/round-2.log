@@ -1,0 +1,31 @@
+$ node scripts/bench.mjs --uncapped --round=uncapped-round-2
+START uncapped-round-2 water 1/5; 600 warm-up + 600 measured frames
+DONE water 1: frame p50/p95=10.730/13.390 ms; CPU p50=4.695 ms; GPU p50=6.906 ms
+START uncapped-round-2 particles 1/5; 600 warm-up + 600 measured frames
+DONE particles 1: frame p50/p95=16.600/17.925 ms; CPU p50=0.805 ms; GPU p50=13.278 ms
+START uncapped-round-2 skinning 1/5; 600 warm-up + 600 measured frames
+DONE skinning 1: frame p50/p95=14.435/15.390 ms; CPU p50=14.130 ms; GPU p50=4.364 ms
+START uncapped-round-2 water 2/5; 600 warm-up + 600 measured frames
+DONE water 2: frame p50/p95=10.715/13.310 ms; CPU p50=4.670 ms; GPU p50=6.815 ms
+START uncapped-round-2 particles 2/5; 600 warm-up + 600 measured frames
+DONE particles 2: frame p50/p95=16.820/18.135 ms; CPU p50=0.825 ms; GPU p50=13.339 ms
+START uncapped-round-2 skinning 2/5; 600 warm-up + 600 measured frames
+DONE skinning 2: frame p50/p95=14.540/15.810 ms; CPU p50=14.245 ms; GPU p50=4.570 ms
+START uncapped-round-2 water 3/5; 600 warm-up + 600 measured frames
+DONE water 3: frame p50/p95=10.740/13.125 ms; CPU p50=4.570 ms; GPU p50=6.996 ms
+START uncapped-round-2 particles 3/5; 600 warm-up + 600 measured frames
+DONE particles 3: frame p50/p95=16.585/17.965 ms; CPU p50=0.765 ms; GPU p50=13.287 ms
+START uncapped-round-2 skinning 3/5; 600 warm-up + 600 measured frames
+DONE skinning 3: frame p50/p95=14.570/15.570 ms; CPU p50=14.285 ms; GPU p50=4.571 ms
+START uncapped-round-2 water 4/5; 600 warm-up + 600 measured frames
+DONE water 4: frame p50/p95=10.700/13.305 ms; CPU p50=4.685 ms; GPU p50=6.710 ms
+START uncapped-round-2 particles 4/5; 600 warm-up + 600 measured frames
+DONE particles 4: frame p50/p95=16.650/18.480 ms; CPU p50=0.755 ms; GPU p50=13.269 ms
+START uncapped-round-2 skinning 4/5; 600 warm-up + 600 measured frames
+DONE skinning 4: frame p50/p95=14.750/15.875 ms; CPU p50=14.470 ms; GPU p50=4.589 ms
+START uncapped-round-2 water 5/5; 600 warm-up + 600 measured frames
+DONE water 5: frame p50/p95=10.925/13.385 ms; CPU p50=5.155 ms; GPU p50=6.965 ms
+START uncapped-round-2 particles 5/5; 600 warm-up + 600 measured frames
+DONE particles 5: frame p50/p95=16.835/18.020 ms; CPU p50=0.880 ms; GPU p50=13.349 ms
+START uncapped-round-2 skinning 5/5; 600 warm-up + 600 measured frames
+DONE skinning 5: frame p50/p95=15.125/17.415 ms; CPU p50=14.775 ms; GPU p50=4.583 ms

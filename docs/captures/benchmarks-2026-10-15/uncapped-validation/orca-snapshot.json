@@ -1,0 +1,13 @@
+{
+  "id": "a13652af-3bf4-4362-9018-26a8bc489371",
+  "ok": true,
+  "result": {
+    "origin": "http://localhost:1440/?bench=water&queue=2&view=orca",
+    "refs": {},
+    "snapshot": "(empty page)",
+    "browserPageId": "4d61c29e-ae0f-4880-a018-3d0e6313dbfe"
+  },
+  "_meta": {
+    "runtimeId": "38cf1741-6edd-47a2-b539-0f58b1abc24e"
+  }
+}

@@ -1,0 +1,11 @@
+{
+  "id": "4807f7a0-a934-4a36-991b-3bab1a3c19a7",
+  "ok": true,
+  "result": {
+    "result": "{\"fingerprint\":{\"hash\":\"c471df0a\",\"skinnedPoints\":0,\"time\":1.9999999999999978,\"values\":128526},\"gpu\":{\"available\":true,\"disjointEvents\":0,\"dropped\":0,\"status\":\"ready\"},\"gpuQueue\":{\"completedFrames\":120,\"completionClock\":\"CPU-observed asynchronous fence completion; includes polling delay\",\"limit\":2,\"peak\":2,\"pollCallbacks\":312,\"polling\":\"non-nested 1 ms timers and task submissions; no spin or blocking GPU wait\",\"scheduler\":\"task\",\"totalSchedulerCpuMs\":3.7799999732524157},\"scene\":\"water\",\"url\":\"http://localhost:1440/?bench=water&queue=2&view=orca\"}",
+    "origin": "http://localhost:1440/?bench=water&queue=2&view=orca"
+  },
+  "_meta": {
+    "runtimeId": "38cf1741-6edd-47a2-b539-0f58b1abc24e"
+  }
+}
