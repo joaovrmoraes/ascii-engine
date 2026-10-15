@@ -70,7 +70,8 @@ native windows. The toolbar and scene remain in the main layout.
    or select it from **part** under **ASCII appearance**, to adjust
    technique, glyph family, size and color. Scope can be instance, type or
    global; all layers are saved in the document.
-7. **Environment → Weather** selects rain/snow. **Studio → Atmosphere**
+7. **Environment → Weather** selects rain/snow. Its intensity slider saves
+   `environment.intensity` (0–1); switching Rain/Snow retains that value. **Studio → Atmosphere**
    opens lighting, color and fog controls. Settings are saved with the
    map; they do not automatically convert objects or terrain to another biome.
 
@@ -104,6 +105,12 @@ persist in terrain.layers[].look / cover. Moss/Earth/Stone/Snow are labels;
 existing IDs remain unchanged.
 
 ## Water: flow, reflections and interaction
+
+Select water in the hierarchy. Its inspector provides **Name**, **Visible**
+and **Position X/Y/Z** (Y is the water level). Unnamed legacy water keeps its
+fallback label. Painting belongs to the Terrain tab; **Edit water in Terrain**
+returns to that brush. The water mode selector appears only with the Water
+brush active. Object erasing lives in the scene toolbar; Delete still works.
 
 Select **Water** in the hierarchy. **Simulate water** enables shallow-water
 simulation: per-cell depth, neighbor flow, gravity and resistance. Water
@@ -154,14 +161,17 @@ prefabs or imported models with position/rotation/scale. **Save file**
 saves the entire composition. **Export this item** saves only the selected
 object with its origin repositioned to `[0, 0, 0]`.
 
-In another document, **Insert saved item** adds file objects near the
+In another document, **File → Import into this map…** adds file objects near the
 camera and embeds their models/styles. Items enter as individual objects:
 grouping, parenting and linked prefab editing are not implemented yet.
-**Open** replaces the whole document and can be undone.
+**File → Open map…** replaces the whole document and can be undone.
+**Import into this map…** adds an item, texture, atmosphere or GLTF/GLB instead.
+Recipes become library assets without applying themselves; item IDs and linked
+resources are remapped. A map selected for Import directs you to Open map.
 
 ## Import models
 
-Use **Import model** above the library or drop files onto the editor:
+Use **File → Import into this map…** or drop files onto the editor:
 
 - GLB with embedded assets.
 - GLTF with its `.bin` files and images, selected together. Missing
@@ -368,17 +378,22 @@ undo action. An agent may also apply directly. Each tab has a session
 and each edit has a revision to prevent overwriting newer changes.
 See [connection, tools and examples](api-mcp.md).
 
-## Save and export for Pomorog
+## Save and export
 
 A per-browser/origin automatic draft lives in **IndexedDB**. The toolbar
 reports success/failure. History lasts for the session, up to 30 actions
 and 64 MB of snapshots; large documents reduce action count. Downloaded
 files are the way to transfer work between machines.
 
-**Save file** (`.ascii.json`) and **Export for Pomorog** (`.pomorog.json`)
-contain the same version 1 `SceneDoc`: name, painted terrain, water, grass,
-environment, styles, instances with identities/seeds, transforms,
-embedded assets and effect recipes. Both reopen in this editor.
+**Save file** (`.ascii.json`, also Ctrl S) writes the editable document.
+**Export…** opens a dialog with Web player, Desktop and Pomorog document targets.
+Web/desktop packaging needs the local bridge (`pnpm api` or `pnpm dev`).
+Builds run in the background and capture the scene at the moment Export is
+pressed. Closing/reopening the dialog or reloading the browser preserves job
+tracking while the bridge remains running. Ready jobs provide a Download link.
+Web ZIPs contain a player for static hosting; desktop ZIPs include the current
+platform's Tauri executable and the same web folder. No site is published.
+Pomorog downloads portable `.pomorog.json` directly in the browser.
 
 Pomorog still needs an importer. Export does not modify a game checkout.
 Built-in prefabs are named recipes, not generated GLBs: the consumer

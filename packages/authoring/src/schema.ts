@@ -27,7 +27,7 @@ export const commandSchema = z.discriminatedUnion('op', [
   z.object({ op: z.literal('terrain.create'), size: z.number().min(1).max(4096).default(32), resolution: z.number().int().min(2).max(513).default(129) }).strict(),
   z.object({ op: z.literal('terrain.stroke'), strokes: z.array(stroke).min(1).max(1000) }).strict(),
   z.object({ op: z.literal('water.paint'), index: z.number().int().nonnegative().optional(), points: z.array(point).min(1).max(1000), radius: z.number().positive().max(4096), mode: z.enum(['terrain', 'level']).default('terrain'), level: coordinate.optional(), erase: z.boolean().default(false), look: json.optional() }).strict(),
-  z.object({ op: z.literal('water.update'), index: z.number().int().nonnegative(), patch: json.describe('SceneWater patch; look supports alphabet/foamAlphabet/reflectionAlphabet, font/weight, cell/sparse/open/sheen/foam/bank, shallow/deep/depthScale, rings {enabled,alphabet,color,size,lifetime}, reflection {enabled,threshold,rows,tint,strength}.') }).strict(),
+  z.object({ op: z.literal('water.update'), index: z.number().int().nonnegative(), patch: json.describe('SceneWater patch: optional name/visible, level (Y), shape.x/z, look and physics. Look supports alphabet/foamAlphabet/reflectionAlphabet, font/weight, cell/sparse/open/sheen/foam/bank, shallow/deep/depthScale, rings {enabled,alphabet,color,size,lifetime}, reflection {enabled,threshold,rows,tint,strength}.') }).strict(),
   z.object({ op: z.literal('water.remove'), index: z.number().int().nonnegative() }).strict(),
   z.object({ op: z.literal('effect.define'), id: key.regex(/^fx:custom-/), effect: json.describe('Complete EffectDef: name, duration, optional loop, emitters and light. See engine_reference effects.') }).strict(),
   z.object({ op: z.literal('asset.define'), id: key, name: z.string().min(1), source: z.string().startsWith('data:') }).strict(),
@@ -49,6 +49,8 @@ export type Command = z.infer<typeof commandSchema>
 
 export const requestSchema = z.discriminatedUnion('method', [
   z.object({ method: z.literal('scene.read'), full: z.boolean().default(false) }).strict(),
+  z.object({ method: z.literal('project.export'), target: z.enum(['web','desktop','pomorog']), title: z.string().trim().min(1).max(100) }).strict(),
+  z.object({ method: z.literal('project.export.status'), jobId: z.string().uuid() }).strict(),
   z.object({ method: z.literal('engine.reference'), topic: z.enum(['commands', 'catalog', 'style', 'effects', 'water', 'documents']).default('commands') }).strict(),
   z.object({ method: z.literal('scene.apply'), revision: z.number().int().nonnegative(), commands: batchSchema, preview: z.boolean().default(true) }).strict(),
   z.object({ method: z.literal('scene.validate'), commands: batchSchema }).strict(),

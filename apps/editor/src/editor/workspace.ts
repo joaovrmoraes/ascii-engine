@@ -11,8 +11,8 @@ export function createWorkspace() {
       <div class="menu-row"><strong class="brand">${icon('cube')} ASCII Engine</strong>
         <details class="editor-menu"><summary>File</summary><div class="menu-items">
           <button data-k="new">New map <kbd>terrain</kbd></button><button data-k="item">New item <kbd>empty</kbd></button>
-          <label class="file">Open document…<input data-k="open" type="file" accept=".json" hidden></label>
-          <button data-k="save">Save file <kbd>Ctrl S</kbd></button><button data-k="export">Export for Pomorog…</button><button data-k="reset-layout">Reset panels</button>
+          <label class="file">Import into this map…<input data-k="model-import" type="file" multiple accept=".json,.glb,.gltf,.bin,.png,.jpg,.jpeg,.webp" hidden></label><label class="file">Open map…<input data-k="open" type="file" accept=".json" hidden></label>
+          <button data-k="save">Save file <kbd>Ctrl S</kbd></button><button data-k="export">Export…</button><button data-k="reset-layout">Reset panels</button>
           <button data-k="save-style">Save style preset…</button><label class="file">Load style preset…<input data-k="load-style" type="file" accept=".json" hidden></label>
         </div></details>
         <button data-k="undo" title="Undo (Ctrl Z)" aria-label="Undo">↶</button><button data-k="redo" title="Redo (Ctrl Shift Z)" aria-label="Redo">↷</button>
@@ -46,7 +46,7 @@ export function createWorkspace() {
         <button data-mode="scale" title="Scale (R)">${icon('scale')}<span>R</span></button>
         <span class="tool-divider"></span>
         <select data-k="space" aria-label="Transform space"><option value="world">Global</option><option value="local">Local</option></select>
-        <button data-k="snap" aria-pressed="false" title="Snap: 0.5 m / 15° / 0.1 scale">${icon('grid')} Snap</button>
+        <button data-object-tool="erase" title="Erase objects by clicking them">${icon('cube')} Erase</button><button data-k="snap" aria-pressed="false" title="Snap: 0.5 m / 15° / 0.1 scale">${icon('grid')} Snap</button>
         <button data-k="frame" title="Focus selection (F)">${icon('focus')}</button>
         <button data-k="reset-view" title="Reset isometric angle">Isometric</button>
         <button data-k="view" class="view-action">Display ▾</button>
@@ -64,7 +64,7 @@ export function createWorkspace() {
     </aside>
     <section id="asset-browser" aria-label="Asset library">
       <div class="dock-heading"><div class="project-tabs"><button data-project-tab="assets">${icon('folder')} Project</button><button data-project-tab="studio">${icon('spark')} Studio</button></div>
-        <div class="asset-actions"><label class="file">${icon('import')} Import model<input data-k="model-import" type="file" multiple accept=".glb,.gltf,.bin,.png,.jpg,.jpeg,.webp" hidden></label><label class="file">Insert saved item<input data-k="insert" type="file" accept=".json" hidden></label></div>
+        <div class="asset-actions"><span class="empty-note">File → Import into this map…</span></div>
       </div>
       <div class="asset-body"><nav data-k="categories" aria-label="Asset categories"></nav><div class="asset-content">
         <div class="asset-search-row"><label class="search-field">${icon('search')}<input data-k="asset-search" type="search" placeholder="Search assets…" aria-label="Search assets"></label><span>Drag into the scene · or click and choose a position</span></div>

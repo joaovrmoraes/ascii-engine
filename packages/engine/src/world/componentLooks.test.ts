@@ -5,6 +5,12 @@ import { parseScene } from './validation'
 import { waterAlphabetLayout, DEFAULT_WATER_LOOK } from '../techniques/water'
 
 describe('optional component letter looks', () => {
+  it('round-trips optional water identity/visibility and rejects incorrect values', () => {
+    const water={name:'My lake',visible:false,level:.7,shape:{kind:'pond',x:1,z:2,angle:0,size:3}}
+    expect(parseScene({version:1,objects:[],waters:[water]}).waters![0]).toEqual(water)
+    expect(()=>parseScene({version:1,objects:[],waters:[{...water,visible:0}]})).toThrow()
+    expect(()=>parseScene({version:1,objects:[],waters:[{...water,name:false}]})).toThrow()
+  })
   it('keeps old documents and legacy water atlases untouched', () => {
     const source={version:1,objects:[],terrain:createTerrainData(8,3),waters:[{shape:{kind:'pond',x:0,z:0,angle:0,size:2}}]}
     expect(parseScene(source)).toEqual(source)

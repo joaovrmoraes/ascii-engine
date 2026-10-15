@@ -88,7 +88,7 @@ try {
     const { nodeId } = await send('DOM.querySelector', { nodeId: root.nodeId, selector: '[data-k="model-import"]' })
     const count = await evaluate('area.document().objects.length')
     await send('DOM.setFileInputFiles', { nodeId, files })
-    await until(`area.document().objects.length === ${count + files.length} && !area.state.includes('opening')`)
+    await until(`area.document().objects.length === ${count + files.filter(file=>/\.(glb|gltf)$/i.test(file)).length} && !area.state.includes('opening')`)
   }
   await send('Runtime.enable'); await send('Page.enable'); await send('Emulation.setFocusEmulationEnabled', { enabled: true })
   await send('Page.navigate', { url: 'http://localhost:1440/?area=sandbox' })
@@ -109,7 +109,10 @@ try {
     window.object = id => engine.scene.children.find(o=>o.userData.sceneId===id);
     window.mesh = id => { let found; object(id).traverse(n=>{if(!found && n.isMesh) found=n}); return found };
     window.pixels = () => {engine.render(0);return engine.renderer.domElement.toDataURL()};`)
-  await importFiles(paths)
+  const recipe=join(output,'mixed.texture.json')
+  await writeFile(recipe,JSON.stringify({version:1,name:'Mixed import ink',texture:{alphabet:'XZ'}}))
+  await importFiles([...paths,recipe])
+  await check('one File import routes models, companions and texture JSON together', `Object.values(area.document().textures??{}).some(asset=>asset.name==='Mixed import ink')`)
   await evaluate(`(async()=>{const doc=area.document();doc.name='GLTF appearance verification';doc.objects=doc.objects.filter(o=>o.prefab.startsWith('asset-'));delete doc.terrain;delete doc.carpet;doc.objects.forEach((o,i)=>o.position=[(i-(doc.objects.length-1)/2)*3,0,0]);await area.openDocument(doc);area.authoring.view([0,1,0],'scene');view.zoom=1.2;window.ids=area.document().objects.map(o=>o.id)})()`)
   const ids = await evaluate('ids')
   for (const id of ids) {

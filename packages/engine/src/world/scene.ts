@@ -38,7 +38,7 @@ export interface PlacedObject {
   options?: AddOptions
 }
 
-export interface SceneWater { shape: WaterShape; look?: Partial<WaterLook>; level?: number; physics?: Partial<import('./waterDynamics').WaterPhysics> }
+export interface SceneWater { name?: string; visible?: boolean; shape: WaterShape; look?: Partial<WaterLook>; level?: number; physics?: Partial<import('./waterDynamics').WaterPhysics> }
 
 export interface SceneDoc {
   version: 1
@@ -138,6 +138,7 @@ export function buildScene(engine: AsciiEngine, source: SceneDoc, library: Prefa
     if (terrain) engine.add(terrain.mesh)
     for (const entry of doc.waters ?? []) {
       const water = engine.createWater(entry.shape, { look: entry.look, level: entry.level, physics: entry.physics })
+      water.mesh.name = entry.name ?? ''; water.mesh.visible = entry.visible ?? true
       waters.push(water)
       engine.add(water.mesh, { glyph: 'water' })
     }
@@ -186,6 +187,7 @@ export function buildScene(engine: AsciiEngine, source: SceneDoc, library: Prefa
     addWater(entry: SceneWater) {
       parseScene({ version: 1, objects: [], waters: [entry] })
       const water = engine.createWater(entry.shape, { look: entry.look, level: entry.level, physics: entry.physics })
+      water.mesh.name = entry.name ?? ''; water.mesh.visible = entry.visible ?? true
       engine.add(water.mesh, { glyph: 'water' }); waters.push(water)
       doc.waters = [...doc.waters ?? [], entry]
       return water

@@ -227,6 +227,8 @@ export function parseScene(input: unknown, library?: PrefabLibrary): SceneDoc {
   }
   if (root.waters !== undefined) array(root.waters, 'waters').forEach((raw, i) => {
     const w = record(raw, `waters[${i}]`), s = record(w.shape, `waters[${i}].shape`)
+    if (w.name !== undefined && typeof w.name !== 'string') fail(`waters[${i}].name`, 'must be text')
+    if (w.visible !== undefined && typeof w.visible !== 'boolean') fail(`waters[${i}].visible`, 'must be a boolean')
     if (!['pond', 'stream', 'paint'].includes(String(s.kind))) fail(`waters[${i}].shape.kind`, 'unknown')
     for (const k of ['x', 'z', 'angle']) number(s[k], `waters[${i}].${k}`)
     number(s.size, `waters[${i}].size`, .01, 4096)

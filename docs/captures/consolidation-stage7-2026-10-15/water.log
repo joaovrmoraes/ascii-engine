@@ -1,0 +1,34 @@
+$ node scripts/verify-water.mjs .cache/consolidation-stage7-water
+PASS cilindro-reflexo-lateral: 419 pixels changed by more than 8/255
+PASS reflected cylinder changes with view direction and disappears outside the wet footprint
+PASS a deep still pool remains clear and its mirror follows the simulated surface
+PASS luar-alinhado: 12084 pixels changed by more than 8/255
+PASS moving an object in shallow water produces physical displacement
+PASS agua-antes-impacto: 926 pixels changed by more than 8/255
+PASS water simulation never writes transient state into the document
+bank elevation=0.12 orbit=0.00: {"changed":1953,"escaped":0}
+bank elevation=0.12 orbit=1.57: {"changed":2428,"escaped":0}
+bank elevation=0.12 orbit=3.14: {"changed":1793,"escaped":0}
+bank elevation=0.12 orbit=4.71: {"changed":1837,"escaped":0}
+bank elevation=0.55 orbit=0.00: {"changed":12367,"escaped":0}
+bank elevation=0.55 orbit=1.57: {"changed":12502,"escaped":0}
+bank elevation=0.55 orbit=3.14: {"changed":12178,"escaped":0}
+bank elevation=0.55 orbit=4.71: {"changed":12480,"escaped":0}
+PASS gravity drives a downhill current and changes depth on the slope
+PASS flow leaves sculpted terrain and authored water unchanged
+PASS wet water vertices remain above the mountain surface
+PASS water inspector persists physical settings
+PASS water source can be closed in the inspector
+PASS water-custom-at: 20197 pixels changed by more than 8/255
+PASS water-shallow-red: 2100 pixels changed by more than 8/255
+PASS water letters and depth colors persist through UI authoring
+PASS water-ring-impact: 1072 pixels changed by more than 8/255
+PASS opt-in rain emits glyph rings on the wet footprint
+PASS glyph impact rings remain transient
+PASS terrain-custom-at: 111773 pixels changed by more than 8/255
+PASS floor looks respect painted layer boundaries
+PASS grass-custom-v: 103622 pixels changed by more than 8/255
+PASS standing letter recipes preserve stable layer IDs and round-trip
+PASS component letters survive a complete reopen
+PASS custom channel outlines retain their CPU simulation footprint
+PASS no uncaught page exceptions

@@ -1,0 +1,4 @@
+World viewport: 1048x340+232+132; frozen camera/time.
+item-roundtrip.json against stage 1 original: RMSE 0 (0).
+mapa-prova.pomorog.json against stage 6 original: RMSE 0 (0).
+Baselines unchanged.

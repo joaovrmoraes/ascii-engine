@@ -118,6 +118,7 @@ the agent can perform these operations without manual interface clicks.
 - Adjust letters, fonts, colors, lighting, fog, weather and composition cameras.
 - Read the live catalog, preview edits, inspect PNG captures and undo/redo.
 - Save and reopen portable scenes with embedded models and reusable assets.
+- Queue Web/Tauri project exports and read their build status through MCP.
 
 **Example prompt:** “Create a moonlit clearing with a lake and trees. Give
 the tree crowns green arrow glyphs with no solid body, save that texture,
@@ -125,7 +126,7 @@ show me a preview and export the editable scene.”
 
 ![A scene created and inspected through the real MCP connection](docs/showcase/posters/mcp-authoring.png)
 
-The server exposes 14 tools. `scene_apply` accepts atomic batches;
+The server exposes 16 tools. `scene_apply` accepts atomic batches;
 `scene.patch` and `scene.replace` cover every supported `SceneDoc` field.
 Each accepted batch shares the editor's undo history. This covers the visual
 features currently implemented; gameplay rules and unsupported rendering

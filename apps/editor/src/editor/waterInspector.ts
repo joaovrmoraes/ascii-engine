@@ -20,9 +20,17 @@ interface WaterInspectorContext {
 export function renderWaterInspector(inspector: HTMLElement, context: WaterInspectorContext) {
       const {index, scene, snapshot, replace, changed, run, field, button, focus, message} = context
       const entry = snapshot().waters![index]
-      for (const [key, label, value] of [['x', 'Position x', entry.shape.x], ['z', 'Position z', entry.shape.z], ['size', 'Size', entry.shape.size], ['angle', 'Direction (degrees)', entry.shape.angle * 180 / Math.PI], ['level', 'Level', entry.level ?? 0], ['flow', 'Flow', entry.look?.flow ?? (entry.shape.kind === 'stream' ? .35 : .025)]] as const) {
-        field(label, String(value), value => { void waterChange(key, Number(value)) })
+      field('Name',entry.name ?? '',value=>run(async()=>{const doc=snapshot();doc.waters![index].name=value || undefined;await replace(doc);context.reselect();changed()}),'text')
+      const visibleRow=document.createElement('label'),visible=document.createElement('input');visibleRow.textContent='Visible';visible.type='checkbox';visible.checked=entry.visible ?? true;visible.dataset.waterVisible=''
+      visible.onchange=()=>run(async()=>{const doc=snapshot();doc.waters![index].visible=visible.checked;await replace(doc);context.reselect();changed()});visibleRow.append(visible);inspector.append(visibleRow)
+      const position=document.createElement('div');position.className='vector-row';const title=document.createElement('span');title.textContent='Position';position.append(title)
+      for(const [axis,value,key] of [['x',entry.shape.x,'x'],['y',entry.level ?? scene.waters[index].mesh.position.y,'level'],['z',entry.shape.z,'z']] as const) {
+        const label=document.createElement('label');label.className=`axis-${axis}`;label.textContent=axis.toUpperCase()
+        const input=document.createElement('input');input.type='number';input.step='.1';input.value=String(value);input.dataset.field=`Position ${axis}`;input.setAttribute('aria-label',`Position ${axis}`)
+        input.onchange=()=>{if(Number.isFinite(input.valueAsNumber))void waterChange(key,input.valueAsNumber)};label.append(input);position.append(label)
       }
+      inspector.append(position)
+      for (const [key,label,value] of [['size','Size',entry.shape.size],['angle','Direction (degrees)',entry.shape.angle*180/Math.PI],['flow','Flow',entry.look?.flow ?? (entry.shape.kind==='stream' ? .35 : .025)]] as const) field(label,String(value),value=>{void waterChange(key,Number(value))})
       const row = document.createElement('label'), reflect = document.createElement('input'); row.textContent = 'Reflection'; reflect.type = 'checkbox'; reflect.checked = scene.waters[index].look.reflection.enabled
       reflect.onchange = () => run(async () => { const doc = snapshot(); doc.waters![index].look = { ...doc.waters![index].look, reflection: { ...scene.waters[index].look.reflection, enabled: reflect.checked } }; await replace(doc); context.reselect(); changed() }); row.append(reflect); inspector.append(row)
       waterLetterFields(inspector, scene.waters[index].look, patch => run(async () => {
@@ -54,7 +62,7 @@ export function renderWaterInspector(inspector: HTMLElement, context: WaterInspe
         shape.mask!.heights = terrain.data.heights.map(height => height + .045)
         doc.waters![index] = { ...entry, shape, level: 0 }; await replace(doc); context.reselect(); changed()
       })
-      if (entry.shape.kind === 'paint') button('Continue painting water', context.paint)
+      if (entry.shape.kind === 'paint') button('Edit water in Terrain', context.paint)
       async function waterChange(key: string, value: number) {
         try {
           const doc = snapshot(), water = doc.waters![index]

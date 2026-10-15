@@ -49,6 +49,14 @@ export function createMcpServer() {
     } finally { await unlink(temporary).catch(() => {}) }
     return text({ path: target, revision: result.revision, preview: result.preview, objects: result.document.objects.length })
   }))
+  server.registerTool('project_export', {
+    description: 'Captures the selected scene and queues a local Web player ZIP, Tauri desktop ZIP for this platform, or portable Pomorog JSON. Does not publish or modify the scene. Keep pnpm api running; poll project_export_status for the artifact path and download URL. Desktop requires the installed Tauri toolchain.',
+    inputSchema: z.object({ ...session, target: z.enum(['web','desktop','pomorog']), title: z.string().trim().min(1).max(100) }),
+  }, safe(async ({sessionId,...args}) => text(await call(sessionId,{method:'project.export',...args}))))
+  server.registerTool('project_export_status', {
+    description: 'Reads a queued/building/ready/failed export job using its original sessionId, including after the editor reconnects. Ready jobs include local artifact paths; download from /v1/exports/<id>/download on the API endpoint.',
+    inputSchema: z.object({...session,jobId:z.string().uuid()}), annotations:{readOnlyHint:true},
+  }, safe(async ({sessionId,jobId}) => text(await call(sessionId,{method:'project.export.status',jobId}))))
   return server
 }
 

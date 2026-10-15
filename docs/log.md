@@ -4,6 +4,44 @@ Entries describe the state at each stage. Earlier limitations may have been
 resolved later; START.md and the editor guide describe the current scope.
 Historical filenames, reference IDs and captured interfaces are preserved.
 
+## 2026-10-15 — Editor consolidation stage 7: panels and project files
+
+Water inspector now has Name, Visible and XYZ (shape.x / level / shape.z),
+with matching hierarchy labels/visibility. These required optional SceneWater
+format fields; omitted values retain the old fallback labels and visible mesh.
+Validation, authoring schema/MCP descriptions, API docs and tests were updated.
+Terrain owns water painting and the inspector links back to that tab. Water
+mode appears only with that brush; object erasing moved to the scene toolbar.
+Environment exposes the existing weather intensity and preserves it on changes.
+
+File separates Open map from Import into this map. Unified import recognizes
+items, texture/atmosphere recipes, models and companions (including mixed
+selections), with atomic replacement and independent asset/texture/type IDs.
+Extracted pure routing/insertion helpers and added meaningful editor unit tests
+to pnpm check. Existing style preset save/load stays in File.
+
+Save retains document download. Export opens Web, Desktop and Pomorog targets.
+The local bridge snapshots a revision, queues the existing Vite/Tauri CLI,
+serves finished ZIPs/JSON and exposes job status, including after browser reload.
+Added project_export/project_export_status MCP tools (16 total); no publication.
+Pomorog remains a visual SceneDoc requiring a game importer. Output stays in
+fresh ignored exports directories; no built binaries were added to git.
+
+Validation: pnpm check 144 tests, boundaries/types/build; authoring 81, textures
+103, GLTF 19, water 25 plus eight bank views, actual stdio MCP/API 39, export 9,
+with dev running. Web ran from a static nested URL; native Linux executable
+built and was checked inside the desktop ZIP. The native window was not opened.
+Pinned Orca tested the new fields/targets; owner document and selection restored.
+Historical item and terrain world crops both RMSE 0; no baseline regeneration.
+[Captures, logs and limitations](captures/consolidation-stage7-2026-10-15/README.md).
+Orca image capture still timed out; inspected GPU Chromium images instead.
+
+All seven consolidation stages are complete in local stage commits, without
+push. The owner's original untracked plan is preserved. Broader sandbox
+splitting, media/history weight, documentation filename cleanup, additional
+editor unit coverage, native window/platform tests and visual approval of the
+preexisting snow baseline remain outside this consolidation.
+
 ## 2026-10-14 — Editor consolidation stage 6: component letters
 
 Added optional WaterLook alphabets for water/foam/reflections, fonts/weight,

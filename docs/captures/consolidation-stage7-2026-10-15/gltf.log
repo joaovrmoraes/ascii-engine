@@ -1,0 +1,20 @@
+$ node scripts/verify-gltf-appearance.mjs docs/captures/consolidation-stage7-2026-10-15/gltf
+PASS one File import routes models, companions and texture JSON together
+PASS 4eb4d7c2-9f80-4aaa-a9ad-ba0af34b15e7: surface size changes the rendered pixels
+PASS 4eb4d7c2-9f80-4aaa-a9ad-ba0af34b15e7: family changes the letters
+PASS 4eb4d7c2-9f80-4aaa-a9ad-ba0af34b15e7: color overrides the original material
+PASS 4eb4d7c2-9f80-4aaa-a9ad-ba0af34b15e7: model color can be restored
+PASS 4eb4d7c2-9f80-4aaa-a9ad-ba0af34b15e7: body size and color affect glyph sprites
+PASS 4eb4d7c2-9f80-4aaa-a9ad-ba0af34b15e7: imported model supports the type scope
+PASS type changes reach both imported copies
+PASS instance override affects only its copy
+PASS save/reopen preserves model, type and instance appearance
+PASS undo/redo restores imported appearance
+PASS whole-tree size preserves separate crown and trunk techniques
+PASS named crown group edits its descendants without changing the trunk
+PASS trunk size and family change independently
+PASS nested imported part appearance survives save/reopen
+PASS clicking a crown selects its named group after hierarchy selection
+PASS all-copy crown edits override Blender defaults and leave every trunk unchanged
+PASS import after deletion preserves existing IDs and allocates a unique new ID
+PASS no runtime or shader errors

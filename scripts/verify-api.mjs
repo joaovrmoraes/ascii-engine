@@ -59,7 +59,7 @@ try {
   }
   const assert=(condition,title)=>{if(!condition)throw new Error('FAIL '+title);console.log('PASS '+title)}
   const tools=await client.listTools()
-  assert(tools.tools.length===14,'official MCP handshake and all 14 tools discoverable')
+  assert(tools.tools.length===16,'official MCP handshake and all 16 tools discoverable')
   const sessions=await invoke('engine_sessions')
   assert(sessions.some(s=>s.sessionId===sessionId),'isolated browser registered, session selected explicitly')
   const catalog=await invoke('engine_reference',{topic:'catalog'})
@@ -78,7 +78,7 @@ try {
     {op:'terrain.stroke',strokes:[{brush:'raise',x:1,z:-2,radius:5,strength:2},{brush:'paint',x:-3,z:0,radius:2,strength:1,layer:1}]},
     {op:'scene.patch',patch:{carpet:{count:35000,seed:48}}},
     {op:'water.paint',points:[{x:1,z:-2},{x:0,z:0},{x:-3,z:2}],radius:1,mode:'terrain'},
-    {op:'water.update',index:0,patch:{look:{alphabet:'~=',foamAlphabet:'*+',reflectionAlphabet:'A#',shallow:[.1,.3,.4],deep:[.02,.05,.12],rings:{enabled:true,alphabet:'|_-',size:1.4,lifetime:1},reflection:{strength:.6}}}},
+    {op:'water.update',index:0,patch:{name:'MCP creek',visible:true,look:{alphabet:'~=',foamAlphabet:'*+',reflectionAlphabet:'A#',shallow:[.1,.3,.4],deep:[.02,.05,.12],rings:{enabled:true,alphabet:'|_-',size:1.4,lifetime:1},reflection:{strength:.6}}}},
     {op:'object.add',object:{id:'fire',prefab:'fogueira',position:[-3,0,-1]}},
     {op:'object.add',object:{id:'rock',prefab:'pedregulho',position:[0,1.2,-3]}},
     {op:'scene.patch',patch:{style:{types:{pedregulho:{style:{size:.21},authored:{style:['size']}}}}}},
@@ -166,6 +166,19 @@ try {
   assert(JSON.parse(await readFile(exported,'utf8')).name===data.name,'export refuses accidental file overwrite')
   state=await invoke('scene_open',{revision:state.revision,path:exported,preview:false})
   assert(JSON.stringify((await invoke('scene_read',{full:true})).document)===JSON.stringify(data),'export and reopen through MCP preserve complete document')
+  assert(data.waters[0].name==='MCP creek'&&data.waters[0].visible===true,'MCP preserves optional water name and visibility')
+  const exportRevision=state.revision
+  const project=await invoke('project_export',{target:'pomorog',title:'MCP project'})
+  let packaged
+  for(let attempt=0;attempt<100;attempt++) {
+    packaged=await invoke('project_export_status',{jobId:project.id})
+    if(packaged.status==='ready'||packaged.status==='failed') break
+    await sleep(100)
+  }
+  assert(packaged.status==='ready','MCP queues a portable project export and exposes its status')
+  const artifact=await fetch('http://127.0.0.1:1442/v1/exports/'+project.id+'/download')
+  assert(artifact.ok&&JSON.stringify(await artifact.json())===JSON.stringify(data),'ready project download equals the captured portable document')
+  assert((await invoke('scene_read')).revision===exportRevision,'project export does not mutate the editor revision')
   const beforeHuman=state.revision
   await action(`document.querySelector('[data-k="name"]').value='Human edit';document.querySelector('[data-k="name"]').dispatchEvent(new Event('change'))`)
   await invoke('scene_apply',{revision:beforeHuman,preview:false,commands:[{op:'scene.patch',patch:{name:'Overwrite'}}]},true)

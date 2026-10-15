@@ -19,9 +19,10 @@ these document operations once the local editor and MCP client are connected.
 
 This is full access to the supported visual document, rather than a promise
 that every interface gesture or future feature is implemented as an MCP tool.
-Panel docking, font installation, new renderer features, gameplay logic and
-native application packaging are outside this server's tool set. Web/desktop
-packaging uses the project CLI. `scene_export` saves the editable document.
+Panel docking, font installation, new renderer features and gameplay logic
+remain outside this server's tool set. `scene_export` saves the editable
+document; `project_export` queues Web/Tauri packaging through the local bridge.
+It uses the same project CLI as the editor's File → Export dialog.
 
 ## Start and connect
 
@@ -77,6 +78,8 @@ origins. The HTTP API does not enable CORS for external sites.
 | `assets_import` | Imports GLB or GLTF and companion files from explicit local paths. |
 | `scene_open` | Opens a local visual document, with preview or direct application. |
 | `scene_export` | Exports a document with embedded models/effects; requires `overwrite: true` to replace a file. |
+| `project_export` | Captures the current scene and queues `web`, `desktop` or `pomorog` with a title. No publication or revision change. |
+| `project_export_status` | Reads a job by `jobId` and its original `sessionId`; returns queued/building/ready/failed and artifact paths. |
 
 Recommended agent workflow: list sessions → read scene/revision → consult
 catalog and required references → build a batch → preview → capture and
@@ -346,3 +349,29 @@ editor labels remain Moss/Earth/Stone/Snow. To clear an optional look/cover via
 MCP, replace the layers array with the desired fields omitted (scene.patch),
 or replace the complete document. No automatic conversion of old documents.
 Custom component atlases use bounded 2D grids; font files are not embedded.
+
+## Project packaging and water identity
+
+`project.export {target, title}` and `project.export.status {jobId}` are
+nonmutating HTTP/in-page requests, also exposed as `project_export` and
+`project_export_status` MCP tools. Start captures the complete document and
+revision immediately. Later edits do not enter that build. Builds run serially
+because Vite/Cargo share output directories. Keep `pnpm api` (or the development
+server's bridge) running until the job completes. Jobs survive browser reloads,
+using their original session ID; restarting the bridge clears job status.
+
+Ready results include `result.artifact`, `filename`, `directory` and, for
+Web/desktop, `web`. Download through `GET /v1/exports/<id>/download` on the
+bridge. Output uses a fresh directory under ignored `exports/`; it does not
+replace earlier exports. Web ZIPs contain a relative-path player and embedded
+scene. Desktop ZIPs also contain the Tauri executable for the build platform,
+with its installed SDK requirements. The build host needs the `zip` archiver. Only Linux packaging has been verified;
+other platform SDKs and native windows remain unverified. Pomorog exports are SceneDoc
+JSON and require an importer in the game. Packaging never deploys a site or
+adds game rules.
+
+SceneWater accepts optional `name: string` and `visible: boolean`. Omission
+preserves the old fallback label and visible mesh. Position is `shape.x`,
+`level` (Y) and `shape.z`; update with `water.update` or a complete scene patch.
+These fields round-trip without migrating old documents. Weather intensity
+already belongs to `environment.intensity` (0–1); Environment exposes it now.

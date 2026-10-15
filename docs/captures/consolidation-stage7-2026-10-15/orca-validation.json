@@ -1,0 +1,11 @@
+{
+  "id": "e11237fc-1685-43ae-b2db-6b92ae1ad0d4",
+  "ok": true,
+  "result": {
+    "result": "{\"eraserOnObjectToolbar\":true,\"exportTargets\":[\"web\",\"desktop\",\"pomorog\"],\"objectCount\":4,\"ownerRestored\":true,\"stage\":7,\"url\":\"http://localhost:1440/?area=sandbox\",\"waterModeHidden\":true,\"waterTest\":{\"name\":\"Orca lake\",\"visible\":false,\"y\":0.7},\"weatherIntensityTest\":0.35}",
+    "origin": "http://localhost:1440/?area=sandbox"
+  },
+  "_meta": {
+    "runtimeId": "38cf1741-6edd-47a2-b539-0f58b1abc24e"
+  }
+}

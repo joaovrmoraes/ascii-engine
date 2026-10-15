@@ -3,6 +3,7 @@ import { pomorog, POMOROG_EFFECTS } from '@ascii-engine/core/pomorog'
 import { DEFAULT_WATER_LOOK, DEFAULT_WATER_PHYSICS, SURFACE_ALPHA, parseScene, type AsciiEngine, type SceneDoc } from '@ascii-engine/core'
 import { importModelFiles } from '../scene/files'
 import type { Area } from '../areas/types'
+import { bridgeRequest } from './transport'
 
 export function connectAuthoring(engine: AsciiEngine, area: Area, view: { angle: number; elevation: number; zoom: number; paused: boolean }, capture: () => string) {
   if (!area.authoring || !area.document) return
@@ -38,6 +39,7 @@ export function connectAuthoring(engine: AsciiEngine, area: Area, view: { angle:
     assertSafeJson(raw)
     const req = requestSchema.parse(raw)
     if (applying) throw new Error('The editor is applying another change; read the scene again.')
+    if (req.method === 'project.export' || req.method === 'project.export.status') return bridgeRequest(sessionId, req)
     if ('revision' in req && req.revision !== revision) throw new Error(`Revision conflict: expected ${revision}, received ${req.revision}. Read scene.read before editing.`)
     if (req.method === 'scene.read') return { ...state(), ...(req.full ? { document: snapshot() } : {}) }
     if (req.method === 'engine.reference') {

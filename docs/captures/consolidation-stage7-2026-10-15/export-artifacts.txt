@@ -1,0 +1,43 @@
+web
+export-web-web.zip
+bytes: 381553
+sha256: a5d88284407a014921583d99c0adb797402962d6d062ea6ff094e63e465b0a35
+Archive:  /home/joao/orca/workspaces/ascii-engine/threadfin/exports/project-tpTzrk/export-web-web.zip
+  Length      Date    Time    Name
+---------  ---------- -----   ----
+        0  2026-10-15 09:05   web/
+        0  2026-10-15 09:05   web/assets/
+    26591  2026-10-15 09:05   web/assets/index-DO74hWO9.css
+   121171  2026-10-15 09:05   web/assets/client-CC1_g8dr.js
+   413506  2026-10-15 09:05   web/assets/index-9PWSdljP.js
+   731649  2026-10-15 09:05   web/assets/transport-Bx_LjQ_t.js
+     3263  2026-10-15 09:05   web/index.html
+     1470  2026-10-15 09:05   web/scene.json
+       54  2026-10-15 09:05   web/game.json
+       91  2026-10-15 09:05   README.txt
+---------                     -------
+  1297795                     10 files
+
+desktop
+export-desktop-desktop.zip
+bytes: 3532484
+sha256: 03ada7b06f3f6439a657b6b7a1edeee48fd3d12892bc463ff45d6c9852887e6b
+Archive:  /home/joao/orca/workspaces/ascii-engine/threadfin/exports/project-Vqf9fh/export-desktop-desktop.zip
+  Length      Date    Time    Name
+---------  ---------- -----   ----
+        0  2026-10-15 09:05   web/
+        0  2026-10-15 09:05   web/assets/
+   413506  2026-10-15 09:05   web/assets/index-9PWSdljP.js
+   731649  2026-10-15 09:05   web/assets/transport-Bx_LjQ_t.js
+    26591  2026-10-15 09:05   web/assets/index-DO74hWO9.css
+   121171  2026-10-15 09:05   web/assets/client-CC1_g8dr.js
+     3263  2026-10-15 09:05   web/index.html
+     1470  2026-10-15 09:05   web/scene.json
+       58  2026-10-15 09:05   web/game.json
+        0  2026-10-15 09:08   desktop/
+ 11509064  2026-10-15 09:08   desktop/export-desktop
+       92  2026-10-15 09:08   README.txt
+---------                     -------
+ 12806864                     12 files
+
+/home/joao/orca/workspaces/ascii-engine/threadfin/exports/project-Vqf9fh/desktop/export-desktop: ELF 64-bit LSB pie executable, x86-64, version 1 (SYSV), dynamically linked, interpreter /lib64/ld-linux-x86-64.so.2, for GNU/Linux 4.4.0, BuildID[sha1]=0cacfd7db56a9d910d8b44e53f930f6b7e466fc2, not stripped

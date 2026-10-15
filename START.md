@@ -227,6 +227,16 @@ without loading document/renderer implementations. Vite imports the development
 bridge through `@ascii-engine/automation/bridge`. See
 [ADR 0003](docs/decisions/0003-package-boundaries.md).
 
+File separates Open map (replace) from Import into this map (items, models,
+texture and atmosphere JSON). Save retains the portable document; Export opens
+Web, native desktop or Pomorog targets. Web/desktop jobs use the loopback bridge
+and the existing export CLI, with status/downloads and the same operations via
+MCP. Jobs capture a revision and run in sequence; no publication occurs.
+Pure file routing/item remapping now has editor unit coverage in pnpm check.
+Water name/visibility are optional SceneDoc fields; XYZ maps to shape.x/level/z.
+Terrain owns the water brush, the scene toolbar owns object erasing, and
+Environment exposes the existing weather intensity.
+
 Commands: `pnpm compare` compares screenshots with the baseline;
 `pnpm export -- --title … --area …|--scene … [--desktop]` exports web/Tauri.
 

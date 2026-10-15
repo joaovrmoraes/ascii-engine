@@ -3,7 +3,7 @@ import * as THREE from 'three'
 import { textureUsers, detachTexture, buildScene, createTerrainData, createHistory, createEffectPrefabs, emptyScene, createWaterPaint, paintWater, loadSceneAssets, parseScene, waterEdge, type AsciiEngine, type Brush, type BuiltScene, type SceneDoc } from '@ascii-engine/core'
 import { pomorog } from '@ascii-engine/core/pomorog'
 import { createPrefabs } from '../scene/prefabs'
-import { downloadDocument, importModelFiles } from '../scene/files'
+import { downloadDocument, importModelFiles, readImportedResource, insertSceneItem } from '../scene/files'
 import { readDraft, saveDraft } from '../scene/storage'
 import type { Area, AreaOptions } from './types'
 import '../authoring.css'
@@ -19,6 +19,7 @@ import { createTextureStudio } from '../editor/textures'
 import { renderWaterInspector } from '../editor/waterInspector'
 import { terrainLetterFields } from '../editor/letterControls'
 import { downloadStylePreset, loadStylePreset } from '../editor/stylePresets'
+import { createExportDialog } from '../editor/exportDialog'
 
 type Tool = 'select' | Brush | 'water' | 'place' | 'erase'
 export function defaultScene(): SceneDoc {
@@ -57,6 +58,7 @@ export async function createSandbox(engine: AsciiEngine, options: AreaOptions = 
   let atmosphereStudio: ReturnType<typeof createAtmosphereStudio> | undefined
   let effectEditor: ReturnType<typeof createEffectEditor> | undefined
   let textureStudio: ReturnType<typeof createTextureStudio> | undefined
+  let exportDialog: ReturnType<typeof createExportDialog> | undefined
   let transformMode: 'hand' | 'orbit' | 'translate' | 'rotate' | 'scale' = 'translate', preview = false, assetCategory = 'All', assetQuery = '', hierarchyQuery = ''
   const run = (action: () => void | Promise<void>) => { if (busy) return; void Promise.resolve().then(action).catch(error => message(String(error))) }
   function message(text: string) { note = text; const el = toolbar?.querySelector('[data-k="note"]'); if (el) el.textContent = text }
@@ -235,8 +237,12 @@ export async function createSandbox(engine: AsciiEngine, options: AreaOptions = 
     layers.replaceChildren(...(scene.terrain?.data.layers ?? []).map((l, i) => new Option(glyphLabel(l.name), String(i))))
     layers.value = String(tool.layer); layers.disabled = !scene.terrain
     box.querySelectorAll<HTMLButtonElement>('[data-brush]').forEach(button => { button.disabled = !scene.terrain; const active = tool.kind === button.dataset.brush; button.classList.toggle('active', active); button.setAttribute('aria-pressed', String(active)) })
+    box.querySelector('[data-k="water-mode"]')!.closest('label')!.hidden=tool.kind!=='water'
+    const erase=ui.get<HTMLButtonElement>('[data-object-tool=erase]')
+    erase.classList.toggle('active',tool.kind==='erase');erase.setAttribute('aria-pressed',String(tool.kind==='erase'))
     ui.get('[data-k="no-terrain"]').hidden = !!scene.terrain
     ui.get<HTMLSelectElement>('[data-k="weather"]').value = snapshot().environment?.weather ?? 'none'
+    ui.get<HTMLInputElement>('[data-k="weather-intensity"]').value = String(snapshot().environment?.intensity ?? 1)
     fillAtmosphereSelect(ui.get<HTMLSelectElement>('[data-k="atmosphere"]'), snapshot(), matchingAtmosphere(snapshot(), engine.style) ?? 'current')
     const root=box.querySelector<HTMLElement>('[data-k=terrain-letters]')!
     const layer=scene.terrain?.data.layers[tool.layer]
@@ -275,10 +281,10 @@ export async function createSandbox(engine: AsciiEngine, options: AreaOptions = 
       const label = document.createElement('span'); label.textContent = object.name + (active ? ' · initial' : ''); button.append(label); button.onclick = () => choose(object); list.append(button)
     }
     scene.waters.forEach((water, i) => {
-      const title = `${water.shape.kind === 'paint' ? 'Water' : water.shape.kind === 'pond' ? 'Lake' : 'Stream'} ${i + 1}`
+      const title = snapshot().waters?.[i].name || `${water.shape.kind === 'paint' ? 'Water' : water.shape.kind === 'pond' ? 'Lake' : 'Stream'} ${i + 1}`
       if (!normalized(title).includes(normalized(hierarchyQuery))) return
-      const button = document.createElement('button'); button.innerHTML = icon('water') + `<span>${title}</span>`
-      button.dataset.waterIndex=String(i); button.className = `hierarchy-object${selectedWater === i ? ' active' : ''}`; button.onclick = () => { choose(); selectedWater = i; ui!.selectPane('object'); refreshHierarchy() }; list.append(button)
+      const button = document.createElement('button'); button.innerHTML = icon('water'); const label=document.createElement('span');label.textContent=title;button.append(label)
+      button.dataset.waterIndex=String(i); button.className = `hierarchy-object${selectedWater === i ? ' active' : ''}`; button.classList.toggle('muted',!water.mesh.visible); button.onclick = () => { choose(); selectedWater = i; ui!.selectPane('object'); refreshHierarchy() }; list.append(button)
     })
     const inspector = ui!.inspector; inspector.replaceChildren()
     const field = (label: string, value: string, change: (value: string) => void, type = 'number') => {
@@ -415,7 +421,8 @@ export async function createSandbox(engine: AsciiEngine, options: AreaOptions = 
     el('new').onclick = () => run(async () => { await replace(defaultScene()); focus.set(0, .8, 0); setMode('translate'); changed() })
     el('item').onclick = () => run(async () => { await replace(emptyScene('My item')); focus.set(0, .8, 0); setMode('translate'); changed() })
     const save = () => downloadDocument(snapshot())
-    const exportScene = () => { downloadDocument(snapshot(), 'pomorog.json'); message('Exported for Pomorog') }
+    exportDialog = createExportDialog(snapshot)
+    const exportScene = () => exportDialog!.open()
     el('save').onclick = save; el('save-short').onclick = save
     el('export').onclick = exportScene; el('export-short').onclick = exportScene
     el('undo').onclick = () => run(() => undo()); el('redo').onclick = () => run(() => undo(true))
@@ -432,6 +439,7 @@ export async function createSandbox(engine: AsciiEngine, options: AreaOptions = 
     el('snap').onclick = () => { const on = el('snap').getAttribute('aria-pressed') !== 'true'; el('snap').setAttribute('aria-pressed', String(on)); el('snap').classList.toggle('active', on); gizmos!.snap(on) }
     el('frame').onclick = () => { focus.copy(selected?.position ?? new THREE.Vector3()); focus.y += .8 }
     el('reset-view').onclick = () => { cameraEditor!.view(null); canvas.dispatchEvent(new Event('editor-view-reset')) };
+    ui.root.querySelector<HTMLButtonElement>('[data-object-tool=erase]')!.onclick=()=>{placement.clear();tool.kind='erase';gizmos?.attach();refreshTools();refreshHint()}
     el('cancel').onclick = () => setMode('translate', true)
     el('preview').onclick = () => {
       placement.clear(); preview = !preview; document.body.classList.toggle('previewing', preview)
@@ -447,47 +455,21 @@ export async function createSandbox(engine: AsciiEngine, options: AreaOptions = 
       const input = e.target as HTMLInputElement, file = input.files?.[0]; input.value = ''
       if (file) run(async () => { await loadStylePreset(engine, file); atmosphereStudio?.refresh(); changed() })
     }
-    const brushes: [Tool, string, string][] = [['raise', 'Raise', 'terrain'], ['lower', 'Lower', 'terrain'], ['smooth', 'Smooth', 'rock'], ['flatten', 'Flatten', 'grid'], ['paint', 'Paint', 'cursor'], ['water', 'Water', 'water'], ['erase', 'Erase object', 'cube']]
+    const brushes: [Tool, string, string][] = [['raise', 'Raise', 'terrain'], ['lower', 'Lower', 'terrain'], ['smooth', 'Smooth', 'rock'], ['flatten', 'Flatten', 'grid'], ['paint', 'Paint', 'cursor'], ['water', 'Water', 'water']]
     box.innerHTML = `<div class="component-title">${icon('terrain')} Terrain tools</div><p data-k="no-terrain" class="empty-note" hidden>This item has no terrain. Use File → New map.</p><div class="brush-grid">${brushes.map(([key, title, symbol]) => `<button data-brush="${key}">${icon(symbol)}${title}</button>`).join('')}</div><label>Radius<input data-k="radius" type="range" min=".5" max="8" step=".25"></label><label>Water<select data-k="water-mode"><option value="terrain">Follow terrain</option><option value="level">Flat level (lake)</option></select></label><label>Strength<input data-k="strength" type="range" min=".01" max=".4" step=".01"></label><label>Layer<select data-k="layer"></select></label><button data-k="grow">Regrow grass</button><p class="empty-note">Drag over the terrain. Undo each stroke with Ctrl Z.</p><div data-k="terrain-letters"></div>`
     box.querySelectorAll<HTMLButtonElement>('[data-brush]').forEach(button => { button.onclick = () => { placement.clear(); tool.kind = button.dataset.brush as Tool; gizmos!.attach(); refreshTools(); refreshHint() } })
     for (const key of ['radius', 'strength'] as const) { const input = el<HTMLInputElement>(key); input.value = String(tool[key]); input.oninput = () => { tool[key] = Number(input.value) } }
     el<HTMLSelectElement>('water-mode').onchange = e => { tool.waterMode = (e.target as HTMLSelectElement).value as 'terrain' | 'level'; selectedWater = -1 }
     el<HTMLSelectElement>('layer').onchange = e => { tool.layer = Number((e.target as HTMLSelectElement).value); refreshTools() }
     el('grow').onclick = () => run(() => { scene.regrow(); changed() })
-    ui.environment.innerHTML = `<div class="component-title">${icon('spark')} Scene environment</div><label>Weather<select data-k="weather"><option value="none">No precipitation</option><option value="rain">Rain</option><option value="snow">Snow</option></select></label><label>Atmosphere<select data-k="atmosphere"><option value="moon">Moonlight</option><option value="dusk">Dusk</option><option value="ember">Ember</option></select></label><button data-k="open-studio">Open atmosphere studio</button><p class="empty-note">Settings saved with the map.</p>`
-    el<HTMLSelectElement>('weather').onchange = e => run(async () => { const doc = snapshot(); doc.environment = { weather: (e.target as HTMLSelectElement).value as 'none' | 'rain' | 'snow' }; await replace(doc); changed() })
+    ui.environment.innerHTML = `<div class="component-title">${icon('spark')} Scene environment</div><label>Weather<select data-k="weather"><option value="none">No precipitation</option><option value="rain">Rain</option><option value="snow">Snow</option></select></label><label>Weather intensity<input data-k="weather-intensity" type="range" min="0" max="1" step=".05" aria-label="Weather intensity"></label><label>Atmosphere<select data-k="atmosphere"><option value="moon">Moonlight</option><option value="dusk">Dusk</option><option value="ember">Ember</option></select></label><button data-k="open-studio">Open atmosphere studio</button><p class="empty-note">Settings saved with the map.</p>`
+    el<HTMLSelectElement>('weather').onchange = e => run(async () => { const doc = snapshot(); doc.environment = { ...doc.environment, weather: (e.target as HTMLSelectElement).value as 'none' | 'rain' | 'snow' }; await replace(doc); changed() })
+    el<HTMLInputElement>('weather-intensity').onchange=e=>run(async()=>{const doc=snapshot();doc.environment={weather:doc.environment?.weather ?? 'none',intensity:(e.target as HTMLInputElement).valueAsNumber};await replace(doc);changed()})
     el<HTMLSelectElement>('atmosphere').onchange = e => { const value = (e.target as HTMLSelectElement).value; if (value.startsWith('asset:')) atmosphereStudio!.applyAsset(value.slice(6)); else if (value !== 'current') atmosphereStudio!.setPreset(value as 'moon' | 'dusk' | 'ember') }
     el('open-studio').onclick = () => { atmosphereStudio!.refresh(); ui!.showStudio('atmosphere') }
     ui.root.addEventListener('project-tab', event => { const pane = (event as CustomEvent).detail; if (pane !== 'assets') { placement.clear(); gizmos?.attach(); gizmos?.cursor() } else gizmos?.attach(selected); if (pane === 'atmosphere') atmosphereStudio!.refresh() }, { signal: signal.signal })
     const modelImport = el<HTMLInputElement>('model-import')
     modelImport.onchange = () => { const files = Array.from(modelImport.files ?? []); modelImport.value = ''; if (files.length) canvas.dispatchEvent(new CustomEvent('editor-import-files', { detail: files })) }
-    const insert = el<HTMLInputElement>('insert')
-    insert.onchange = () => { const file = insert.files?.[0]; insert.value = ''; if (file) run(async () => {
-      const item = parseScene(JSON.parse(await file.text())), doc = snapshot()
-      if (item.terrain || item.waters?.length) throw new Error('To insert an item, save a document without terrain or water. Use Open for maps.')
-      const remap = new Map(Object.keys(item.assets ?? {}).map(key => [key, `asset-${crypto.randomUUID()}`]))
-      for (const [key, asset] of Object.entries(item.assets ?? {})) { doc.assets ??= {}; doc.assets[remap.get(key)!] = asset }
-      for (const [key, definition] of Object.entries(item.effects ?? {})) { const id = `fx:custom-${crypto.randomUUID()}`; remap.set(key, id); doc.effects ??= {}; doc.effects[id] = definition }
-      for (const asset of Object.values(item.atmospheres ?? {})) { doc.atmospheres ??= {}; doc.atmospheres[`atmosphere-${crypto.randomUUID()}`] = asset }
-      const textureRemap = new Map<string, string>()
-      for (const [key, asset] of Object.entries(item.textures ?? {})) { const id = `texture-${crypto.randomUUID()}`; textureRemap.set(key, id); doc.textures ??= {}; doc.textures[id] = asset }
-      for (const camera of Object.values(item.cameras ?? {})) { doc.cameras ??= {}; doc.cameras[`camera-${crypto.randomUUID()}`] = { ...camera, position: [camera.position[0] + focus.x, camera.position[1], camera.position[2] + focus.z] } }
-      const insertedTypes = new Map<string, string>()
-      for (const object of item.objects) {
-        const type = object.options?.type ?? object.prefab, typeStyle = item.style?.types?.[type] ?? library[object.prefab]?.style
-        const objectOptions = structuredClone(object.options ?? {})
-        if (objectOptions.texture) objectOptions.texture = textureRemap.get(objectOptions.texture) ?? objectOptions.texture
-        for (const part of Object.values(objectOptions.parts ?? {})) if (part.texture) part.texture = textureRemap.get(part.texture) ?? part.texture
-        let insertedType = insertedTypes.get(type)
-        if (!insertedType) { insertedType = `item-type-${crypto.randomUUID()}`; insertedTypes.set(type, insertedType); doc.style ??= {}; doc.style.types ??= {}; doc.style.types[insertedType] = { ...typeStyle, style: { ...item.style?.glyphs, ...typeStyle?.style } } }
-        objectOptions.type = insertedType
-        doc.objects.push({ ...object, id: crypto.randomUUID(), prefab: remap.get(object.prefab) ?? object.prefab,
-          position: [object.position[0] + focus.x, object.position[1] + (scene.terrain?.heightAt(focus.x, focus.z) ?? 0), object.position[2] + focus.z],
-          options: objectOptions,
-        })
-      }
-      await replace(doc); changed()
-    }) }
     refreshTools(); refreshHierarchy(); refreshHistory(); setMode('translate'); message(note || 'Everything saved in this browser')
 
     const raycaster = new THREE.Raycaster(), ndc = new THREE.Vector2(), plane = new THREE.Plane(new THREE.Vector3(0, 1, 0), 0)
@@ -629,16 +611,27 @@ export async function createSandbox(engine: AsciiEngine, options: AreaOptions = 
     },
     async importFiles(files) {
       if (busy) throw new Error('Wait for the current scene to finish opening.')
-      message('Importando modelos…')
-      const imported = await importModelFiles(files), doc = snapshot()
-      doc.assets = { ...doc.assets, ...imported }
+      message('Importing resources…')
+      const hasModels=files.some(file=>/\.(glb|gltf)$/i.test(file.name))
+      const imported=hasModels ? await importModelFiles(files) : {}
+      let doc=snapshot(), category=hasModels ? 'Imported' : 'All'
+      const resources=files.filter(file=>/\.json$/i.test(file.name))
+      if(!hasModels && !resources.length) throw new Error('Choose an item, texture, atmosphere, GLB or GLTF file.')
+      for(const file of resources) {
+        const resource=readImportedResource(JSON.parse(await file.text()),file.name)
+        if(resource.kind==='item') doc=insertSceneItem(doc,resource.document,[focus.x,scene.terrain?.heightAt(focus.x,focus.z) ?? 0,focus.z],Object.fromEntries(Object.entries(library).map(([key,prefab])=>[key,prefab.style])))
+        else if(resource.kind==='texture') { (doc.textures ??= {})[`texture-${crypto.randomUUID()}`]=resource.asset;category='Textures' }
+        else { (doc.atmospheres ??= {})[`atmosphere-${crypto.randomUUID()}`]=resource.asset;category='Atmospheres' }
+      }
+      if(hasModels) doc.assets = { ...doc.assets, ...imported }
       for (const [prefab, asset] of Object.entries(imported)) doc.objects.push({ id: crypto.randomUUID(), prefab, name: asset.name, position: [focus.x, scene.terrain?.heightAt(focus.x, focus.z) ?? 0, focus.z] })
-      await replace(doc); choose(scene.placed.at(-1)?.object); changed()
+      await replace(doc); if(hasModels) choose(scene.placed.at(-1)?.object); changed()
+      if(ui){assetCategory=category;refreshLibrary()}
     },
     update(time) { scene.update(time); placement.update(time) },
     dispose() {
       placement.clear(); signal.abort(); cameraEditor?.dispose(); effectEditor?.dispose(); textureStudio?.dispose(); gizmos?.dispose(); scene.dispose(); assets.dispose()
-      ui?.dispose()
+      exportDialog?.dispose(); ui?.dispose()
     },
   }
 }
