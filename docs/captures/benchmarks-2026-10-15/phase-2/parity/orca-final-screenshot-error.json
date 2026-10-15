@@ -1,0 +1,11 @@
+{
+  "id": "7e0c485b-3da0-4d7d-8a73-ef31ee157852",
+  "ok": false,
+  "error": {
+    "code": "browser_tab_not_found",
+    "message": "Browser page 157d306a-3e02-4891-9f04-6f30b39841c8 is no longer available"
+  },
+  "_meta": {
+    "runtimeId": "38cf1741-6edd-47a2-b539-0f58b1abc24e"
+  }
+}

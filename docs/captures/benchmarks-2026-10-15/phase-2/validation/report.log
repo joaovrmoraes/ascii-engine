@@ -1,0 +1,12 @@
+PASS Phase 2 protocol/parity/repeatability [
+  [ 'skinning', 'before-skinning', '1.11%' ],
+  [ 'skinning', 'after-skinning', '1.63%' ],
+  [ 'water-scale-1-off', 'water-scale-1', '1.32%' ],
+  [ 'water-scale-1-pause', 'water-scale-1', '1.50%' ],
+  [ 'water-scale-2-off', 'water-scale-2', '1.26%' ],
+  [ 'water-scale-2-pause', 'water-scale-2', '0.87%' ],
+  [ 'water-scale-4-off', 'water-scale-4', '2.42%' ],
+  [ 'water-scale-4-pause', 'water-scale-4', '0.12%' ],
+  [ 'water-scale-8-off', 'water-scale-8', '1.10%' ],
+  [ 'water-scale-8-pause', 'water-scale-8', '0.76%' ]
+]

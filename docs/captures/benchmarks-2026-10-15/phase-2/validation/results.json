@@ -1,0 +1,31 @@
+{
+  "phase": 2,
+  "check": "pass; 177 tests plus formatting, boundaries, type checks, editor build",
+  "compare": {
+    "sourceAfterCoreChanges": "0a4e072",
+    "coreTreeUnchangedSince": true,
+    "knownFailures": {
+      "reference": 0.041,
+      "forest": 0.0846,
+      "snow": 0.0436,
+      "cathedral": 0.0491
+    },
+    "passing": {
+      "marsh": 0.1282,
+      "mine": 0.035
+    },
+    "newFailures": [],
+    "baselinesChanged": false
+  },
+  "numericParityMaxAbsoluteDifference": 0,
+  "controlledImageRMSE": 0,
+  "frameRepeatabilityMaxPercent": 2.419457539706637,
+  "waterVisibleHash": "46f3835e",
+  "ownerStudyPlanSha256": "b96faa37b3d657add64b4513e1822ff04c72cd4365f21690c0299254873884b4",
+  "ownerConsolidationPlanSha256": "902a2dc97c95e8f5ffb90e79c1b09f1bc48230d610cdbf78d5e3316154b53916",
+  "orca": {
+    "page": "157d306a-3e02-4891-9f04-6f30b39841c8",
+    "run": "pass; 120 completed GPU frames, visible-only water updates, zero IndexedDB calls",
+    "capture": "unverified; earlier CDP screenshot timeout, final JPEG missing-page error while same-page eval succeeds"
+  }
+}
