@@ -1,0 +1,33 @@
+{
+  "revision": "b3d3784e5df7aa0797f1e51b23de8b5e6362086a",
+  "preservedUntracked": [
+    "?? docs/editor-consolidation-plan.md",
+    "?? docs/wasm-performance-study-plan.md"
+  ],
+  "runs": [
+    {
+      "run": 1,
+      "generateOnly": "passed",
+      "pnpmCheck": "passed",
+      "trackedStatusAfterGeneration": "",
+      "trackedStatusAfterCheck": "",
+      "pagesSha256": {
+        "docs/index.html": "aef7aaaa61f3a92827ce9b7e1887dcebac701027b1b3a83f7c7c67241ede64df",
+        "docs/watch.html": "aef7aaaa61f3a92827ce9b7e1887dcebac701027b1b3a83f7c7c67241ede64df"
+      },
+      "durationSeconds": 24.44
+    },
+    {
+      "run": 2,
+      "generateOnly": "passed",
+      "pnpmCheck": "passed",
+      "trackedStatusAfterGeneration": "",
+      "trackedStatusAfterCheck": "",
+      "pagesSha256": {
+        "docs/index.html": "aef7aaaa61f3a92827ce9b7e1887dcebac701027b1b3a83f7c7c67241ede64df",
+        "docs/watch.html": "aef7aaaa61f3a92827ce9b7e1887dcebac701027b1b3a83f7c7c67241ede64df"
+      },
+      "durationSeconds": 26.95
+    }
+  ]
+}

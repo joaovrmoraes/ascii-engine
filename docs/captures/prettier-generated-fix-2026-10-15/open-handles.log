@@ -1,0 +1,28 @@
+HANDLE TCPSERVERWRAP 3705
+Error
+    at AsyncHook.init (file:///home/joao/orca/workspaces/ascii-engine/threadfin/.cache/prettier-generated-fix/handles.mjs:4:83)
+    at TCP.emitInitNative (node:internal/async_hooks:208:43)
+    at createServerHandle (node:net:2309:14)
+    at Server.setupListenHandle [as _listen2] (node:net:2365:14)
+    at listenInCluster (node:net:2499:12)
+    at node:net:2728:7
+    at process.processTicksAndRejections (node:internal/process/task_queues:90:21)
+
+ RUN  v3.2.7 /home/joao/orca/workspaces/ascii-engine/threadfin/apps/editor
+
+ ✓ src/scene/files.test.ts (3 tests) 7ms
+
+ Test Files  1 passed (1)
+      Tests  3 passed (3)
+   Start at  10:45:11
+   Duration  671ms (transform 276ms, setup 0ms, collect 381ms, tests 7ms, environment 0ms, prepare 90ms)
+
+{"kind":"ChildProcess"}
+{"kind":"Server","address":{"address":"127.0.0.1","family":"IPv4","port":1442},"listening":true}
+HANDLE TCPWRAP 22823
+Error
+    at AsyncHook.init (file:///home/joao/orca/workspaces/ascii-engine/threadfin/.cache/prettier-generated-fix/handles.mjs:4:83)
+    at TCP.emitInitNative (node:internal/async_hooks:208:43)
+close timed out after 10000ms
+Tests closed successfully but something prevents Vite server from exiting
+You can try to identify the cause by enabling "hanging-process" reporter. See https://vitest.dev/config/#reporters

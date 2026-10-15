@@ -1,0 +1,11 @@
+{
+  "id": "b6996b08-e0d0-4d70-87f4-b9d7116cffe5",
+  "ok": true,
+  "result": {
+    "result": "{\"name\":\"Meu item\",\"ready\":true,\"url\":\"http://localhost:1440/?area=sandbox\"}",
+    "origin": "http://localhost:1440/?area=sandbox"
+  },
+  "_meta": {
+    "runtimeId": "38cf1741-6edd-47a2-b539-0f58b1abc24e"
+  }
+}

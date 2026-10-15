@@ -1,0 +1,10 @@
+
+ RUN  v3.2.7 /home/joao/orca/workspaces/ascii-engine/threadfin/apps/editor
+
+ ✓ src/scene/files.test.ts (3 tests) 9ms
+
+ Test Files  1 passed (1)
+      Tests  3 passed (3)
+   Start at  10:46:55
+   Duration  721ms (transform 289ms, setup 0ms, collect 422ms, tests 9ms, environment 0ms, prepare 70ms)
+

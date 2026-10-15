@@ -1,0 +1,38 @@
+$ node scripts/verify-pages.mjs http://127.0.0.1:4179/ .cache/prettier-generated-fix/pages-verify
+PASS gallery retains seven video chapters
+PASS gallery exposes exactly five map buttons
+PASS gallery embeds one reusable demo frame
+PASS embedded controls omit the area menu and the separate link opens the standalone viewer
+PASS embedded rain_marsh switches without leaving the gallery
+PASS embedded snow_pines switches without leaving the gallery
+PASS embedded old_mine switches without leaving the gallery
+PASS embedded sunken_cathedral switches without leaving the gallery
+PASS embedded dark_forest switches without leaving the gallery
+PASS embedded control reloads keep the selected map and gallery URL
+PASS embedded viewer controls remain interactive
+PASS map buttons still switch after navigation inside the frame
+PASS keyboard activation switches the embedded map
+PASS embedded gallery fits a mobile viewport without horizontal overflow
+PASS the video gallery also embeds the five-map viewer
+PASS dark_forest retains sandbox controls
+PASS dark_forest renders real WebGL content beneath the project path
+PASS public area menu contains only the five requested maps
+PASS public demos expose viewing controls without authoring tools
+PASS visitors can pause the forest demo
+PASS visitors can rotate the demo camera
+PASS visitors can adjust demo lighting
+PASS area switching preserves the hosted subdirectory and shareable URL
+PASS rain_marsh retains sandbox controls
+PASS rain_marsh renders real WebGL content beneath the project path
+PASS snow_pines retains sandbox controls
+PASS snow_pines renders real WebGL content beneath the project path
+PASS old_mine retains sandbox controls
+PASS old_mine renders real WebGL content beneath the project path
+PASS authoring URL sandbox falls back to the forest demo
+PASS authoring URL effects falls back to the forest demo
+PASS authoring URL gltf falls back to the forest demo
+PASS authoring URL reference falls back to the forest demo
+PASS authoring URL terrain falls back to the forest demo
+PASS public sandbox never attempts a local WebSocket connection
+PASS gallery and all demos load without failed HTTP responses
+PASS no uncaught production page exceptions

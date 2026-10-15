@@ -30,9 +30,15 @@ which is released after teardown. No timeout suppression was added.
 Initial validation: editor tests with the hanging-process reporter, free-port
 release, format:check, production Pages build and verify:pages passed. Orca
 checked the isolated sandbox page 4d61c29e-ae0f-4880-a018-3d0e6313dbfe without
-editing the document. Two regeneration/check cycles on the committed fix are
-the remaining final validation; results will be recorded below. Owner plans
-remain untracked and untouched. No push or publication.
+editing the document. On committed fix b3d3784, two consecutive cycles of
+preview-readme --github-pages --generate-only followed by pnpm check passed
+(159 tests each), with no tracked changes after generation or after checking.
+Both HTMLs remained byte-identical across the cycles. Neither check emitted
+the editor teardown warning; the existing dev bridge remained available.
+The two preexisting owner plans remain untracked and untouched; full status
+is unchanged apart from those plans. No push or publication.
+
+[Generated-output audit, capture and validation logs](captures/prettier-generated-fix-2026-10-15/README.md).
 
 ## 2026-10-15 — Consistent formatting and check gate
 
