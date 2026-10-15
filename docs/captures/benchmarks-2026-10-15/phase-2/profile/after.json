@@ -1,0 +1,537 @@
+{
+  "source": "5bc6077d6173627d21ccda7d9f3b81a94279a03e",
+  "flags": [
+    "--headless=new",
+    "--no-sandbox",
+    "--use-angle=gl",
+    "--enable-gpu",
+    "--ignore-gpu-blocklist",
+    "--hide-scrollbars",
+    "--window-size=1920,1080",
+    "--force-device-scale-factor=1",
+    "--disable-gpu-vsync",
+    "--disable-frame-rate-limit",
+    "--remote-debugging-port=0",
+    "--user-data-dir=<isolated temporary profile>",
+    "about:blank"
+  ],
+  "chromium": {
+    "protocolVersion": "1.3",
+    "product": "Chrome/152.0.7977.82",
+    "revision": "@d04cdb24d67b081f6cf80200ffc5233f44b61109",
+    "userAgent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/152.0.0.0 Safari/537.36",
+    "jsVersion": "15.2.124.21"
+  },
+  "browser": {
+    "userAgent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/152.0.0.0 Safari/537.36",
+    "isolated": true,
+    "hardwareConcurrency": 12,
+    "timerResolutionMs": 0.004999998956918716,
+    "renderer": "ANGLE (Intel, Mesa Intel(R) Graphics (ADL GT2), OpenGL ES 3.2)",
+    "vendor": "Google Inc. (Intel)"
+  },
+  "creatures": [
+    {
+      "letters": 1091,
+      "sourceVertices": 144,
+      "uniqueCorners": 144,
+      "bones": 7
+    },
+    {
+      "letters": 1098,
+      "sourceVertices": 144,
+      "uniqueCorners": 144,
+      "bones": 7
+    },
+    {
+      "letters": 1095,
+      "sourceVertices": 144,
+      "uniqueCorners": 144,
+      "bones": 7
+    },
+    {
+      "letters": 1096,
+      "sourceVertices": 144,
+      "uniqueCorners": 144,
+      "bones": 7
+    },
+    {
+      "letters": 1177,
+      "sourceVertices": 144,
+      "uniqueCorners": 144,
+      "bones": 7
+    },
+    {
+      "letters": 1177,
+      "sourceVertices": 144,
+      "uniqueCorners": 144,
+      "bones": 7
+    },
+    {
+      "letters": 1177,
+      "sourceVertices": 144,
+      "uniqueCorners": 144,
+      "bones": 7
+    },
+    {
+      "letters": 1177,
+      "sourceVertices": 144,
+      "uniqueCorners": 144,
+      "bones": 7
+    },
+    {
+      "letters": 1177,
+      "sourceVertices": 144,
+      "uniqueCorners": 143,
+      "bones": 7
+    },
+    {
+      "letters": 1177,
+      "sourceVertices": 144,
+      "uniqueCorners": 144,
+      "bones": 7
+    },
+    {
+      "letters": 1177,
+      "sourceVertices": 144,
+      "uniqueCorners": 143,
+      "bones": 7
+    },
+    {
+      "letters": 1177,
+      "sourceVertices": 144,
+      "uniqueCorners": 144,
+      "bones": 7
+    },
+    {
+      "letters": 1092,
+      "sourceVertices": 144,
+      "uniqueCorners": 144,
+      "bones": 7
+    },
+    {
+      "letters": 1100,
+      "sourceVertices": 144,
+      "uniqueCorners": 144,
+      "bones": 7
+    },
+    {
+      "letters": 1097,
+      "sourceVertices": 144,
+      "uniqueCorners": 144,
+      "bones": 7
+    },
+    {
+      "letters": 1094,
+      "sourceVertices": 144,
+      "uniqueCorners": 144,
+      "bones": 7
+    }
+  ],
+  "frames": 1200,
+  "warning": "CPU and allocation sampling perturb timings; diagnostic only, not performance baseline",
+  "hot": [
+    {
+      "function": "(idle)",
+      "url": "",
+      "line": -1,
+      "ms": 6111.546
+    },
+    {
+      "function": "(program)",
+      "url": "",
+      "line": -1,
+      "ms": 600.815
+    },
+    {
+      "function": "updateSkinnedBody",
+      "url": "http://localhost:1440/@fs/home/joao/orca/workspaces/ascii-engine/threadfin/packages/engine/src/techniques/body.ts?t=1792084573034",
+      "line": 345,
+      "ms": 310.005
+    },
+    {
+      "function": "updateSkinVertices",
+      "url": "http://localhost:1440/@fs/home/joao/orca/workspaces/ascii-engine/threadfin/packages/engine/src/techniques/skinnedVertices.ts?t=1792084573034",
+      "line": 14,
+      "ms": 118.248
+    },
+    {
+      "function": "bufferSubData",
+      "url": "",
+      "line": -1,
+      "ms": 91.346
+    },
+    {
+      "function": "",
+      "url": "http://localhost:1440/src/benchmark/main.ts?t=1792084573034",
+      "line": 110,
+      "ms": 79.253
+    },
+    {
+      "function": "pollChannel.port1.onmessage",
+      "url": "http://localhost:1440/src/benchmark/main.ts?t=1792084573034",
+      "line": 105,
+      "ms": 60.855
+    },
+    {
+      "function": "step",
+      "url": "http://localhost:1440/src/benchmark/main.ts?t=1792084573034",
+      "line": 120,
+      "ms": 52.946
+    },
+    {
+      "function": "render",
+      "url": "http://localhost:1440/@fs/home/joao/orca/workspaces/ascii-engine/threadfin/packages/engine/src/engine.ts?t=1792084573034",
+      "line": 706,
+      "ms": 48.422
+    },
+    {
+      "function": "setTimeout",
+      "url": "",
+      "line": -1,
+      "ms": 42.983
+    },
+    {
+      "function": "pollFence",
+      "url": "http://localhost:1440/src/benchmark/main.ts?t=1792084573034",
+      "line": 74,
+      "ms": 34.365
+    },
+    {
+      "function": "texSubImage2D",
+      "url": "",
+      "line": -1,
+      "ms": 28.754
+    },
+    {
+      "function": "setProgram",
+      "url": "http://localhost:1440/node_modules/.vite/deps/chunk-V7KZFINS.js?v=5e7097f4",
+      "line": 42831,
+      "ms": 28.555
+    },
+    {
+      "function": "WebGLRenderer.renderBufferDirect",
+      "url": "http://localhost:1440/node_modules/.vite/deps/chunk-V7KZFINS.js?v=5e7097f4",
+      "line": 42251,
+      "ms": 27.118
+    },
+    {
+      "function": "clientWaitSync",
+      "url": "",
+      "line": -1,
+      "ms": 23.733
+    },
+    {
+      "function": "upload",
+      "url": "http://localhost:1440/node_modules/.vite/deps/chunk-V7KZFINS.js?v=5e7097f4",
+      "line": 35761,
+      "ms": 20.428
+    },
+    {
+      "function": "setup",
+      "url": "http://localhost:1440/node_modules/.vite/deps/chunk-V7KZFINS.js?v=5e7097f4",
+      "line": 33043,
+      "ms": 19.79
+    },
+    {
+      "function": "clear",
+      "url": "",
+      "line": -1,
+      "ms": 19.542
+    },
+    {
+      "function": "texSubImage2D",
+      "url": "http://localhost:1440/node_modules/.vite/deps/chunk-V7KZFINS.js?v=5e7097f4",
+      "line": 38499,
+      "ms": 18.865
+    },
+    {
+      "function": "getTextureCacheKey",
+      "url": "http://localhost:1440/node_modules/.vite/deps/chunk-V7KZFINS.js?v=5e7097f4",
+      "line": 38984,
+      "ms": 16.738
+    },
+    {
+      "function": "",
+      "url": "http://localhost:1440/src/benchmark/scenes.ts?t=1792084573034",
+      "line": 163,
+      "ms": 16.308
+    },
+    {
+      "function": "setup",
+      "url": "http://localhost:1440/node_modules/.vite/deps/chunk-V7KZFINS.js?v=5e7097f4",
+      "line": 33043,
+      "ms": 15.414
+    },
+    {
+      "function": "needsUpdate",
+      "url": "http://localhost:1440/node_modules/.vite/deps/chunk-V7KZFINS.js?v=5e7097f4",
+      "line": 33119,
+      "ms": 14.912
+    },
+    {
+      "function": "flatten",
+      "url": "http://localhost:1440/node_modules/.vite/deps/chunk-V7KZFINS.js?v=5e7097f4",
+      "line": 35110,
+      "ms": 14.167
+    },
+    {
+      "function": "flatten",
+      "url": "http://localhost:1440/node_modules/.vite/deps/chunk-V7KZFINS.js?v=5e7097f4",
+      "line": 35110,
+      "ms": 13.291
+    },
+    {
+      "function": "bindBuffer",
+      "url": "",
+      "line": -1,
+      "ms": 13.014
+    },
+    {
+      "function": "bindVertexArray",
+      "url": "",
+      "line": -1,
+      "ms": 10.65
+    },
+    {
+      "function": "projectObject",
+      "url": "http://localhost:1440/node_modules/.vite/deps/chunk-V7KZFINS.js?v=5e7097f4",
+      "line": 42551,
+      "ms": 10.517
+    },
+    {
+      "function": "sort",
+      "url": "http://localhost:1440/node_modules/.vite/deps/chunk-V7KZFINS.js?v=5e7097f4",
+      "line": 37054,
+      "ms": 10.289
+    },
+    {
+      "function": "updateMatrixWorld",
+      "url": "http://localhost:1440/node_modules/.vite/deps/chunk-V7KZFINS.js?v=5e7097f4",
+      "line": 7336,
+      "ms": 9.87
+    },
+    {
+      "function": "compose",
+      "url": "http://localhost:1440/node_modules/.vite/deps/chunk-V7KZFINS.js?v=5e7097f4",
+      "line": 6065,
+      "ms": 9.749
+    },
+    {
+      "function": "WebGLRenderer.render",
+      "url": "http://localhost:1440/node_modules/.vite/deps/chunk-V7KZFINS.js?v=5e7097f4",
+      "line": 42447,
+      "ms": 9.628
+    },
+    {
+      "function": "projectObject",
+      "url": "http://localhost:1440/node_modules/.vite/deps/chunk-V7KZFINS.js?v=5e7097f4",
+      "line": 42551,
+      "ms": 8.829
+    },
+    {
+      "function": "setValue",
+      "url": "http://localhost:1440/node_modules/.vite/deps/chunk-V7KZFINS.js?v=5e7097f4",
+      "line": 35753,
+      "ms": 8.686
+    },
+    {
+      "function": "WebGLRenderer.renderBufferDirect",
+      "url": "http://localhost:1440/node_modules/.vite/deps/chunk-V7KZFINS.js?v=5e7097f4",
+      "line": 42251,
+      "ms": 8.615
+    }
+  ],
+  "allocations": [
+    {
+      "function": "setValueM4",
+      "url": "http://localhost:1440/node_modules/.vite/deps/chunk-V7KZFINS.js?v=5e7097f4",
+      "bytes": 3867336
+    },
+    {
+      "function": "setValueV3f",
+      "url": "http://localhost:1440/node_modules/.vite/deps/chunk-V7KZFINS.js?v=5e7097f4",
+      "bytes": 2785788
+    },
+    {
+      "function": "setValueM4",
+      "url": "http://localhost:1440/node_modules/.vite/deps/chunk-V7KZFINS.js?v=5e7097f4",
+      "bytes": 2720244
+    },
+    {
+      "function": "next",
+      "url": "",
+      "bytes": 2687800
+    },
+    {
+      "function": "updateTexture",
+      "url": "http://localhost:1440/node_modules/.vite/deps/chunk-V7KZFINS.js?v=5e7097f4",
+      "bytes": 2066188
+    },
+    {
+      "function": "add",
+      "url": "http://localhost:1440/src/benchmark/main.ts?t=1792084573034",
+      "bytes": 2031984
+    },
+    {
+      "function": "next",
+      "url": "",
+      "bytes": 1802800
+    },
+    {
+      "function": "setFromProjectionMatrix",
+      "url": "http://localhost:1440/node_modules/.vite/deps/chunk-V7KZFINS.js?v=5e7097f4",
+      "bytes": 1704252
+    },
+    {
+      "function": "next",
+      "url": "",
+      "bytes": 1474932
+    },
+    {
+      "function": "sort",
+      "url": "",
+      "bytes": 1389200
+    },
+    {
+      "function": "join",
+      "url": "",
+      "bytes": 1344904
+    },
+    {
+      "function": "setValueV3f",
+      "url": "http://localhost:1440/node_modules/.vite/deps/chunk-V7KZFINS.js?v=5e7097f4",
+      "bytes": 1278192
+    },
+    {
+      "function": "from",
+      "url": "",
+      "bytes": 1238096
+    },
+    {
+      "function": "setValueV3f",
+      "url": "http://localhost:1440/node_modules/.vite/deps/chunk-V7KZFINS.js?v=5e7097f4",
+      "bytes": 1048764
+    },
+    {
+      "function": "getTextureCacheKey",
+      "url": "http://localhost:1440/node_modules/.vite/deps/chunk-V7KZFINS.js?v=5e7097f4",
+      "bytes": 983904
+    },
+    {
+      "function": "setValueV4fArray",
+      "url": "http://localhost:1440/node_modules/.vite/deps/chunk-V7KZFINS.js?v=5e7097f4",
+      "bytes": 884904
+    },
+    {
+      "function": "pollChannel.port1.onmessage",
+      "url": "http://localhost:1440/src/benchmark/main.ts?t=1792084573034",
+      "bytes": 855480
+    },
+    {
+      "function": "render",
+      "url": "http://localhost:1440/@fs/home/joao/orca/workspaces/ascii-engine/threadfin/packages/engine/src/engine.ts?t=1792084573034",
+      "bytes": 822120
+    },
+    {
+      "function": "next",
+      "url": "",
+      "bytes": 819460
+    },
+    {
+      "function": "setFromProjectionMatrix",
+      "url": "http://localhost:1440/node_modules/.vite/deps/chunk-V7KZFINS.js?v=5e7097f4",
+      "bytes": 688260
+    },
+    {
+      "function": "updateTexture",
+      "url": "http://localhost:1440/node_modules/.vite/deps/chunk-V7KZFINS.js?v=5e7097f4",
+      "bytes": 655896
+    },
+    {
+      "function": "",
+      "url": "http://localhost:1440/src/benchmark/main.ts?t=1792084573034",
+      "bytes": 644704
+    },
+    {
+      "function": "join",
+      "url": "",
+      "bytes": 623220
+    },
+    {
+      "function": "Plane",
+      "url": "http://localhost:1440/node_modules/.vite/deps/chunk-V7KZFINS.js?v=5e7097f4",
+      "bytes": 524472
+    },
+    {
+      "function": "pollFence",
+      "url": "http://localhost:1440/src/benchmark/main.ts?t=1792084573034",
+      "bytes": 524396
+    },
+    {
+      "function": "projectObject",
+      "url": "http://localhost:1440/node_modules/.vite/deps/chunk-V7KZFINS.js?v=5e7097f4",
+      "bytes": 459528
+    },
+    {
+      "function": "(V8 API)",
+      "url": "",
+      "bytes": 426540
+    },
+    {
+      "function": "Frustum",
+      "url": "http://localhost:1440/node_modules/.vite/deps/chunk-V7KZFINS.js?v=5e7097f4",
+      "bytes": 426232
+    },
+    {
+      "function": "step",
+      "url": "http://localhost:1440/src/benchmark/main.ts?t=1792084573034",
+      "bytes": 426108
+    },
+    {
+      "function": "setFromProjectionMatrix",
+      "url": "http://localhost:1440/node_modules/.vite/deps/chunk-V7KZFINS.js?v=5e7097f4",
+      "bytes": 426060
+    },
+    {
+      "function": "WebGLRenderer.renderBufferDirect",
+      "url": "http://localhost:1440/node_modules/.vite/deps/chunk-V7KZFINS.js?v=5e7097f4",
+      "bytes": 426060
+    },
+    {
+      "function": "invert",
+      "url": "http://localhost:1440/node_modules/.vite/deps/chunk-V7KZFINS.js?v=5e7097f4",
+      "bytes": 327744
+    },
+    {
+      "function": "getTextureCacheKey",
+      "url": "http://localhost:1440/node_modules/.vite/deps/chunk-V7KZFINS.js?v=5e7097f4",
+      "bytes": 295260
+    },
+    {
+      "function": "updateTexture",
+      "url": "http://localhost:1440/node_modules/.vite/deps/chunk-V7KZFINS.js?v=5e7097f4",
+      "bytes": 262368
+    },
+    {
+      "function": "values",
+      "url": "",
+      "bytes": 262248
+    }
+  ],
+  "gpuQueue": {
+    "limit": 2,
+    "scheduler": "task",
+    "peak": 2,
+    "completedFrames": 1200,
+    "pollCallbacks": 6930,
+    "totalSchedulerCpuMs": 69.86999998986721,
+    "completionClock": "CPU-observed asynchronous fence completion; includes polling delay",
+    "polling": "non-nested 1 ms timers and task submissions; no spin or blocking GPU wait"
+  },
+  "sourceNote": "Working tree after 5bc6077, before optimized JS commit; CPU/heap sampling diagnostic, not benchmark.",
+  "sourceFiles": {
+    "packages/engine/src/techniques/body.ts": "06b054202b68a9f07ca9403e876f6cd994da8119826cc796ddf54dc09089c78c",
+    "packages/engine/src/techniques/skinnedVertices.ts": "55bb5eafa2c8a1e8a3a3837163a96b2653ec5fc9e3114ebcb38f833e6fb20c33"
+  }
+}

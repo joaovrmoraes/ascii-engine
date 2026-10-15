@@ -1,0 +1,44 @@
+[
+  {
+    "scene": "reference",
+    "rmse": 0,
+    "clock": "fixed injected rAF, fallback disabled, pause=3",
+    "sourceBefore": "34c7ca9",
+    "sourceAfter": "working tree"
+  },
+  {
+    "scene": "dark_forest",
+    "rmse": 0,
+    "clock": "fixed injected rAF, fallback disabled, pause=3",
+    "sourceBefore": "34c7ca9",
+    "sourceAfter": "working tree"
+  },
+  {
+    "scene": "rain_marsh",
+    "rmse": 0,
+    "clock": "fixed injected rAF, fallback disabled, pause=3",
+    "sourceBefore": "34c7ca9",
+    "sourceAfter": "working tree"
+  },
+  {
+    "scene": "snow_pines",
+    "rmse": 0,
+    "clock": "fixed injected rAF, fallback disabled, pause=3",
+    "sourceBefore": "34c7ca9",
+    "sourceAfter": "working tree"
+  },
+  {
+    "scene": "old_mine",
+    "rmse": 0,
+    "clock": "fixed injected rAF, fallback disabled, pause=3",
+    "sourceBefore": "34c7ca9",
+    "sourceAfter": "working tree"
+  },
+  {
+    "scene": "sunken_cathedral",
+    "rmse": 0,
+    "clock": "fixed injected rAF, fallback disabled, pause=3",
+    "sourceBefore": "34c7ca9",
+    "sourceAfter": "working tree"
+  }
+]

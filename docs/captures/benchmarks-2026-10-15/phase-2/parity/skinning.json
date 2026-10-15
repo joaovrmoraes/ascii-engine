@@ -1,0 +1,1135 @@
+{
+  "before": "http://localhost:1445",
+  "after": "http://localhost:1440",
+  "dt": 0.016666666666666666,
+  "results": [
+    {
+      "id": "skinning",
+      "steps": 1,
+      "arrays": [
+        {
+          "body": 0,
+          "field": "position",
+          "values": 3273,
+          "maximumAbsoluteDifference": 0,
+          "differentValues": 0
+        },
+        {
+          "body": 0,
+          "field": "normal",
+          "values": 3273,
+          "maximumAbsoluteDifference": 0,
+          "differentValues": 0
+        },
+        {
+          "body": 1,
+          "field": "position",
+          "values": 3294,
+          "maximumAbsoluteDifference": 0,
+          "differentValues": 0
+        },
+        {
+          "body": 1,
+          "field": "normal",
+          "values": 3294,
+          "maximumAbsoluteDifference": 0,
+          "differentValues": 0
+        },
+        {
+          "body": 2,
+          "field": "position",
+          "values": 3285,
+          "maximumAbsoluteDifference": 0,
+          "differentValues": 0
+        },
+        {
+          "body": 2,
+          "field": "normal",
+          "values": 3285,
+          "maximumAbsoluteDifference": 0,
+          "differentValues": 0
+        },
+        {
+          "body": 3,
+          "field": "position",
+          "values": 3288,
+          "maximumAbsoluteDifference": 0,
+          "differentValues": 0
+        },
+        {
+          "body": 3,
+          "field": "normal",
+          "values": 3288,
+          "maximumAbsoluteDifference": 0,
+          "differentValues": 0
+        },
+        {
+          "body": 4,
+          "field": "position",
+          "values": 3531,
+          "maximumAbsoluteDifference": 0,
+          "differentValues": 0
+        },
+        {
+          "body": 4,
+          "field": "normal",
+          "values": 3531,
+          "maximumAbsoluteDifference": 0,
+          "differentValues": 0
+        },
+        {
+          "body": 5,
+          "field": "position",
+          "values": 3531,
+          "maximumAbsoluteDifference": 0,
+          "differentValues": 0
+        },
+        {
+          "body": 5,
+          "field": "normal",
+          "values": 3531,
+          "maximumAbsoluteDifference": 0,
+          "differentValues": 0
+        },
+        {
+          "body": 6,
+          "field": "position",
+          "values": 3531,
+          "maximumAbsoluteDifference": 0,
+          "differentValues": 0
+        },
+        {
+          "body": 6,
+          "field": "normal",
+          "values": 3531,
+          "maximumAbsoluteDifference": 0,
+          "differentValues": 0
+        },
+        {
+          "body": 7,
+          "field": "position",
+          "values": 3531,
+          "maximumAbsoluteDifference": 0,
+          "differentValues": 0
+        },
+        {
+          "body": 7,
+          "field": "normal",
+          "values": 3531,
+          "maximumAbsoluteDifference": 0,
+          "differentValues": 0
+        },
+        {
+          "body": 8,
+          "field": "position",
+          "values": 3531,
+          "maximumAbsoluteDifference": 0,
+          "differentValues": 0
+        },
+        {
+          "body": 8,
+          "field": "normal",
+          "values": 3531,
+          "maximumAbsoluteDifference": 0,
+          "differentValues": 0
+        },
+        {
+          "body": 9,
+          "field": "position",
+          "values": 3531,
+          "maximumAbsoluteDifference": 0,
+          "differentValues": 0
+        },
+        {
+          "body": 9,
+          "field": "normal",
+          "values": 3531,
+          "maximumAbsoluteDifference": 0,
+          "differentValues": 0
+        },
+        {
+          "body": 10,
+          "field": "position",
+          "values": 3531,
+          "maximumAbsoluteDifference": 0,
+          "differentValues": 0
+        },
+        {
+          "body": 10,
+          "field": "normal",
+          "values": 3531,
+          "maximumAbsoluteDifference": 0,
+          "differentValues": 0
+        },
+        {
+          "body": 11,
+          "field": "position",
+          "values": 3531,
+          "maximumAbsoluteDifference": 0,
+          "differentValues": 0
+        },
+        {
+          "body": 11,
+          "field": "normal",
+          "values": 3531,
+          "maximumAbsoluteDifference": 0,
+          "differentValues": 0
+        },
+        {
+          "body": 12,
+          "field": "position",
+          "values": 3276,
+          "maximumAbsoluteDifference": 0,
+          "differentValues": 0
+        },
+        {
+          "body": 12,
+          "field": "normal",
+          "values": 3276,
+          "maximumAbsoluteDifference": 0,
+          "differentValues": 0
+        },
+        {
+          "body": 13,
+          "field": "position",
+          "values": 3300,
+          "maximumAbsoluteDifference": 0,
+          "differentValues": 0
+        },
+        {
+          "body": 13,
+          "field": "normal",
+          "values": 3300,
+          "maximumAbsoluteDifference": 0,
+          "differentValues": 0
+        },
+        {
+          "body": 14,
+          "field": "position",
+          "values": 3291,
+          "maximumAbsoluteDifference": 0,
+          "differentValues": 0
+        },
+        {
+          "body": 14,
+          "field": "normal",
+          "values": 3291,
+          "maximumAbsoluteDifference": 0,
+          "differentValues": 0
+        },
+        {
+          "body": 15,
+          "field": "position",
+          "values": 3282,
+          "maximumAbsoluteDifference": 0,
+          "differentValues": 0
+        },
+        {
+          "body": 15,
+          "field": "normal",
+          "values": 3282,
+          "maximumAbsoluteDifference": 0,
+          "differentValues": 0
+        }
+      ],
+      "imageRmse": 0,
+      "before": {
+        "configuration": {
+          "name": "skinning",
+          "seed": 4242,
+          "carpetSeed": 48017,
+          "cover": 1800,
+          "dt": 0.016666666666666666,
+          "creatures": 16,
+          "bonesPerCreature": 7,
+          "skinWeights": [
+            0.9,
+            0.1
+          ],
+          "bodySize": 0.09
+        },
+        "diagnostics": {
+          "waterCalls": []
+        },
+        "fingerprint": {
+          "hash": "80983f89",
+          "values": 61485,
+          "skinnedPoints": 18179,
+          "time": 0.016666666666666666
+        }
+      },
+      "after": {
+        "configuration": {
+          "name": "skinning",
+          "seed": 4242,
+          "carpetSeed": 48017,
+          "cover": 1800,
+          "dt": 0.016666666666666666,
+          "creatures": 16,
+          "bonesPerCreature": 7,
+          "skinWeights": [
+            0.9,
+            0.1
+          ],
+          "bodySize": 0.09
+        },
+        "diagnostics": {
+          "waterCalls": []
+        },
+        "fingerprint": {
+          "hash": "80983f89",
+          "values": 61485,
+          "skinnedPoints": 18179,
+          "time": 0.016666666666666666
+        }
+      },
+      "storageCalls": 0
+    },
+    {
+      "id": "skinning",
+      "steps": 60,
+      "arrays": [
+        {
+          "body": 0,
+          "field": "position",
+          "values": 3273,
+          "maximumAbsoluteDifference": 0,
+          "differentValues": 0
+        },
+        {
+          "body": 0,
+          "field": "normal",
+          "values": 3273,
+          "maximumAbsoluteDifference": 0,
+          "differentValues": 0
+        },
+        {
+          "body": 1,
+          "field": "position",
+          "values": 3294,
+          "maximumAbsoluteDifference": 0,
+          "differentValues": 0
+        },
+        {
+          "body": 1,
+          "field": "normal",
+          "values": 3294,
+          "maximumAbsoluteDifference": 0,
+          "differentValues": 0
+        },
+        {
+          "body": 2,
+          "field": "position",
+          "values": 3285,
+          "maximumAbsoluteDifference": 0,
+          "differentValues": 0
+        },
+        {
+          "body": 2,
+          "field": "normal",
+          "values": 3285,
+          "maximumAbsoluteDifference": 0,
+          "differentValues": 0
+        },
+        {
+          "body": 3,
+          "field": "position",
+          "values": 3288,
+          "maximumAbsoluteDifference": 0,
+          "differentValues": 0
+        },
+        {
+          "body": 3,
+          "field": "normal",
+          "values": 3288,
+          "maximumAbsoluteDifference": 0,
+          "differentValues": 0
+        },
+        {
+          "body": 4,
+          "field": "position",
+          "values": 3531,
+          "maximumAbsoluteDifference": 0,
+          "differentValues": 0
+        },
+        {
+          "body": 4,
+          "field": "normal",
+          "values": 3531,
+          "maximumAbsoluteDifference": 0,
+          "differentValues": 0
+        },
+        {
+          "body": 5,
+          "field": "position",
+          "values": 3531,
+          "maximumAbsoluteDifference": 0,
+          "differentValues": 0
+        },
+        {
+          "body": 5,
+          "field": "normal",
+          "values": 3531,
+          "maximumAbsoluteDifference": 0,
+          "differentValues": 0
+        },
+        {
+          "body": 6,
+          "field": "position",
+          "values": 3531,
+          "maximumAbsoluteDifference": 0,
+          "differentValues": 0
+        },
+        {
+          "body": 6,
+          "field": "normal",
+          "values": 3531,
+          "maximumAbsoluteDifference": 0,
+          "differentValues": 0
+        },
+        {
+          "body": 7,
+          "field": "position",
+          "values": 3531,
+          "maximumAbsoluteDifference": 0,
+          "differentValues": 0
+        },
+        {
+          "body": 7,
+          "field": "normal",
+          "values": 3531,
+          "maximumAbsoluteDifference": 0,
+          "differentValues": 0
+        },
+        {
+          "body": 8,
+          "field": "position",
+          "values": 3531,
+          "maximumAbsoluteDifference": 0,
+          "differentValues": 0
+        },
+        {
+          "body": 8,
+          "field": "normal",
+          "values": 3531,
+          "maximumAbsoluteDifference": 0,
+          "differentValues": 0
+        },
+        {
+          "body": 9,
+          "field": "position",
+          "values": 3531,
+          "maximumAbsoluteDifference": 0,
+          "differentValues": 0
+        },
+        {
+          "body": 9,
+          "field": "normal",
+          "values": 3531,
+          "maximumAbsoluteDifference": 0,
+          "differentValues": 0
+        },
+        {
+          "body": 10,
+          "field": "position",
+          "values": 3531,
+          "maximumAbsoluteDifference": 0,
+          "differentValues": 0
+        },
+        {
+          "body": 10,
+          "field": "normal",
+          "values": 3531,
+          "maximumAbsoluteDifference": 0,
+          "differentValues": 0
+        },
+        {
+          "body": 11,
+          "field": "position",
+          "values": 3531,
+          "maximumAbsoluteDifference": 0,
+          "differentValues": 0
+        },
+        {
+          "body": 11,
+          "field": "normal",
+          "values": 3531,
+          "maximumAbsoluteDifference": 0,
+          "differentValues": 0
+        },
+        {
+          "body": 12,
+          "field": "position",
+          "values": 3276,
+          "maximumAbsoluteDifference": 0,
+          "differentValues": 0
+        },
+        {
+          "body": 12,
+          "field": "normal",
+          "values": 3276,
+          "maximumAbsoluteDifference": 0,
+          "differentValues": 0
+        },
+        {
+          "body": 13,
+          "field": "position",
+          "values": 3300,
+          "maximumAbsoluteDifference": 0,
+          "differentValues": 0
+        },
+        {
+          "body": 13,
+          "field": "normal",
+          "values": 3300,
+          "maximumAbsoluteDifference": 0,
+          "differentValues": 0
+        },
+        {
+          "body": 14,
+          "field": "position",
+          "values": 3291,
+          "maximumAbsoluteDifference": 0,
+          "differentValues": 0
+        },
+        {
+          "body": 14,
+          "field": "normal",
+          "values": 3291,
+          "maximumAbsoluteDifference": 0,
+          "differentValues": 0
+        },
+        {
+          "body": 15,
+          "field": "position",
+          "values": 3282,
+          "maximumAbsoluteDifference": 0,
+          "differentValues": 0
+        },
+        {
+          "body": 15,
+          "field": "normal",
+          "values": 3282,
+          "maximumAbsoluteDifference": 0,
+          "differentValues": 0
+        }
+      ],
+      "imageRmse": 0,
+      "before": {
+        "configuration": {
+          "name": "skinning",
+          "seed": 4242,
+          "carpetSeed": 48017,
+          "cover": 1800,
+          "dt": 0.016666666666666666,
+          "creatures": 16,
+          "bonesPerCreature": 7,
+          "skinWeights": [
+            0.9,
+            0.1
+          ],
+          "bodySize": 0.09
+        },
+        "diagnostics": {
+          "waterCalls": []
+        },
+        "fingerprint": {
+          "hash": "bca99d98",
+          "values": 61485,
+          "skinnedPoints": 18179,
+          "time": 1.0000000000000013
+        }
+      },
+      "after": {
+        "configuration": {
+          "name": "skinning",
+          "seed": 4242,
+          "carpetSeed": 48017,
+          "cover": 1800,
+          "dt": 0.016666666666666666,
+          "creatures": 16,
+          "bonesPerCreature": 7,
+          "skinWeights": [
+            0.9,
+            0.1
+          ],
+          "bodySize": 0.09
+        },
+        "diagnostics": {
+          "waterCalls": []
+        },
+        "fingerprint": {
+          "hash": "bca99d98",
+          "values": 61485,
+          "skinnedPoints": 18179,
+          "time": 1.0000000000000013
+        }
+      },
+      "storageCalls": 0
+    },
+    {
+      "id": "skinning",
+      "steps": 240,
+      "arrays": [
+        {
+          "body": 0,
+          "field": "position",
+          "values": 3273,
+          "maximumAbsoluteDifference": 0,
+          "differentValues": 0
+        },
+        {
+          "body": 0,
+          "field": "normal",
+          "values": 3273,
+          "maximumAbsoluteDifference": 0,
+          "differentValues": 0
+        },
+        {
+          "body": 1,
+          "field": "position",
+          "values": 3294,
+          "maximumAbsoluteDifference": 0,
+          "differentValues": 0
+        },
+        {
+          "body": 1,
+          "field": "normal",
+          "values": 3294,
+          "maximumAbsoluteDifference": 0,
+          "differentValues": 0
+        },
+        {
+          "body": 2,
+          "field": "position",
+          "values": 3285,
+          "maximumAbsoluteDifference": 0,
+          "differentValues": 0
+        },
+        {
+          "body": 2,
+          "field": "normal",
+          "values": 3285,
+          "maximumAbsoluteDifference": 0,
+          "differentValues": 0
+        },
+        {
+          "body": 3,
+          "field": "position",
+          "values": 3288,
+          "maximumAbsoluteDifference": 0,
+          "differentValues": 0
+        },
+        {
+          "body": 3,
+          "field": "normal",
+          "values": 3288,
+          "maximumAbsoluteDifference": 0,
+          "differentValues": 0
+        },
+        {
+          "body": 4,
+          "field": "position",
+          "values": 3531,
+          "maximumAbsoluteDifference": 0,
+          "differentValues": 0
+        },
+        {
+          "body": 4,
+          "field": "normal",
+          "values": 3531,
+          "maximumAbsoluteDifference": 0,
+          "differentValues": 0
+        },
+        {
+          "body": 5,
+          "field": "position",
+          "values": 3531,
+          "maximumAbsoluteDifference": 0,
+          "differentValues": 0
+        },
+        {
+          "body": 5,
+          "field": "normal",
+          "values": 3531,
+          "maximumAbsoluteDifference": 0,
+          "differentValues": 0
+        },
+        {
+          "body": 6,
+          "field": "position",
+          "values": 3531,
+          "maximumAbsoluteDifference": 0,
+          "differentValues": 0
+        },
+        {
+          "body": 6,
+          "field": "normal",
+          "values": 3531,
+          "maximumAbsoluteDifference": 0,
+          "differentValues": 0
+        },
+        {
+          "body": 7,
+          "field": "position",
+          "values": 3531,
+          "maximumAbsoluteDifference": 0,
+          "differentValues": 0
+        },
+        {
+          "body": 7,
+          "field": "normal",
+          "values": 3531,
+          "maximumAbsoluteDifference": 0,
+          "differentValues": 0
+        },
+        {
+          "body": 8,
+          "field": "position",
+          "values": 3531,
+          "maximumAbsoluteDifference": 0,
+          "differentValues": 0
+        },
+        {
+          "body": 8,
+          "field": "normal",
+          "values": 3531,
+          "maximumAbsoluteDifference": 0,
+          "differentValues": 0
+        },
+        {
+          "body": 9,
+          "field": "position",
+          "values": 3531,
+          "maximumAbsoluteDifference": 0,
+          "differentValues": 0
+        },
+        {
+          "body": 9,
+          "field": "normal",
+          "values": 3531,
+          "maximumAbsoluteDifference": 0,
+          "differentValues": 0
+        },
+        {
+          "body": 10,
+          "field": "position",
+          "values": 3531,
+          "maximumAbsoluteDifference": 0,
+          "differentValues": 0
+        },
+        {
+          "body": 10,
+          "field": "normal",
+          "values": 3531,
+          "maximumAbsoluteDifference": 0,
+          "differentValues": 0
+        },
+        {
+          "body": 11,
+          "field": "position",
+          "values": 3531,
+          "maximumAbsoluteDifference": 0,
+          "differentValues": 0
+        },
+        {
+          "body": 11,
+          "field": "normal",
+          "values": 3531,
+          "maximumAbsoluteDifference": 0,
+          "differentValues": 0
+        },
+        {
+          "body": 12,
+          "field": "position",
+          "values": 3276,
+          "maximumAbsoluteDifference": 0,
+          "differentValues": 0
+        },
+        {
+          "body": 12,
+          "field": "normal",
+          "values": 3276,
+          "maximumAbsoluteDifference": 0,
+          "differentValues": 0
+        },
+        {
+          "body": 13,
+          "field": "position",
+          "values": 3300,
+          "maximumAbsoluteDifference": 0,
+          "differentValues": 0
+        },
+        {
+          "body": 13,
+          "field": "normal",
+          "values": 3300,
+          "maximumAbsoluteDifference": 0,
+          "differentValues": 0
+        },
+        {
+          "body": 14,
+          "field": "position",
+          "values": 3291,
+          "maximumAbsoluteDifference": 0,
+          "differentValues": 0
+        },
+        {
+          "body": 14,
+          "field": "normal",
+          "values": 3291,
+          "maximumAbsoluteDifference": 0,
+          "differentValues": 0
+        },
+        {
+          "body": 15,
+          "field": "position",
+          "values": 3282,
+          "maximumAbsoluteDifference": 0,
+          "differentValues": 0
+        },
+        {
+          "body": 15,
+          "field": "normal",
+          "values": 3282,
+          "maximumAbsoluteDifference": 0,
+          "differentValues": 0
+        }
+      ],
+      "imageRmse": 0,
+      "before": {
+        "configuration": {
+          "name": "skinning",
+          "seed": 4242,
+          "carpetSeed": 48017,
+          "cover": 1800,
+          "dt": 0.016666666666666666,
+          "creatures": 16,
+          "bonesPerCreature": 7,
+          "skinWeights": [
+            0.9,
+            0.1
+          ],
+          "bodySize": 0.09
+        },
+        "diagnostics": {
+          "waterCalls": []
+        },
+        "fingerprint": {
+          "hash": "68b9b037",
+          "values": 61485,
+          "skinnedPoints": 18179,
+          "time": 3.9999999999999907
+        }
+      },
+      "after": {
+        "configuration": {
+          "name": "skinning",
+          "seed": 4242,
+          "carpetSeed": 48017,
+          "cover": 1800,
+          "dt": 0.016666666666666666,
+          "creatures": 16,
+          "bonesPerCreature": 7,
+          "skinWeights": [
+            0.9,
+            0.1
+          ],
+          "bodySize": 0.09
+        },
+        "diagnostics": {
+          "waterCalls": []
+        },
+        "fingerprint": {
+          "hash": "68b9b037",
+          "values": 61485,
+          "skinnedPoints": 18179,
+          "time": 3.9999999999999907
+        }
+      },
+      "storageCalls": 0
+    },
+    {
+      "id": "skinning",
+      "steps": 1200,
+      "arrays": [
+        {
+          "body": 0,
+          "field": "position",
+          "values": 3273,
+          "maximumAbsoluteDifference": 0,
+          "differentValues": 0
+        },
+        {
+          "body": 0,
+          "field": "normal",
+          "values": 3273,
+          "maximumAbsoluteDifference": 0,
+          "differentValues": 0
+        },
+        {
+          "body": 1,
+          "field": "position",
+          "values": 3294,
+          "maximumAbsoluteDifference": 0,
+          "differentValues": 0
+        },
+        {
+          "body": 1,
+          "field": "normal",
+          "values": 3294,
+          "maximumAbsoluteDifference": 0,
+          "differentValues": 0
+        },
+        {
+          "body": 2,
+          "field": "position",
+          "values": 3285,
+          "maximumAbsoluteDifference": 0,
+          "differentValues": 0
+        },
+        {
+          "body": 2,
+          "field": "normal",
+          "values": 3285,
+          "maximumAbsoluteDifference": 0,
+          "differentValues": 0
+        },
+        {
+          "body": 3,
+          "field": "position",
+          "values": 3288,
+          "maximumAbsoluteDifference": 0,
+          "differentValues": 0
+        },
+        {
+          "body": 3,
+          "field": "normal",
+          "values": 3288,
+          "maximumAbsoluteDifference": 0,
+          "differentValues": 0
+        },
+        {
+          "body": 4,
+          "field": "position",
+          "values": 3531,
+          "maximumAbsoluteDifference": 0,
+          "differentValues": 0
+        },
+        {
+          "body": 4,
+          "field": "normal",
+          "values": 3531,
+          "maximumAbsoluteDifference": 0,
+          "differentValues": 0
+        },
+        {
+          "body": 5,
+          "field": "position",
+          "values": 3531,
+          "maximumAbsoluteDifference": 0,
+          "differentValues": 0
+        },
+        {
+          "body": 5,
+          "field": "normal",
+          "values": 3531,
+          "maximumAbsoluteDifference": 0,
+          "differentValues": 0
+        },
+        {
+          "body": 6,
+          "field": "position",
+          "values": 3531,
+          "maximumAbsoluteDifference": 0,
+          "differentValues": 0
+        },
+        {
+          "body": 6,
+          "field": "normal",
+          "values": 3531,
+          "maximumAbsoluteDifference": 0,
+          "differentValues": 0
+        },
+        {
+          "body": 7,
+          "field": "position",
+          "values": 3531,
+          "maximumAbsoluteDifference": 0,
+          "differentValues": 0
+        },
+        {
+          "body": 7,
+          "field": "normal",
+          "values": 3531,
+          "maximumAbsoluteDifference": 0,
+          "differentValues": 0
+        },
+        {
+          "body": 8,
+          "field": "position",
+          "values": 3531,
+          "maximumAbsoluteDifference": 0,
+          "differentValues": 0
+        },
+        {
+          "body": 8,
+          "field": "normal",
+          "values": 3531,
+          "maximumAbsoluteDifference": 0,
+          "differentValues": 0
+        },
+        {
+          "body": 9,
+          "field": "position",
+          "values": 3531,
+          "maximumAbsoluteDifference": 0,
+          "differentValues": 0
+        },
+        {
+          "body": 9,
+          "field": "normal",
+          "values": 3531,
+          "maximumAbsoluteDifference": 0,
+          "differentValues": 0
+        },
+        {
+          "body": 10,
+          "field": "position",
+          "values": 3531,
+          "maximumAbsoluteDifference": 0,
+          "differentValues": 0
+        },
+        {
+          "body": 10,
+          "field": "normal",
+          "values": 3531,
+          "maximumAbsoluteDifference": 0,
+          "differentValues": 0
+        },
+        {
+          "body": 11,
+          "field": "position",
+          "values": 3531,
+          "maximumAbsoluteDifference": 0,
+          "differentValues": 0
+        },
+        {
+          "body": 11,
+          "field": "normal",
+          "values": 3531,
+          "maximumAbsoluteDifference": 0,
+          "differentValues": 0
+        },
+        {
+          "body": 12,
+          "field": "position",
+          "values": 3276,
+          "maximumAbsoluteDifference": 0,
+          "differentValues": 0
+        },
+        {
+          "body": 12,
+          "field": "normal",
+          "values": 3276,
+          "maximumAbsoluteDifference": 0,
+          "differentValues": 0
+        },
+        {
+          "body": 13,
+          "field": "position",
+          "values": 3300,
+          "maximumAbsoluteDifference": 0,
+          "differentValues": 0
+        },
+        {
+          "body": 13,
+          "field": "normal",
+          "values": 3300,
+          "maximumAbsoluteDifference": 0,
+          "differentValues": 0
+        },
+        {
+          "body": 14,
+          "field": "position",
+          "values": 3291,
+          "maximumAbsoluteDifference": 0,
+          "differentValues": 0
+        },
+        {
+          "body": 14,
+          "field": "normal",
+          "values": 3291,
+          "maximumAbsoluteDifference": 0,
+          "differentValues": 0
+        },
+        {
+          "body": 15,
+          "field": "position",
+          "values": 3282,
+          "maximumAbsoluteDifference": 0,
+          "differentValues": 0
+        },
+        {
+          "body": 15,
+          "field": "normal",
+          "values": 3282,
+          "maximumAbsoluteDifference": 0,
+          "differentValues": 0
+        }
+      ],
+      "imageRmse": 0,
+      "before": {
+        "configuration": {
+          "name": "skinning",
+          "seed": 4242,
+          "carpetSeed": 48017,
+          "cover": 1800,
+          "dt": 0.016666666666666666,
+          "creatures": 16,
+          "bonesPerCreature": 7,
+          "skinWeights": [
+            0.9,
+            0.1
+          ],
+          "bodySize": 0.09
+        },
+        "diagnostics": {
+          "waterCalls": []
+        },
+        "fingerprint": {
+          "hash": "9c18f5c9",
+          "values": 61485,
+          "skinnedPoints": 18179,
+          "time": 20.000000000000146
+        }
+      },
+      "after": {
+        "configuration": {
+          "name": "skinning",
+          "seed": 4242,
+          "carpetSeed": 48017,
+          "cover": 1800,
+          "dt": 0.016666666666666666,
+          "creatures": 16,
+          "bonesPerCreature": 7,
+          "skinWeights": [
+            0.9,
+            0.1
+          ],
+          "bodySize": 0.09
+        },
+        "diagnostics": {
+          "waterCalls": []
+        },
+        "fingerprint": {
+          "hash": "9c18f5c9",
+          "values": 61485,
+          "skinnedPoints": 18179,
+          "time": 20.000000000000146
+        }
+      },
+      "storageCalls": 0
+    }
+  ]
+}

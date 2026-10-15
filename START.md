@@ -565,7 +565,8 @@ fresh loads per scene, serially. Results, environment and raw samples go under
 `pnpm bench --verify --out=.cache/bench-study` checks exact state/visual parity
 with profiling on/off and forbids IndexedDB calls. The report applies the
 owner-confirmed [ADR 0004](docs/decisions/0004-webassembly-for-simulation.md),
-which remains Proposed. This is Phase 1 only, without WASM or JS optimization.
+which remains Proposed. Phase 2 now evaluates optimized JS and optional offscreen
+water scheduling; WASM/GPU alternatives remain outside the authorized work.
 
 The Phase 1 methodology amendment adds `--uncapped`, launching Chromium with
 `--disable-gpu-vsync --disable-frame-rate-limit` while keeping fixed simulation
@@ -573,7 +574,7 @@ steps. Default capture/editor flags are unchanged. The report now requires the
 two uncapped rounds; prior paced measurements remain as presentation context in
 vsync-report.md. Qualification considers CPU/GPU dominance and the uncapped frame,
 not just the active CPU fraction. CPU savings in a GPU-limited scene do not count
-as measured frame gains. No optimized JS or alternate implementation is included.
+as measured frame gains. Phase 1 raw data retain the original JS implementation.
 The uncapped harness bounds in-flight GPU frames to two through nonblocking
 WebGL fences, keeping CPU/GPU overlap while preventing a queue of uncompleted
 frames from being mistaken for throughput. It also reports observed completion
@@ -582,3 +583,13 @@ Uncapped render steps use free-running MessageChannel tasks, independent of rAF
 compositor cadence; ordinary editor and paced benchmark retain rAF. Unsupported
 rAF cadence in task mode is recorded as null. Earlier failed submission/rAF
 experiments remain as diagnostic evidence; the report requires the task mode.
+
+Phase 2 skins distinct source vertices once per body, caches double-precision
+bone matrices and writes letter positions/normals directly to float32 arrays.
+Interleaved/normalized attributes and custom mesh methods retain Three semantics
+through a cached source-vertex fallback. Fixed-step array and image parity are
+checked with scripts/verify-simulation.mjs against the preserved original core.
+`/?bench=water-scale&waters=1|2|4|8&queue=2` adds a seeded large-map fixture
+(one visible 129×129 water, others 64 m apart). `pnpm bench --uncapped
+--scenes=skinning,water-scale-8-off` selects workloads without changing the
+Phase 1 defaults. Phase 2 evidence is retained in the dated capture directory.

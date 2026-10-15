@@ -48,6 +48,9 @@ try {
   alloc.sort((a, b) => b.bytes - a.bytes)
   const evidence = {
     source: execFileSync('git', ['rev-parse', 'HEAD'], { encoding: 'utf8' }).trim(),
+    trackedChanges: execFileSync('git', ['status', '--porcelain', '--untracked-files=no'], {
+      encoding: 'utf8',
+    }).trim(),
     flags: b.flags,
     chromium: b.version,
     browser: r.browser,

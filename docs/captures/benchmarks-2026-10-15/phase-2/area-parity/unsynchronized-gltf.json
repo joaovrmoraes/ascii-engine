@@ -1,0 +1,7 @@
+{
+  "scene": "gltf",
+  "rmse": 0.0109192,
+  "clock": "fixed injected rAF, fallback disabled, pause=3",
+  "sourceBefore": "34c7ca9",
+  "sourceAfter": "working tree"
+}

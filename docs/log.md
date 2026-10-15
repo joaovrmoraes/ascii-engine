@@ -4,6 +4,44 @@ Entries describe the state at each stage. Earlier limitations may have been
 resolved later; START.md and the editor guide describe the current scope.
 Historical filenames, reference IDs and captured interfaces are preserved.
 
+## 2026-10-15 — Reuse source vertices and bone matrices in JS skinning
+
+The standard body path skins each distinct source vertex once per frame and
+computes each bone matrix once. Cached Float64 intermediates preserve Three's
+operation order, barycentric interpolation and face normals; output attributes
+remain float32. The steady kernel has no allocation, per-letter generic calls
+or repeated bone products. Live geometry/morph/weight edits are read each frame.
+Interleaved/normalized attributes, float16 and custom mesh methods retain a
+cached Three fallback rather than silently changing their semantics.
+
+Validation: pnpm check passed (174 tests). Seven new tests compare all letter
+positions/normals with the frozen original path over 600 poses, including
+relative/absolute morphs, live edits, interleaved/normalized data, detached
+binds, custom methods, geometry replacement and degenerate triangles.
+Browser comparison against preserved core 34c7ca9 has maximum difference 0
+for every position/normal after 1, 60, 240 and 1,200 steps; image RMSE is 0.
+All six existing areas also have RMSE 0 under matching clocks. GLTF initially
+differed because asynchronous model loading consumed a different number of
+animation steps; waiting for both models before advancing yields RMSE 0. The
+unsynchronized diagnostic is preserved separately and is not parity evidence.
+
+Two fresh original-JS benchmark rounds (five loads × 600 warm-up + 600 measured
+frames each) are preserved: frame p50 14.765/14.930 ms (1.11% difference), skinning
+p50 13.750/13.915 ms. Post-change CPU/allocation sampling no longer finds the
+repeated applyBoneTransform/Vector3-generator allocation hotspot. Sampling is
+only diagnostic; optimized throughput measurement follows the clean commit.
+
+Orca explicitly targeted page 157d306a-3e02-4891-9f04-6f30b39841c8 and completed
+1,830 skinning steps/all fences. Its page screenshot still timed out during
+active rendering. cdpshot.mjs and CDP page captures succeed and were inspected;
+no desktop capture was used. The editor draft was never opened.
+
+[Array/image parity](captures/benchmarks-2026-10-15/phase-2/parity/skinning.json),
+[area parity](captures/benchmarks-2026-10-15/phase-2/area-parity/results.json),
+[GLTF parity](captures/benchmarks-2026-10-15/phase-2/area-parity/gltf.json),
+[cdpshot capture](captures/benchmarks-2026-10-15/phase-2/cdpshot-skinning.png).
+Optimized measurements and the optional water policy remain pending. No push.
+
 ## 2026-10-15 — Phase 2 fixtures and pre-change skinning profile
 
 Owner authorized JS optimization and optional water scheduling only; no GPU

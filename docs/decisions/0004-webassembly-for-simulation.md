@@ -4,7 +4,9 @@ Status: **Proposed**
 
 Date: 2026-10-15. The owner confirmed the numerical decision rule before the
 original measurements, then requested the uncapped bottleneck amendment below
-after reviewing Phase 1. This draft authorizes Phase 1 measurement only.
+after reviewing Phase 1. The owner subsequently authorized Phase 2 JS skinning
+and optional offscreen water scheduling. Status remains Proposed; no WASM/GPU
+implementation, toolchain installation or default water behavior change is authorized.
 
 ## Decision rule
 
@@ -114,9 +116,9 @@ The original water step is 1.000 / 4.790 = **20.9% of active CPU**, although onl
 6.00% of the display-paced frame. Original GPU p50 is 8.959 ms versus 4.790 ms
 CPU. Moving the step to WASM would shorten the smaller side of an overlapping
 pipeline and does not establish a frame improvement. The uncapped data must
-confirm or correct this bottleneck inference. No Phase 2 work is authorized.
+confirm or correct this bottleneck inference. This was the stopping point before the subsequent Phase 2 authorization.
 
-## Uncapped Phase 1 measurements (current)
+## Uncapped Phase 1 measurements (original JS)
 
 Runtime source: `af0413f`, with clean tracked trees at the start of both rounds.
 Each scene has ten fresh loads in total, 600 warm-up and 600 measured frames

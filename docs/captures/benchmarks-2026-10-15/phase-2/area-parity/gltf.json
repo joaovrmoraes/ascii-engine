@@ -1,0 +1,9 @@
+[
+  {
+    "scene": "gltf",
+    "rmse": 0,
+    "clock": "fixed injected rAF, fallback disabled, pause=3; GLTF animation waits for both models",
+    "sourceBefore": "34c7ca9",
+    "sourceAfter": "working tree"
+  }
+]

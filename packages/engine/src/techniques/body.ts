@@ -1,4 +1,5 @@
 import * as THREE from 'three'
+import { createSkinCache, updateSkinVertices, type SkinCache } from './skinnedVertices'
 import { MeshSurfaceSampler } from 'three/examples/jsm/math/MeshSurfaceSampler.js'
 import { inkLightsGLSL, inkLightUniforms } from '../illumination'
 import { SURFACE_ALPHA } from '../surface'
@@ -462,29 +463,55 @@ function scatterSkinned(
   return { geometry: out, skin }
 }
 
-const va = new THREE.Vector3(),
-  vb = new THREE.Vector3(),
-  vc = new THREE.Vector3(),
-  vp = new THREE.Vector3(),
-  vn = new THREE.Vector3()
+const skinCaches = new WeakMap<Skin, SkinCache>()
 /** Re-skins the letters of a skinned body (call after the animation, before rendering). */
 export function updateSkinnedBody(points: THREE.Points) {
   const skin = points.userData.skin as Skin | undefined
   if (!skin) return
   const { mesh, corners, weights } = skin
-  const position = points.geometry.attributes.position as THREE.BufferAttribute,
-    normal = points.geometry.attributes.normal as THREE.BufferAttribute
-  for (let i = 0; i < weights.length / 3; i++) {
-    mesh.getVertexPosition(corners[i * 3], va)
-    mesh.getVertexPosition(corners[i * 3 + 1], vb)
-    mesh.getVertexPosition(corners[i * 3 + 2], vc)
-    vp.copy(va)
-      .multiplyScalar(weights[i * 3])
-      .addScaledVector(vb, weights[i * 3 + 1])
-      .addScaledVector(vc, weights[i * 3 + 2])
-    vn.subVectors(vb, va).cross(vc.sub(va)).normalize()
-    position.setXYZ(i, vp.x, vp.y, vp.z)
-    normal.setXYZ(i, vn.x, vn.y, vn.z)
+  let cache = skinCaches.get(skin)
+  if (
+    !cache ||
+    cache.geometry !== mesh.geometry ||
+    cache.bones.length !== mesh.skeleton.bones.length * 16
+  ) {
+    cache = createSkinCache(mesh, corners)
+    skinCaches.set(skin, cache)
+  }
+  const vertices = updateSkinVertices(mesh, cache)
+  const position = points.geometry.attributes.position as THREE.BufferAttribute
+  const normal = points.geometry.attributes.normal as THREE.BufferAttribute
+  const positions = position.array,
+    normals = normal.array
+  for (let at = 0; at < weights.length; at += 3) {
+    const a = corners[at] * 3,
+      b = corners[at + 1] * 3,
+      c = corners[at + 2] * 3
+    const ax = vertices[a],
+      ay = vertices[a + 1],
+      az = vertices[a + 2]
+    const bx = vertices[b],
+      by = vertices[b + 1],
+      bz = vertices[b + 2]
+    const cx = vertices[c],
+      cy = vertices[c + 1],
+      cz = vertices[c + 2]
+    positions[at] = ax * weights[at] + bx * weights[at + 1] + cx * weights[at + 2]
+    positions[at + 1] = ay * weights[at] + by * weights[at + 1] + cy * weights[at + 2]
+    positions[at + 2] = az * weights[at] + bz * weights[at + 1] + cz * weights[at + 2]
+    const ux = bx - ax,
+      uy = by - ay,
+      uz = bz - az
+    const vx = cx - ax,
+      vy = cy - ay,
+      vz = cz - az
+    const nx = uy * vz - uz * vy,
+      ny = uz * vx - ux * vz,
+      nz = ux * vy - uy * vx
+    const scale = 1 / (Math.sqrt(nx * nx + ny * ny + nz * nz) || 1)
+    normals[at] = nx * scale
+    normals[at + 1] = ny * scale
+    normals[at + 2] = nz * scale
   }
   position.needsUpdate = normal.needsUpdate = true
 }
