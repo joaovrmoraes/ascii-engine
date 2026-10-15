@@ -4,6 +4,18 @@ Entries describe the state at each stage. Earlier limitations may have been
 resolved later; START.md and the editor guide describe the current scope.
 Historical filenames, reference IDs and captured interfaces are preserved.
 
+## 2026-10-15 — Consolidation review, group 2: shared Apply warning
+
+A changed shared recipe labels Apply with its complete affected-object count.
+Apply asks before updating other users and suggests Save copy or Detach.
+Cancel leaves both the resource and instances unchanged. Detach now ends shared
+asset editing, so subsequent Apply writes only the target's local appearance.
+
+Validation: pnpm check (147 tests), verify:textures (106 checks), including
+cancel/accept and actual rendered shared users. The isolated Orca profile tested
+the warning; owner profile was not edited. [Studio capture](captures/editor-review-fix-2026-10-15/shared-apply-00.png).
+No push.
+
 ## 2026-10-15 — Consolidation review, group 1: visible texture links
 
 Reviewed and adopted the existing uncommitted core/authoring implementation:

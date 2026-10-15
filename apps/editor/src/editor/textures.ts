@@ -74,6 +74,14 @@ export function createTextureStudio(root: HTMLElement, callbacks: {
     if (common.glyph && !['surface', 'body', 'screen'].includes(common.glyph)) delete common.glyph
     return { ...textureStyle(common), gap: 0 }
   }
+  function sharedApply() {
+    if (!selectedKey || scope !== 'object' && scope !== 'part') return
+    const doc = callbacks.document(), saved = doc.textures?.[selectedKey]
+    if (!saved || GLYPH_STYLE_KEYS.every(key => JSON.stringify(saved.style[key]) === JSON.stringify(asset().style[key]))) return
+    const users = textureUsers(doc, selectedKey)
+    if (!users.some(item => item.id !== objectId)) return
+    return { name: saved.name, count: new Set([...users.map(item => item.id), objectId]).size }
+  }
   function savedNote() {
     root.querySelector('h2')!.textContent = selectedKey ? `Edit texture: ${draft.name}` : 'New texture'
     const saved = selectedKey ? callbacks.document().textures?.[selectedKey] : undefined
@@ -86,7 +94,8 @@ export function createTextureStudio(root: HTMLElement, callbacks: {
     get<HTMLButtonElement>('delete').disabled = !saved || saving
     const options = callbacks.document().objects.find(item => item.id === objectId)?.options
     get<HTMLButtonElement>('detach').disabled = scope === 'type' || scope === 'global' || !(scope === 'part' ? options?.parts?.[part]?.texture : options?.texture || Object.values(options?.parts ?? {}).some(part => part.texture))
-    get('apply').textContent = scope === 'global' ? 'Apply globally' : scope === 'type' ? 'Apply to every copy' : scope === 'part' ? 'Apply to part' : 'Apply to object'
+    const shared = sharedApply()
+    get('apply').textContent = shared ? `Apply to ${shared.count} users` : scope === 'global' ? 'Apply globally' : scope === 'type' ? 'Apply to every copy' : scope === 'part' ? 'Apply to part' : 'Apply to object'
   }
   function edited(commit = true) {
     if (commit) history.commit(draft)
@@ -281,6 +290,8 @@ export function createTextureStudio(root: HTMLElement, callbacks: {
   }
   async function apply() {
     if (scope !== 'global' && !target() || saving) return
+    const shared = sharedApply()
+    if (shared && !confirm(`Apply changes to ${shared.name} for ${shared.count} users? Use Save copy to create a separate recipe, or Detach to edit only this target.`)) return
     try { parseScene({ version: 1, objects: [], textures: { draft: asset() } }); const linkedId = scope === 'object' || scope === 'part' ? selectedKey : undefined; if (linkedId) await callbacks.save(linkedId, asset()); const replaced = await callbacks.apply(objectId, scope === 'object' ? '' : part, previewStyle(), scope, linkedId); stage.commit(); status('Texture applied.' + (replaced?.length ? ' Replaced local fields: ' + replaced.join(', ') + '.' : '') + ' Ctrl Z in the scene undoes the change.') }
     catch (error) { status(String(error)) }
   }
@@ -291,7 +302,7 @@ export function createTextureStudio(root: HTMLElement, callbacks: {
   get<HTMLInputElement>('name').oninput = () => { draft.name = get<HTMLInputElement>('name').value; savedNote() }; get<HTMLInputElement>('name').onchange = () => history.commit(draft)
   get('reset').onclick = () => { draft.style = startingStyle(); draft.cleared = []; edited(); render() }
   get('undo').onclick = () => undo(); get('redo').onclick = () => undo(true)
-  get('detach').onclick = async () => { try { await callbacks.detach(objectId, scope === 'part' ? part : undefined); baseline = appearance(); beginEdits(); render(); status('Detached: the appearance is now a local snapshot.'); if (active) await stage.show(callbacks.document(), objectId) } catch (error) { status(String(error)) } }
+  get('detach').onclick = async () => { try { await callbacks.detach(objectId, scope === 'part' ? part : undefined); selectedKey = undefined; recipeDraft = true; baseline = appearance(); beginEdits(); render(); status('Detached: the appearance is now a local snapshot.'); if (active) await stage.show(callbacks.document(), objectId) } catch (error) { status(String(error)) } }
   get('delete').onclick = async () => { if (!selectedKey) return; const count = textureUsers(callbacks.document(), selectedKey).length; if (!confirm(count ? `Delete this texture and detach its ${count} users, preserving their appearance?` : 'Delete this texture asset?')) return; try { await callbacks.remove(selectedKey); selectedKey = undefined; render(); status('Texture deleted. Its users retain their appearance.') } catch (error) { status(String(error)) } }
   get('apply').onclick = () => { void apply() }; get('save').onclick = () => { void save() }; get('copy').onclick = () => { void save(true) }; get('reveal').onclick = callbacks.reveal
   get('export').onclick = () => {

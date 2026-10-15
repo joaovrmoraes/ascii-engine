@@ -457,3 +457,8 @@ authoring does not enforce collision or placement rules. Panel docking
 provides one region per edge; arbitrary column splits and universal tab
 groups remain unavailable. Native Tauri/mobile were not validated in this
 release. Full visual equivalence approval against Pomorog is still pending.
+
+When an edited recipe has other linked users, Apply shows **Apply to N users**
+and asks before changing that shared texture. Choose Save copy for a separate
+recipe or Detach to edit only the current target. Detach preserves its appearance
+and ends shared-resource editing for the next Apply.
