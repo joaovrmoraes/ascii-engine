@@ -1,0 +1,37 @@
+{
+  "checks": [
+    {
+      "case": "skinning-64",
+      "pngByteIdentical": true,
+      "sha256": "838176f168d423cd1ded0ffe860f4c8eb144ae03b227142d35015aa43d06aa2e"
+    },
+    {
+      "case": "water-visible-4",
+      "pngByteIdentical": true,
+      "sha256": "07f7e7fc77b13671542282f2dec8bf960142bd4559ebae165fd6e704d8cd1aeb"
+    },
+    {
+      "case": "particles-16",
+      "pngByteIdentical": true,
+      "sha256": "16a71bf89b40ea93920f4382d87cb7018326974fc769c37072ffddc56cc517f5"
+    },
+    {
+      "case": "water-grid-257",
+      "pngByteIdentical": true,
+      "sha256": "712bb9f4c7f3353e11ac698dd5dfec7901787ea5559d858fe2ea77ad43785cfd"
+    },
+    {
+      "case": "water-scale-128-pause",
+      "pngByteIdentical": true,
+      "sha256": "33d56aea17b989957219edc57db620a6313e9680350df0a8974e31eb0b9e1029"
+    },
+    {
+      "case": "water-scale-1-off",
+      "pngByteIdentical": true,
+      "sha256": "33d56aea17b989957219edc57db620a6313e9680350df0a8974e31eb0b9e1029"
+    }
+  ],
+  "legacy129FixtureStateUnchanged": true,
+  "legacy129PngUnchanged": true,
+  "note": "Original loads and legacy 129 bed preserved; generic core tree unchanged since Phase 2."
+}

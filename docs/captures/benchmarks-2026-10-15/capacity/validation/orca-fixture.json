@@ -1,0 +1,11 @@
+{
+  "id": "eb3ab806-5760-41f3-b834-149baf41380c",
+  "ok": true,
+  "result": {
+    "result": "{\"configuration\":{\"name\":\"skinning\",\"seed\":4242,\"carpetSeed\":48017,\"cover\":1800,\"dt\":0.016666666666666666,\"creatures\":64,\"bonesPerCreature\":7,\"skinWeights\":[0.9,0.1],\"bodySize\":0.09},\"diagnostics\":{\"waterCalls\":[],\"visibleCreatures\":64,\"visibleWaters\":0,\"simulationResolutions\":[],\"reflectionLevels\":[]},\"fingerprint\":{\"hash\":\"6753aa2f\",\"values\":244659,\"skinnedPoints\":72325,\"time\":1.0000000000000013},\"gpuQueue\":{\"limit\":2,\"scheduler\":\"task\",\"peak\":2,\"completedFrames\":60,\"pollCallbacks\":79,\"totalSchedulerCpuMs\":1.7449999898672104,\"completionClock\":\"CPU-observed asynchronous fence completion; includes polling delay\",\"polling\":\"non-nested 1 ms timers and task submissions; no spin or blocking GPU wait\"}}",
+    "origin": "http://localhost:1440/?bench=skinning&creatures=64&queue=2"
+  },
+  "_meta": {
+    "runtimeId": "38cf1741-6edd-47a2-b539-0f58b1abc24e"
+  }
+}

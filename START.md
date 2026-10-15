@@ -641,3 +641,10 @@ p50 gain), exact parity and water results for all four map sizes. All ten
 before/after cases repeat within 5%. The water decision depends on map size;
 four paused waters remain a borderline numeric target. ADR 0004 stays Proposed,
 stopped after Phase 2. Regenerate its tables with `node scripts/bench-phase2-report.mjs`.
+
+The owner authorized a final [capacity study](docs/captures/benchmarks-2026-10-15/capacity/README.md)
+and static performance charts, plus default offscreen-water pausing in the live
+editor/exported player. Capacity is the largest measured load meeting the worse
+round p95 budget (16.7/33.3 ms), using the Phase 2 uncapped controls. Mesh-grid
+resolution is reported separately from the solver's existing 129 cap. Offline
+and parity modes must keep full simulation; the generic core default stays full.

@@ -9,7 +9,7 @@
     "mcp": "pnpm --silent --filter @ascii-engine/automation mcp",
     "build": "pnpm -r build",
     "pages:build": "node scripts/build-pages.mjs",
-    "test": "node --test scripts/export-args.test.mjs scripts/bench-stats.test.mjs && pnpm -r test",
+    "test": "node --test scripts/export-args.test.mjs scripts/bench-stats.test.mjs scripts/bench-cases.test.mjs scripts/bench-capacity-data.test.mjs && pnpm -r test",
     "typecheck": "pnpm -r typecheck",
     "format": "node scripts/format.mjs --write",
     "format:check": "node scripts/format.mjs --check",
@@ -28,7 +28,8 @@
     "verify:textures": "node scripts/verify-textures.mjs",
     "verify:gltf": "node scripts/verify-gltf-appearance.mjs",
     "export": "node scripts/export.mjs",
-    "verify:water": "node scripts/verify-water.mjs"
+    "verify:water": "node scripts/verify-water.mjs",
+    "bench:capacity": "node scripts/bench-capacity.mjs"
   },
   "packageManager": "pnpm@11.9.0",
   "devDependencies": {

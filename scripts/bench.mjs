@@ -4,6 +4,7 @@ import { cpus, platform, release, arch, totalmem } from 'node:os'
 import { join, resolve } from 'node:path'
 import { benchmarkBrowser } from './bench-browser.mjs'
 import { summarize as summary } from './bench-stats.mjs'
+import { benchmarkCase } from './bench-cases.mjs'
 
 const args = Object.fromEntries(
   process.argv
@@ -61,6 +62,8 @@ if (
     warmup < 60)
 )
   throw new Error('Use at least 600 measured frames, 5 runs and 60 warm-up frames')
+const scenes = String(args.scenes ?? 'water,particles,skinning').split(',')
+scenes.forEach(benchmarkCase)
 const date = new Date().toISOString().slice(0, 10),
   round = String(args.round ?? (uncapped ? 'uncapped-round-1' : 'round-1'))
 if (!/^[a-z0-9-]+$/.test(round)) throw new Error('Invalid round name')
@@ -175,13 +178,8 @@ const flatten = sample => ({
   completedFrameMs: sample.completedFrameMs,
   gpuLatencyMs: sample.gpuLatencyMs,
 })
-const scenes = String(args.scenes ?? 'water,particles,skinning').split(',')
-for (const scene of scenes)
-  if (!/^(water|particles|skinning|water-scale-(1|2|4|8)-(off|pause))$/.test(scene))
-    throw new Error('Unknown scene variant: ' + scene)
 function sceneUrl(scene, extra = '') {
-  const scale = /^water-scale-(1|2|4|8)-(off|pause)$/.exec(scene)
-  return `${base}/?bench=${scale ? 'water-scale&waters=' + scale[1] + '&water-policy=' + scale[2] : scene}${uncapped ? '&queue=2' : ''}${extra}`
+  return `${base}/?${benchmarkCase(scene).query}${uncapped ? '&queue=2' : ''}${extra}`
 }
 const results = Object.fromEntries(scenes.map(name => [name, { scene: name, columns, runs: [] }]))
 const validFrameClock = sample =>
@@ -236,6 +234,9 @@ try {
         states.push(result.fingerprint)
         metrics.push({
           profile,
+          configuration: result.configuration,
+          diagnostics: result.diagnostics,
+          effectStats: result.effectStats,
           summary: summary(result.samples.map(flatten)),
           gpuQueue: result.gpuQueue,
           gpu: result.gpu,

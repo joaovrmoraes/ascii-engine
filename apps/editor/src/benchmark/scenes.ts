@@ -8,6 +8,13 @@ export type BenchmarkScene = (typeof BENCHMARK_SCENES)[number]
 export const BENCHMARK_DT = 1 / 60
 export const BENCHMARK_SEED = 4242
 
+export interface BenchmarkLoad {
+  creatures?: number
+  effectGroups?: number
+  waterResolution?: number
+  waterLayout?: 'loaded' | 'visible'
+}
+
 /** A small, genuine skinned humanoid fixture. Geometry is sampled by the normal body path. */
 function skinnedCreature() {
   const bones = Array.from({ length: 7 }, () => new THREE.Bone())
@@ -66,7 +73,12 @@ function skinnedCreature() {
 }
 
 /** Fixed fixtures never instantiate the sandbox, storage, Studio or authoring adapters. */
-export function createBenchmarkScene(engine: AsciiEngine, name: BenchmarkScene, waterCount = 1) {
+export function createBenchmarkScene(
+  engine: AsciiEngine,
+  name: BenchmarkScene,
+  waterCount = 1,
+  load: BenchmarkLoad = {},
+) {
   const focus = new THREE.Vector3(0, 0.6, 0)
   const floor = new THREE.Mesh(
     new THREE.PlaneGeometry(name === 'water-scale' ? 1024 : 34, name === 'water-scale' ? 1024 : 34),
@@ -94,16 +106,26 @@ export function createBenchmarkScene(engine: AsciiEngine, name: BenchmarkScene, 
   }
   const waterCalls: number[] = []
   if (name === 'water-scale') {
-    if (![1, 2, 4, 8].includes(waterCount)) throw new Error('Water count must be 1, 2, 4 or 8')
+    if (!Number.isInteger(waterCount) || waterCount < 1 || waterCount > 512)
+      throw new Error('Water count must be an integer in 1..512')
+    const resolution = load.waterResolution ?? 129
+    if (![65, 129, 257, 513].includes(resolution)) throw new Error('Unsupported water grid')
+    const columns = Math.ceil(Math.sqrt(waterCount)),
+      rows = Math.ceil(waterCount / columns)
     for (let i = 0; i < waterCount; i++) {
-      const shape = createWaterPaint(28, 129)
-      shape.x = i * 64
+      const shape = createWaterPaint(28, resolution)
+      if (load.waterLayout === 'visible') {
+        shape.x = ((i % columns) - (columns - 1) / 2) * 32
+        shape.z = (Math.floor(i / columns) - (rows - 1) / 2) * 32
+      } else shape.x = i * 64
       shape.mask!.values.fill(1)
       // A seeded sloping bed initializes flow without out-of-render rain/actor impulses.
-      shape.mask!.heights = Array.from(
-        { length: 129 ** 2 },
-        (_, j) => (Math.floor(j / 129) - 64) * 0.001 + Math.sin(j * 0.017 + BENCHMARK_SEED) * 0.002,
-      )
+      shape.mask!.heights = Array.from({ length: resolution ** 2 }, (_, j) => {
+        // Sample the same world-space bed at every grid size; exactly the old bed at 129.
+        const z = (Math.floor(j / resolution) * 128) / (resolution - 1),
+          x = ((j % resolution) * 128) / (resolution - 1)
+        return (z - 64) * 0.001 + Math.sin((z * 129 + x) * 0.017 + BENCHMARK_SEED) * 0.002
+      })
       const water = engine.createWater(shape, { physics: { enabled: true } })
       engine.add(water.mesh, { glyph: 'water' })
       waterCalls.push(0)
@@ -115,12 +137,12 @@ export function createBenchmarkScene(engine: AsciiEngine, name: BenchmarkScene, 
     }
     Object.assign(configuration, {
       waterCount,
-      waterResolution: 129,
-      waterCells: waterCount * 129 ** 2,
+      waterResolution: resolution,
+      waterCells: waterCount * resolution ** 2,
       waterWidth: 28,
-      spacing: 64,
+      spacing: load.waterLayout === 'visible' ? 32 : 64,
       mapWidth: 1024,
-      expectedVisible: 1,
+      expectedVisible: load.waterLayout === 'visible' ? waterCount : 1,
       reflection: true,
       externalImpulses: false,
     })
@@ -150,22 +172,36 @@ export function createBenchmarkScene(engine: AsciiEngine, name: BenchmarkScene, 
       reflection: true,
     })
   } else if (name === 'particles') {
-    for (let i = 0; i < 8; i++) {
-      const at = new THREE.Vector3(((i % 4) - 1.5) * 4, 0, (Math.floor(i / 4) - 0.5) * 5)
+    const groups = load.effectGroups ?? 8
+    if (!Number.isInteger(groups) || groups < 1 || groups > 256)
+      throw new Error('Effect groups must be an integer in 1..256')
+    for (let i = 0; i < groups; i++) {
+      // More simultaneous events share the original eight locations: fixed pixel footprint.
+      const slot = i % 8
+      const at = new THREE.Vector3(((slot % 4) - 1.5) * 4, 0, (Math.floor(slot / 4) - 0.5) * 5)
       engine.fx.play('fogueira', at)
       engine.fx.play('explosao-de-fogo', at, { loop: true })
       engine.fx.play('gelo', at, { loop: true })
     }
     Object.assign(configuration, {
-      campfires: 8,
-      combatEffects: 16,
+      campfires: groups,
+      combatEffects: groups * 2,
       effectSeed: 4242,
       effectBudget: 6000,
     })
   } else {
-    const creatures = Array.from({ length: 16 }, (_, i) => {
+    const count = load.creatures ?? 16
+    if (!Number.isInteger(count) || count < 1 || count > 512)
+      throw new Error('Creature count must be an integer in 1..512')
+    const columns = Math.ceil(Math.sqrt(count)),
+      rows = Math.ceil(count / columns)
+    const creatures = Array.from({ length: count }, (_, i) => {
       const creature = skinnedCreature()
-      creature.mesh.position.set(((i % 4) - 1.5) * 3, 0, (Math.floor(i / 4) - 1.5) * 3)
+      creature.mesh.position.set(
+        ((i % columns) - (columns - 1) / 2) * 3,
+        0,
+        (Math.floor(i / columns) - (rows - 1) / 2) * 3,
+      )
       engine.add(creature.mesh, { glyph: 'body', surface: 'actor', size: 0.09, open: true })
       return creature
     })
@@ -179,7 +215,7 @@ export function createBenchmarkScene(engine: AsciiEngine, name: BenchmarkScene, 
       })
     }
     Object.assign(configuration, {
-      creatures: 16,
+      creatures: count,
       bonesPerCreature: 7,
       skinWeights: [0.9, 0.1],
       bodySize: 0.09,
@@ -196,5 +232,36 @@ export function createBenchmarkScene(engine: AsciiEngine, name: BenchmarkScene, 
     update: time => update(time),
     dispose() {},
   }
-  return { area, configuration, diagnostics: () => ({ waterCalls: [...waterCalls] }) }
+  return {
+    area,
+    configuration,
+    diagnostics: () => {
+      const frustum = new THREE.Frustum().setFromProjectionMatrix(
+        new THREE.Matrix4().multiplyMatrices(
+          engine.camera.projectionMatrix,
+          engine.camera.matrixWorldInverse,
+        ),
+      )
+      let visibleCreatures = 0
+      engine.scene.traverse(object => {
+        if (object instanceof THREE.SkinnedMesh && frustum.intersectsObject(object))
+          visibleCreatures++
+      })
+      return {
+        waterCalls: [...waterCalls],
+        visibleCreatures,
+        visibleWaters: engine.waters.filter(w => frustum.intersectsObject(w.mesh)).length,
+        simulationResolutions: engine.waters.map(w =>
+          'dynamics' in w ? (w.dynamics as { resolution: number }).resolution : null,
+        ),
+        reflectionLevels: [
+          ...new Set(
+            engine.waters
+              .filter(w => frustum.intersectsObject(w.mesh))
+              .map(w => w.mesh.userData.waterReflectionLevel),
+          ),
+        ],
+      }
+    },
+  }
 }

@@ -1,4 +1,5 @@
 import { CPU_SUBSYSTEMS, type RenderSample } from '@ascii-engine/core'
+import { Vector3 } from 'three'
 import { createAsciiEngine } from '../engine'
 import { BENCHMARK_DT, BENCHMARK_SCENES, createBenchmarkScene, type BenchmarkScene } from './scenes'
 
@@ -17,6 +18,12 @@ const { area, configuration, diagnostics } = createBenchmarkScene(
   engine,
   name,
   Number(params.get('waters') ?? 1),
+  {
+    creatures: params.has('creatures') ? Number(params.get('creatures')) : undefined,
+    effectGroups: params.has('effect-groups') ? Number(params.get('effect-groups')) : undefined,
+    waterResolution: params.has('resolution') ? Number(params.get('resolution')) : undefined,
+    waterLayout: params.get('water-layout') === 'visible' ? 'visible' : 'loaded',
+  },
 )
 if (name === 'water-scale') configuration.waterPolicy = waterPolicy
 const camera = {
@@ -24,8 +31,30 @@ const camera = {
   span: name.startsWith('water') ? 17 : 9,
   angle: Math.PI / 7,
   elevation: Math.atan2(18, 15),
+  retreat: 0,
 }
-engine.frame(area.hero, camera.span, camera.angle, camera.elevation)
+if (params.has('creatures')) {
+  const columns = Math.ceil(Math.sqrt(Number(configuration.creatures)))
+  camera.span = Math.max(9, columns * 2.25)
+  camera.retreat = Math.max(0, columns * 3 - 12)
+}
+if (params.get('water-layout') === 'visible') {
+  const columns = Math.ceil(Math.sqrt(Number(configuration.waterCount)))
+  camera.span = 17 * columns
+  camera.retreat = (columns - 1) * 48
+}
+const direction = new Vector3()
+function frame() {
+  engine.frame(area.hero, camera.span, camera.angle, camera.elevation)
+  if (camera.retreat) {
+    engine.camera.getWorldDirection(direction)
+    engine.camera.position.addScaledVector(direction, -camera.retreat)
+    engine.camera.far = 90 + camera.retreat * 2
+    engine.camera.updateProjectionMatrix()
+    engine.camera.updateMatrixWorld()
+  }
+}
+frame()
 engine.render(0)
 canvas.dataset.ready = 'true'
 
@@ -196,7 +225,7 @@ async function run(warmup = 600, frames = 600) {
           }
           const started = performance.now()
           area.update(engine.time + BENCHMARK_DT, BENCHMARK_DT)
-          engine.frame(area.hero, camera.span, camera.angle, camera.elevation)
+          frame()
           engine.render(BENCHMARK_DT)
           const frameCpuMs = performance.now() - started
           const stats = engine.stats?.latest

@@ -4,6 +4,38 @@ Entries describe the state at each stage. Earlier limitations may have been
 resolved later; START.md and the editor guide describe the current scope.
 Historical filenames, reference IDs and captured interfaces are preserved.
 
+## 2026-10-15 — Preregister optimized JS capacity study
+
+Added URL-addressable creature/effect counts, visible-water layout and mesh-grid
+sizes without changing the original fixtures at their original loads. Camera
+fit/retreat keeps every creature/visible water in frame, with visibility counts
+and actual solver resolutions checked after measurement. Repeated effects keep
+the original eight positions and pixel footprint. The grid axis measures the
+existing engine: 257/513 mesh grids still use its capped 129 solver, explicitly
+reported rather than silently calling them high-resolution physics.
+
+The capacity runner uses the stabilized uncapped fixed-step Phase 2 controls,
+two rounds of five fresh processes, 600 warm-up/600 measured frames. Capacity
+uses the worse round p95 against 16.7/33.3 ms; maxima are measured, never
+interpolated. Reuse is limited to matching Phase 2 water fixtures/protocol.
+Resource/range bounds and failed repeatability remain explicit. No WASM,
+new simulation resolution, machine power changes or push. Runtime water
+scheduling still retains its prior default until the separately authorized
+editor/player policy change and camera parity validation.
+
+[Protocol](captures/benchmarks-2026-10-15/capacity/README.md).
+Validation: pnpm check passes (181 tests). Six scaled fixtures have exact
+profiling on/off state and PNG byte parity, with no IndexedDB access. The
+legacy 129 fixture state/PNG is identical to Phase 2. Orca page
+3e2777fa-782a-49be-a647-92ea35fab1eb completed 60 fixed steps with all 64
+creatures visible; capture results are retained. Page-only CDP and cdpshot
+captures contain no desktop/private content. Accepted capacity measurements
+remain pending.
+
+[Fixture parity](captures/benchmarks-2026-10-15/capacity/validation/fixture-image-parity.json),
+[cdpshot capture](captures/benchmarks-2026-10-15/capacity/cdpshot-creatures-00.png),
+[Orca run](captures/benchmarks-2026-10-15/capacity/validation/orca-fixture.json).
+
 ## 2026-10-15 — Phase 2 results, JS baseline and optional water scaling
 
 Completed 60,000 measured and 60,000 warm-up frames across the two skinning

@@ -1,0 +1,2340 @@
+{
+  "environment": {
+    "timestamp": "2026-10-15T19:37:58.195Z",
+    "sourceCommit": "1314f0f02b3f94a891afa3c013e89b227c25bd4d",
+    "trackedChanges": "M START.md\n M apps/editor/src/benchmark/main.ts\n M apps/editor/src/benchmark/scenes.ts\n M docs/log.md\n M package.json\n M scripts/bench.mjs",
+    "browserIsolation": "fresh Chromium process and temporary profile per execution",
+    "rendererCpu": 6,
+    "extensionsDisabled": true,
+    "rendererAffinityScope": "active benchmark page main thread only; spare/GPU/browser/other existing threads unchanged",
+    "framePacing": "uncapped",
+    "scheduler": "task-with-gpu-backpressure",
+    "cpu": {
+      "model": "12th Gen Intel(R) Core(TM) i5-12450H",
+      "logicalCores": 12
+    },
+    "os": {
+      "platform": "linux",
+      "release": "7.2.3-arch1-3",
+      "arch": "x64",
+      "distribution": "NAME=\"Omarchy\"\nPRETTY_NAME=\"Omarchy\"\nID=omarchy\nID_LIKE=arch\nBUILD_ID=\"4.0.4\"\nVERSION_ID=\"4.0.4\"\nANSI_COLOR=\"38;2;158;206;106\"\nHOME_URL=\"https://omarchy.org/\"\nDOCUMENTATION_URL=\"https://learn.omacom.io/2/the-omarchy-manual\"\nSUPPORT_URL=\"https://discord.gg/tXFUdasqhY\"\nBUG_REPORT_URL=\"https://github.com/basecamp/omarchy/issues\"\nLOGO=omarchy"
+    },
+    "memoryBytes": 24901357568,
+    "power": {
+      "profile": "performance",
+      "governor": "powersave",
+      "driver": "intel_pstate",
+      "energyPreference": "performance"
+    },
+    "chromium": {
+      "protocolVersion": "1.3",
+      "product": "Chrome/152.0.7977.82",
+      "revision": "@d04cdb24d67b081f6cf80200ffc5233f44b61109",
+      "userAgent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/152.0.0.0 Safari/537.36",
+      "jsVersion": "15.2.124.21"
+    },
+    "flags": [
+      "--disable-extensions",
+      "--disable-component-extensions-with-background-pages",
+      "--headless=new",
+      "--no-sandbox",
+      "--use-angle=gl",
+      "--enable-gpu",
+      "--ignore-gpu-blocklist",
+      "--hide-scrollbars",
+      "--window-size=1920,1080",
+      "--force-device-scale-factor=1",
+      "--disable-gpu-vsync",
+      "--disable-frame-rate-limit",
+      "--remote-debugging-port=0",
+      "--user-data-dir=<isolated temporary profile>",
+      "about:blank"
+    ]
+  },
+  "checks": [
+    {
+      "scene": "skinning-64",
+      "fingerprint": {
+        "hash": "facccc73",
+        "values": 244659,
+        "skinnedPoints": 72325,
+        "time": 3.9999999999999907
+      },
+      "parity": "exact",
+      "storageCalls": 0,
+      "metrics": [
+        {
+          "profile": "on",
+          "configuration": {
+            "name": "skinning",
+            "seed": 4242,
+            "carpetSeed": 48017,
+            "cover": 1800,
+            "dt": 0.016666666666666666,
+            "creatures": 64,
+            "bonesPerCreature": 7,
+            "skinWeights": [
+              0.9,
+              0.1
+            ],
+            "bodySize": 0.09
+          },
+          "diagnostics": {
+            "waterCalls": [],
+            "visibleCreatures": 64,
+            "visibleWaters": 0,
+            "simulationResolutions": []
+          },
+          "summary": {
+            "frameMs": {
+              "p50": 10.930000003427267,
+              "p95": 15.140000000596046,
+              "p99": 19.765000000596046
+            },
+            "rafIntervalMs": {
+              "p50": null,
+              "p95": null,
+              "p99": null
+            },
+            "frameCpuMs": {
+              "p50": 5.219999998807907,
+              "p95": 8.419999998062849,
+              "p99": 14.79500000178814
+            },
+            "renderCpuMs": {
+              "p50": 4.954999998211861,
+              "p95": 8.109999999403954,
+              "p99": 14.559999998658895
+            },
+            "sceneCpuMs": {
+              "p50": 0.19999999925494194,
+              "p95": 0.3400000035762787,
+              "p99": 0.5
+            },
+            "waterStep": {
+              "p50": 0,
+              "p95": 0,
+              "p99": 0
+            },
+            "waterUpload": {
+              "p50": 0,
+              "p95": 0,
+              "p99": 0
+            },
+            "skinning": {
+              "p50": 1.7749999985098839,
+              "p95": 2.4899999983608723,
+              "p99": 4.3599999994039536
+            },
+            "effects": {
+              "p50": 0,
+              "p95": 0.004999998956918716,
+              "p99": 0.005000002682209015
+            },
+            "carpet": {
+              "p50": 0.010000001639127731,
+              "p95": 0.019999999552965164,
+              "p99": 0.05000000074505806
+            },
+            "bodyUniforms": {
+              "p50": 0.004999998956918716,
+              "p95": 0.010000001639127731,
+              "p99": 0.015000000596046448
+            },
+            "renderRest": {
+              "p50": 3.274999998509884,
+              "p95": 5.849999997764826,
+              "p99": 12.144999999552965
+            },
+            "drawCalls": {
+              "p50": 195,
+              "p95": 195,
+              "p99": 195
+            },
+            "triangles": {
+              "p50": 20020,
+              "p95": 20020,
+              "p99": 20020
+            },
+            "points": {
+              "p50": 72325,
+              "p95": 72325,
+              "p99": 72325
+            },
+            "gpuMs": {
+              "p50": 4.225364,
+              "p95": 7.165416,
+              "p99": 7.566822
+            },
+            "schedulerCpuMs": {
+              "p50": 0.08500000089406967,
+              "p95": 0.16999999806284904,
+              "p99": 0.544999998062849
+            },
+            "completedFrameMs": {
+              "p50": 10.894999999552965,
+              "p95": 15.155000001192093,
+              "p99": 19.74500000104308
+            },
+            "gpuLatencyMs": {
+              "p50": 22.100000001490116,
+              "p95": 26.844999998807907,
+              "p99": 32.87999999895692
+            }
+          },
+          "gpuQueue": {
+            "limit": 2,
+            "scheduler": "task",
+            "peak": 2,
+            "completedFrames": 240,
+            "pollCallbacks": 1177,
+            "totalSchedulerCpuMs": 26.51499990001321,
+            "completionClock": "CPU-observed asynchronous fence completion; includes polling delay",
+            "polling": "non-nested 1 ms timers and task submissions; no spin or blocking GPU wait"
+          },
+          "gpu": {
+            "available": true,
+            "status": "ready",
+            "disjointEvents": 0,
+            "dropped": 0
+          }
+        },
+        {
+          "profile": "off",
+          "configuration": {
+            "name": "skinning",
+            "seed": 4242,
+            "carpetSeed": 48017,
+            "cover": 1800,
+            "dt": 0.016666666666666666,
+            "creatures": 64,
+            "bonesPerCreature": 7,
+            "skinWeights": [
+              0.9,
+              0.1
+            ],
+            "bodySize": 0.09
+          },
+          "diagnostics": {
+            "waterCalls": [],
+            "visibleCreatures": 64,
+            "visibleWaters": 0,
+            "simulationResolutions": []
+          },
+          "summary": {
+            "frameMs": {
+              "p50": 11,
+              "p95": 13.634999997913837,
+              "p99": 15.129999998956919
+            },
+            "rafIntervalMs": {
+              "p50": null,
+              "p95": null,
+              "p99": null
+            },
+            "frameCpuMs": {
+              "p50": 4.480000000447035,
+              "p95": 6.295000001788139,
+              "p99": 6.855000000447035
+            },
+            "renderCpuMs": {
+              "p50": 0,
+              "p95": 0,
+              "p99": 0
+            },
+            "sceneCpuMs": {
+              "p50": 4.480000000447035,
+              "p95": 6.295000001788139,
+              "p99": 6.855000000447035
+            },
+            "waterStep": {
+              "p50": 0,
+              "p95": 0,
+              "p99": 0
+            },
+            "waterUpload": {
+              "p50": 0,
+              "p95": 0,
+              "p99": 0
+            },
+            "skinning": {
+              "p50": 0,
+              "p95": 0,
+              "p99": 0
+            },
+            "effects": {
+              "p50": 0,
+              "p95": 0,
+              "p99": 0
+            },
+            "carpet": {
+              "p50": 0,
+              "p95": 0,
+              "p99": 0
+            },
+            "bodyUniforms": {
+              "p50": 0,
+              "p95": 0,
+              "p99": 0
+            },
+            "renderRest": {
+              "p50": 0,
+              "p95": 0,
+              "p99": 0
+            },
+            "drawCalls": {
+              "p50": 0,
+              "p95": 0,
+              "p99": 0
+            },
+            "triangles": {
+              "p50": 0,
+              "p95": 0,
+              "p99": 0
+            },
+            "points": {
+              "p50": 0,
+              "p95": 0,
+              "p99": 0
+            },
+            "gpuMs": {
+              "p50": null,
+              "p95": null,
+              "p99": null
+            },
+            "schedulerCpuMs": {
+              "p50": 0.08999999985098839,
+              "p95": 0.13499999418854713,
+              "p99": 0.16499999910593033
+            },
+            "completedFrameMs": {
+              "p50": 11.024999998509884,
+              "p95": 13.669999998062849,
+              "p99": 15.08499999716878
+            },
+            "gpuLatencyMs": {
+              "p50": 21.849999997764826,
+              "p95": 25.559999998658895,
+              "p99": 29.054999999701977
+            }
+          },
+          "gpuQueue": {
+            "limit": 2,
+            "scheduler": "task",
+            "peak": 2,
+            "completedFrames": 240,
+            "pollCallbacks": 1308,
+            "totalSchedulerCpuMs": 24.359999902546406,
+            "completionClock": "CPU-observed asynchronous fence completion; includes polling delay",
+            "polling": "non-nested 1 ms timers and task submissions; no spin or blocking GPU wait"
+          },
+          "gpu": {
+            "available": false,
+            "status": "profiling-disabled"
+          }
+        }
+      ]
+    },
+    {
+      "scene": "water-visible-4",
+      "fingerprint": {
+        "hash": "c6e66e59",
+        "values": 465984,
+        "skinnedPoints": 0,
+        "time": 3.9999999999999907,
+        "visibleWaterHash": "a9373e34"
+      },
+      "parity": "exact",
+      "storageCalls": 0,
+      "metrics": [
+        {
+          "profile": "on",
+          "configuration": {
+            "name": "water-scale",
+            "seed": 4242,
+            "carpetSeed": 48017,
+            "cover": 1800,
+            "dt": 0.016666666666666666,
+            "waterCount": 4,
+            "waterResolution": 129,
+            "waterCells": 66564,
+            "waterWidth": 28,
+            "spacing": 32,
+            "mapWidth": 1024,
+            "expectedVisible": 4,
+            "reflection": true,
+            "externalImpulses": false,
+            "waterPolicy": "off"
+          },
+          "diagnostics": {
+            "waterCalls": [
+              241,
+              241,
+              241,
+              241
+            ],
+            "visibleCreatures": 0,
+            "visibleWaters": 4,
+            "simulationResolutions": [
+              129,
+              129,
+              129,
+              129
+            ]
+          },
+          "summary": {
+            "frameMs": {
+              "p50": 24.53500000014901,
+              "p95": 33.11999999731779,
+              "p99": 37.29500000178814
+            },
+            "rafIntervalMs": {
+              "p50": null,
+              "p95": null,
+              "p99": null
+            },
+            "frameCpuMs": {
+              "p50": 24.074999999254942,
+              "p95": 32.74500000104308,
+              "p99": 36.980000000447035
+            },
+            "renderCpuMs": {
+              "p50": 24.04000000283122,
+              "p95": 32.70499999821186,
+              "p99": 36.940000001341105
+            },
+            "sceneCpuMs": {
+              "p50": 0.03500000014901161,
+              "p95": 0.054999999701976776,
+              "p99": 0.10000000149011612
+            },
+            "waterStep": {
+              "p50": 6.470000002533197,
+              "p95": 8.595000006258488,
+              "p99": 9.344999995082617
+            },
+            "waterUpload": {
+              "p50": 15.050000000745058,
+              "p95": 20.99500000104308,
+              "p99": 23.15999999642372
+            },
+            "skinning": {
+              "p50": 0,
+              "p95": 0,
+              "p99": 0
+            },
+            "effects": {
+              "p50": 0,
+              "p95": 0.004999998956918716,
+              "p99": 0.005000002682209015
+            },
+            "carpet": {
+              "p50": 0.005000002682209015,
+              "p95": 0.010000001639127731,
+              "p99": 0.019999999552965164
+            },
+            "bodyUniforms": {
+              "p50": 0,
+              "p95": 0.009999997913837433,
+              "p99": 0.010000001639127731
+            },
+            "renderRest": {
+              "p50": 2.594999995082617,
+              "p95": 3.464999996125698,
+              "p99": 5.149999998509884
+            },
+            "drawCalls": {
+              "p50": 11,
+              "p95": 11,
+              "p99": 11
+            },
+            "triangles": {
+              "p50": 133160,
+              "p95": 133160,
+              "p99": 133160
+            },
+            "points": {
+              "p50": 0,
+              "p95": 0,
+              "p99": 0
+            },
+            "gpuMs": {
+              "p50": 9.614427,
+              "p95": 13.37875,
+              "p99": 14.481458
+            },
+            "schedulerCpuMs": {
+              "p50": 0.030000001192092896,
+              "p95": 0.05999999865889549,
+              "p99": 0.5450000017881393
+            },
+            "completedFrameMs": {
+              "p50": 24.53500000014901,
+              "p95": 33.125,
+              "p99": 37.30000000074506
+            },
+            "gpuLatencyMs": {
+              "p50": 49.45499999821186,
+              "p95": 63.63499999791384,
+              "p99": 72.35999999940395
+            }
+          },
+          "gpuQueue": {
+            "limit": 2,
+            "scheduler": "task",
+            "peak": 2,
+            "completedFrames": 240,
+            "pollCallbacks": 248,
+            "totalSchedulerCpuMs": 11.390000056475401,
+            "completionClock": "CPU-observed asynchronous fence completion; includes polling delay",
+            "polling": "non-nested 1 ms timers and task submissions; no spin or blocking GPU wait"
+          },
+          "gpu": {
+            "available": true,
+            "status": "ready",
+            "disjointEvents": 0,
+            "dropped": 0
+          }
+        },
+        {
+          "profile": "off",
+          "configuration": {
+            "name": "water-scale",
+            "seed": 4242,
+            "carpetSeed": 48017,
+            "cover": 1800,
+            "dt": 0.016666666666666666,
+            "waterCount": 4,
+            "waterResolution": 129,
+            "waterCells": 66564,
+            "waterWidth": 28,
+            "spacing": 32,
+            "mapWidth": 1024,
+            "expectedVisible": 4,
+            "reflection": true,
+            "externalImpulses": false,
+            "waterPolicy": "off"
+          },
+          "diagnostics": {
+            "waterCalls": [
+              241,
+              241,
+              241,
+              241
+            ],
+            "visibleCreatures": 0,
+            "visibleWaters": 4,
+            "simulationResolutions": [
+              129,
+              129,
+              129,
+              129
+            ]
+          },
+          "summary": {
+            "frameMs": {
+              "p50": 24.625,
+              "p95": 28.28500000014901,
+              "p99": 37.00499999895692
+            },
+            "rafIntervalMs": {
+              "p50": null,
+              "p95": null,
+              "p99": null
+            },
+            "frameCpuMs": {
+              "p50": 24.144999999552965,
+              "p95": 27.71499999985099,
+              "p99": 36.399999998509884
+            },
+            "renderCpuMs": {
+              "p50": 0,
+              "p95": 0,
+              "p99": 0
+            },
+            "sceneCpuMs": {
+              "p50": 24.144999999552965,
+              "p95": 27.71499999985099,
+              "p99": 36.399999998509884
+            },
+            "waterStep": {
+              "p50": 0,
+              "p95": 0,
+              "p99": 0
+            },
+            "waterUpload": {
+              "p50": 0,
+              "p95": 0,
+              "p99": 0
+            },
+            "skinning": {
+              "p50": 0,
+              "p95": 0,
+              "p99": 0
+            },
+            "effects": {
+              "p50": 0,
+              "p95": 0,
+              "p99": 0
+            },
+            "carpet": {
+              "p50": 0,
+              "p95": 0,
+              "p99": 0
+            },
+            "bodyUniforms": {
+              "p50": 0,
+              "p95": 0,
+              "p99": 0
+            },
+            "renderRest": {
+              "p50": 0,
+              "p95": 0,
+              "p99": 0
+            },
+            "drawCalls": {
+              "p50": 0,
+              "p95": 0,
+              "p99": 0
+            },
+            "triangles": {
+              "p50": 0,
+              "p95": 0,
+              "p99": 0
+            },
+            "points": {
+              "p50": 0,
+              "p95": 0,
+              "p99": 0
+            },
+            "gpuMs": {
+              "p50": null,
+              "p95": null,
+              "p99": null
+            },
+            "schedulerCpuMs": {
+              "p50": 0.044999998062849045,
+              "p95": 0.07499999925494194,
+              "p99": 0.20500000193715096
+            },
+            "completedFrameMs": {
+              "p50": 24.574999999254942,
+              "p95": 28.280000001192093,
+              "p99": 37.12000000104308
+            },
+            "gpuLatencyMs": {
+              "p50": 49.29500000178814,
+              "p95": 56.63500000163913,
+              "p99": 61.32999999821186
+            }
+          },
+          "gpuQueue": {
+            "limit": 2,
+            "scheduler": "task",
+            "peak": 2,
+            "completedFrames": 240,
+            "pollCallbacks": 270,
+            "totalSchedulerCpuMs": 13.285000015050173,
+            "completionClock": "CPU-observed asynchronous fence completion; includes polling delay",
+            "polling": "non-nested 1 ms timers and task submissions; no spin or blocking GPU wait"
+          },
+          "gpu": {
+            "available": false,
+            "status": "profiling-disabled"
+          }
+        }
+      ]
+    },
+    {
+      "scene": "particles-16",
+      "fingerprint": {
+        "hash": "e77e6879",
+        "values": 24036,
+        "skinnedPoints": 0,
+        "time": 3.9999999999999907
+      },
+      "parity": "exact",
+      "storageCalls": 0,
+      "metrics": [
+        {
+          "profile": "on",
+          "configuration": {
+            "name": "particles",
+            "seed": 4242,
+            "carpetSeed": 48017,
+            "cover": 1800,
+            "dt": 0.016666666666666666,
+            "campfires": 16,
+            "combatEffects": 32,
+            "effectSeed": 4242,
+            "effectBudget": 6000
+          },
+          "diagnostics": {
+            "waterCalls": [],
+            "visibleCreatures": 0,
+            "visibleWaters": 0,
+            "simulationResolutions": []
+          },
+          "effectStats": {
+            "letters": 2477,
+            "effects": 48,
+            "emitters": 128,
+            "budget": 6000
+          },
+          "summary": {
+            "frameMs": {
+              "p50": 22.855000000447035,
+              "p95": 24.474999997764826,
+              "p99": 42.08999999985099
+            },
+            "rafIntervalMs": {
+              "p50": null,
+              "p95": null,
+              "p99": null
+            },
+            "frameCpuMs": {
+              "p50": 1.5399999991059303,
+              "p95": 2.2999999970197678,
+              "p99": 2.574999999254942
+            },
+            "renderCpuMs": {
+              "p50": 1.4800000004470348,
+              "p95": 2.244999997317791,
+              "p99": 2.519999999552965
+            },
+            "sceneCpuMs": {
+              "p50": 0.04999999701976776,
+              "p95": 0.06999999657273293,
+              "p99": 0.11499999836087227
+            },
+            "waterStep": {
+              "p50": 0,
+              "p95": 0,
+              "p99": 0
+            },
+            "waterUpload": {
+              "p50": 0,
+              "p95": 0,
+              "p99": 0
+            },
+            "skinning": {
+              "p50": 0,
+              "p95": 0,
+              "p99": 0
+            },
+            "effects": {
+              "p50": 0.9899999983608723,
+              "p95": 1.6950000002980232,
+              "p99": 1.9450000002980232
+            },
+            "carpet": {
+              "p50": 0.005000002682209015,
+              "p95": 0.010000001639127731,
+              "p99": 0.03500000014901161
+            },
+            "bodyUniforms": {
+              "p50": 0.004999998956918716,
+              "p95": 0.005000002682209015,
+              "p99": 0.010000001639127731
+            },
+            "renderRest": {
+              "p50": 0.4400000050663948,
+              "p95": 0.6100000031292439,
+              "p99": 0.7300000004470348
+            },
+            "drawCalls": {
+              "p50": 4,
+              "p95": 4,
+              "p99": 4
+            },
+            "triangles": {
+              "p50": 10804,
+              "p95": 10804,
+              "p99": 10804
+            },
+            "points": {
+              "p50": 3511,
+              "p95": 3746,
+              "p99": 3825
+            },
+            "gpuMs": {
+              "p50": 19.584427,
+              "p95": 20.535468,
+              "p99": 20.641875
+            },
+            "schedulerCpuMs": {
+              "p50": 0.17999999597668648,
+              "p95": 0.22999999672174454,
+              "p99": 0.2749999985098839
+            },
+            "completedFrameMs": {
+              "p50": 22.83999999985099,
+              "p95": 24.489999998360872,
+              "p99": 42.105000000447035
+            },
+            "gpuLatencyMs": {
+              "p50": 45.13499999791384,
+              "p95": 48.100000001490116,
+              "p99": 51.7799999974668
+            }
+          },
+          "gpuQueue": {
+            "limit": 2,
+            "scheduler": "task",
+            "peak": 2,
+            "completedFrames": 240,
+            "pollCallbacks": 4004,
+            "totalSchedulerCpuMs": 43.230000004172325,
+            "completionClock": "CPU-observed asynchronous fence completion; includes polling delay",
+            "polling": "non-nested 1 ms timers and task submissions; no spin or blocking GPU wait"
+          },
+          "gpu": {
+            "available": true,
+            "status": "ready",
+            "disjointEvents": 0,
+            "dropped": 0
+          }
+        },
+        {
+          "profile": "off",
+          "configuration": {
+            "name": "particles",
+            "seed": 4242,
+            "carpetSeed": 48017,
+            "cover": 1800,
+            "dt": 0.016666666666666666,
+            "campfires": 16,
+            "combatEffects": 32,
+            "effectSeed": 4242,
+            "effectBudget": 6000
+          },
+          "diagnostics": {
+            "waterCalls": [],
+            "visibleCreatures": 0,
+            "visibleWaters": 0,
+            "simulationResolutions": []
+          },
+          "effectStats": {
+            "letters": 2477,
+            "effects": 48,
+            "emitters": 128,
+            "budget": 6000
+          },
+          "summary": {
+            "frameMs": {
+              "p50": 21.740000002086163,
+              "p95": 23.37999999895692,
+              "p99": 24.28500000014901
+            },
+            "rafIntervalMs": {
+              "p50": null,
+              "p95": null,
+              "p99": null
+            },
+            "frameCpuMs": {
+              "p50": 1.3500000014901161,
+              "p95": 2.1649999991059303,
+              "p99": 2.7399999983608723
+            },
+            "renderCpuMs": {
+              "p50": 0,
+              "p95": 0,
+              "p99": 0
+            },
+            "sceneCpuMs": {
+              "p50": 1.3500000014901161,
+              "p95": 2.1649999991059303,
+              "p99": 2.7399999983608723
+            },
+            "waterStep": {
+              "p50": 0,
+              "p95": 0,
+              "p99": 0
+            },
+            "waterUpload": {
+              "p50": 0,
+              "p95": 0,
+              "p99": 0
+            },
+            "skinning": {
+              "p50": 0,
+              "p95": 0,
+              "p99": 0
+            },
+            "effects": {
+              "p50": 0,
+              "p95": 0,
+              "p99": 0
+            },
+            "carpet": {
+              "p50": 0,
+              "p95": 0,
+              "p99": 0
+            },
+            "bodyUniforms": {
+              "p50": 0,
+              "p95": 0,
+              "p99": 0
+            },
+            "renderRest": {
+              "p50": 0,
+              "p95": 0,
+              "p99": 0
+            },
+            "drawCalls": {
+              "p50": 0,
+              "p95": 0,
+              "p99": 0
+            },
+            "triangles": {
+              "p50": 0,
+              "p95": 0,
+              "p99": 0
+            },
+            "points": {
+              "p50": 0,
+              "p95": 0,
+              "p99": 0
+            },
+            "gpuMs": {
+              "p50": null,
+              "p95": null,
+              "p99": null
+            },
+            "schedulerCpuMs": {
+              "p50": 0.1550000049173832,
+              "p95": 0.20499999821186066,
+              "p99": 0.23000000044703484
+            },
+            "completedFrameMs": {
+              "p50": 21.725000001490116,
+              "p95": 23.33000000193715,
+              "p99": 24.189999997615814
+            },
+            "gpuLatencyMs": {
+              "p50": 43.225000001490116,
+              "p95": 45.16499999910593,
+              "p99": 45.75500000268221
+            }
+          },
+          "gpuQueue": {
+            "limit": 2,
+            "scheduler": "task",
+            "peak": 2,
+            "completedFrames": 240,
+            "pollCallbacks": 3909,
+            "totalSchedulerCpuMs": 41.84000000357628,
+            "completionClock": "CPU-observed asynchronous fence completion; includes polling delay",
+            "polling": "non-nested 1 ms timers and task submissions; no spin or blocking GPU wait"
+          },
+          "gpu": {
+            "available": false,
+            "status": "profiling-disabled"
+          }
+        }
+      ]
+    },
+    {
+      "scene": "water-grid-257",
+      "fingerprint": {
+        "hash": "39f902e0",
+        "values": 264747,
+        "skinnedPoints": 0,
+        "time": 3.9999999999999907,
+        "visibleWaterHash": "bbb28c75"
+      },
+      "parity": "exact",
+      "storageCalls": 0,
+      "metrics": [
+        {
+          "profile": "on",
+          "configuration": {
+            "name": "water-scale",
+            "seed": 4242,
+            "carpetSeed": 48017,
+            "cover": 1800,
+            "dt": 0.016666666666666666,
+            "waterCount": 1,
+            "waterResolution": 257,
+            "waterCells": 66049,
+            "waterWidth": 28,
+            "spacing": 64,
+            "mapWidth": 1024,
+            "expectedVisible": 1,
+            "reflection": true,
+            "externalImpulses": false,
+            "waterPolicy": "off"
+          },
+          "diagnostics": {
+            "waterCalls": [
+              241
+            ],
+            "visibleCreatures": 0,
+            "visibleWaters": 1,
+            "simulationResolutions": [
+              129
+            ]
+          },
+          "summary": {
+            "frameMs": {
+              "p50": 14.899999998509884,
+              "p95": 23.314999997615814,
+              "p99": 24.140000000596046
+            },
+            "rafIntervalMs": {
+              "p50": null,
+              "p95": null,
+              "p99": null
+            },
+            "frameCpuMs": {
+              "p50": 14.554999999701977,
+              "p95": 22.92000000178814,
+              "p99": 23.720000002533197
+            },
+            "renderCpuMs": {
+              "p50": 14.524999998509884,
+              "p95": 22.849999997764826,
+              "p99": 23.66499999910593
+            },
+            "sceneCpuMs": {
+              "p50": 0.030000001192092896,
+              "p95": 0.04999999701976776,
+              "p99": 0.06499999761581421
+            },
+            "waterStep": {
+              "p50": 0.794999998062849,
+              "p95": 1.300000000745058,
+              "p99": 1.875
+            },
+            "waterUpload": {
+              "p50": 12.725000001490116,
+              "p95": 20.049999997019768,
+              "p99": 21.220000002533197
+            },
+            "skinning": {
+              "p50": 0,
+              "p95": 0,
+              "p99": 0
+            },
+            "effects": {
+              "p50": 0,
+              "p95": 0.005000002682209015,
+              "p99": 0.005000002682209015
+            },
+            "carpet": {
+              "p50": 0.004999998956918716,
+              "p95": 0.010000001639127731,
+              "p99": 0.015000000596046448
+            },
+            "bodyUniforms": {
+              "p50": 0,
+              "p95": 0.005000002682209015,
+              "p99": 0.010000001639127731
+            },
+            "renderRest": {
+              "p50": 0.919999998062849,
+              "p95": 1.4549999982118607,
+              "p99": 2.150000002235174
+            },
+            "drawCalls": {
+              "p50": 5,
+              "p95": 5,
+              "p99": 5
+            },
+            "triangles": {
+              "p50": 133154,
+              "p95": 133154,
+              "p99": 133154
+            },
+            "points": {
+              "p50": 0,
+              "p95": 0,
+              "p99": 0
+            },
+            "gpuMs": {
+              "p50": 5.943958,
+              "p95": 8.663906,
+              "p99": 11.250833
+            },
+            "schedulerCpuMs": {
+              "p50": 0.02499999850988388,
+              "p95": 0.03999999910593033,
+              "p99": 0.055000003427267075
+            },
+            "completedFrameMs": {
+              "p50": 14.899999998509884,
+              "p95": 23.324999999254942,
+              "p99": 24.140000000596046
+            },
+            "gpuLatencyMs": {
+              "p50": 30.184999998658895,
+              "p95": 45.42000000178814,
+              "p99": 47.66000000014901
+            }
+          },
+          "gpuQueue": {
+            "limit": 2,
+            "scheduler": "task",
+            "peak": 2,
+            "completedFrames": 240,
+            "pollCallbacks": 275,
+            "totalSchedulerCpuMs": 7.299999922513962,
+            "completionClock": "CPU-observed asynchronous fence completion; includes polling delay",
+            "polling": "non-nested 1 ms timers and task submissions; no spin or blocking GPU wait"
+          },
+          "gpu": {
+            "available": true,
+            "status": "ready",
+            "disjointEvents": 0,
+            "dropped": 0
+          }
+        },
+        {
+          "profile": "off",
+          "configuration": {
+            "name": "water-scale",
+            "seed": 4242,
+            "carpetSeed": 48017,
+            "cover": 1800,
+            "dt": 0.016666666666666666,
+            "waterCount": 1,
+            "waterResolution": 257,
+            "waterCells": 66049,
+            "waterWidth": 28,
+            "spacing": 64,
+            "mapWidth": 1024,
+            "expectedVisible": 1,
+            "reflection": true,
+            "externalImpulses": false,
+            "waterPolicy": "off"
+          },
+          "diagnostics": {
+            "waterCalls": [
+              241
+            ],
+            "visibleCreatures": 0,
+            "visibleWaters": 1,
+            "simulationResolutions": [
+              129
+            ]
+          },
+          "summary": {
+            "frameMs": {
+              "p50": 14.649999998509884,
+              "p95": 17.03999999910593,
+              "p99": 21.559999998658895
+            },
+            "rafIntervalMs": {
+              "p50": null,
+              "p95": null,
+              "p99": null
+            },
+            "frameCpuMs": {
+              "p50": 14.265000000596046,
+              "p95": 16.66000000014901,
+              "p99": 18.804999999701977
+            },
+            "renderCpuMs": {
+              "p50": 0,
+              "p95": 0,
+              "p99": 0
+            },
+            "sceneCpuMs": {
+              "p50": 14.265000000596046,
+              "p95": 16.66000000014901,
+              "p99": 18.804999999701977
+            },
+            "waterStep": {
+              "p50": 0,
+              "p95": 0,
+              "p99": 0
+            },
+            "waterUpload": {
+              "p50": 0,
+              "p95": 0,
+              "p99": 0
+            },
+            "skinning": {
+              "p50": 0,
+              "p95": 0,
+              "p99": 0
+            },
+            "effects": {
+              "p50": 0,
+              "p95": 0,
+              "p99": 0
+            },
+            "carpet": {
+              "p50": 0,
+              "p95": 0,
+              "p99": 0
+            },
+            "bodyUniforms": {
+              "p50": 0,
+              "p95": 0,
+              "p99": 0
+            },
+            "renderRest": {
+              "p50": 0,
+              "p95": 0,
+              "p99": 0
+            },
+            "drawCalls": {
+              "p50": 0,
+              "p95": 0,
+              "p99": 0
+            },
+            "triangles": {
+              "p50": 0,
+              "p95": 0,
+              "p99": 0
+            },
+            "points": {
+              "p50": 0,
+              "p95": 0,
+              "p99": 0
+            },
+            "gpuMs": {
+              "p50": null,
+              "p95": null,
+              "p99": null
+            },
+            "schedulerCpuMs": {
+              "p50": 0.029999997466802597,
+              "p95": 0.044999998062849045,
+              "p99": 0.054999999701976776
+            },
+            "completedFrameMs": {
+              "p50": 14.640000000596046,
+              "p95": 17.04000000283122,
+              "p99": 21.565000001341105
+            },
+            "gpuLatencyMs": {
+              "p50": 29.554999999701977,
+              "p95": 32.99499999731779,
+              "p99": 46.07000000029802
+            }
+          },
+          "gpuQueue": {
+            "limit": 2,
+            "scheduler": "task",
+            "peak": 2,
+            "completedFrames": 240,
+            "pollCallbacks": 271,
+            "totalSchedulerCpuMs": 8.594999961555004,
+            "completionClock": "CPU-observed asynchronous fence completion; includes polling delay",
+            "polling": "non-nested 1 ms timers and task submissions; no spin or blocking GPU wait"
+          },
+          "gpu": {
+            "available": false,
+            "status": "profiling-disabled"
+          }
+        }
+      ]
+    },
+    {
+      "scene": "water-scale-128-pause",
+      "fingerprint": {
+        "hash": "2a954e7",
+        "values": 14910372,
+        "skinnedPoints": 0,
+        "time": 3.9999999999999907,
+        "visibleWaterHash": "a9373e34"
+      },
+      "parity": "exact",
+      "storageCalls": 0,
+      "metrics": [
+        {
+          "profile": "on",
+          "configuration": {
+            "name": "water-scale",
+            "seed": 4242,
+            "carpetSeed": 48017,
+            "cover": 1800,
+            "dt": 0.016666666666666666,
+            "waterCount": 128,
+            "waterResolution": 129,
+            "waterCells": 2130048,
+            "waterWidth": 28,
+            "spacing": 64,
+            "mapWidth": 1024,
+            "expectedVisible": 1,
+            "reflection": true,
+            "externalImpulses": false,
+            "waterPolicy": "pause"
+          },
+          "diagnostics": {
+            "waterCalls": [
+              241,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0
+            ],
+            "visibleCreatures": 0,
+            "visibleWaters": 1,
+            "simulationResolutions": [
+              129,
+              129,
+              129,
+              129,
+              129,
+              129,
+              129,
+              129,
+              129,
+              129,
+              129,
+              129,
+              129,
+              129,
+              129,
+              129,
+              129,
+              129,
+              129,
+              129,
+              129,
+              129,
+              129,
+              129,
+              129,
+              129,
+              129,
+              129,
+              129,
+              129,
+              129,
+              129,
+              129,
+              129,
+              129,
+              129,
+              129,
+              129,
+              129,
+              129,
+              129,
+              129,
+              129,
+              129,
+              129,
+              129,
+              129,
+              129,
+              129,
+              129,
+              129,
+              129,
+              129,
+              129,
+              129,
+              129,
+              129,
+              129,
+              129,
+              129,
+              129,
+              129,
+              129,
+              129,
+              129,
+              129,
+              129,
+              129,
+              129,
+              129,
+              129,
+              129,
+              129,
+              129,
+              129,
+              129,
+              129,
+              129,
+              129,
+              129,
+              129,
+              129,
+              129,
+              129,
+              129,
+              129,
+              129,
+              129,
+              129,
+              129,
+              129,
+              129,
+              129,
+              129,
+              129,
+              129,
+              129,
+              129,
+              129,
+              129,
+              129,
+              129,
+              129,
+              129,
+              129,
+              129,
+              129,
+              129,
+              129,
+              129,
+              129,
+              129,
+              129,
+              129,
+              129,
+              129,
+              129,
+              129,
+              129,
+              129,
+              129,
+              129,
+              129,
+              129,
+              129,
+              129,
+              129,
+              129
+            ]
+          },
+          "summary": {
+            "frameMs": {
+              "p50": 8.79000000283122,
+              "p95": 10.964999999850988,
+              "p99": 12.395000003278255
+            },
+            "rafIntervalMs": {
+              "p50": null,
+              "p95": null,
+              "p99": null
+            },
+            "frameCpuMs": {
+              "p50": 6.195000000298023,
+              "p95": 9.010000001639128,
+              "p99": 9.314999997615814
+            },
+            "renderCpuMs": {
+              "p50": 6.160000000149012,
+              "p95": 8.979999996721745,
+              "p99": 9.280000001192093
+            },
+            "sceneCpuMs": {
+              "p50": 0.04000000283122063,
+              "p95": 0.06500000134110451,
+              "p99": 0.10999999940395355
+            },
+            "waterStep": {
+              "p50": 1.2699999995529652,
+              "p95": 2.0350000001490116,
+              "p99": 2.1299999989569187
+            },
+            "waterUpload": {
+              "p50": 3.2549999989569187,
+              "p95": 5.389999996870756,
+              "p99": 5.600000001490116
+            },
+            "skinning": {
+              "p50": 0,
+              "p95": 0,
+              "p99": 0
+            },
+            "effects": {
+              "p50": 0,
+              "p95": 0.004999998956918716,
+              "p99": 0.005000002682209015
+            },
+            "carpet": {
+              "p50": 0.004999998956918716,
+              "p95": 0.010000001639127731,
+              "p99": 0.015000000596046448
+            },
+            "bodyUniforms": {
+              "p50": 0,
+              "p95": 0.005000002682209015,
+              "p99": 0.009999997913837433
+            },
+            "renderRest": {
+              "p50": 1.4750000014901161,
+              "p95": 2.1200000010430813,
+              "p99": 2.9249999970197678
+            },
+            "drawCalls": {
+              "p50": 5,
+              "p95": 5,
+              "p99": 5
+            },
+            "triangles": {
+              "p50": 34850,
+              "p95": 34850,
+              "p99": 34850
+            },
+            "points": {
+              "p50": 0,
+              "p95": 0,
+              "p99": 0
+            },
+            "gpuMs": {
+              "p50": 4.443489,
+              "p95": 7.000781,
+              "p99": 7.130833
+            },
+            "schedulerCpuMs": {
+              "p50": 0.044999998062849045,
+              "p95": 0.07999999821186066,
+              "p99": 0.10499999672174454
+            },
+            "completedFrameMs": {
+              "p50": 8.78999999910593,
+              "p95": 10.96000000089407,
+              "p99": 12.315000001341105
+            },
+            "gpuLatencyMs": {
+              "p50": 17.45999999716878,
+              "p95": 20.344999998807907,
+              "p99": 21.824999999254942
+            }
+          },
+          "gpuQueue": {
+            "limit": 2,
+            "scheduler": "task",
+            "peak": 2,
+            "completedFrames": 240,
+            "pollCallbacks": 636,
+            "totalSchedulerCpuMs": 12.76000002771616,
+            "completionClock": "CPU-observed asynchronous fence completion; includes polling delay",
+            "polling": "non-nested 1 ms timers and task submissions; no spin or blocking GPU wait"
+          },
+          "gpu": {
+            "available": true,
+            "status": "ready",
+            "disjointEvents": 0,
+            "dropped": 0
+          }
+        },
+        {
+          "profile": "off",
+          "configuration": {
+            "name": "water-scale",
+            "seed": 4242,
+            "carpetSeed": 48017,
+            "cover": 1800,
+            "dt": 0.016666666666666666,
+            "waterCount": 128,
+            "waterResolution": 129,
+            "waterCells": 2130048,
+            "waterWidth": 28,
+            "spacing": 64,
+            "mapWidth": 1024,
+            "expectedVisible": 1,
+            "reflection": true,
+            "externalImpulses": false,
+            "waterPolicy": "pause"
+          },
+          "diagnostics": {
+            "waterCalls": [
+              241,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0
+            ],
+            "visibleCreatures": 0,
+            "visibleWaters": 1,
+            "simulationResolutions": [
+              129,
+              129,
+              129,
+              129,
+              129,
+              129,
+              129,
+              129,
+              129,
+              129,
+              129,
+              129,
+              129,
+              129,
+              129,
+              129,
+              129,
+              129,
+              129,
+              129,
+              129,
+              129,
+              129,
+              129,
+              129,
+              129,
+              129,
+              129,
+              129,
+              129,
+              129,
+              129,
+              129,
+              129,
+              129,
+              129,
+              129,
+              129,
+              129,
+              129,
+              129,
+              129,
+              129,
+              129,
+              129,
+              129,
+              129,
+              129,
+              129,
+              129,
+              129,
+              129,
+              129,
+              129,
+              129,
+              129,
+              129,
+              129,
+              129,
+              129,
+              129,
+              129,
+              129,
+              129,
+              129,
+              129,
+              129,
+              129,
+              129,
+              129,
+              129,
+              129,
+              129,
+              129,
+              129,
+              129,
+              129,
+              129,
+              129,
+              129,
+              129,
+              129,
+              129,
+              129,
+              129,
+              129,
+              129,
+              129,
+              129,
+              129,
+              129,
+              129,
+              129,
+              129,
+              129,
+              129,
+              129,
+              129,
+              129,
+              129,
+              129,
+              129,
+              129,
+              129,
+              129,
+              129,
+              129,
+              129,
+              129,
+              129,
+              129,
+              129,
+              129,
+              129,
+              129,
+              129,
+              129,
+              129,
+              129,
+              129,
+              129,
+              129,
+              129,
+              129,
+              129,
+              129,
+              129,
+              129
+            ]
+          },
+          "summary": {
+            "frameMs": {
+              "p50": 8.285000000149012,
+              "p95": 10.28999999910593,
+              "p99": 10.955000001937151
+            },
+            "rafIntervalMs": {
+              "p50": null,
+              "p95": null,
+              "p99": null
+            },
+            "frameCpuMs": {
+              "p50": 5.544999998062849,
+              "p95": 6.6450000032782555,
+              "p99": 8.875
+            },
+            "renderCpuMs": {
+              "p50": 0,
+              "p95": 0,
+              "p99": 0
+            },
+            "sceneCpuMs": {
+              "p50": 5.544999998062849,
+              "p95": 6.6450000032782555,
+              "p99": 8.875
+            },
+            "waterStep": {
+              "p50": 0,
+              "p95": 0,
+              "p99": 0
+            },
+            "waterUpload": {
+              "p50": 0,
+              "p95": 0,
+              "p99": 0
+            },
+            "skinning": {
+              "p50": 0,
+              "p95": 0,
+              "p99": 0
+            },
+            "effects": {
+              "p50": 0,
+              "p95": 0,
+              "p99": 0
+            },
+            "carpet": {
+              "p50": 0,
+              "p95": 0,
+              "p99": 0
+            },
+            "bodyUniforms": {
+              "p50": 0,
+              "p95": 0,
+              "p99": 0
+            },
+            "renderRest": {
+              "p50": 0,
+              "p95": 0,
+              "p99": 0
+            },
+            "drawCalls": {
+              "p50": 0,
+              "p95": 0,
+              "p99": 0
+            },
+            "triangles": {
+              "p50": 0,
+              "p95": 0,
+              "p99": 0
+            },
+            "points": {
+              "p50": 0,
+              "p95": 0,
+              "p99": 0
+            },
+            "gpuMs": {
+              "p50": null,
+              "p95": null,
+              "p99": null
+            },
+            "schedulerCpuMs": {
+              "p50": 0.04500000178813934,
+              "p95": 0.07000000029802322,
+              "p99": 0.11499999836087227
+            },
+            "completedFrameMs": {
+              "p50": 8.25,
+              "p95": 10.28999999910593,
+              "p99": 11.294999998062849
+            },
+            "gpuLatencyMs": {
+              "p50": 16.684999998658895,
+              "p95": 18.720000002533197,
+              "p99": 22.280000001192093
+            }
+          },
+          "gpuQueue": {
+            "limit": 2,
+            "scheduler": "task",
+            "peak": 2,
+            "completedFrames": 240,
+            "pollCallbacks": 771,
+            "totalSchedulerCpuMs": 11.889999970793724,
+            "completionClock": "CPU-observed asynchronous fence completion; includes polling delay",
+            "polling": "non-nested 1 ms timers and task submissions; no spin or blocking GPU wait"
+          },
+          "gpu": {
+            "available": false,
+            "status": "profiling-disabled"
+          }
+        }
+      ]
+    },
+    {
+      "scene": "water-scale-1-off",
+      "fingerprint": {
+        "hash": "a8992034",
+        "values": 116523,
+        "skinnedPoints": 0,
+        "time": 3.9999999999999907,
+        "visibleWaterHash": "a9373e34"
+      },
+      "parity": "exact",
+      "storageCalls": 0,
+      "metrics": [
+        {
+          "profile": "on",
+          "configuration": {
+            "name": "water-scale",
+            "seed": 4242,
+            "carpetSeed": 48017,
+            "cover": 1800,
+            "dt": 0.016666666666666666,
+            "waterCount": 1,
+            "waterResolution": 129,
+            "waterCells": 16641,
+            "waterWidth": 28,
+            "spacing": 64,
+            "mapWidth": 1024,
+            "expectedVisible": 1,
+            "reflection": true,
+            "externalImpulses": false,
+            "waterPolicy": "off"
+          },
+          "diagnostics": {
+            "waterCalls": [
+              241
+            ],
+            "visibleCreatures": 0,
+            "visibleWaters": 1,
+            "simulationResolutions": [
+              129
+            ]
+          },
+          "summary": {
+            "frameMs": {
+              "p50": 8.904999997466803,
+              "p95": 11.515000000596046,
+              "p99": 14.269999999552965
+            },
+            "rafIntervalMs": {
+              "p50": null,
+              "p95": null,
+              "p99": null
+            },
+            "frameCpuMs": {
+              "p50": 4.964999999850988,
+              "p95": 8.16499999910593,
+              "p99": 8.905000001192093
+            },
+            "renderCpuMs": {
+              "p50": 4.925000000745058,
+              "p95": 8.120000001043081,
+              "p99": 8.875
+            },
+            "sceneCpuMs": {
+              "p50": 0.04000000283122063,
+              "p95": 0.06000000238418579,
+              "p99": 0.11000000312924385
+            },
+            "waterStep": {
+              "p50": 0.7650000005960464,
+              "p95": 1.2399999983608723,
+              "p99": 1.3999999985098839
+            },
+            "waterUpload": {
+              "p50": 3.224999997764826,
+              "p95": 5.5599999986588955,
+              "p99": 5.935000002384186
+            },
+            "skinning": {
+              "p50": 0,
+              "p95": 0,
+              "p99": 0
+            },
+            "effects": {
+              "p50": 0,
+              "p95": 0.004999998956918716,
+              "p99": 0.004999998956918716
+            },
+            "carpet": {
+              "p50": 0.005000002682209015,
+              "p95": 0.010000001639127731,
+              "p99": 0.015000000596046448
+            },
+            "bodyUniforms": {
+              "p50": 0,
+              "p95": 0.005000002682209015,
+              "p99": 0.010000001639127731
+            },
+            "renderRest": {
+              "p50": 0.8999999947845936,
+              "p95": 1.5299999974668026,
+              "p99": 1.6799999997019768
+            },
+            "drawCalls": {
+              "p50": 5,
+              "p95": 5,
+              "p99": 5
+            },
+            "triangles": {
+              "p50": 34850,
+              "p95": 34850,
+              "p99": 34850
+            },
+            "points": {
+              "p50": 0,
+              "p95": 0,
+              "p99": 0
+            },
+            "gpuMs": {
+              "p50": 4.480625,
+              "p95": 7.134895,
+              "p99": 8.486145
+            },
+            "schedulerCpuMs": {
+              "p50": 0.054999999701976776,
+              "p95": 0.09999999776482582,
+              "p99": 0.13000000268220901
+            },
+            "completedFrameMs": {
+              "p50": 8.955000001937151,
+              "p95": 11.625,
+              "p99": 14.300000000745058
+            },
+            "gpuLatencyMs": {
+              "p50": 18.019999999552965,
+              "p95": 21.760000001639128,
+              "p99": 34.814999997615814
+            }
+          },
+          "gpuQueue": {
+            "limit": 2,
+            "scheduler": "task",
+            "peak": 2,
+            "completedFrames": 240,
+            "pollCallbacks": 877,
+            "totalSchedulerCpuMs": 15.390000063925982,
+            "completionClock": "CPU-observed asynchronous fence completion; includes polling delay",
+            "polling": "non-nested 1 ms timers and task submissions; no spin or blocking GPU wait"
+          },
+          "gpu": {
+            "available": true,
+            "status": "ready",
+            "disjointEvents": 0,
+            "dropped": 0
+          }
+        },
+        {
+          "profile": "off",
+          "configuration": {
+            "name": "water-scale",
+            "seed": 4242,
+            "carpetSeed": 48017,
+            "cover": 1800,
+            "dt": 0.016666666666666666,
+            "waterCount": 1,
+            "waterResolution": 129,
+            "waterCells": 16641,
+            "waterWidth": 28,
+            "spacing": 64,
+            "mapWidth": 1024,
+            "expectedVisible": 1,
+            "reflection": true,
+            "externalImpulses": false,
+            "waterPolicy": "off"
+          },
+          "diagnostics": {
+            "waterCalls": [
+              241
+            ],
+            "visibleCreatures": 0,
+            "visibleWaters": 1,
+            "simulationResolutions": [
+              129
+            ]
+          },
+          "summary": {
+            "frameMs": {
+              "p50": 8.67000000178814,
+              "p95": 11.17000000178814,
+              "p99": 12.565000001341105
+            },
+            "rafIntervalMs": {
+              "p50": null,
+              "p95": null,
+              "p99": null
+            },
+            "frameCpuMs": {
+              "p50": 5.455000001937151,
+              "p95": 8.900000002235174,
+              "p99": 10.17000000178814
+            },
+            "renderCpuMs": {
+              "p50": 0,
+              "p95": 0,
+              "p99": 0
+            },
+            "sceneCpuMs": {
+              "p50": 5.455000001937151,
+              "p95": 8.900000002235174,
+              "p99": 10.17000000178814
+            },
+            "waterStep": {
+              "p50": 0,
+              "p95": 0,
+              "p99": 0
+            },
+            "waterUpload": {
+              "p50": 0,
+              "p95": 0,
+              "p99": 0
+            },
+            "skinning": {
+              "p50": 0,
+              "p95": 0,
+              "p99": 0
+            },
+            "effects": {
+              "p50": 0,
+              "p95": 0,
+              "p99": 0
+            },
+            "carpet": {
+              "p50": 0,
+              "p95": 0,
+              "p99": 0
+            },
+            "bodyUniforms": {
+              "p50": 0,
+              "p95": 0,
+              "p99": 0
+            },
+            "renderRest": {
+              "p50": 0,
+              "p95": 0,
+              "p99": 0
+            },
+            "drawCalls": {
+              "p50": 0,
+              "p95": 0,
+              "p99": 0
+            },
+            "triangles": {
+              "p50": 0,
+              "p95": 0,
+              "p99": 0
+            },
+            "points": {
+              "p50": 0,
+              "p95": 0,
+              "p99": 0
+            },
+            "gpuMs": {
+              "p50": null,
+              "p95": null,
+              "p99": null
+            },
+            "schedulerCpuMs": {
+              "p50": 0.05000000074505806,
+              "p95": 0.0949999950826168,
+              "p99": 0.17500000447034836
+            },
+            "completedFrameMs": {
+              "p50": 8.685000002384186,
+              "p95": 11.179999999701977,
+              "p99": 12.405000001192093
+            },
+            "gpuLatencyMs": {
+              "p50": 17.384999997913837,
+              "p95": 20.83499999716878,
+              "p99": 29.04500000178814
+            }
+          },
+          "gpuQueue": {
+            "limit": 2,
+            "scheduler": "task",
+            "peak": 2,
+            "completedFrames": 240,
+            "pollCallbacks": 629,
+            "totalSchedulerCpuMs": 15.085000034421682,
+            "completionClock": "CPU-observed asynchronous fence completion; includes polling delay",
+            "polling": "non-nested 1 ms timers and task submissions; no spin or blocking GPU wait"
+          },
+          "gpu": {
+            "available": false,
+            "status": "profiling-disabled"
+          }
+        }
+      ]
+    }
+  ]
+}
