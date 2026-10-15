@@ -3,7 +3,7 @@ import { mkdtemp, rm } from 'node:fs/promises'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 
-export async function benchmarkBrowser({ blockStorage = true } = {}) {
+export async function benchmarkBrowser({ blockStorage = true, uncapped = false } = {}) {
   const profile = await mkdtemp(join(tmpdir(), 'ascii-benchmark-'))
   const flags = [
     '--headless=new',
@@ -14,6 +14,7 @@ export async function benchmarkBrowser({ blockStorage = true } = {}) {
     '--hide-scrollbars',
     '--window-size=1920,1080',
     '--force-device-scale-factor=1',
+    ...(uncapped ? ['--disable-gpu-vsync', '--disable-frame-rate-limit'] : []),
     '--remote-debugging-port=0',
     `--user-data-dir=${profile}`,
     'about:blank',

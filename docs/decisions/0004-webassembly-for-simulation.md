@@ -66,11 +66,46 @@ have been met. Record the measurements and candidate qualifications, then stop
 for owner review before Phase 2. The confirmed original study plan is preserved
 byte for byte in `docs/wasm-performance-study-plan.md`.
 
-## Phase 1 measurements
+## Methodology amendment — uncapped measurement
+
+The owner requested this amendment after reviewing the paced results, before
+Phase 2. Display-paced frame medians near 16.665 ms and their stability measure
+presentation cadence, not uncapped workload cost. Preserve the original paced
+report/raw data for context; do not use their frame shares as decision evidence.
+
+Before collecting the additional rounds:
+
+- Add Chromium `--disable-gpu-vsync` and `--disable-frame-rate-limit`. Keep the
+  existing scenes, seeds, viewport, 1/60 simulation step, warm-up and run counts.
+  Measure actual callback wall intervals without inserting GPU synchronization.
+- Collect two uncapped rounds, each five fresh loads and 600 measured frames
+  per scene after 600 warm-up frames. Check uncapped full-frame p50 repeatability
+  within 5%; preserve and investigate unstable rounds.
+- Compare active CPU p50 with asynchronous GPU-range p50. A separation of at
+  least 20% describes CPU or GPU dominance; closer values are mixed, and missing
+  GPU timing is unknown. This descriptive band is not an adoption threshold.
+  CPU submission may include driver backpressure, and GPU ranges exclude the
+  browser compositor. Do not add the overlapping CPU and GPU durations.
+- Qualification considers the scene bottleneck as well as numeric work and
+  the 15% target share of the uncapped frame. A large active-CPU fraction alone
+  cannot qualify a CPU target in a GPU-limited scene. Mixed/unknown bottlenecks
+  need more evidence before qualification.
+- Adoption still requires a measured 2× isolated gain and at least 15% uncapped
+  full-frame p50 improvement, no p95 regression, parity and the JS fallback.
+  CPU time saved in a GPU-limited scene does not count as a frame gain.
+
+The original water step is 1.000 / 4.790 = **20.9% of active CPU**, although only
+6.00% of the display-paced frame. Original GPU p50 is 8.959 ms versus 4.790 ms
+CPU. Moving the step to WASM would shorten the smaller side of an overlapping
+pipeline and does not establish a frame improvement. The uncapped data must
+confirm or correct this bottleneck inference. No Phase 2 work is authorized.
+
+## Original display-paced Phase 1 measurements (context only)
 
 Measured source: `d105af5`, two rounds of five fresh loads per scene, each with
 600 warm-up and 600 measured frames. The [report](../captures/benchmarks-2026-10-15/README.md)
-contains subsystem p50/p95, frame shares, p99, raw data and environment. See
+will contain the revised uncapped results. The original [paced report](../captures/benchmarks-2026-10-15/vsync-report.md)
+retains subsystem p50/p95, paced frame shares, p99, raw data and environment. See
 [provenance and validation](../captures/benchmarks-2026-10-15/study-notes.md) for
 the retained preliminary clock diagnostic and visual comparison limitations.
 

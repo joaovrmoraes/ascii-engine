@@ -1,6 +1,12 @@
 import { test } from 'node:test'
 import assert from 'node:assert/strict'
-import { percentile, summarize, relativeDifference } from './bench-stats.mjs'
+import {
+  percentile,
+  summarize,
+  relativeDifference,
+  classifyBottleneck,
+  qualifyTarget,
+} from './bench-stats.mjs'
 
 test('nearest-rank percentiles retain zero samples and exclude unavailable GPU data', () => {
   assert.equal(percentile([100, 0, 10, 20, null, NaN], 0.5), 10)
@@ -22,4 +28,25 @@ test('round differences are symmetric, including zero and missing values', () =>
   assert.ok(relativeDifference(16, 17) > 0.05)
   assert.equal(relativeDifference(0, 0), 0)
   assert.equal(relativeDifference(null, 10), null)
+})
+
+test('bottleneck classification preserves uncertainty and compares overlapping CPU/GPU ranges', () => {
+  assert.equal(classifyBottleneck(5, 9), 'GPU')
+  assert.equal(classifyBottleneck(15, 7), 'CPU')
+  assert.equal(classifyBottleneck(10, 11), 'mixed')
+  assert.equal(classifyBottleneck(5, null), 'unknown')
+})
+
+test('CPU share alone cannot qualify numeric work in a GPU-limited scene', () => {
+  assert.equal(qualifyTarget('waterStep', 3, 10, 'GPU').qualifies, false)
+  assert.equal(qualifyTarget('waterStep', 3, 10, 'mixed').qualifies, false)
+  assert.equal(qualifyTarget('waterStep', 3, 10, 'unknown').qualifies, false)
+  assert.equal(qualifyTarget('waterStep', 3, 10, 'CPU').qualifies, true)
+})
+
+test('qualification still requires numeric work and at least 15% of uncapped frame', () => {
+  assert.equal(qualifyTarget('skinning', 2, 10, 'CPU').qualifies, true)
+  assert.equal(qualifyTarget('waterStep', 1, 10, 'CPU').qualifies, false)
+  assert.equal(qualifyTarget('waterUpload', 6, 10, 'CPU').qualifies, false)
+  assert.equal(qualifyTarget('effects', 6, 10, 'CPU').qualifies, false)
 })

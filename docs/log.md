@@ -4,6 +4,28 @@ Entries describe the state at each stage. Earlier limitations may have been
 resolved later; START.md and the editor guide describe the current scope.
 Historical filenames, reference IDs and captured interfaces are preserved.
 
+## 2026-10-15 — Phase 1 methodology amendment: uncapped runner
+
+The owner requested uncapped measurements before Phase 2 because the original
+16.665 ms frame median describes presentation pacing. Preserved the original
+report and summary as vsync-report.md and vsync-summary.json; all prior raw data
+is unchanged. Added --uncapped to the isolated Chromium runner, with both
+disable-gpu-vsync and disable-frame-rate-limit, while retaining fixed simulation
+steps, seeds, viewport and workloads. The default editor and capture flags are
+unchanged. No renderer or simulation algorithm was modified.
+
+Before collecting the new rounds, amended Proposed ADR 0004: compare CPU/GPU
+dominance, qualify CPU targets only with a CPU bottleneck and use the uncapped
+frame denominator. The 20% separation band describes dominance, not adoption.
+Water's original step is 20.9% of active CPU; that fraction alone does not justify
+WASM when GPU work dominates. CPU savings are not assumed to be frame savings.
+Added checks for GPU/mixed/unknown qualification and missing GPU measurements.
+Validation: pnpm check passes (167 tests); uncapped profiling on/off smoke has
+matching state hashes and byte-identical screenshots in all three scenes,
+also identical to the prior paced captures. No IndexedDB operations occurred.
+New measurements, validation and conclusions are recorded in the next entry.
+Still Phase 1 only; no JS optimization, WASM/GPU alternatives or push.
+
 ## 2026-10-15 — Simulation performance study, Phase 1
 
 Committed the owner's WebAssembly study plan unchanged as d48998a. After owner

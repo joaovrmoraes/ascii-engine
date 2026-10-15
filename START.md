@@ -512,7 +512,8 @@ pnpm format              # format versioned source, configuration and documentat
 pnpm format:check        # check formatting without writing
 pnpm check               # formatting + package boundaries + typecheck + tests + build
 pnpm bench --round=round-1 # fixed-step CPU/GPU study; repeat with round-2
-pnpm bench:report         # summarize the two rounds; stop after Phase 1
+pnpm bench --uncapped --round=uncapped-round-1 # repeat with uncapped-round-2
+pnpm bench:report         # summarize uncapped rounds and bottlenecks; stop before Phase 2
 pnpm tauri dev           # desktop editor
 node scripts/preview-readme.mjs  # local README/video preview: localhost:4178
 ```
@@ -565,3 +566,11 @@ fresh loads per scene, serially. Results, environment and raw samples go under
 with profiling on/off and forbids IndexedDB calls. The report applies the
 owner-confirmed [ADR 0004](docs/decisions/0004-webassembly-for-simulation.md),
 which remains Proposed. This is Phase 1 only, without WASM or JS optimization.
+
+The Phase 1 methodology amendment adds `--uncapped`, launching Chromium with
+`--disable-gpu-vsync --disable-frame-rate-limit` while keeping fixed simulation
+steps. Default capture/editor flags are unchanged. The report now requires the
+two uncapped rounds; prior paced measurements remain as presentation context in
+vsync-report.md. Qualification considers CPU/GPU dominance and the uncapped frame,
+not just the active CPU fraction. CPU savings in a GPU-limited scene do not count
+as measured frame gains. No optimized JS or alternate implementation is included.

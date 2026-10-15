@@ -8,12 +8,15 @@ import { summarize as summary } from './bench-stats.mjs'
 const args = Object.fromEntries(
   process.argv.slice(2).map(argument => {
     const [key, ...value] = argument.replace(/^--/, '').split('=')
-    if (!['round', 'frames', 'warmup', 'runs', 'out', 'verify'].includes(key))
+    if (!['round', 'frames', 'warmup', 'runs', 'out', 'verify', 'uncapped'].includes(key))
       throw new Error('Unknown option: ' + argument)
     return [key, value.length ? value.join('=') : true]
   }),
 )
 const verify = args.verify === true
+if (args.uncapped !== undefined && args.uncapped !== true)
+  throw new Error('Use --uncapped without a value')
+const uncapped = args.uncapped === true
 const frames = Number(args.frames ?? 600),
   warmup = Number(args.warmup ?? 600),
   runs = Number(args.runs ?? 5)
@@ -28,7 +31,7 @@ if (
 )
   throw new Error('Use at least 600 measured frames, 5 runs and 60 warm-up frames')
 const date = new Date().toISOString().slice(0, 10),
-  round = String(args.round ?? 'round-1')
+  round = String(args.round ?? (uncapped ? 'uncapped-round-1' : 'round-1'))
 if (!/^[a-z0-9-]+$/.test(round)) throw new Error('Invalid round name')
 const root = resolve(import.meta.dirname, '..'),
   output = resolve(
@@ -61,6 +64,7 @@ const environment = {
     cwd: root,
     encoding: 'utf8',
   }).trim(),
+  framePacing: uncapped ? 'uncapped' : 'display',
   cpu: { model: cpus()[0].model, logicalCores: cpus().length },
   os: {
     platform: platform(),
@@ -80,7 +84,7 @@ const environment = {
 }
 if (!verify && environment.trackedChanges)
   throw new Error('Commit the benchmark source before measuring; tracked working tree is dirty')
-const browser = await benchmarkBrowser()
+const browser = await benchmarkBrowser({ uncapped })
 Object.assign(environment, { chromium: browser.version, flags: browser.flags })
 const columns = [
   'frame',
@@ -215,7 +219,7 @@ try {
         sceneResult.summary = summary(allRows)
         await writeFile(join(output, scene + '.json'), JSON.stringify(sceneResult) + '\n')
         console.log(
-          `DONE ${scene} ${run}: frame p50=${stats.frameMs.p50.toFixed(3)} ms; CPU p50=${stats.frameCpuMs.p50.toFixed(3)} ms; GPU=${result.gpu.status}`,
+          `DONE ${scene} ${run}: frame p50/p95=${stats.frameMs.p50.toFixed(3)}/${stats.frameMs.p95.toFixed(3)} ms; CPU p50=${stats.frameCpuMs.p50.toFixed(3)} ms; GPU p50=${stats.gpuMs.p50?.toFixed(3) ?? 'unavailable'} ms`,
         )
       }
   }
