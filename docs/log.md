@@ -4,6 +4,44 @@ Entries describe the state at each stage. Earlier limitations may have been
 resolved later; START.md and the editor guide describe the current scope.
 Historical filenames, reference IDs and captured interfaces are preserved.
 
+## 2026-10-15 — Phase 2 fixtures and pre-change skinning profile
+
+Owner authorized JS optimization and optional water scheduling only; no GPU
+skinning, WASM or toolchain. Before changing the kernel, sampled clean source
+34c7ca9 for 1,200 fixed steps with CDP CPU (100 microseconds) and allocation
+sampling (32 KiB, including collected objects). Sampling perturbs timings;
+these profiles diagnose causes and are not the performance baseline.
+
+16 creatures contain 18,179 letters (1,091–1,177 each), 2,304 source vertices,
+2,302 distinct sampled corners and seven bones each. The original loop makes
+54,537 getVertexPosition calls/frame and repeats bone matrix products per
+weight. Of 23,160.760 sampled ms, applyBoneTransform self time is 9,287.394 ms,
+matrix multiplication 2,907.756 ms, Vector3/iterator work 2,227.455 ms and GC
+1,070.825 ms; attribute setXYZ self time is 69.279 ms. Allocation samples also
+point to Three's spread/Vector3 iteration in applyBoneTransform. Raw CPU/heap
+profiles are losslessly gzipped; the reproducer is scripts/profile-skinning.mjs.
+
+Added seeded water-scale URLs (waters=1/2/4/8), each a 129-square grid, 64 m
+apart across a 1,024 m floor. One water is visible; the others remain loaded.
+A sloped seeded bed sustains flow without external rain/actor disturbances.
+The runner accepts --scenes=skinning,water-scale-8-off and retains fresh loads,
+fixed dt, uncapped task scheduling and two-frame GPU backpressure. Array
+snapshots expose every skinned letter position/normal and water state for
+cross-version parity. No simulation behavior changed in this commit.
+
+Validation: pnpm check passed (167 tests); profiling on/off state parity and
+zero IndexedDB calls pass skinning and water-scale 1/8. Page-only CDP captures
+were inspected. Orca page 157d306a-3e02-4891-9f04-6f30b39841c8 completed 120
+water-scale steps: every loaded water received 121 updateDynamics invocations
+(including the initial dt=0 render), confirming no offscreen skip. Its idle
+page capture timed out; retry during active rendering remains pending.
+
+[Profile](captures/benchmarks-2026-10-15/phase-2/profile/before.json),
+[skinning capture](captures/benchmarks-2026-10-15/phase-2/before-validation/verification/skinning-on.png),
+[water-scale capture](captures/benchmarks-2026-10-15/phase-2/before-validation/verification/water-scale-8-off-on.png).
+Measurements, optimized JS, optional water scheduling and final parity remain
+pending. Water scheduling will stay disabled by default. No push.
+
 ## 2026-10-15 — Uncapped Phase 1 results and bottleneck review
 
 Completed two fresh task-scheduled rounds on clean source af0413f: five loads

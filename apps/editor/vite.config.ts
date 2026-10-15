@@ -18,7 +18,11 @@ export default defineConfig({
             (url.pathname === '/' || url.pathname === '/benchmark.html') &&
             url.searchParams.has('bench')
           ) {
-            if (!['water', 'particles', 'skinning'].includes(url.searchParams.get('bench')!)) {
+            if (
+              !['water', 'particles', 'skinning', 'water-scale'].includes(
+                url.searchParams.get('bench')!,
+              )
+            ) {
               response.statusCode = 400
               response.end('Unknown benchmark scene')
               return

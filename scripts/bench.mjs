@@ -6,12 +6,17 @@ import { benchmarkBrowser } from './bench-browser.mjs'
 import { summarize as summary } from './bench-stats.mjs'
 
 const args = Object.fromEntries(
-  process.argv.slice(2).map(argument => {
-    const [key, ...value] = argument.replace(/^--/, '').split('=')
-    if (!['round', 'frames', 'warmup', 'runs', 'out', 'verify', 'uncapped'].includes(key))
-      throw new Error('Unknown option: ' + argument)
-    return [key, value.length ? value.join('=') : true]
-  }),
+  process.argv
+    .slice(2)
+    .filter(argument => argument !== '--')
+    .map(argument => {
+      const [key, ...value] = argument.replace(/^--/, '').split('=')
+      if (
+        !['round', 'frames', 'warmup', 'runs', 'out', 'verify', 'uncapped', 'scenes'].includes(key)
+      )
+        throw new Error('Unknown option: ' + argument)
+      return [key, value.length ? value.join('=') : true]
+    }),
 )
 const verify = args.verify === true
 if (args.uncapped !== undefined && args.uncapped !== true)
@@ -125,8 +130,15 @@ const flatten = sample => ({
   completedFrameMs: sample.completedFrameMs,
   gpuLatencyMs: sample.gpuLatencyMs,
 })
-const scenes = ['water', 'particles', 'skinning'],
-  results = Object.fromEntries(scenes.map(name => [name, { scene: name, columns, runs: [] }]))
+const scenes = String(args.scenes ?? 'water,particles,skinning').split(',')
+for (const scene of scenes)
+  if (!/^(water|particles|skinning|water-scale-(1|2|4|8)-(off|pause))$/.test(scene))
+    throw new Error('Unknown scene variant: ' + scene)
+function sceneUrl(scene, extra = '') {
+  const scale = /^water-scale-(1|2|4|8)-(off|pause)$/.exec(scene)
+  return `${base}/?bench=${scale ? 'water-scale&waters=' + scale[1] + '&water-policy=' + scale[2] : scene}${uncapped ? '&queue=2' : ''}${extra}`
+}
+const results = Object.fromEntries(scenes.map(name => [name, { scene: name, columns, runs: [] }]))
 const validFrameClock = sample =>
   (uncapped ? sample.rafIntervalMs === null : Number.isFinite(sample.rafIntervalMs)) &&
   sample.frameMs >= sample.frameCpuMs
@@ -155,9 +167,7 @@ try {
       const states = [],
         metrics = []
       for (const profile of ['on', 'off']) {
-        await browser.navigate(
-          `${base}/?bench=${scene}&profile=${profile}${uncapped ? '&queue=2' : ''}`,
-        )
+        await browser.navigate(sceneUrl(scene, '&profile=' + profile))
         const result = await browser.evaluate('benchmark.run(60,180)')
         await browser.check()
         validateQueue(result)
@@ -199,7 +209,7 @@ try {
         console.log(
           `START ${round} ${scene} ${run}/${runs}; ${warmup} warm-up + ${frames} measured frames`,
         )
-        await browser.navigate(`${base}/?bench=${scene}&run=${run}${uncapped ? '&queue=2' : ''}`)
+        await browser.navigate(sceneUrl(scene, '&run=' + run))
         const before = {
           timestamp: new Date().toISOString(),
           frequencyKHz: await read('/sys/devices/system/cpu/cpu0/cpufreq/scaling_cur_freq'),

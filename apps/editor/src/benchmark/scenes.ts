@@ -3,7 +3,7 @@ import { mergeGeometries } from 'three/examples/jsm/utils/BufferGeometryUtils.js
 import { createRain, createWaterPaint, type AsciiEngine } from '@ascii-engine/core'
 import type { Area } from '../areas/types'
 
-export const BENCHMARK_SCENES = ['water', 'particles', 'skinning'] as const
+export const BENCHMARK_SCENES = ['water', 'particles', 'skinning', 'water-scale'] as const
 export type BenchmarkScene = (typeof BENCHMARK_SCENES)[number]
 export const BENCHMARK_DT = 1 / 60
 export const BENCHMARK_SEED = 4242
@@ -66,10 +66,10 @@ function skinnedCreature() {
 }
 
 /** Fixed fixtures never instantiate the sandbox, storage, Studio or authoring adapters. */
-export function createBenchmarkScene(engine: AsciiEngine, name: BenchmarkScene) {
+export function createBenchmarkScene(engine: AsciiEngine, name: BenchmarkScene, waterCount = 1) {
   const focus = new THREE.Vector3(0, 0.6, 0)
   const floor = new THREE.Mesh(
-    new THREE.PlaneGeometry(34, 34),
+    new THREE.PlaneGeometry(name === 'water-scale' ? 1024 : 34, name === 'water-scale' ? 1024 : 34),
     new THREE.MeshStandardMaterial({ color: 0x435441 }),
   )
   floor.rotation.x = -Math.PI / 2
@@ -79,7 +79,7 @@ export function createBenchmarkScene(engine: AsciiEngine, name: BenchmarkScene) 
   const cover = engine.createCarpet({
     count: 1800,
     extent: 30,
-    density: x => (name === 'water' ? (Math.abs(x) > 12 ? 1 : 0) : 1),
+    density: x => (name.startsWith('water') ? (Math.abs(x) > 12 ? 1 : 0) : 1),
     y: () => 0,
     pick: random => ({ glyph: Math.floor(random() * 5), height: 0.22, color: [0.28, 0.44, 0.2] }),
   })
@@ -92,7 +92,39 @@ export function createBenchmarkScene(engine: AsciiEngine, name: BenchmarkScene) 
     cover: 1800,
     dt: BENCHMARK_DT,
   }
-  if (name === 'water') {
+  const waterCalls: number[] = []
+  if (name === 'water-scale') {
+    if (![1, 2, 4, 8].includes(waterCount)) throw new Error('Water count must be 1, 2, 4 or 8')
+    for (let i = 0; i < waterCount; i++) {
+      const shape = createWaterPaint(28, 129)
+      shape.x = i * 64
+      shape.mask!.values.fill(1)
+      // A seeded sloping bed maintains flow without out-of-render rain/actor impulses.
+      shape.mask!.heights = Array.from(
+        { length: 129 ** 2 },
+        (_, j) => (Math.floor(j / 129) - 64) * 0.001 + Math.sin(j * 0.017 + BENCHMARK_SEED) * 0.002,
+      )
+      const water = engine.createWater(shape, { physics: { enabled: true } })
+      engine.add(water.mesh, { glyph: 'water' })
+      waterCalls.push(0)
+      const original = water.updateDynamics
+      water.updateDynamics = (dt, time, timings) => {
+        waterCalls[i]++
+        original(dt, time, timings)
+      }
+    }
+    Object.assign(configuration, {
+      waterCount,
+      waterResolution: 129,
+      waterCells: waterCount * 129 ** 2,
+      waterWidth: 28,
+      spacing: 64,
+      mapWidth: 1024,
+      expectedVisible: 1,
+      reflection: true,
+      externalImpulses: false,
+    })
+  } else if (name === 'water') {
     const shape = createWaterPaint(28, 129)
     shape.mask!.values.fill(1)
     const water = engine.createWater(shape, {
@@ -164,5 +196,5 @@ export function createBenchmarkScene(engine: AsciiEngine, name: BenchmarkScene) 
     update: time => update(time),
     dispose() {},
   }
-  return { area, configuration }
+  return { area, configuration, diagnostics: () => ({ waterCalls: [...waterCalls] }) }
 }

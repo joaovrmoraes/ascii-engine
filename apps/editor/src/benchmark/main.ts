@@ -10,10 +10,14 @@ const engine = createAsciiEngine(canvas, {
   maxPixelRatio: 1,
   profiling: params.get('profile') !== 'off',
 })
-const { area, configuration } = createBenchmarkScene(engine, name)
+const { area, configuration, diagnostics } = createBenchmarkScene(
+  engine,
+  name,
+  Number(params.get('waters') ?? 1),
+)
 const camera = {
   focus: [0, 0.6, 0],
-  span: name === 'water' ? 17 : 9,
+  span: name.startsWith('water') ? 17 : 9,
   angle: Math.PI / 7,
   elevation: Math.atan2(18, 15),
 }
@@ -258,6 +262,7 @@ async function run(warmup = 600, frames = 600) {
       samples,
       fingerprint: fingerprint(),
       resources: engine.resources,
+      diagnostics: diagnostics(),
       effectStats: name === 'particles' ? engine.fx.stats : undefined,
       visibilityChanges,
       viewport: {
@@ -288,7 +293,34 @@ async function run(warmup = 600, frames = 600) {
   }
 }
 
-Object.assign(window, { engine, area, benchmark: { ready: true, configuration, run, fingerprint } })
+function snapshot() {
+  const bodies: { position: number[]; normal: number[] }[] = []
+  engine.scene.traverse(object => {
+    if (!object.userData.skin) return
+    const geometry = (object as import('three').Points).geometry
+    bodies.push({
+      position: Array.from(geometry.attributes.position.array),
+      normal: Array.from(geometry.attributes.normal.array),
+    })
+  })
+  const waters = engine.waters.map(source => {
+    const water = source as ReturnType<typeof engine.createWater>
+    return {
+      position: Array.from(water.mesh.geometry.attributes.position.array),
+      normal: Array.from(water.mesh.geometry.attributes.normal.array),
+      depth: Array.from(water.dynamics.depth),
+      flowX: Array.from(water.dynamics.flowX),
+      flowZ: Array.from(water.dynamics.flowZ),
+      foam: Array.from(water.dynamics.foam),
+    }
+  })
+  return { bodies, waters, diagnostics: diagnostics(), time: engine.time }
+}
+Object.assign(window, {
+  engine,
+  area,
+  benchmark: { ready: true, configuration, run, fingerprint, snapshot },
+})
 addEventListener(
   'pagehide',
   () => {
