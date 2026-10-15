@@ -85,6 +85,7 @@ Object.assign(environment, { chromium: browser.version, flags: browser.flags })
 const columns = [
   'frame',
   'frameMs',
+  'rafIntervalMs',
   'frameCpuMs',
   'renderCpuMs',
   'sceneCpuMs',
@@ -103,6 +104,7 @@ const columns = [
 const flatten = sample => ({
   frame: sample.frame,
   frameMs: sample.frameMs,
+  rafIntervalMs: sample.rafIntervalMs,
   frameCpuMs: sample.frameCpuMs,
   renderCpuMs: sample.cpuMs,
   sceneCpuMs: sample.sceneCpuMs,
@@ -123,6 +125,12 @@ try {
         await browser.navigate(`${base}/?bench=${scene}&profile=${profile}`)
         const result = await browser.evaluate('benchmark.run(60,180)')
         await browser.check()
+        if (
+          result.samples.some(
+            sample => !Number.isFinite(sample.rafIntervalMs) || sample.frameMs < sample.frameCpuMs,
+          )
+        )
+          throw new Error('Frame wall interval does not contain its active CPU work')
         if (
           result.viewport.width !== 1920 ||
           result.viewport.height !== 1080 ||
@@ -173,7 +181,10 @@ try {
         if (
           result.samples.length !== frames ||
           result.visibilityChanges ||
-          !result.browser.isolated
+          !result.browser.isolated ||
+          result.samples.some(
+            sample => !Number.isFinite(sample.rafIntervalMs) || sample.frameMs < sample.frameCpuMs,
+          )
         )
           throw new Error('Invalid benchmark run')
         if (

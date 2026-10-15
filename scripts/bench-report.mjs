@@ -33,7 +33,7 @@ const report = [
   '',
   'Status: measurement only. ADR 0004 remains Proposed; no optimized JS, WASM or GPU implementation was attempted.',
   '',
-  '1920×1080 CSS pixels, DPR 1, dt 1/60 s, fixed camera and seeded scene. Each round uses five fresh scene loads with 600 warm-up and 600 measured frames per run by default. Raw files record the actual counts. Frame time is the observed presentation interval; CPU work and asynchronous GPU elapsed ranges are reported separately. Neither CPU submission nor GPU elapsed time alone is the full frame.',
+  '1920×1080 CSS pixels, DPR 1, dt 1/60 s, fixed camera and seeded scene. Each round uses five fresh scene loads with 600 warm-up and 600 measured frames per run by default. Raw files record the actual counts. Frame time is the performance.now() interval between actual callbacks, including pacing and dispatch jitter. Native rAF cadence, CPU work and asynchronous GPU elapsed ranges are recorded separately. Neither CPU submission nor GPU elapsed time alone is the full frame.',
   '',
   'Percentiles use nearest rank over equally sized runs. Share = subsystem p50 CPU / full-frame p50. The 15% gate also requires transferable numeric CPU work. Water upload combines array preparation with Three.js geometry updates; its total alone cannot establish a portable numeric kernel. Effects use JS objects; carpet/body uniforms and remaining submission fail the numeric-array condition. Skinned vertex math can qualify, with GPU skinning the preferred comparison.',
   '',
@@ -46,6 +46,16 @@ for (const scene of scenes) {
       JSON.parse(await readFile(join(root, round, scene + '.json'), 'utf8')),
     ),
   )
+  if (data.some(d => d.runs.some(run => !run.metadata.frameClock?.startsWith('performance.now'))))
+    throw new Error('These rounds only measure scheduled rAF cadence; use the wall-clock rounds')
+  if (
+    data.some(
+      d =>
+        d.runs.length < 5 ||
+        d.runs.some(run => run.metadata.frames < 600 || run.samples.length !== run.metadata.frames),
+    )
+  )
+    throw new Error('A complete round requires at least five runs of at least 600 measured frames')
   const rows = data.flatMap(d =>
     d.runs.flatMap(run =>
       run.samples.map(sample => Object.fromEntries(d.columns.map((key, i) => [key, sample[i]]))),
@@ -103,6 +113,18 @@ for (const scene of scenes) {
   )
   results.push({ scene, summary: stats, frameP50Difference: delta, targets })
 }
+if (
+  await readFile(join(root, 'clock-diagnostic.json')).then(
+    () => true,
+    () => false,
+  )
+)
+  report.push(
+    '## Clock diagnostic',
+    '',
+    'Preliminary rounds used native rAF timestamp differences. An independent clock diagnostic showed these scheduled timestamps hide dispatch jitter at p95. Those raw rounds and their original report are retained under [preliminary-raf/](preliminary-raf/README.md), with the [diagnostic samples](clock-diagnostic.json). The final rounds use actual callback wall intervals and also retain native rAF cadence. Thresholds and simulation steps were unchanged.',
+    '',
+  )
 report.push(
   '## Interpretation and limits',
   '',

@@ -33,8 +33,10 @@ does not require choosing WASM when GPU execution is more suitable.
 - 1920×1080 CSS pixels, device pixel ratio 1, fixed camera and 1/60 s steps.
 - At least 600 measured frames after warm-up, five independent runs per scene,
   repeated in two complete rounds. Record raw data and p50/p95/p99.
-- Primary full-frame time is the observed animation-frame interval, including
-  presentation pacing. Also record active CPU frame work separately; do not
+- Primary full-frame time is the `performance.now()` interval between actual
+  animation-frame callbacks, including pacing and dispatch jitter. Record native
+  rAF timestamps separately: their scheduled cadence can hide dispatch jitter.
+  Also record active CPU frame work separately; do not
   mistake CPU submission time for GPU completion or uncapped throughput.
 - Qualification share is subsystem p50 CPU time divided by p50 full-frame
   interval. Report the active CPU-frame share as additional context.

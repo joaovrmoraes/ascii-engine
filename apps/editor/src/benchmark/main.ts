@@ -67,6 +67,7 @@ async function run(warmup = 600, frames = 600) {
   hasRun = true
   const samples: (RenderSample & {
     frameMs: number
+    rafIntervalMs: number
     frameCpuMs: number
     sceneCpuMs: number
     gpuMs: number | null
@@ -74,6 +75,7 @@ async function run(warmup = 600, frames = 600) {
   const gpuSamples = new Map<number, number>()
   let count = 0,
     previous = 0,
+    previousWall = 0,
     visibilityChanges = 0
   const visibility = () => {
     visibilityChanges++
@@ -84,8 +86,13 @@ async function run(warmup = 600, frames = 600) {
       function step(now: number) {
         try {
           if (document.hidden) throw new Error('Benchmark document became hidden')
-          if (samples.length) samples.at(-1)!.frameMs = now - previous
+          const entered = performance.now()
+          if (samples.length) {
+            samples.at(-1)!.frameMs = entered - previousWall
+            samples.at(-1)!.rafIntervalMs = now - previous
+          }
           previous = now
+          previousWall = entered
           const started = performance.now()
           area.update(engine.time + BENCHMARK_DT, BENCHMARK_DT)
           engine.frame(area.hero, camera.span, camera.angle, camera.elevation)
@@ -105,6 +112,7 @@ async function run(warmup = 600, frames = 600) {
                 points: 0,
               }),
               frameMs: 0,
+              rafIntervalMs: 0,
               frameCpuMs,
               sceneCpuMs: frameCpuMs - (stats?.cpuMs ?? 0),
               gpuMs: null,
@@ -123,7 +131,8 @@ async function run(warmup = 600, frames = 600) {
     // Associate each interval with the work submitted in that frame, including the last one.
     await new Promise<void>(resolve =>
       requestAnimationFrame(now => {
-        samples.at(-1)!.frameMs = now - previous
+        samples.at(-1)!.frameMs = performance.now() - previousWall
+        samples.at(-1)!.rafIntervalMs = now - previous
         resolve()
       }),
     )
@@ -139,6 +148,7 @@ async function run(warmup = 600, frames = 600) {
       camera,
       warmup,
       frames,
+      frameClock: 'performance.now callback interval; rAF cadence recorded separately',
       samples,
       fingerprint: fingerprint(),
       resources: engine.resources,
