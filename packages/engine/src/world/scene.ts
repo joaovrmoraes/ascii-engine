@@ -131,7 +131,8 @@ export function buildScene(engine: AsciiEngine, source: SceneDoc, library: Prefa
     if (carpet) engine.remove(carpet.mesh, { dispose: true })
   }
   try {
-    engine.setTextures({ ...previousTextures, ...doc.textures })
+    // Recipes still linked by the scene being replaced stay until it is disposed.
+    engine.setTextures(doc.textures ?? {}, { keepUsed: true })
     for (const [name, prefab] of Object.entries(library)) if (prefab.style || doc.style?.types?.[name]?.authored) engine.setTypeStyle(name, prefab.style ?? {})
     if (doc.style) engine.setStyle(doc.style)
     terrain = doc.terrain ? createTerrain(doc.terrain) : undefined

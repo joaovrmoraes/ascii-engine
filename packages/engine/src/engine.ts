@@ -427,12 +427,17 @@ export function createAsciiEngine(canvas: HTMLCanvasElement, options: AsciiEngin
     /** Instance options of an added object (its own layer and its parts). */
     instanceStyle(object: THREE.Object3D) { return entries.get(object)?.options },
     /** Update resources and re-resolve linked users without copying asset fields. */
-    setTextures(next: Record<string, TextureAsset>) {
+    /** `keepUsed` retains current recipes still linked by added objects (e.g. while a replacement scene is built). */
+    setTextures(next: Record<string, TextureAsset>, options: { keepUsed?: boolean } = {}) {
+      const resolved = { ...next }
       for (const entry of entries.values()) {
         const ids = [entry.options.texture, ...Object.values(entry.options.parts ?? {}).map(part => part.texture)]
-        for (const id of ids) if (id && !next[id]) throw new Error(`ascii-engine: texture is in use "${id}"`)
+        for (const id of ids) if (id && !resolved[id]) {
+          if (options.keepUsed && textures[id]) resolved[id] = textures[id]
+          else throw new Error(`ascii-engine: texture is in use "${id}"`)
+        }
       }
-      textures = structuredClone(next)
+      textures = structuredClone(resolved)
       for (const entry of entries.values()) if (entry.options.texture || Object.values(entry.options.parts ?? {}).some(part => part.texture)) { unapply(entry); apply(entry) }
     },
     get textures(): Readonly<Record<string, TextureAsset>> { return textures },

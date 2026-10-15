@@ -348,6 +348,13 @@ try {
   await check('unified File import adds recipes without applying their lighting', `Object.values(area.document().textures).some(a=>a.name==='Imported texture') && Object.values(area.document().atmospheres).some(a=>a.name==='Imported light') && area.document().style.brightness!==1.5`)
   await action(`window.beforeMapImport=JSON.stringify(area.document());window.mapImportRejected=false;try{await area.importFiles([new File([JSON.stringify({version:1,objects:[],waters:[{shape:{kind:'pond',x:0,z:0,size:2,angle:0}}]})],'map.json')])}catch(error){mapImportRejected=String(error).includes('Open map')}`)
   await check('importing a map directs Open map and preserves the current document', `mapImportRejected && JSON.stringify(area.document())===beforeMapImport`)
+  await action(`await area.openDocument({version:1,name:'Registry lifetime',objects:[{id:'old-user',prefab:'bloco',position:[0,0,0],options:{texture:'used'}}],textures:{used:{name:'Used',style:{alphabet:'U'}},stale:{name:'Deleted',style:{alphabet:'D'}}}});
+    window.registryCandidate=core.buildScene(engine,{version:1,objects:[],textures:{fresh:{name:'Fresh',style:{alphabet:'F'}}}},{});`)
+  await check('buildScene drops unused old recipes and keeps links needed by the previous live scene', `JSON.stringify(Object.keys(engine.textures).sort())===JSON.stringify(['fresh','used'])`)
+  await evaluate(`window.registryBefore=JSON.stringify(engine.textures);window.failedRegistryBuild=false;try{core.buildScene(engine,{version:1,objects:[{prefab:'broken',position:[0,0,0]}],textures:{temporary:{name:'Temporary',style:{alphabet:'T'}}}},{broken:{title:'Broken fixture',create(){throw new Error('fixture failure')}}})}catch{failedRegistryBuild=true}`)
+  await check('a failed candidate restores the entire texture registry and keeps the old scene usable', `failedRegistryBuild&&JSON.stringify(engine.textures)===registryBefore&&engine.scene.children.some(o=>o.userData.sceneId==='old-user')`)
+  await action(`registryCandidate.dispose();await area.openDocument({version:1,name:'Replacement',objects:[]})`)
+  await check('replacing the old scene releases its final linked recipe', `Object.keys(engine.textures).length===0`)
   await evaluate(`window.ui=(selector,value)=>{const el=document.querySelector(selector);if(!el)throw new Error(selector);if(value===undefined)el.click();else{el.value=value;el.dispatchEvent(new Event('change'))}}`)
   await action(`await area.openDocument({version:1,name:'Water panel',objects:[],waters:[{shape:{kind:'pond',x:0,z:0,size:3,angle:0}}]});ui('[data-water-index="0"]')`)
   await action(`ui('#object-inspector input[type=text]','Named lake')`)

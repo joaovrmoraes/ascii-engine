@@ -4,6 +4,18 @@ Entries describe the state at each stage. Earlier limitations may have been
 resolved later; START.md and the editor guide describe the current scope.
 Historical filenames, reference IDs and captured interfaces are preserved.
 
+## 2026-10-15 — Consolidation review, group 5: texture registry lifetime
+
+Adopted the reviewed preexisting keepUsed/setTextures/buildScene edits. A new
+scene registers its own textures plus only previous recipes still linked by live
+objects. Removed resources no longer linger. Failed construction restores the
+registry; disposing/replacing the old scene releases its last retained link.
+
+Validation: pnpm check (11 CLI + 148 workspace tests), verify:authoring (84
+checks), including actual WebGL registry lifetime, rollback and final release.
+Pinned isolated Orca confirmed the same [registry state](captures/editor-review-fix-2026-10-15/registry-orca.json).
+No previous agent changes were discarded. Owner draft untouched; no push.
+
 ## 2026-10-15 — Consolidation review, group 4: export arguments/retention
 
 The CLI consumes named values exactly once and accepts --key=value. Flag-like
