@@ -634,3 +634,10 @@ Phase 2 water measurements additionally block by map size: two five-run rounds
 per off/pause pair, reversing their order in round 2. Counts, fixed dt, GPU queue
 and the 5% full-frame repeatability gate remain unchanged. Earlier failed
 full-matrix rounds remain in extension-background-diagnostic/.
+
+The [Phase 2 report](docs/captures/benchmarks-2026-10-15/phase-2/README.md)
+records optimized JS as the skinning baseline (45.38× isolated, 52.41% frame
+p50 gain), exact parity and water results for all four map sizes. All ten
+before/after cases repeat within 5%. The water decision depends on map size;
+four paused waters remain a borderline numeric target. ADR 0004 stays Proposed,
+stopped after Phase 2. Regenerate its tables with `node scripts/bench-phase2-report.mjs`.

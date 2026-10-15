@@ -29,6 +29,113 @@ Adoption requires all of the following against an optimized JavaScript baseline:
 GPU skinning may be the appropriate comparison for skinned glyphs. Qualifying
 does not require choosing WASM when GPU execution is more suitable.
 
+## Phase 2 — Optimized JS baseline and water at scale
+
+Owner-authorized scope: optimize JS skinning and test optional water scheduling.
+Both use the accepted uncapped protocol: seeded fixtures, fixed dt 1/60 s,
+1920×1080/DPR 1, two rounds × five fresh loads × 600 warm-up/600 measured frames.
+Two GPU frames overlap through asynchronous fences; all samples complete.
+Skinning uses OS-default affinity; final water pairs use the same verified
+P-core CPU 6 affinity with extensions disabled. Water measurements block by map
+size, reversing off/pause order in round 2. Machine power, GPU flags, dt, counts
+and gates stay fixed. These numbers apply to the **i5-12450H, Chromium
+headless, ANGLE GL** profile.
+They are not extrapolated to other hardware or browsers. The owner confirmed
+no heavy external GPU use; normal background desktop activity is not isolated.
+
+### Skinning: stop after the JS optimization
+
+The original 18,179 letters call getVertexPosition 54,537 times per frame for
+2,302 distinct source vertices. CPU/allocation profiles identify repeated bone
+products and Three's Vector3 generator/spread in applyBoneTransform. Skin each
+source vertex once, compute bone matrices once, keep double intermediates and
+write existing float32 attributes directly. Nonstandard attributes/custom
+methods retain a cached Three fallback. No per-frame allocation in the standard
+kernel. Positions, normals and image pixels remain exact in fixed-step tests.
+
+| Implementation        | Skinning p50/p95 ms | Active CPU p50 ms | GPU range p50 ms | Frame p50/p95 ms | Bottleneck |
+| --------------------- | ------------------: | ----------------: | ---------------: | ---------------: | ---------- |
+| Original JS           |       13.840/15.545 |            14.565 |            6.461 |    14.855/16.750 | CPU        |
+| Optimized JS baseline |         0.305/0.485 |             1.115 |            3.650 |     7.070/10.225 | GPU        |
+
+JS isolated gain 45.38×, full-frame p50 gain 52.41%, with improved p95.
+Skinning is now 4.31% of a GPU-dominant frame. It no longer meets the
+qualifying CPU/share rule.
+Stop this front; no GPU skinning/WASM alternative is justified by this fixture.
+A later alternative must be compared against this optimized JS baseline.
+
+### Water: map size changes the decision; scheduling comes first
+
+A seeded 1,024 m map loads 1/2/4/8 independent 28 m waters, each 129×129 cells,
+64 m apart. One is visible; the others are offscreen. Both modes use source
+4f5120c and identical initial state; their renderer main threads
+are pinned to P-core CPU 6 to control observed P/E migration. Each execution
+uses a new Chromium process/profile to avoid observed cross-variant history
+sensitivity; the pre-warm-up CPU probe does not advance simulation. The original
+5×2 unpinned data fail two frame gates (6.16%, 5.79%) and remain as diagnostics.
+Fresh-process full-matrix data still fail five light-case gates and are retained.
+The fresh benchmark browser was loading system extensions; the final protocol
+disables them, checks absent extension targets and blocks by map-size pair with
+reversed policy order in round 2. No old/new runs are spliced. Off preserves unconditional integration
+and preparation for every water; pause updates only the visible one. All
+variants retain five draw calls and exact visible arrays/images.
+
+| Loaded waters | Frame p50/p95 ms off → pause | Active CPU p50 ms off → pause | GPU range p50 ms off → pause | Bottleneck off → pause |
+| ------------: | ---------------------------: | ----------------------------: | ---------------------------: | ---------------------- |
+|             1 |  7.970/10.725 → 7.980/10.645 |                 4.605 → 4.650 |                4.445 → 4.444 | mixed → mixed          |
+|             2 | 10.340/13.190 → 8.055/10.540 |                 9.945 → 5.245 |                4.820 → 4.438 | CPU → mixed            |
+|             4 | 19.645/23.750 → 8.170/11.395 |                19.295 → 5.390 |                8.124 → 4.438 | CPU → CPU              |
+|             8 | 37.010/42.990 → 7.915/10.620 |                36.660 → 5.130 |                9.580 → 4.434 | CPU → mixed            |
+
+The [Phase 2 report](../captures/benchmarks-2026-10-15/phase-2/README.md)
+contains separate water step/preparation p50/p95, frame shares, per-case
+qualification, repeatability, state hashes, raw JSON and environment.
+CPU preparation includes texture arrays, deformation, normals and bounds;
+it is not pure GPU upload. Three already culls offscreen draw work. The GPU
+elapsed range starts at the first reflection and can include feeding gaps
+while CPU updates later waters; it must not be treated as exclusive GPU busy
+time or added to CPU time. The large unoptimized maps are CPU-dominant.
+
+With update-all, the numeric step passes the CPU/share gate at 2/4/8 waters
+(27.66%/28.94%/29.83% of frame); one water is mixed and below 15%.
+After pausing, four waters still narrowly pass: step 1.265 ms, 15.48% of the
+8.170 ms frame, CPU 5.390 ms versus GPU range 4.438 ms (21.45% separation,
+close to the descriptive 20% boundary). Both rounds have that classification,
+but this is a borderline candidate, not adoption evidence. Paused two/eight
+waters are mixed despite step shares above 15%; their CPU bottleneck is not
+established. No alternative implementation is selected for these cases.
+
+Therefore the original single-water GPU result does not generalize to a large
+map. Numeric water steps can meet the CPU/share gate at scale, but avoidable
+updates should first be reduced algorithmically. The optional policy removes
+hidden integration/preparation; any remaining case near 15% or the CPU/GPU
+boundary needs its actual run distributions. Qualification is not adoption:
+no alternate target step or measured 15% macro improvement versus optimized JS
+has been established for WASM. No WASM/toolchain/Phase 3 work is authorized.
+
+### Optional scheduling and deterministic documents
+
+Runtime offscreenWater={mode:'pause',margin:4} is **absent by default**.
+A complete transformed bounding sphere must miss the frustum plus four world
+metres before engine-driven physics, preparation/dirtying and actor contacts
+skip. On return only the current dt advances; there is no catch-up. Global
+shader/ring clocks continue, and explicit rain/disturb/refresh calls are not
+intercepted. Depth/flows/foam and their queries therefore depend on camera
+history and external calls; wind phase may jump. Visible water kept active
+has exact parity. The pause/return test compares 166,410 values with max
+difference 0 against one fresh step. Default enablement remains the owner's
+decision; editor/player and SceneDoc behavior stay unchanged for v0.2.
+
+Validation: pnpm check passes (177 tests). Every compared position/normal and
+water array has max difference 0 (required ≤1e-5); benchmark and controlled
+area/GLTF images have RMSE 0. pnpm compare retains the four known historical
+failures, without new ones or baseline changes. Frame p50 repeats within 5%
+for all ten before/after cases. Orca page runs complete with explicit page id.
+Earlier page screenshots time out; the final JPEG attempt reports a missing
+page although evaluation on the same page succeeds immediately afterward.
+The Orca capture remains unverified; page-only cdpshot/CDP evidence is retained.
+Status stays **Proposed**, stopped after Phase 2. No push.
+
 ## Original paced Phase 1 method (superseded for qualification)
 
 - Three URL-addressable, seeded fixtures: water, particles and skinning. No
@@ -61,7 +168,7 @@ updates Three.js geometry and submits buffer changes; its aggregate alone does
 not prove a transferable numeric kernel. Effects manipulate JS object state;
 carpet/body uniforms and render submission do not meet the numeric-array rule.
 
-## Scope and stopping point
+## Original Phase 1 scope and stopping point
 
 No implementation has been selected. Phase 1 does not optimize the JavaScript,
 write WASM/GPU alternatives, install a toolchain or claim the adoption thresholds

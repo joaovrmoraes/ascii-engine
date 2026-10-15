@@ -1,5 +1,7 @@
 # Simulation performance study — Phase 1
 
+> Phase 2 follow-up: [optimized JS skinning and optional water scheduling](phase-2/README.md). This report preserves the original Phase 1 measurements.
+
 Status: measurement only. ADR 0004 remains Proposed; no optimized JS, WASM or GPU implementation was attempted.
 
 Methodology amendment: the original display-paced measurements were limited by presentation cadence near 16.665 ms. Their frame shares and repeatability do not establish workload cost. The original [vsync report](vsync-report.md), [summary](vsync-summary.json) and round-1/round-2 raw data are preserved. The measurements below disable GPU vsync and the frame-rate limit; qualification uses these uncapped results and the observed CPU/GPU bottleneck.

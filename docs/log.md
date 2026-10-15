@@ -4,6 +4,69 @@ Entries describe the state at each stage. Earlier limitations may have been
 resolved later; START.md and the editor guide describe the current scope.
 Historical filenames, reference IDs and captured interfaces are preserved.
 
+## 2026-10-15 — Phase 2 results, JS baseline and optional water scaling
+
+Completed 60,000 measured and 60,000 warm-up frames across the two skinning
+implementations and eight water variants. Each case uses two rounds × five
+fresh loads × 600 warm-up/600 measured frames, fixed seeded dt 1/60, uncapped
+headless Chromium/ANGLE GL on i5-12450H. Skinning uses OS-default affinity;
+water off/on pairs use fresh Chromium processes, verified P-core CPU 6, no
+extensions and map-size blocks with reversed policy order in round 2. Original
+unpinned and fresh-process full-matrix gate failures remain as diagnostics.
+All GPU frames/queries complete and visible-state hashes repeat. Frame p50
+repeatability passes the unchanged 5%
+gate in all ten cases. Raw samples, environment, profiles and per-run timings
+are retained in the dated Phase 2 directory.
+
+Skinning p50/p95: 13.840/15.545 →
+0.305/0.485 ms (45.38×).
+Frame: 14.855/16.750 → 7.070/10.225 ms
+(52.41% p50 improvement). CPU → GPU dominance;
+optimized JS is the new baseline and this front stops. Position/normal max
+difference and image RMSE are 0; no shader/GPU/WASM implementation was added.
+
+Water frame p50/p95 per loaded count, off → pause:
+
+- 1: 7.970/10.725 → 7.980/10.645 ms; mixed → mixed.
+- 2: 10.340/13.190 → 8.055/10.540 ms; CPU → mixed.
+- 4: 19.645/23.750 → 8.170/11.395 ms; CPU → CPU.
+- 8: 37.010/42.990 → 7.915/10.620 ms; CPU → mixed.
+
+Confirmed all loaded waters previously integrated/prepared every frame. The
+optional frustum-margin pause removes hidden work; CPU step/preparation and
+GPU/frame timings are reported separately. Five draw calls remain unchanged.
+GPU elapsed ranges may include idle/feeding gaps after the first reflection;
+CPU savings are not mislabeled GPU active-work gains. The water decision
+therefore depends on map size and starts with algorithmic scheduling. The
+option remains disabled by default: camera history changes physics, return
+has no catch-up, and global clocks/external disturbances still proceed.
+At four paused waters the numeric step narrowly retains the raw CPU/share
+gate (15.48% of frame; CPU/GPU separation 21.45%). Treat it as borderline;
+no alternative is selected or implemented. Paused two/eight waters are mixed.
+
+pnpm check passes (177 tests). Fixed-step benchmark/area/GLTF array/image
+parity passes, all compared max differences and RMSE are 0. pnpm compare has
+only reference/forest/snow/cathedral historical failures; no baselines changed.
+Orca used explicit page 157d306a-3e02-4891-9f04-6f30b39841c8 in a separate
+profile and completed skinning/water runs with expected skip counts. Its
+page screenshots previously timed out even during rendering. A final JPEG
+attempt returned browser_tab_not_found while the same-page eval immediately
+afterward succeeded. The 120-step final Orca run completed every GPU fence,
+updated only the visible water and made zero IndexedDB calls. The capture
+limitation remains; cdpshot/CDP evidence contains only benchmark/scene pages,
+no desktop/private content. The owner's draft and untracked consolidation
+plan remain untouched. ADR 0004 stays
+Proposed. Stopped after Phase 2; no GPU skinning, WASM, toolchain or push.
+
+[Full results and raw/environment links](captures/benchmarks-2026-10-15/phase-2/README.md),
+[summary](captures/benchmarks-2026-10-15/phase-2/summary.json),
+[skinning capture](captures/benchmarks-2026-10-15/phase-2/cdpshot-skinning.png),
+[water parity capture](captures/benchmarks-2026-10-15/phase-2/parity/water-scale-8-1200-after.png).
+
+[Final Orca run](captures/benchmarks-2026-10-15/phase-2/parity/orca-final-run.json),
+[capture error](captures/benchmarks-2026-10-15/phase-2/parity/orca-final-screenshot-error.json),
+[same-page evaluation after capture](captures/benchmarks-2026-10-15/phase-2/parity/orca-final-after-capture.json).
+
 ## 2026-10-15 — Exclude browser extensions and block paired water measurements
 
 Fresh-process/P-core rounds still failed five light-case frame gates, while
