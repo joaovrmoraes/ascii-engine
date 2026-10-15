@@ -606,3 +606,12 @@ modify hidden waters. Paused/offscreen simulation therefore depends on camera
 history and external calls. This runtime policy is not stored in SceneDoc,
 not enabled in the editor/player and not suitable as an implicit deterministic
 v0.2 default. Enabling it by default requires the owner's separate decision.
+
+`pnpm bench --uncapped --renderer-cpu=6` optionally pins only main threads of
+non-extension renderers belonging to that temporary benchmark profile (including
+spares). GPU/browser processes and existing other threads keep their affinity.
+The runner records the requested CPU and verifies each applied mask in /proc.
+No affinity is applied unless requested, and no machine power setting changes.
+Phase 2 water follow-up uses P-core CPU 6 to control observed P/E migration;
+the failed unpinned rounds remain as diagnostics. This is a measurement control,
+not a change to the simulation, frame counts or the default editor clock.

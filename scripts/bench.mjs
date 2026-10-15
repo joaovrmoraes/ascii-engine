@@ -12,7 +12,17 @@ const args = Object.fromEntries(
     .map(argument => {
       const [key, ...value] = argument.replace(/^--/, '').split('=')
       if (
-        !['round', 'frames', 'warmup', 'runs', 'out', 'verify', 'uncapped', 'scenes'].includes(key)
+        ![
+          'round',
+          'frames',
+          'warmup',
+          'runs',
+          'out',
+          'verify',
+          'uncapped',
+          'scenes',
+          'renderer-cpu',
+        ].includes(key)
       )
         throw new Error('Unknown option: ' + argument)
       return [key, value.length ? value.join('=') : true]
@@ -22,6 +32,14 @@ const verify = args.verify === true
 if (args.uncapped !== undefined && args.uncapped !== true)
   throw new Error('Use --uncapped without a value')
 const uncapped = args.uncapped === true
+if (
+  args['renderer-cpu'] !== undefined &&
+  (typeof args['renderer-cpu'] !== 'string' || !/^\d+$/.test(args['renderer-cpu']))
+)
+  throw new Error('Use --renderer-cpu=<CPU id>')
+const rendererCpu = args['renderer-cpu'] === undefined ? undefined : Number(args['renderer-cpu'])
+if (rendererCpu !== undefined && (!Number.isInteger(rendererCpu) || rendererCpu < 0))
+  throw new Error('Invalid --renderer-cpu')
 const frames = Number(args.frames ?? 600),
   warmup = Number(args.warmup ?? 600),
   runs = Number(args.runs ?? 5)
@@ -69,6 +87,11 @@ const environment = {
     cwd: root,
     encoding: 'utf8',
   }).trim(),
+  rendererCpu: rendererCpu ?? null,
+  rendererAffinityScope:
+    rendererCpu === undefined
+      ? 'OS default'
+      : 'isolated renderer main thread only; GPU/browser/other threads unchanged',
   framePacing: uncapped ? 'uncapped' : 'display',
   scheduler: uncapped ? 'task-with-gpu-backpressure' : 'rAF',
   cpu: { model: cpus()[0].model, logicalCores: cpus().length },
@@ -168,6 +191,7 @@ try {
         metrics = []
       for (const profile of ['on', 'off']) {
         await browser.navigate(sceneUrl(scene, '&profile=' + profile))
+        await browser.pinRenderer(rendererCpu)
         const result = await browser.evaluate('benchmark.run(60,180)')
         await browser.check()
         validateQueue(result)
@@ -211,6 +235,7 @@ try {
         )
         await browser.navigate(sceneUrl(scene, '&run=' + run))
         const before = {
+          rendererAffinity: await browser.pinRenderer(rendererCpu),
           timestamp: new Date().toISOString(),
           frequencyKHz: await read('/sys/devices/system/cpu/cpu0/cpufreq/scaling_cur_freq'),
         }

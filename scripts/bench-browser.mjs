@@ -1,5 +1,5 @@
-import { spawn } from 'node:child_process'
-import { mkdtemp, rm } from 'node:fs/promises'
+import { spawn, execFileSync } from 'node:child_process'
+import { mkdtemp, rm, readdir, readFile } from 'node:fs/promises'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 
@@ -116,6 +116,31 @@ export async function benchmarkBrowser({ blockStorage = true, uncapped = false }
         await sleep(100)
       }
       throw new Error('Page did not become ready: ' + url)
+    },
+    async pinRenderer(cpu) {
+      if (cpu === undefined) return null
+      if (!Number.isInteger(cpu) || cpu < 0) throw new Error('Invalid renderer CPU')
+      const pinned = []
+      for (const pid of await readdir('/proc')) {
+        if (!/^\d+$/.test(pid)) continue
+        const command = await readFile(`/proc/${pid}/cmdline`, 'utf8').catch(() => '')
+        // Chromium rewrites argv as a space-separated process title on Linux.
+        const argv = command.split(/[\0\s]+/)
+        if (
+          !argv.includes('--type=renderer') ||
+          !argv.includes(`--user-data-dir=${profile}`) ||
+          argv.includes('--extension-process') ||
+          argv.includes('--top-chrome-webui')
+        )
+          continue
+        execFileSync('taskset', ['-pc', String(cpu), pid], { encoding: 'utf8' })
+        const status = await readFile(`/proc/${pid}/status`, 'utf8')
+        const allowed = /^Cpus_allowed_list:\s+(.+)$/m.exec(status)?.[1]
+        if (allowed !== String(cpu)) throw new Error('Renderer affinity was not applied')
+        pinned.push({ pid: Number(pid), mainThreadCpu: cpu, allowed })
+      }
+      if (!pinned.length) throw new Error('No isolated benchmark renderer found')
+      return pinned
     },
     async check() {
       if (errors.length) throw new Error(errors.join('\n'))

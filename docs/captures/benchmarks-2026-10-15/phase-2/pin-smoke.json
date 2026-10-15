@@ -1,0 +1,85 @@
+{
+  "affinity": [
+    {
+      "pid": 1893450,
+      "mainThreadCpu": 6,
+      "allowed": "6"
+    },
+    {
+      "pid": 1893515,
+      "mainThreadCpu": 6,
+      "allowed": "6"
+    }
+  ],
+  "summary": {
+    "cpu": {
+      "p50": 4.314999997615814,
+      "p95": 5.900000002235174,
+      "p99": 7.169999998062849
+    },
+    "gpu": {
+      "p50": 4.547031,
+      "p95": 7.641875,
+      "p99": 8.031718
+    },
+    "waterStep": {
+      "p50": 0.75,
+      "p95": 1.1050000004470348,
+      "p99": 1.2200000025331974
+    },
+    "waterUpload": {
+      "p50": 2.850000001490116,
+      "p95": 4.089999999850988,
+      "p99": 4.989999998360872
+    },
+    "skinning": {
+      "p50": 0,
+      "p95": 0,
+      "p99": 0
+    },
+    "effects": {
+      "p50": 0,
+      "p95": 0.004999998956918716,
+      "p99": 0.005000002682209015
+    },
+    "carpet": {
+      "p50": 0,
+      "p95": 0.005000002682209015,
+      "p99": 0.010000001639127731
+    },
+    "bodyUniforms": {
+      "p50": 0,
+      "p95": 0.005000002682209015,
+      "p99": 0.005000002682209015
+    },
+    "renderRest": {
+      "p50": 0.6949999965727329,
+      "p95": 0.955000001937151,
+      "p99": 1.2199999950826168
+    }
+  },
+  "fingerprint": {
+    "hash": "a902d504",
+    "values": 116523,
+    "skinnedPoints": 0,
+    "time": 20.000000000000146,
+    "visibleWaterHash": "46f3835e"
+  },
+  "gpuQueue": {
+    "limit": 2,
+    "scheduler": "task",
+    "peak": 2,
+    "completedFrames": 1200,
+    "pollCallbacks": 4888,
+    "totalSchedulerCpuMs": 69.85000021383166,
+    "completionClock": "CPU-observed asynchronous fence completion; includes polling delay",
+    "polling": "non-nested 1 ms timers and task submissions; no spin or blocking GPU wait"
+  },
+  "gpu": {
+    "available": true,
+    "status": "ready",
+    "disjointEvents": 0,
+    "dropped": 0
+  },
+  "warning": "One diagnostic run; not accepted benchmark evidence"
+}

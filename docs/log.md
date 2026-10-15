@@ -4,6 +4,28 @@ Entries describe the state at each stage. Earlier limitations may have been
 resolved later; START.md and the editor guide describe the current scope.
 Historical filenames, reference IDs and captured interfaces are preserved.
 
+## 2026-10-15 — Control benchmark renderer CPU residency
+
+Added optional --renderer-cpu=6. The runner applies/verifies taskset masks on
+main threads of non-extension renderers belonging strictly to its own random
+temporary profile (including spare renderers). Linux Chromium may rewrite
+argv into a single process-title string, so ownership matches parsed flag
+boundaries as well as NUL-separated arguments. Browser/GPU processes, existing
+other threads, machine power and default launches are unchanged. No affinity
+is applied unless requested. Each run records actual verified PID/mask data.
+
+Validation: pnpm check passes (177 tests); pinned profiling on/off smoke has
+exact state/image parity and zero IndexedDB calls. A diagnostic 600-warm-up/
+600-measured run pinned to P-core CPU 6 has water-step p50 0.750 ms, supporting
+CPU residency as a contributor to the unpinned 0.740–1.490 ms variation; it is
+one smoke run and not accepted throughput evidence. Fresh complete off/on
+water rounds follow this clean commit with unchanged thresholds and counts.
+
+[Pinned smoke](captures/benchmarks-2026-10-15/phase-2/pin-smoke.json),
+[profiling/state check](captures/benchmarks-2026-10-15/phase-2/pinned-verification/verification/parity.json),
+[page capture](captures/benchmarks-2026-10-15/phase-2/pinned-verification/verification/water-scale-1-off-on.png).
+No engine/editor behavior changed; the water option remains disabled. No push.
+
 ## 2026-10-15 — Retain the unpinned water repeatability failure
 
 Two complete original-protocol water rounds on clean source 0a4e072 retain
