@@ -3,9 +3,16 @@ import { mkdtemp, rm, readdir, readFile } from 'node:fs/promises'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 
-export async function benchmarkBrowser({ blockStorage = true, uncapped = false } = {}) {
+export async function benchmarkBrowser({
+  blockStorage = true,
+  uncapped = false,
+  disableExtensions = false,
+} = {}) {
   const profile = await mkdtemp(join(tmpdir(), 'ascii-benchmark-'))
   const flags = [
+    ...(disableExtensions
+      ? ['--disable-extensions', '--disable-component-extensions-with-background-pages']
+      : []),
     '--headless=new',
     '--no-sandbox',
     '--use-angle=gl',
@@ -95,9 +102,16 @@ export async function benchmarkBrowser({ blockStorage = true, uncapped = false }
     await send('Page.addScriptToEvaluateOnNewDocument', {
       source: `window.benchmarkStorageCalls=[];for(const method of ['open','deleteDatabase','databases'])if(IDBFactory.prototype[method])IDBFactory.prototype[method]=function(){benchmarkStorageCalls.push(method);throw new Error('IndexedDB is forbidden in benchmarks: '+method)}`,
     })
+  async function extensionTargets() {
+    const targets = (await send('Target.getTargets')).targetInfos
+    return targets
+      .filter(target => target.url.startsWith('chrome-extension://'))
+      .map(({ type, url }) => ({ type, url }))
+  }
   return {
     send,
     evaluate,
+    extensionTargets,
     processId: chrome.pid,
     flags: flags.map(flag =>
       flag.startsWith('--user-data-dir=') ? '--user-data-dir=<isolated temporary profile>' : flag,
@@ -194,6 +208,8 @@ export async function benchmarkBrowser({ blockStorage = true, uncapped = false }
     },
     async check() {
       if (errors.length) throw new Error(errors.join('\n'))
+      if (disableExtensions && (await extensionTargets()).length)
+        throw new Error('Extension targets are active despite --no-extensions')
       const storage = await evaluate('window.benchmarkStorageCalls')
       if (storage?.length) throw new Error('Benchmark used IndexedDB: ' + storage)
     },

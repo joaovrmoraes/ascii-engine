@@ -23,6 +23,7 @@ const args = Object.fromEntries(
           'scenes',
           'renderer-cpu',
           'fresh-browser',
+          'no-extensions',
         ].includes(key)
       )
         throw new Error('Unknown option: ' + argument)
@@ -35,6 +36,9 @@ if (args.uncapped !== undefined && args.uncapped !== true)
 if (args['fresh-browser'] !== undefined && args['fresh-browser'] !== true)
   throw new Error('Use --fresh-browser without a value')
 const freshBrowser = args['fresh-browser'] === true
+if (args['no-extensions'] !== undefined && args['no-extensions'] !== true)
+  throw new Error('Use --no-extensions without a value')
+const disableExtensions = args['no-extensions'] === true
 const uncapped = args.uncapped === true
 if (
   args['renderer-cpu'] !== undefined &&
@@ -95,6 +99,7 @@ const environment = {
     ? 'fresh Chromium process and temporary profile per execution'
     : 'fresh page per execution; one Chromium/profile per round',
   rendererCpu: rendererCpu ?? null,
+  extensionsDisabled: disableExtensions,
   rendererAffinityScope:
     rendererCpu === undefined
       ? 'OS default'
@@ -120,12 +125,12 @@ const environment = {
 }
 if (!verify && environment.trackedChanges)
   throw new Error('Commit the benchmark source before measuring; tracked working tree is dirty')
-let browser = await benchmarkBrowser({ uncapped })
+let browser = await benchmarkBrowser({ uncapped, disableExtensions })
 let executions = 0
 async function prepareBrowser() {
   if (freshBrowser && executions) {
     await browser.close()
-    browser = await benchmarkBrowser({ uncapped })
+    browser = await benchmarkBrowser({ uncapped, disableExtensions })
     if (browser.version.product !== environment.chromium.product)
       throw new Error('Chromium changed between executions')
   }
@@ -253,7 +258,10 @@ try {
         )
         await prepareBrowser()
         await browser.navigate(sceneUrl(scene, '&run=' + run))
+        const extensionTargets = disableExtensions ? await browser.extensionTargets() : null
+        if (extensionTargets?.length) throw new Error('Benchmark extensions must be disabled')
         const before = {
+          extensionTargets,
           browserProcessId: browser.processId,
           browserGeneration: executions,
           rendererAffinity: await browser.pinRenderer(rendererCpu),

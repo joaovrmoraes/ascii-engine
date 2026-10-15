@@ -4,6 +4,34 @@ Entries describe the state at each stage. Earlier limitations may have been
 resolved later; START.md and the editor guide describe the current scope.
 Historical filenames, reference IDs and captured interfaces are preserved.
 
+## 2026-10-15 — Exclude browser extensions and block paired water measurements
+
+Fresh-process/P-core rounds still failed five light-case frame gates, while
+all-update 2/4/8-water variants passed. Retained all 48,000 measured frames
+under extension-background-diagnostic/, including exact gates, environment
+and the observed benchmark-browser targets. The owner confirmed no heavy
+external GPU use. New profiles were still loading system extension background
+pages/service workers. A two-flag extension-disable smoke removed them; this
+is a confirmed isolation improvement, not proof of the exclusive noise cause.
+
+Added optional --no-extensions to the benchmark runner, using Chromium's
+--disable-extensions and --disable-component-extensions-with-background-pages.
+Assert no extension targets before/after each measured execution and record
+the policy/empty target list. Default benchmark/editor launches stay available;
+no system/user/browser configuration is changed. Before further measurements,
+fix the final water protocol: fresh process and active-page CPU 6, extensions
+disabled, two 5-run rounds per map-size pair. Round 2 reverses off/pause order.
+This blocks by map size and controls order/global-load drift. Retest all four
+pairs with 600 warm-up/600 measured frames, unchanged seeds/dt/queue and <=5%
+gate. Preserve every failed pair; do not splice runs or relax the threshold.
+
+[Failed pair table and isolation diagnostic](captures/benchmarks-2026-10-15/phase-2/extension-background-diagnostic/README.md).
+Validation: pnpm check passes (177 tests). Extension-free profiling on/off
+state and PNG byte parity pass for one-water/off and eight-water/pause. The
+one-water PNG is also byte-identical to the prior extension-enabled capture.
+No IndexedDB calls. Water scheduling remains off by default. Final paired
+measurements/report remain pending. No GPU skinning, WASM, toolchain or push.
+
 ## 2026-10-15 — Isolate each water execution from browser history
 
 Before spending another full round, tested 1→2→1 waters in one Chromium with

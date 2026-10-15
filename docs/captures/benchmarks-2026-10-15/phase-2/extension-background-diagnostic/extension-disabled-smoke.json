@@ -1,0 +1,244 @@
+{
+  "note": "Diagnostic only: source 7d4868a, cache harness adds extension-disable flags; no core changes",
+  "flags": [
+    "--disable-extensions",
+    "--disable-component-extensions-with-background-pages",
+    "--headless=new",
+    "--no-sandbox",
+    "--use-angle=gl",
+    "--enable-gpu",
+    "--ignore-gpu-blocklist",
+    "--hide-scrollbars",
+    "--window-size=1920,1080",
+    "--force-device-scale-factor=1",
+    "--disable-gpu-vsync",
+    "--disable-frame-rate-limit",
+    "--remote-debugging-port=0",
+    "--user-data-dir=<isolated temporary profile>",
+    "about:blank"
+  ],
+  "before": [
+    {
+      "type": "page",
+      "url": "http://localhost:1440/?bench=water-scale&waters=1&queue=2"
+    },
+    {
+      "type": "browser_ui",
+      "url": "chrome://omnibox-popup.top-chrome/omnibox_popup_aim.html"
+    },
+    {
+      "type": "browser_ui",
+      "url": "chrome://omnibox-popup.top-chrome/"
+    }
+  ],
+  "after": [
+    {
+      "type": "page",
+      "url": "http://localhost:1440/?bench=water-scale&waters=1&queue=2"
+    },
+    {
+      "type": "browser_ui",
+      "url": "chrome://omnibox-popup.top-chrome/omnibox_popup_aim.html"
+    },
+    {
+      "type": "browser_ui",
+      "url": "chrome://omnibox-popup.top-chrome/"
+    }
+  ],
+  "affinity": [
+    {
+      "pid": 3189356,
+      "mainThreadCpu": 6,
+      "allowed": "6",
+      "probeMs": 150,
+      "probeTicks": 15,
+      "unchangedOtherThreads": 17,
+      "scope": "active benchmark page main thread only; spares excluded"
+    }
+  ],
+  "summary": {
+    "cpuMs": {
+      "p50": 4.685000002384186,
+      "p95": 7.58500000089407,
+      "p99": 8.109999999403954
+    },
+    "timings": {
+      "p50": null,
+      "p95": null,
+      "p99": null
+    },
+    "drawCalls": {
+      "p50": 5,
+      "p95": 5,
+      "p99": 5
+    },
+    "triangles": {
+      "p50": 34850,
+      "p95": 34850,
+      "p99": 34850
+    },
+    "points": {
+      "p50": 0,
+      "p95": 0,
+      "p99": 0
+    },
+    "frameMs": {
+      "p50": 8.060000002384186,
+      "p95": 11.25,
+      "p99": 12.360000003129244
+    },
+    "rafIntervalMs": {
+      "p50": null,
+      "p95": null,
+      "p99": null
+    },
+    "frameCpuMs": {
+      "p50": 4.71000000089407,
+      "p95": 7.619999997317791,
+      "p99": 8.140000000596046
+    },
+    "sceneCpuMs": {
+      "p50": 0.02499999850988388,
+      "p95": 0.03500000014901161,
+      "p99": 0.04500000178813934
+    },
+    "gpuMs": {
+      "p50": 4.438072,
+      "p95": 6.780416,
+      "p99": 8.071354
+    },
+    "schedulerCpuMs": {
+      "p50": 0.044999998062849045,
+      "p95": 0.08499999716877937,
+      "p99": 0.10500000417232513
+    },
+    "completedFrameMs": {
+      "p50": 8.059999998658895,
+      "p95": 11.234999999403954,
+      "p99": 12.355000000447035
+    },
+    "gpuLatencyMs": {
+      "p50": 15.944999996572733,
+      "p95": 20.859999999403954,
+      "p99": 23.45999999716878
+    },
+    "waterStep": {
+      "p50": 0.7650000005960464,
+      "p95": 1.2300000004470348,
+      "p99": 1.469999998807907
+    },
+    "waterUpload": {
+      "p50": 3.0700000002980232,
+      "p95": 5.330000001937151,
+      "p99": 5.700000002980232
+    },
+    "skinning": {
+      "p50": 0,
+      "p95": 0,
+      "p99": 0
+    },
+    "effects": {
+      "p50": 0,
+      "p95": 0.004999998956918716,
+      "p99": 0.005000002682209015
+    },
+    "carpet": {
+      "p50": 0,
+      "p95": 0.005000002682209015,
+      "p99": 0.009999997913837433
+    },
+    "bodyUniforms": {
+      "p50": 0,
+      "p95": 0.005000002682209015,
+      "p99": 0.005000002682209015
+    },
+    "renderRest": {
+      "p50": 0.7799999974668026,
+      "p95": 1.2300000004470348,
+      "p99": 1.5100000016391277
+    }
+  },
+  "metadata": {
+    "configuration": {
+      "name": "water-scale",
+      "seed": 4242,
+      "carpetSeed": 48017,
+      "cover": 1800,
+      "dt": 0.016666666666666666,
+      "waterCount": 1,
+      "waterResolution": 129,
+      "waterCells": 16641,
+      "waterWidth": 28,
+      "spacing": 64,
+      "mapWidth": 1024,
+      "expectedVisible": 1,
+      "reflection": true,
+      "externalImpulses": false,
+      "waterPolicy": "off"
+    },
+    "camera": {
+      "focus": [
+        0,
+        0.6,
+        0
+      ],
+      "span": 17,
+      "angle": 0.4487989505128276,
+      "elevation": 0.8760580505981934
+    },
+    "warmup": 600,
+    "frames": 600,
+    "frameClock": "performance.now free-running task interval; asynchronous bounded GPU queue; no rAF pacing",
+    "gpuQueue": {
+      "limit": 2,
+      "scheduler": "task",
+      "peak": 2,
+      "completedFrames": 1200,
+      "pollCallbacks": 3434,
+      "totalSchedulerCpuMs": 55.52500008419156,
+      "completionClock": "CPU-observed asynchronous fence completion; includes polling delay",
+      "polling": "non-nested 1 ms timers and task submissions; no spin or blocking GPU wait"
+    },
+    "fingerprint": {
+      "hash": "a902d504",
+      "values": 116523,
+      "skinnedPoints": 0,
+      "time": 20.000000000000146,
+      "visibleWaterHash": "46f3835e"
+    },
+    "resources": {
+      "objects": 3,
+      "carpets": 1,
+      "particles": 0,
+      "rain": 0,
+      "waters": 1
+    },
+    "diagnostics": {
+      "waterCalls": [
+        1201
+      ]
+    },
+    "visibilityChanges": 0,
+    "viewport": {
+      "width": 1920,
+      "height": 1080,
+      "dpr": 1,
+      "canvasWidth": 1920,
+      "canvasHeight": 1080
+    },
+    "gpu": {
+      "available": true,
+      "status": "ready",
+      "disjointEvents": 0,
+      "dropped": 0
+    },
+    "browser": {
+      "userAgent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/152.0.0.0 Safari/537.36",
+      "isolated": true,
+      "hardwareConcurrency": 12,
+      "timerResolutionMs": 0.004999998956918716,
+      "renderer": "ANGLE (Intel, Mesa Intel(R) Graphics (ADL GT2), OpenGL ES 3.2)",
+      "vendor": "Google Inc. (Intel)"
+    }
+  }
+}

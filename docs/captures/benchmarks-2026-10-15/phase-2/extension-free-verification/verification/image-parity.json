@@ -1,0 +1,20 @@
+[
+  {
+    "scene": "water-scale-1-off",
+    "comparison": "profiling on/off with extensions disabled",
+    "byteIdentical": true,
+    "sha256": "33d56aea17b989957219edc57db620a6313e9680350df0a8974e31eb0b9e1029"
+  },
+  {
+    "scene": "water-scale-8-pause",
+    "comparison": "profiling on/off with extensions disabled",
+    "byteIdentical": true,
+    "sha256": "33d56aea17b989957219edc57db620a6313e9680350df0a8974e31eb0b9e1029"
+  },
+  {
+    "scene": "water-scale-1-off",
+    "comparison": "default extensions vs disabled at the same fixed step",
+    "byteIdentical": true,
+    "sha256": "33d56aea17b989957219edc57db620a6313e9680350df0a8974e31eb0b9e1029"
+  }
+]

@@ -1,0 +1,27 @@
+[
+  {
+    "type": "page",
+    "title": "ASCII Engine benchmark",
+    "url": "http://localhost:1440/?bench=water-scale&waters=8&water-policy=off&queue=2&run=4"
+  },
+  {
+    "type": "browser_ui",
+    "title": "Omnibox Popup",
+    "url": "chrome://omnibox-popup.top-chrome/"
+  },
+  {
+    "type": "browser_ui",
+    "title": "Omnibox Popup",
+    "url": "chrome://omnibox-popup.top-chrome/omnibox_popup_aim.html"
+  },
+  {
+    "type": "service_worker",
+    "title": "Service Worker chrome-extension://bgpiichlckmfanooecilcjemknkcpngb/background-4.js",
+    "url": "chrome-extension://bgpiichlckmfanooecilcjemknkcpngb/background-4.js"
+  },
+  {
+    "type": "service_worker",
+    "title": "Service Worker chrome-extension://dedjgknigfeelejglamclffonmophnfl/background.js",
+    "url": "chrome-extension://dedjgknigfeelejglamclffonmophnfl/background.js"
+  }
+]

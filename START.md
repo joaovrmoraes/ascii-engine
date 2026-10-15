@@ -625,3 +625,12 @@ process returned it near its initial value. This avoids cross-variant browser
 history; it does not identify JIT/GC/thermal/driver effects individually.
 Process IDs/generations and the isolation policy are recorded per run. The
 default runner behavior remains available for Phase 1 reproduction.
+
+`--no-extensions` disables system/user and component extension background pages
+for the owned benchmark Chromium, and checks that no extension target exists
+before/after measured runs. It does not edit browser/system configuration.
+A fresh temporary profile alone can still load distro-installed extensions.
+Phase 2 water measurements additionally block by map size: two five-run rounds
+per off/pause pair, reversing their order in round 2. Counts, fixed dt, GPU queue
+and the 5% full-frame repeatability gate remain unchanged. Earlier failed
+full-matrix rounds remain in extension-background-diagnostic/.
