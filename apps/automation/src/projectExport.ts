@@ -1,6 +1,6 @@
 import { spawn } from 'node:child_process'
 import { createWriteStream } from 'node:fs'
-import { cp, mkdir, mkdtemp, writeFile } from 'node:fs/promises'
+import { cp, mkdir, mkdtemp, writeFile, readdir, stat, rm } from 'node:fs/promises'
 import { join } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { randomUUID } from 'node:crypto'
@@ -10,6 +10,7 @@ interface Job {
   id: string; sessionId: string; revision: number; title: string; target: ExportTarget
   status: 'queued' | 'building' | 'ready' | 'failed'
   error?: string
+  directory?: string
   result?: { directory: string; artifact: string; filename: string; mime: string; web?: string }
 }
 
@@ -17,6 +18,31 @@ interface Job {
 export function createProjectExports(root = fileURLToPath(new URL('../../../', import.meta.url))) {
   const jobs = new Map<string, Job>()
   let queue = Promise.resolve()
+  const exportsRoot = join(root, 'exports')
+  const retained = 5
+  async function prune() {
+    // Never remove an active job. Only this service's project-* directories qualify.
+    const active = new Set([...jobs.values()].filter(job => job.status === 'queued' || job.status === 'building').map(job => job.directory))
+    const entries = await readdir(exportsRoot, { withFileTypes: true }).catch(error => {
+      if (error.code === 'ENOENT') return []
+      throw error
+    })
+    const directories = await Promise.all(entries.filter(entry => entry.isDirectory() && entry.name.startsWith('project-'))
+      .map(async entry => { const directory = join(exportsRoot, entry.name); return { directory, time: (await stat(directory)).mtimeMs } }))
+    const order = new Map([...jobs.values()].map((job,index) => [job.directory,index]))
+    const expired = directories.filter(entry => !active.has(entry.directory))
+      .sort((a,b) => b.time-a.time || (order.get(b.directory) ?? -1)-(order.get(a.directory) ?? -1)).slice(retained)
+    for (const { directory } of expired) {
+      await rm(directory, { recursive: true, force: true })
+      for (const [id, job] of jobs) if (job.directory === directory) jobs.delete(id)
+    }
+    // Failed jobs without a directory must not accumulate in memory either.
+    const complete = [...jobs.values()].filter(job => job.status === 'ready' || job.status === 'failed')
+    for (const job of complete.slice(0, Math.max(0, complete.length-retained))) {
+      if (job.directory) await rm(job.directory, { recursive: true, force: true })
+      jobs.delete(job.id)
+    }
+  }
   const view = (job: Job) => structuredClone(job)
   return {
     start(sessionId: string, snapshot: {document:unknown; revision:number}, target: ExportTarget, title: string) {
@@ -25,8 +51,9 @@ export function createProjectExports(root = fileURLToPath(new URL('../../../', i
       const document = JSON.stringify(snapshot.document)
       queue = queue.then(async()=>{
         job.status='building'
-        const exportsRoot=join(root,'exports');await mkdir(exportsRoot,{recursive:true})
+        await mkdir(exportsRoot,{recursive:true})
         const directory=await mkdtemp(join(exportsRoot,'project-'))
+        job.directory = directory
         const slug=title.normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'') || 'scene'
         const scene=join(directory,'scene.json');await writeFile(scene,document)
         const log=createWriteStream(join(directory,'build.log'))
@@ -59,6 +86,7 @@ export function createProjectExports(root = fileURLToPath(new URL('../../../', i
           job.status='ready'
         } finally { log.end() }
       }).catch(error=>{job.status='failed';job.error=error instanceof Error ? error.message : String(error)})
+        .then(prune).catch(error=>{job.error=`Export retention failed: ${String(error)}`})
       return view(job)
     },
     status(id:string,sessionId:string) {

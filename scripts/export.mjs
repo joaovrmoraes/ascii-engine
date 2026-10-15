@@ -4,12 +4,13 @@
 // Builds a relative-path web player; optionally packages the same files with Tauri.
 // Android/iOS use the same web output when the platform SDKs are installed.
 import { spawnSync } from 'node:child_process'
+import { parseExportArgs } from './export-args.mjs'
 import { cpSync, mkdirSync, rmSync, writeFileSync, readFileSync, existsSync } from 'node:fs'
 import { join, resolve, basename } from 'node:path'
 
 const root = resolve(new URL('..', import.meta.url).pathname)
-const args = process.argv.slice(2)
-const arg = (name, fallback) => { const i = args.indexOf(`--${name}`); return i >= 0 ? args[i + 1] : fallback }
+const args = parseExportArgs(process.argv.slice(2))
+const arg = (name, fallback) => args[name] ?? fallback
 const title = arg('title', 'ASCII Engine')
 const slug = title.normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '') || 'game'
 const out = resolve(arg('out', join(root, 'exports', slug)))
@@ -33,7 +34,7 @@ writeFileSync(join(web, 'game.json'), JSON.stringify(game, null, 2))
 console.log(`web: ${web} (serve the folder, for example: python -m http.server -d "${web}")`)
 
 // 2. Desktop with Tauri.
-if (args.includes('--desktop')) {
+if (args.desktop) {
   const tauriDir = join(root, 'apps/editor/src-tauri')
   const base = JSON.parse(readFileSync(join(tauriDir, 'tauri.conf.json'), 'utf8'))
   const config = {

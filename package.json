@@ -9,7 +9,7 @@
     "mcp": "pnpm --silent --filter @ascii-engine/automation mcp",
     "build": "pnpm -r build",
     "pages:build": "node scripts/build-pages.mjs",
-    "test": "pnpm -r test",
+    "test": "node --test scripts/export-args.test.mjs && pnpm -r test",
     "typecheck": "pnpm -r typecheck",
     "check": "node scripts/check-package-boundaries.mjs && pnpm typecheck && pnpm test && pnpm build",
     "tauri": "pnpm --filter @ascii-engine/editor tauri",

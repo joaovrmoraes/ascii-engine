@@ -62,6 +62,10 @@ export function createExportDialog(snapshot: () => SceneDoc) {
       remember(); render()
       if (running()) timer = setTimeout(() => void poll(), 1500)
     } catch (error) {
+      if (String(error).includes('Export job not found')) {
+        job = { ...job!, status: 'failed', error: 'This export is no longer retained. Create a new export.' }
+        remember(); render(); return
+      }
       status.textContent = `Could not read export status. Keep pnpm api running. ${String(error)}`
       if (!stopped) timer = setTimeout(() => void poll(), 5000)
     }

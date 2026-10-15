@@ -4,6 +4,22 @@ Entries describe the state at each stage. Earlier limitations may have been
 resolved later; START.md and the editor guide describe the current scope.
 Historical filenames, reference IDs and captured interfaces are preserved.
 
+## 2026-10-15 — Consolidation review, group 4: export arguments/retention
+
+The CLI consumes named values exactly once and accepts --key=value. Flag-like
+titles cannot enable desktop builds or replace scene paths. Added parser tests
+to pnpm check. The bridge retains the latest five completed project-* exports,
+pruning old disk directories and in-memory jobs, including previous-run output.
+Active jobs and unrelated folders remain. The dialog handles pruned job status.
+
+Validation: pnpm check (11 CLI + 148 workspace tests), retention tests with
+queued jobs/old folders/manual output, and verify:export (11 checks). Actual
+Web --desktop and native Linux --scene titles built/downloaded correctly;
+the static player preserved its scene. Native window not opened.
+[Literal-title export](captures/editor-review-fix-2026-10-15/literal-title-export.png).
+Restarted only this worktree's Vite/bridge to load the Node implementation.
+No owner draft edits or push.
+
 ## 2026-10-15 — Consolidation review, group 3: sandbox modules
 
 Proposed the split before editing. Extracted library/cards, hierarchy, object

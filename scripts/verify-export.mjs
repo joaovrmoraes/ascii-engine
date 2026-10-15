@@ -48,8 +48,9 @@ try {
   await action(`await area.openDocument({version:1,name:'Export fixture',objects:[{id:'block',prefab:'bloco',position:[0,0,0],options:{texture:'ink'}}],textures:{ink:{name:'Export ink',style:{alphabet:'XZ',color:0x66bb99}}},waters:[{name:'Hidden lake',visible:false,shape:{kind:'pond',x:0,z:0,size:2,angle:0}}]}); await area.authoring.commit()`)
   const expected=await evaluate('area.document()')
   const jobs={}
+  const titles={web:'--desktop',desktop:'--scene'}
   for(const target of ['web','desktop']) {
-    await action(`ui('[data-k=export]');ui('[data-export=target]',${JSON.stringify(target)});ui('[data-export=title]',${JSON.stringify('Export '+target)});ui('[data-export=start]')`)
+    await action(`ui('[data-k=export]');ui('[data-export=target]',${JSON.stringify(target)});ui('[data-export=title]',${JSON.stringify(titles[target])});ui('[data-export=start]')`)
     await until(`!!sessionStorage.getItem('ascii-project-export') && JSON.parse(sessionStorage.getItem('ascii-project-export')).target===${JSON.stringify(target)}`)
     const initial=await evaluate(`JSON.parse(sessionStorage.getItem('ascii-project-export'))`)
     await check(`${target} packaging queues without mutating the scene`, `JSON.stringify(area.document())===${JSON.stringify(JSON.stringify(expected))}`)
@@ -74,6 +75,8 @@ try {
     if(job?.status!=='ready')throw new Error('Build timed out')
     jobs[target]=job
     console.log('PASS '+target+' build ready')
+    if(target==='web' && await stat(join(job.result.directory,'tauri.game.conf.json')).then(()=>true,()=>false))throw new Error('Literal --desktop title was treated as a flag')
+    console.log('PASS literal flag-like title '+titles[target]+' is preserved without changing the target')
     const archive=await fetch('http://127.0.0.1:1442/v1/exports/'+job.id+'/download')
     if(!archive.ok || archive.headers.get('content-type')!=='application/zip')throw new Error('Invalid download')
     await writeFile(join(output,job.result.filename),Buffer.from(await archive.arrayBuffer()))
@@ -82,9 +85,9 @@ try {
     const scene=JSON.parse(await readFile(join(job.result.web,'scene.json'),'utf8'))
     if(JSON.stringify(scene)!==JSON.stringify(expected))throw new Error('Export changed scene')
     if(target==='desktop') {
-      const executable=join(job.result.directory,'desktop','export-desktop')
+      const executable=join(job.result.directory,'desktop','scene')
       if(!((await stat(executable)).mode & 0o111))throw new Error('Desktop executable permission missing')
-      if(!listing.stdout.includes('desktop/export-desktop'))throw new Error('Desktop binary absent')
+      if(!listing.stdout.includes('desktop/scene'))throw new Error('Desktop binary absent')
     }
     await action(`ui('[data-k=export]')`)
     await until(`document.querySelector('[data-export=status]').textContent.startsWith('Ready')`)
@@ -105,7 +108,7 @@ try {
   await new Promise(resolve=>staticServer.listen(0,'127.0.0.1',resolve))
   await send('Page.navigate',{url:`http://127.0.0.1:${staticServer.address().port}/demo/`})
   await until('!!window.area && !!document.querySelector("canvas[data-ready]")')
-  await check('exported Web player runs from a relative subfolder without editor UI', `document.body.classList.contains('player') && !document.querySelector('#editor-workspace') && document.title==='Export web'`)
+  await check('exported Web player runs from a relative subfolder without editor UI', `document.body.classList.contains('player') && !document.querySelector('#editor-workspace') && document.title==='--desktop'`)
   await check('player preserves linked recipes and hidden water', `area.document().textures.ink.style.alphabet==='XZ' && area.document().waters[0].visible===false && engine.scene.children.some(o=>o.name==='Hidden lake'&&!o.visible)`)
   await shot('export-web-player')
   if(errors.length)throw new Error(errors.join('\n'))

@@ -387,3 +387,10 @@ bakes the result without changing appearance. The core `linkTexture` returns the
 new options and the replaced field names; `engine.setInstanceOptions` replaces
 the full layer rather than merging deleted fields back in. Existing unlinked
 styles are unchanged; no saved document is migrated.
+
+The export bridge retains the five most recent completed `project-*` exports.
+Older directories and their job records are removed after completion, including
+leftovers from previous bridge runs. Queued/building jobs and other export
+folders are preserved. A pruned job/download is no longer available; create a
+new export. CLI values are consumed once; literal titles such as `--desktop`
+and `--scene` and `--title=--desktop` do not change the export target.
