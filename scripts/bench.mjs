@@ -22,6 +22,7 @@ const args = Object.fromEntries(
           'uncapped',
           'scenes',
           'renderer-cpu',
+          'fresh-browser',
         ].includes(key)
       )
         throw new Error('Unknown option: ' + argument)
@@ -31,6 +32,9 @@ const args = Object.fromEntries(
 const verify = args.verify === true
 if (args.uncapped !== undefined && args.uncapped !== true)
   throw new Error('Use --uncapped without a value')
+if (args['fresh-browser'] !== undefined && args['fresh-browser'] !== true)
+  throw new Error('Use --fresh-browser without a value')
+const freshBrowser = args['fresh-browser'] === true
 const uncapped = args.uncapped === true
 if (
   args['renderer-cpu'] !== undefined &&
@@ -87,6 +91,9 @@ const environment = {
     cwd: root,
     encoding: 'utf8',
   }).trim(),
+  browserIsolation: freshBrowser
+    ? 'fresh Chromium process and temporary profile per execution'
+    : 'fresh page per execution; one Chromium/profile per round',
   rendererCpu: rendererCpu ?? null,
   rendererAffinityScope:
     rendererCpu === undefined
@@ -113,7 +120,17 @@ const environment = {
 }
 if (!verify && environment.trackedChanges)
   throw new Error('Commit the benchmark source before measuring; tracked working tree is dirty')
-const browser = await benchmarkBrowser({ uncapped })
+let browser = await benchmarkBrowser({ uncapped })
+let executions = 0
+async function prepareBrowser() {
+  if (freshBrowser && executions) {
+    await browser.close()
+    browser = await benchmarkBrowser({ uncapped })
+    if (browser.version.product !== environment.chromium.product)
+      throw new Error('Chromium changed between executions')
+  }
+  executions++
+}
 Object.assign(environment, { chromium: browser.version, flags: browser.flags })
 const columns = [
   'frame',
@@ -190,6 +207,7 @@ try {
       const states = [],
         metrics = []
       for (const profile of ['on', 'off']) {
+        await prepareBrowser()
         await browser.navigate(sceneUrl(scene, '&profile=' + profile))
         await browser.pinRenderer(rendererCpu)
         const result = await browser.evaluate('benchmark.run(60,180)')
@@ -233,8 +251,11 @@ try {
         console.log(
           `START ${round} ${scene} ${run}/${runs}; ${warmup} warm-up + ${frames} measured frames`,
         )
+        await prepareBrowser()
         await browser.navigate(sceneUrl(scene, '&run=' + run))
         const before = {
+          browserProcessId: browser.processId,
+          browserGeneration: executions,
           rendererAffinity: await browser.pinRenderer(rendererCpu),
           timestamp: new Date().toISOString(),
           frequencyKHz: await read('/sys/devices/system/cpu/cpu0/cpufreq/scaling_cur_freq'),

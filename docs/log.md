@@ -4,6 +4,29 @@ Entries describe the state at each stage. Earlier limitations may have been
 resolved later; START.md and the editor guide describe the current scope.
 Historical filenames, reference IDs and captured interfaces are preserved.
 
+## 2026-10-15 — Isolate each water execution from browser history
+
+Before spending another full round, tested 1→2→1 waters in one Chromium with
+active main-thread affinity fixed to CPU 6, 600 warm-up/600 measured frames
+per load. One-water step p50 changed 0.755→1.230 ms; a new Chromium's one-water
+run returned 0.780 ms. All visible hashes agree. This demonstrates a history
+sensitivity despite fixed residency; it does not isolate JIT, GC, thermal or
+driver effects individually. Raw diagnostic results remain preserved.
+
+Added optional --fresh-browser: each execution owns a fresh Chromium process
+and temporary profile, with process ID/generation and isolation policy in raw
+environment/run metadata. Browser version must remain unchanged. The 150 ms
+active-page probe still precedes warm-up and never advances state. Existing
+runner defaults remain reproducible. Final water off/on pairs use both
+fresh-process isolation and the same verified P-core control, without changing
+GPU flags, dt, seeds, frame counts, warm-up or the 5% acceptance threshold.
+
+Validation: pnpm check and fresh-process pinned profiling on/off state/image
+parity pass, no IndexedDB calls. [Order/process diagnostic](captures/benchmarks-2026-10-15/phase-2/order-diagnostic.json),
+[fresh-process check](captures/benchmarks-2026-10-15/phase-2/fresh-process-verification/verification/parity.json).
+No core/editor change; water pause remains off by default. Complete new water
+measurements and final ADR/table update remain pending. No push.
+
 ## 2026-10-15 — Identify only the active benchmark renderer for affinity
 
 Stopped the first affinity attempt during round 1/run 2. Pinning spare

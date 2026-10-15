@@ -98,6 +98,7 @@ export async function benchmarkBrowser({ blockStorage = true, uncapped = false }
   return {
     send,
     evaluate,
+    processId: chrome.pid,
     flags: flags.map(flag =>
       flag.startsWith('--user-data-dir=') ? '--user-data-dir=<isolated temporary profile>' : flag,
     ),

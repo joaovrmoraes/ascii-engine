@@ -616,3 +616,12 @@ settings stay unchanged; no affinity is applied unless requested. Phase 2
 water follow-up controls observed P/E migration. Failed unpinned rounds and
 a stopped spare-affinity attempt remain as diagnostics. The default editor
 clock, simulation, frame counts and acceptance thresholds are unchanged.
+
+`--fresh-browser` starts a new Chromium process and temporary profile for each
+execution instead of reusing one process across fresh scene pages. Phase 2
+water measurements pair this with active-page CPU affinity: a fixed-CPU
+1→2→1-water diagnostic still changed the one-water step cost, while a new
+process returned it near its initial value. This avoids cross-variant browser
+history; it does not identify JIT/GC/thermal/driver effects individually.
+Process IDs/generations and the isolation policy are recorded per run. The
+default runner behavior remains available for Phase 1 reproduction.
