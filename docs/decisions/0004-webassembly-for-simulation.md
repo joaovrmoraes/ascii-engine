@@ -77,7 +77,13 @@ Before collecting the additional rounds:
 
 - Add Chromium `--disable-gpu-vsync` and `--disable-frame-rate-limit`. Keep the
   existing scenes, seeds, viewport, 1/60 simulation step, warm-up and run counts.
-  Measure actual callback wall intervals without inserting GPU synchronization.
+  Measure actual callback wall intervals without synchronous GPU waits.
+  Unbounded callbacks can outrun GPU completion: a partial diagnostic round is
+  retained under submission-diagnostic/. Therefore bound in-flight GPU frames
+  to two with asynchronous WebGL fences and nonblocking polls. CPU frame N can
+  overlap GPU frame N-1; do not call gl.finish or serialize every CPU/GPU frame.
+  Record actual step intervals, CPU-observed completion intervals, latency and
+  fence/scheduler overhead separately. All measured GPU frames must complete.
 - Collect two uncapped rounds, each five fresh loads and 600 measured frames
   per scene after 600 warm-up frames. Check uncapped full-frame p50 repeatability
   within 5%; preserve and investigate unstable rounds.

@@ -574,3 +574,7 @@ two uncapped rounds; prior paced measurements remain as presentation context in
 vsync-report.md. Qualification considers CPU/GPU dominance and the uncapped frame,
 not just the active CPU fraction. CPU savings in a GPU-limited scene do not count
 as measured frame gains. No optimized JS or alternate implementation is included.
+The uncapped harness bounds in-flight GPU frames to two through nonblocking
+WebGL fences, keeping CPU/GPU overlap while preventing a queue of uncompleted
+frames from being mistaken for throughput. It also reports observed completion
+intervals, latency and scheduler overhead; GPU work drains before each run ends.

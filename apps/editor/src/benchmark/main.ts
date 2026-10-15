@@ -21,7 +21,11 @@ engine.frame(area.hero, camera.span, camera.angle, camera.elevation)
 engine.render(0)
 canvas.dataset.ready = 'true'
 
-const gl = engine.renderer.getContext()
+const gl = engine.renderer.getContext() as WebGL2RenderingContext
+// Only the uncapped runner bounds overlapping GPU work. Default views stay unchanged.
+const gpuQueueLimit = params.get('queue') === '2' ? 2 : 0
+if (gpuQueueLimit && typeof gl.fenceSync !== 'function')
+  throw new Error('Uncapped completion measurement requires WebGL2 fences')
 const debug = gl.getExtension('WEBGL_debug_renderer_info')
 let timerResolutionMs = Infinity,
   previousTick = performance.now()
@@ -71,21 +75,78 @@ async function run(warmup = 600, frames = 600) {
     frameCpuMs: number
     sceneCpuMs: number
     gpuMs: number | null
+    schedulerCpuMs: number
+    completedFrameMs: number | null
+    gpuLatencyMs: number | null
   })[] = []
   const gpuSamples = new Map<number, number>()
+  const pending: { sync: WebGLSync; frame: number; started: number }[] = []
+  const completed = new Map<number, { interval: number; latency: number }>()
+  const pollChannel = gpuQueueLimit ? new MessageChannel() : undefined
+  let pollTimer = 0
   let count = 0,
     previous = 0,
     previousWall = 0,
-    visibilityChanges = 0
+    visibilityChanges = 0,
+    peakGpuQueue = 0,
+    pollCallbacks = 0,
+    schedulerCpuMs = 0,
+    totalSchedulerCpuMs = 0,
+    lastCompletion = 0
+  function pollFence() {
+    const started = performance.now()
+    pollCallbacks++
+    if (pending.length) {
+      const item = pending[0]
+      if (performance.now() - item.started > 10000)
+        throw new Error('GPU fence completion timed out')
+      const status = gl.clientWaitSync(item.sync, 0, 0)
+      if (status === gl.WAIT_FAILED) throw new Error('GPU fence failed')
+      if (status !== gl.TIMEOUT_EXPIRED) {
+        const now = performance.now()
+        pending.shift()
+        gl.deleteSync(item.sync)
+        completed.set(item.frame, {
+          interval: lastCompletion ? now - lastCompletion : 0,
+          latency: now - item.started,
+        })
+        lastCompletion = now
+      }
+    }
+    const cost = performance.now() - started
+    schedulerCpuMs += cost
+    totalSchedulerCpuMs += cost
+  }
   const visibility = () => {
     visibilityChanges++
   }
   document.addEventListener('visibilitychange', visibility)
   try {
     await new Promise<void>((resolve, reject) => {
+      // Poll outside rAF so an idle poll does not request another compositor frame.
+      // Each message task starts a fresh 1 ms timer, avoiding nested timer clamping.
+      if (pollChannel)
+        pollChannel.port1.onmessage = () => {
+          pollTimer = window.setTimeout(() => {
+            try {
+              pollFence()
+              if (pending.length >= gpuQueueLimit) pollChannel.port2.postMessage(null)
+              else animation = requestAnimationFrame(step)
+            } catch (error) {
+              reject(error)
+            }
+          }, 1)
+        }
       function step(now: number) {
         try {
           if (document.hidden) throw new Error('Benchmark document became hidden')
+          if (gpuQueueLimit && pending.length >= gpuQueueLimit) {
+            pollFence()
+            if (pending.length >= gpuQueueLimit) {
+              pollChannel!.port2.postMessage(null)
+              return
+            }
+          }
           const entered = performance.now()
           if (samples.length) {
             samples.at(-1)!.frameMs = entered - previousWall
@@ -93,12 +154,27 @@ async function run(warmup = 600, frames = 600) {
           }
           previous = now
           previousWall = entered
+          if (count === warmup + frames) {
+            resolve()
+            return
+          }
           const started = performance.now()
           area.update(engine.time + BENCHMARK_DT, BENCHMARK_DT)
           engine.frame(area.hero, camera.span, camera.angle, camera.elevation)
           engine.render(BENCHMARK_DT)
           const frameCpuMs = performance.now() - started
           const stats = engine.stats?.latest
+          if (gpuQueueLimit) {
+            const fenceStarted = performance.now()
+            const sync = gl.fenceSync(gl.SYNC_GPU_COMMANDS_COMPLETE, 0)
+            if (!sync) throw new Error('GPU fence unavailable')
+            pending.push({ sync, frame: stats?.frame ?? count + 2, started })
+            peakGpuQueue = Math.max(peakGpuQueue, pending.length)
+            gl.flush() // Submit without waiting; CPU and GPU remain overlapped.
+            const cost = performance.now() - fenceStarted
+            schedulerCpuMs += cost
+            totalSchedulerCpuMs += cost
+          }
           if (count >= warmup)
             samples.push({
               ...(stats ?? {
@@ -116,39 +192,56 @@ async function run(warmup = 600, frames = 600) {
               frameCpuMs,
               sceneCpuMs: frameCpuMs - (stats?.cpuMs ?? 0),
               gpuMs: null,
+              schedulerCpuMs,
+              completedFrameMs: null,
+              gpuLatencyMs: null,
             })
+          schedulerCpuMs = 0
           for (const sample of engine.stats?.takeGpuSamples() ?? [])
             gpuSamples.set(sample.frame, sample.ms)
           count++
-          if (count === warmup + frames) resolve()
-          else animation = requestAnimationFrame(step)
+          animation = requestAnimationFrame(step)
         } catch (error) {
           reject(error)
         }
       }
       animation = requestAnimationFrame(step)
     })
-    // Associate each interval with the work submitted in that frame, including the last one.
-    await new Promise<void>(resolve =>
-      requestAnimationFrame(now => {
-        samples.at(-1)!.frameMs = performance.now() - previousWall
-        samples.at(-1)!.rafIntervalMs = now - previous
-        resolve()
-      }),
-    )
+    // Drain completed GPU work asynchronously; no extra simulation steps or gl.finish().
+    const deadline = performance.now() + 10000
+    while (pending.length) {
+      if (performance.now() > deadline) throw new Error('GPU fence completion timed out')
+      await new Promise<void>(resolve => requestAnimationFrame(() => resolve()))
+      pollFence()
+      for (const sample of engine.stats?.takeGpuSamples() ?? [])
+        gpuSamples.set(sample.frame, sample.ms)
+    }
     // Poll asynchronously after the final submission; do not simulate extra steps or gl.finish().
     for (let i = 0; i < 60 && engine.stats?.gpu.available; i++) {
       await new Promise<void>(resolve => requestAnimationFrame(() => resolve()))
       for (const sample of engine.stats.takeGpuSamples()) gpuSamples.set(sample.frame, sample.ms)
       if (gpuSamples.has(samples.at(-1)!.frame)) break
     }
-    for (const sample of samples) sample.gpuMs = gpuSamples.get(sample.frame) ?? null
+    for (const sample of samples) {
+      sample.gpuMs = gpuSamples.get(sample.frame) ?? null
+      sample.completedFrameMs = completed.get(sample.frame)?.interval ?? null
+      sample.gpuLatencyMs = completed.get(sample.frame)?.latency ?? null
+    }
     return {
       configuration,
       camera,
       warmup,
       frames,
       frameClock: 'performance.now callback interval; rAF cadence recorded separately',
+      gpuQueue: {
+        limit: gpuQueueLimit,
+        peak: peakGpuQueue,
+        completedFrames: completed.size,
+        pollCallbacks,
+        totalSchedulerCpuMs,
+        completionClock: 'CPU-observed asynchronous fence completion; includes polling delay',
+        polling: 'non-nested 1 ms timers between rAF submissions; no spin or blocking GPU wait',
+      },
       samples,
       fingerprint: fingerprint(),
       resources: engine.resources,
@@ -174,6 +267,10 @@ async function run(warmup = 600, frames = 600) {
       },
     }
   } finally {
+    clearTimeout(pollTimer)
+    pollChannel?.port1.close()
+    pollChannel?.port2.close()
+    for (const item of pending) gl.deleteSync(item.sync)
     document.removeEventListener('visibilitychange', visibility)
   }
 }

@@ -104,6 +104,9 @@ const columns = [
   'triangles',
   'points',
   'gpuMs',
+  'schedulerCpuMs',
+  'completedFrameMs',
+  'gpuLatencyMs',
 ]
 const flatten = sample => ({
   frame: sample.frame,
@@ -117,18 +120,42 @@ const flatten = sample => ({
   triangles: sample.triangles,
   points: sample.points,
   gpuMs: sample.gpuMs,
+  schedulerCpuMs: sample.schedulerCpuMs,
+  completedFrameMs: sample.completedFrameMs,
+  gpuLatencyMs: sample.gpuLatencyMs,
 })
 const scenes = ['water', 'particles', 'skinning'],
   results = Object.fromEntries(scenes.map(name => [name, { scene: name, columns, runs: [] }]))
+function validateQueue(result) {
+  if (!uncapped) return
+  if (
+    result.gpuQueue.limit !== 2 ||
+    result.gpuQueue.peak > 2 ||
+    result.gpuQueue.completedFrames !== result.warmup + result.frames ||
+    result.samples.some(sample => sample.completedFrameMs === null)
+  )
+    throw new Error('Uncapped run did not bound and complete every GPU frame')
+  if (
+    result.gpu.available &&
+    (result.gpu.disjointEvents ||
+      result.gpu.dropped ||
+      result.samples.some(sample => sample.gpuMs === null))
+  )
+    throw new Error('Uncapped GPU timing lost queries; preserve this round and investigate')
+}
 try {
   if (verify) {
     const checks = []
     for (const scene of scenes) {
-      const states = []
+      const states = [],
+        metrics = []
       for (const profile of ['on', 'off']) {
-        await browser.navigate(`${base}/?bench=${scene}&profile=${profile}`)
+        await browser.navigate(
+          `${base}/?bench=${scene}&profile=${profile}${uncapped ? '&queue=2' : ''}`,
+        )
         const result = await browser.evaluate('benchmark.run(60,180)')
         await browser.check()
+        validateQueue(result)
         if (
           result.samples.some(
             sample => !Number.isFinite(sample.rafIntervalMs) || sample.frameMs < sample.frameCpuMs,
@@ -149,10 +176,16 @@ try {
           Buffer.from(image.data, 'base64'),
         )
         states.push(result.fingerprint)
+        metrics.push({
+          profile,
+          summary: summary(result.samples.map(flatten)),
+          gpuQueue: result.gpuQueue,
+          gpu: result.gpu,
+        })
       }
       if (JSON.stringify(states[0]) !== JSON.stringify(states[1]))
         throw new Error('Profiling changes simulation: ' + scene)
-      checks.push({ scene, fingerprint: states[0], parity: 'exact', storageCalls: 0 })
+      checks.push({ scene, fingerprint: states[0], parity: 'exact', storageCalls: 0, metrics })
       console.log('PASS fixed-step state and profiling on/off parity; no IndexedDB:', scene)
     }
     await writeFile(
@@ -165,7 +198,7 @@ try {
         console.log(
           `START ${round} ${scene} ${run}/${runs}; ${warmup} warm-up + ${frames} measured frames`,
         )
-        await browser.navigate(`${base}/?bench=${scene}&run=${run}`)
+        await browser.navigate(`${base}/?bench=${scene}&run=${run}${uncapped ? '&queue=2' : ''}`)
         const before = {
           timestamp: new Date().toISOString(),
           frequencyKHz: await read('/sys/devices/system/cpu/cpu0/cpufreq/scaling_cur_freq'),
@@ -191,6 +224,7 @@ try {
           )
         )
           throw new Error('Invalid benchmark run')
+        validateQueue(result)
         if (
           result.viewport.width !== 1920 ||
           result.viewport.height !== 1080 ||

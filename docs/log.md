@@ -4,6 +4,28 @@ Entries describe the state at each stage. Earlier limitations may have been
 resolved later; START.md and the editor guide describe the current scope.
 Historical filenames, reference IDs and captured interfaces are preserved.
 
+## 2026-10-15 — Uncapped throughput: bound GPU work before measuring
+
+The first partial uncapped round exposed a measurement failure: particles
+submitted callbacks around 0.6 ms while GPU ranges took around 11 ms. The CPU
+outran GPU completion and the eight-query budget dropped samples. Stopped the
+owned isolated runner/browser and preserved every completed run in
+submission-diagnostic/. These are diagnostic data, not frame-throughput or
+qualification evidence.
+
+Added opt-in queue=2 to the benchmark-only entry. Nonblocking WebGL fence polls
+bound in-flight GPU frames to two; CPU frame N can still overlap GPU frame N-1.
+All GPU work drains before returning. No gl.finish or synchronous per-frame wait
+is used. Record actual render-step intervals, CPU-observed completion intervals,
+latency and scheduler CPU overhead separately. Uncapped acceptance checks require
+complete fences and every GPU timer sample when supported. Default rendering,
+simulation and ordinary editor scheduling remain unchanged. Updated ADR method
+before the corrected rounds. Polls use non-nested 1 ms timers outside rAF to
+avoid spinning or requesting a compositor frame solely to poll a fence.
+Validation: pnpm check passes (167 tests); all three bounded smoke fixtures
+complete every fence and GPU query, with exact profiling on/off state and image
+parity. No Phase 2 work and no push.
+
 ## 2026-10-15 — Phase 1 methodology amendment: uncapped runner
 
 The owner requested uncapped measurements before Phase 2 because the original

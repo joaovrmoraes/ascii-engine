@@ -1,0 +1,17 @@
+$ node scripts/bench.mjs --uncapped --round=uncapped-round-1
+START uncapped-round-1 water 1/5; 600 warm-up + 600 measured frames
+DONE water 1: frame p50/p95=4.715/6.960 ms; CPU p50=4.485 ms; GPU p50=5.776 ms
+START uncapped-round-1 particles 1/5; 600 warm-up + 600 measured frames
+DONE particles 1: frame p50/p95=0.595/1.175 ms; CPU p50=0.510 ms; GPU p50=11.068 ms
+START uncapped-round-1 skinning 1/5; 600 warm-up + 600 measured frames
+DONE skinning 1: frame p50/p95=13.880/14.535 ms; CPU p50=13.630 ms; GPU p50=6.672 ms
+START uncapped-round-1 water 2/5; 600 warm-up + 600 measured frames
+DONE water 2: frame p50/p95=4.655/5.585 ms; CPU p50=4.410 ms; GPU p50=5.781 ms
+START uncapped-round-1 particles 2/5; 600 warm-up + 600 measured frames
+DONE particles 2: frame p50/p95=0.595/1.315 ms; CPU p50=0.510 ms; GPU p50=11.059 ms
+START uncapped-round-1 skinning 2/5; 600 warm-up + 600 measured frames
+DONE skinning 2: frame p50/p95=13.740/14.590 ms; CPU p50=13.485 ms; GPU p50=7.194 ms
+START uncapped-round-1 water 3/5; 600 warm-up + 600 measured frames
+DONE water 3: frame p50/p95=4.650/6.125 ms; CPU p50=4.410 ms; GPU p50=5.782 ms
+START uncapped-round-1 particles 3/5; 600 warm-up + 600 measured frames
+[ELIFECYCLE] Command failed.
