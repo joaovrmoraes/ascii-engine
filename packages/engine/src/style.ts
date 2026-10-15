@@ -57,11 +57,39 @@ export interface GlyphStyle {
   shadowSteps?: number
 }
 
-export const GLYPH_STYLE_KEYS = ['glyph', 'surface', 'size', 'color', 'alphabet', 'font', 'fontWeight', 'open', 'faces', 'rotation', 'palette', 'lighting', 'emissive', 'emissiveIntensity', 'spacing', 'density', 'strength', 'gap', 'contrast', 'toneOffset', 'shadowSteps'] as const
+export const GLYPH_STYLE_KEYS = [
+  'glyph',
+  'surface',
+  'size',
+  'color',
+  'alphabet',
+  'font',
+  'fontWeight',
+  'open',
+  'faces',
+  'rotation',
+  'palette',
+  'lighting',
+  'emissive',
+  'emissiveIntensity',
+  'spacing',
+  'density',
+  'strength',
+  'gap',
+  'contrast',
+  'toneOffset',
+  'shadowSteps',
+] as const
 
 /** One atlas slot per single character; control/combining sequences are unsupported. */
 export function validGlyphAlphabet(value: unknown): value is string {
-  return typeof value === 'string' && Array.from(value).length >= 1 && Array.from(value).length <= 128 && !!value.trim() && !/[\p{C}\p{M}\p{Zl}\p{Zp}]/u.test(value)
+  return (
+    typeof value === 'string' &&
+    Array.from(value).length >= 1 &&
+    Array.from(value).length <= 128 &&
+    !!value.trim() &&
+    !/[\p{C}\p{M}\p{Zl}\p{Zp}]/u.test(value)
+  )
 }
 
 /** Styles for a type of object ("tree") and its types of part ("crown", "trunk"). */
@@ -73,14 +101,17 @@ export interface ObjectTypeStyle {
 }
 
 /** Asset reference is a layer, never part of the portable appearance recipe. */
-export interface LinkedGlyphStyle extends GlyphStyle { texture?: string }
+export interface LinkedGlyphStyle extends GlyphStyle {
+  texture?: string
+}
 
 /** Later layers win; `undefined` fields never erase earlier ones. */
 export function mergeGlyphStyles(...layers: (GlyphStyle | undefined)[]): GlyphStyle {
   const out: GlyphStyle = {}
   for (const layer of layers) {
     if (!layer) continue
-    for (const [key, value] of Object.entries(layer)) if (key !== 'texture' && value !== undefined) (out as Record<string, unknown>)[key] = value
+    for (const [key, value] of Object.entries(layer))
+      if (key !== 'texture' && value !== undefined) (out as Record<string, unknown>)[key] = value
   }
   return out
 }
@@ -108,13 +139,24 @@ export interface StyleLayers {
  */
 function glyphLayers(layers: StyleLayers): [string, GlyphStyle | undefined][] {
   const part = layers.part
-  const authored = (style: GlyphStyle | undefined, fields?: (keyof GlyphStyle)[]) => fields ? Object.fromEntries(fields.map(key => [key, style?.[key]])) : undefined
-  return [['model default', layers.defaults], ['global', layers.global], ['type', layers.type?.style],
-    ['type part', part ? layers.type?.parts?.[part] : undefined], ['model part', layers.node],
+  const authored = (style: GlyphStyle | undefined, fields?: (keyof GlyphStyle)[]) =>
+    fields ? Object.fromEntries(fields.map(key => [key, style?.[key]])) : undefined
+  return [
+    ['model default', layers.defaults],
+    ['global', layers.global],
+    ['type', layers.type?.style],
+    ['type part', part ? layers.type?.parts?.[part] : undefined],
+    ['model part', layers.node],
     ['authored type', authored(layers.type?.style, layers.type?.authored?.style)],
-    ['authored type part', part ? authored(layers.type?.parts?.[part], layers.type?.authored?.parts?.[part]) : undefined],
-    ['linked texture', layers.texture], ['instance', layers.instance],
-    ['linked part texture', layers.texturePart], ['instance part', part ? layers.instanceParts?.[part] : undefined]]
+    [
+      'authored type part',
+      part ? authored(layers.type?.parts?.[part], layers.type?.authored?.parts?.[part]) : undefined,
+    ],
+    ['linked texture', layers.texture],
+    ['instance', layers.instance],
+    ['linked part texture', layers.texturePart],
+    ['instance part', part ? layers.instanceParts?.[part] : undefined],
+  ]
 }
 export function resolveGlyphStyle(layers: StyleLayers): GlyphStyle {
   return mergeGlyphStyles(...glyphLayers(layers).map(([, style]) => style))
@@ -131,7 +173,8 @@ export function glyphStyleSources(layers: StyleLayers): Partial<Record<keyof Gly
 
 /** Style written on a node: `userData.glyph` (technique) and `userData.glyphStyle` (the rest). */
 export function nodeGlyphStyle(userData: Record<string, unknown>): GlyphStyle | undefined {
-  const glyph = userData.glyph as GlyphKind | undefined, style = userData.glyphStyle as GlyphStyle | undefined
+  const glyph = userData.glyph as GlyphKind | undefined,
+    style = userData.glyphStyle as GlyphStyle | undefined
   if (!glyph && !style) return undefined
   return mergeGlyphStyles(style, glyph ? { glyph } : undefined)
 }

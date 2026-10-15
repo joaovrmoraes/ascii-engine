@@ -1,5 +1,10 @@
 import * as THREE from 'three'
-import { createCampfire, pushFireflies, pushLanternMotes, createDustTrail } from '@ascii-engine/core/pomorog'
+import {
+  createCampfire,
+  pushFireflies,
+  pushLanternMotes,
+  createDustTrail,
+} from '@ascii-engine/core/pomorog'
 import { type AsciiEngine, type GlyphCloud } from '@ascii-engine/core'
 import { createCamp, createKit, type Kit } from '../scene/pomorogKit'
 import { createAdventurer } from '../pomorog/models'
@@ -13,7 +18,8 @@ import { usesLegacyScreenComparison, type AreaOptions } from './types'
  */
 export const CAMP = new THREE.Vector3(-3, 0, 2.6)
 export const CAMP_SEAT = new THREE.Vector3(-1.8, 0, 2.7)
-const EXPLORE_SECONDS = 70, CAMP_SECONDS = 25
+const EXPLORE_SECONDS = 70,
+  CAMP_SECONDS = 25
 
 /**
  * The unlit floor of the screen-pass maps (`environment.ts → floorMaterial`):
@@ -36,7 +42,8 @@ export function legacyFloor(forest = false) {
       }`,
   })
   const floor = new THREE.Mesh(new THREE.PlaneGeometry(42, 40), material)
-  floor.rotation.x = -Math.PI / 2; floor.position.y = -.07
+  floor.rotation.x = -Math.PI / 2
+  floor.position.y = -0.07
   floor.userData.glyph = 'screen'
   return floor
 }
@@ -54,7 +61,11 @@ export interface RouteOptions {
 }
 
 /** Camp, bonfire, traveller and lantern for a fixed map. */
-export function createFixedMapActors(engine: AsciiEngine, options: AreaOptions, route: RouteOptions) {
+export function createFixedMapActors(
+  engine: AsciiEngine,
+  options: AreaOptions,
+  route: RouteOptions,
+) {
   const kit: Kit = createKit()
   const campGroup = createCamp(kit, route.leanTo ?? false)
   campGroup.position.copy(CAMP)
@@ -66,23 +77,37 @@ export function createFixedMapActors(engine: AsciiEngine, options: AreaOptions, 
   engine.setLights({ hearth: CAMP })
 
   const player = createAdventurer()
-  engine.add(player.root, usesLegacyScreenComparison(options) ? { glyph: 'screen', surface: 'actor' } : { type: 'hero' })
-  player.root.position.set(-.8, 0, 2.7)
+  engine.add(
+    player.root,
+    usesLegacyScreenComparison(options) ? { glyph: 'screen', surface: 'actor' } : { type: 'hero' },
+  )
+  player.root.position.set(-0.8, 0, 2.7)
   const lanternPower = route.lantern ?? 7
-  const lantern = new THREE.PointLight(0xffce83, lanternPower, 9, 1.65); engine.scene.add(lantern)
+  const lantern = new THREE.PointLight(0xffce83, lanternPower, 9, 1.65)
+  engine.scene.add(lantern)
   const lanternModel = player.root.getObjectByName('traveller-lantern')!
   const ambient = engine.createParticles(1200)
   engine.add(ambient.mesh, { glyph: 'particle' })
   const dust = createDustTrail()
   engine.setActors({ hero: player.root.position })
 
-  let routeIndex = 0, speed = 0, sitting = 0
-  const destination = new THREE.Vector3(), delta = new THREE.Vector3()
+  let routeIndex = 0,
+    speed = 0,
+    sitting = 0
+  const destination = new THREE.Vector3(),
+    delta = new THREE.Vector3()
   const feet = player.feet!.map(() => ({ position: new THREE.Vector3(), step: 0, grounded: true }))
   const state = { travelled: 0, wading: false, camping: !!options.camp, seated: false }
 
   return {
-    player, feet, state, fire, fireLetters, ambient, campGroup, kit,
+    player,
+    feet,
+    state,
+    fire,
+    fireLetters,
+    ambient,
+    campGroup,
+    kit,
     /** Moves the traveller; returns metres travelled this frame. */
     update(time: number, dt: number) {
       const cycle = time % (EXPLORE_SECONDS + CAMP_SECONDS)
@@ -91,31 +116,63 @@ export function createFixedMapActors(engine: AsciiEngine, options: AreaOptions, 
       else {
         const point = route.route[routeIndex]
         destination.set(point[0], 0, point[1])
-        if (Math.hypot(player.root.position.x - destination.x, player.root.position.z - destination.z) < .2) routeIndex = (routeIndex + 1) % route.route.length
+        if (
+          Math.hypot(
+            player.root.position.x - destination.x,
+            player.root.position.z - destination.z,
+          ) < 0.2
+        )
+          routeIndex = (routeIndex + 1) % route.route.length
       }
-      delta.subVectors(destination, player.root.position); delta.y = 0
+      delta.subVectors(destination, player.root.position)
+      delta.y = 0
       const distance = delta.length()
-      state.seated = state.camping && distance < .12
+      state.seated = state.camping && distance < 0.12
       sitting = damp(sitting, state.seated ? 1 : 0, state.seated ? 3.2 : 5.5, dt)
       const p = player.root.position
       state.wading = route.wadingAt?.(p.x, p.z) ?? false
-      const targetSpeed = state.seated ? 0 : (state.wading ? 1.12 / 1.28 : 1) * 1.28 * smooth(distance / .45) * (1 - smooth(sitting * 1.5))
+      const targetSpeed = state.seated
+        ? 0
+        : (state.wading ? 1.12 / 1.28 : 1) *
+          1.28 *
+          smooth(distance / 0.45) *
+          (1 - smooth(sitting * 1.5))
       speed = damp(speed, targetSpeed, targetSpeed > speed ? 6 : 10, dt)
       let travelled = 0
-      if (distance > .015 && speed > .005) {
+      if (distance > 0.015 && speed > 0.005) {
         const targetAngle = Math.atan2(delta.x, delta.z)
         player.root.rotation.y = turn(player.root.rotation.y, targetAngle, 6, dt)
-        const alignment = .4 + .6 * Math.max(0, Math.cos(targetAngle - player.root.rotation.y))
+        const alignment = 0.4 + 0.6 * Math.max(0, Math.cos(targetAngle - player.root.rotation.y))
         travelled = Math.min(distance, dt * speed * alignment)
         player.root.position.addScaledVector(delta.normalize(), travelled)
       }
       if (route.heightAt) p.y = damp(p.y, route.heightAt(p.x, p.z), 10, dt)
-      if (state.seated) player.root.rotation.y = turn(player.root.rotation.y, Math.atan2(CAMP.x - p.x, CAMP.z - p.z), 5, dt)
-      player.animate({ time, dt, speed, distance: travelled, attackAge: 9, hurtAge: 9, sitting, wading: state.wading })
+      if (state.seated)
+        player.root.rotation.y = turn(
+          player.root.rotation.y,
+          Math.atan2(CAMP.x - p.x, CAMP.z - p.z),
+          5,
+          dt,
+        )
+      player.animate({
+        time,
+        dt,
+        speed,
+        distance: travelled,
+        attackAge: 9,
+        hurtAge: 9,
+        sitting,
+        wading: state.wading,
+      })
       player.root.updateMatrixWorld(true)
-      player.feet!.forEach((foot, i) => { foot.anchor.getWorldPosition(feet[i].position); feet[i].step = foot.step; feet[i].grounded = foot.grounded })
-      lanternModel.getWorldPosition(lantern.position); lantern.position.y += .5
-      lantern.intensity = lanternPower + Math.sin(time * 3.7) * .7 + Math.sin(time * 7.3) * .35
+      player.feet!.forEach((foot, i) => {
+        foot.anchor.getWorldPosition(feet[i].position)
+        feet[i].step = foot.step
+        feet[i].grounded = foot.grounded
+      })
+      lanternModel.getWorldPosition(lantern.position)
+      lantern.position.y += 0.5
+      lantern.intensity = lanternPower + Math.sin(time * 3.7) * 0.7 + Math.sin(time * 7.3) * 0.35
       engine.setLights({ lantern: lantern.position })
       state.travelled = travelled
       ambient.clear()
@@ -125,11 +182,18 @@ export function createFixedMapActors(engine: AsciiEngine, options: AreaOptions, 
       return travelled
     },
     /** Bonfire letters for this frame (`heat`, `steam` from the weather). */
-    burn(time: number, heat = 1, steam = 0) { fireLetters.clear(); fire.update(time, engine.camera, heat, steam) },
-    fireflies(cloud: GlyphCloud, time: number, dim = 1) { pushFireflies(cloud, player.root.position, time, { dim }) },
+    burn(time: number, heat = 1, steam = 0) {
+      fireLetters.clear()
+      fire.update(time, engine.camera, heat, steam)
+    },
+    fireflies(cloud: GlyphCloud, time: number, dim = 1) {
+      pushFireflies(cloud, player.root.position, time, { dim })
+    },
     focus(angle: number, target: THREE.Vector3) {
-      target.copy(player.root.position); target.y = 1.05
-      target.x -= Math.sin(angle) * 2; target.z -= Math.cos(angle) * 2
+      target.copy(player.root.position)
+      target.y = 1.05
+      target.x -= Math.sin(angle) * 2
+      target.z -= Math.cos(angle) * 2
       return target
     },
   }

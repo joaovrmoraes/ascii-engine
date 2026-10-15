@@ -1,0 +1,13 @@
+# Read-only reference archive, generated files and captured evidence.
+reference/
+node_modules/
+dist/
+target/
+apps/editor/src-tauri/gen/
+.cache/
+exports/
+docs/captures/
+docs/showcase/
+docs/examples/
+pnpm-lock.yaml
+**/package-lock.json

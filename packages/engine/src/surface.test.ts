@@ -1,6 +1,12 @@
 import { describe, expect, it } from 'vitest'
 import * as THREE from 'three'
-import { SURFACE_ALPHA, SURFACE_TOLERANCE, surfaceAlpha, tagSurface, type SurfaceKind } from './surface'
+import {
+  SURFACE_ALPHA,
+  SURFACE_TOLERANCE,
+  surfaceAlpha,
+  tagSurface,
+  type SurfaceKind,
+} from './surface'
 
 const kinds = Object.keys(SURFACE_ALPHA) as SurfaceKind[]
 /** What the 8-bit offscreen target stores and the screen pass reads back. */
@@ -16,20 +22,28 @@ describe('surface IDs', () => {
   it('survives the 8-bit alpha and matches only its own ID', () => {
     for (const kind of kinds) {
       const alpha = stored(surfaceAlpha(kind))
-      const hits = kinds.filter((other) => matches(alpha, SURFACE_ALPHA[other]))
+      const hits = kinds.filter(other => matches(alpha, SURFACE_ALPHA[other]))
       expect(hits).toEqual([kind])
     }
   })
 
   it('keeps IDs at least .05 apart', () => {
-    const values = kinds.map((k) => SURFACE_ALPHA[k]).sort((a, b) => a - b)
-    for (let i = 1; i < values.length; i++) expect(values[i] - values[i - 1]).toBeGreaterThanOrEqual(.05 - 1e-9)
+    const values = kinds.map(k => SURFACE_ALPHA[k]).sort((a, b) => a - b)
+    for (let i = 1; i < values.length; i++)
+      expect(values[i] - values[i - 1]).toBeGreaterThanOrEqual(0.05 - 1e-9)
   })
 
   it('injects the alpha after lighting and keys the program by kind', () => {
     const material = tagSurface(new THREE.MeshStandardMaterial(), 'stone')
-    const shader = { fragmentShader: 'x\n#include <dithering_fragment>\ny', vertexShader: '', uniforms: {} }
-    material.onBeforeCompile(shader as unknown as THREE.WebGLProgramParametersWithUniforms, {} as THREE.WebGLRenderer)
+    const shader = {
+      fragmentShader: 'x\n#include <dithering_fragment>\ny',
+      vertexShader: '',
+      uniforms: {},
+    }
+    material.onBeforeCompile(
+      shader as unknown as THREE.WebGLProgramParametersWithUniforms,
+      {} as THREE.WebGLRenderer,
+    )
     expect(shader.fragmentShader).toContain('gl_FragColor.a = 0.60;')
     expect(material.customProgramCacheKey()).toBe('ascii-surface-stone')
     expect(material.userData.asciiSurface).toBe('stone')

@@ -12,10 +12,21 @@ const root = resolve(new URL('..', import.meta.url).pathname)
 const args = parseExportArgs(process.argv.slice(2))
 const arg = (name, fallback) => args[name] ?? fallback
 const title = arg('title', 'ASCII Engine')
-const slug = title.normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '') || 'game'
+const slug =
+  title
+    .normalize('NFD')
+    .replace(/[̀-ͯ]/g, '')
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-|-$/g, '') || 'game'
 const out = resolve(arg('out', join(root, 'exports', slug)))
-const area = arg('area'), scene = arg('scene'), zoom = arg('zoom')
-if (!area && !scene) { console.error('provide --area <id> or --scene <file.json>'); process.exit(1) }
+const area = arg('area'),
+  scene = arg('scene'),
+  zoom = arg('zoom')
+if (!area && !scene) {
+  console.error('provide --area <id> or --scene <file.json>')
+  process.exit(1)
+}
 
 const run = (cmd, cmdArgs, cwd = root) => {
   console.log(`$ ${cmd} ${cmdArgs.join(' ')}`)
@@ -26,10 +37,14 @@ const run = (cmd, cmdArgs, cwd = root) => {
 // 1. Web build.
 run('pnpm', ['--filter', '@ascii-engine/editor', 'exec', 'vite', 'build'])
 const web = join(out, 'web')
-rmSync(web, { recursive: true, force: true }); mkdirSync(web, { recursive: true })
+rmSync(web, { recursive: true, force: true })
+mkdirSync(web, { recursive: true })
 cpSync(join(root, 'apps/editor/dist'), web, { recursive: true })
 const game = { title, ...(area ? { area } : {}), ...(zoom ? { zoom: Number(zoom) } : {}) }
-if (scene) { cpSync(resolve(scene), join(web, 'scene.json')); game.scene = './scene.json' }
+if (scene) {
+  cpSync(resolve(scene), join(web, 'scene.json'))
+  game.scene = './scene.json'
+}
 writeFileSync(join(web, 'game.json'), JSON.stringify(game, null, 2))
 console.log(`web: ${web} (serve the folder, for example: python -m http.server -d "${web}")`)
 
@@ -46,8 +61,23 @@ if (args.desktop) {
   }
   const configPath = join(out, 'tauri.game.conf.json')
   writeFileSync(configPath, JSON.stringify(config, null, 2))
-  run('pnpm', ['--filter', '@ascii-engine/editor', 'exec', 'tauri', 'build', '--config', configPath, ...(arg('bundle') ? [] : ['--no-bundle'])])
-  const binary = join(tauriDir, 'target/release', existsSync(join(tauriDir, 'target/release/ascii-engine-editor')) ? 'ascii-engine-editor' : '')
-  console.log(`desktop: ${binary || join(tauriDir, 'target/release')} ${arg('bundle') ? `(bundles in ${join(tauriDir, 'target/release/bundle')})` : '(binary, no installer)'}`)
+  run('pnpm', [
+    '--filter',
+    '@ascii-engine/editor',
+    'exec',
+    'tauri',
+    'build',
+    '--config',
+    configPath,
+    ...(arg('bundle') ? [] : ['--no-bundle']),
+  ])
+  const binary = join(
+    tauriDir,
+    'target/release',
+    existsSync(join(tauriDir, 'target/release/ascii-engine-editor')) ? 'ascii-engine-editor' : '',
+  )
+  console.log(
+    `desktop: ${binary || join(tauriDir, 'target/release')} ${arg('bundle') ? `(bundles in ${join(tauriDir, 'target/release/bundle')})` : '(binary, no installer)'}`,
+  )
 }
 console.log(`ready: ${basename(out)}`)

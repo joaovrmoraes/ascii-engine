@@ -11,10 +11,10 @@ describe('optional preset ownership', () => {
     expect(POMOROG_FIRE).toEqual(defaults)
 
     try {
-      POMOROG_FIRE.cell[0] = .9
+      POMOROG_FIRE.cell[0] = 0.9
       POMOROG_FIRE.ramp[0][0] = '!'
-      POMOROG_FIRE.ramp[0][1][0] = .1
-      POMOROG_FIRE.smoke.color[0] = .8
+      POMOROG_FIRE.ramp[0][1][0] = 0.1
+      POMOROG_FIRE.smoke.color[0] = 0.8
       POMOROG_FIRE.light.intensity = 99
       expect(DEFAULT_HEAT_GRID).toEqual(defaults)
     } finally {
@@ -28,10 +28,10 @@ describe('optional preset ownership', () => {
     expect(FOREST_WATER).toEqual(defaults)
 
     try {
-      FOREST_WATER.cell[0] = .9
-      FOREST_WATER.open[0] = .8
+      FOREST_WATER.cell[0] = 0.9
+      FOREST_WATER.open[0] = 0.8
       FOREST_WATER.reflection.enabled = false
-      FOREST_WATER.reflection.tint[0] = .1
+      FOREST_WATER.reflection.tint[0] = 0.1
       expect(DEFAULT_WATER_LOOK).toEqual(defaults)
     } finally {
       Object.assign(FOREST_WATER, original)

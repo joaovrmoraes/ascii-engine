@@ -38,7 +38,14 @@ export interface PlacedObject {
   options?: AddOptions
 }
 
-export interface SceneWater { name?: string; visible?: boolean; shape: WaterShape; look?: Partial<WaterLook>; level?: number; physics?: Partial<import('./waterDynamics').WaterPhysics> }
+export interface SceneWater {
+  name?: string
+  visible?: boolean
+  shape: WaterShape
+  look?: Partial<WaterLook>
+  level?: number
+  physics?: Partial<import('./waterDynamics').WaterPhysics>
+}
 
 export interface SceneDoc {
   version: 1
@@ -74,40 +81,105 @@ export interface Prefab {
 }
 export type PrefabLibrary = Record<string, Prefab>
 
-export function emptyScene(name = 'scene'): SceneDoc { return { version: 1, name, objects: [] } }
+export function emptyScene(name = 'scene'): SceneDoc {
+  return { version: 1, name, objects: [] }
+}
 
 export function seededRandom(seed: number) {
-  return () => { seed = (Math.imul(seed, 1664525) + 1013904223) >>> 0; return seed / 4294967296 }
+  return () => {
+    seed = (Math.imul(seed, 1664525) + 1013904223) >>> 0
+    return seed / 4294967296
+  }
 }
 
 const pickOf = (list: number[], random: () => number) => list[Math.floor(random() * list.length)]
 /** Meadow blades over a terrain: density from the painted layer, height from the relief. */
-export function terrainCover(terrain: Terrain, count: number, waterLevel: number | SceneWater[] = -Infinity): GroundCover {
+export function terrainCover(
+  terrain: Terrain,
+  count: number,
+  waterLevel: number | SceneWater[] = -Infinity,
+): GroundCover {
   const custom = terrain.data.layers.some(layer => layer.cover)
-  const slots: GlyphSlot[] = CARPET_GLYPHS.map(glyph => ({glyph,font:'monospace'})), layerSlots = new Map<number, number[]>()
-  terrain.data.layers.forEach((layer,index) => {
+  const slots: GlyphSlot[] = CARPET_GLYPHS.map(glyph => ({ glyph, font: 'monospace' })),
+    layerSlots = new Map<number, number[]>()
+  terrain.data.layers.forEach((layer, index) => {
     if (!layer.cover) return
-    const look = layer.cover, chars = Array.from(look.alphabet ?? CARPET_GLYPHS.join(''))
-    layerSlots.set(index, chars.map(glyph => {
-      const slot = {glyph,font:look.font ?? 'monospace',fontWeight:look.fontWeight ?? 400}, found = slots.findIndex(item => item.glyph===slot.glyph && item.font===slot.font && (item.fontWeight ?? 400)===slot.fontWeight)
-      if(found>=0) return found; slots.push(slot); return slots.length-1
-    }))
+    const look = layer.cover,
+      chars = Array.from(look.alphabet ?? CARPET_GLYPHS.join(''))
+    layerSlots.set(
+      index,
+      chars.map(glyph => {
+        const slot = { glyph, font: look.font ?? 'monospace', fontWeight: look.fontWeight ?? 400 },
+          found = slots.findIndex(
+            item =>
+              item.glyph === slot.glyph &&
+              item.font === slot.font &&
+              (item.fontWeight ?? 400) === slot.fontWeight,
+          )
+        if (found >= 0) return found
+        slots.push(slot)
+        return slots.length - 1
+      }),
+    )
   })
   return {
-    count, ...(custom ? {glyphs:slots,variableWind:true} : {}), extent: terrain.data.size, y: (x, z) => terrain.heightAt(x, z) - .06,
-    density: (x, z) => (terrain.data.layers[terrain.layerAt(x,z)]?.cover?.density ?? 1) * terrain.grassAt(x, z, typeof waterLevel === 'number' ? waterLevel : Math.max(-Infinity, ...waterLevel.filter(w => waterEdge(w.shape, x, z) > 0).map(w => waterHeightAt(w.shape, x, z, w.level ?? 0)))),
-    pick(random,x,z) {
-      const flower = random() < .012, shade = .55 + random() * .6, warm = random()
+    count,
+    ...(custom ? { glyphs: slots, variableWind: true } : {}),
+    extent: terrain.data.size,
+    y: (x, z) => terrain.heightAt(x, z) - 0.06,
+    density: (x, z) =>
+      (terrain.data.layers[terrain.layerAt(x, z)]?.cover?.density ?? 1) *
+      terrain.grassAt(
+        x,
+        z,
+        typeof waterLevel === 'number'
+          ? waterLevel
+          : Math.max(
+              -Infinity,
+              ...waterLevel
+                .filter(w => waterEdge(w.shape, x, z) > 0)
+                .map(w => waterHeightAt(w.shape, x, z, w.level ?? 0)),
+            ),
+      ),
+    pick(random, x, z) {
+      const flower = random() < 0.012,
+        shade = 0.55 + random() * 0.6,
+        warm = random()
       const legacy = flower
-        ? { glyph: 6 + Math.floor(random() * 2), height: .2, color: [.62 * shade, .66 * shade, .5 * shade] }
-        : { glyph: pickOf([0, 0, 1, 2, 5, 5, 3], random), height: .12 + random() * .16, color: [(.2 + warm * .14) * shade, (.46 + warm * .06) * shade, (.26 - warm * .1) * shade] }
-      const layer = terrain.layerAt(x,z), look = terrain.data.layers[layer]?.cover
-      if (!look) return { ...legacy, color:legacy.color as [number,number,number] }
-      const glyphs=layerSlots.get(layer)!, glyph=look.alphabet ? glyphs[Math.floor(random()*glyphs.length)] : glyphs[legacy.glyph]
-      const height=look.height ?? (legacy.glyph>=6 ? .1+legacy.height*.5 : legacy.height)
-      const width=look.width ?? (legacy.glyph>=6 ? .16+legacy.height*.3 : legacy.height*.4)
-      const color=look.palette?.[Math.floor(random()*look.palette.length)] ?? look.color
-      return {glyph,height,width,absoluteHeight:true,wind:look.wind ?? 1,color:color===undefined ? legacy.color as [number,number,number] : new THREE.Color(color).toArray() as [number,number,number]}
+        ? {
+            glyph: 6 + Math.floor(random() * 2),
+            height: 0.2,
+            color: [0.62 * shade, 0.66 * shade, 0.5 * shade],
+          }
+        : {
+            glyph: pickOf([0, 0, 1, 2, 5, 5, 3], random),
+            height: 0.12 + random() * 0.16,
+            color: [
+              (0.2 + warm * 0.14) * shade,
+              (0.46 + warm * 0.06) * shade,
+              (0.26 - warm * 0.1) * shade,
+            ],
+          }
+      const layer = terrain.layerAt(x, z),
+        look = terrain.data.layers[layer]?.cover
+      if (!look) return { ...legacy, color: legacy.color as [number, number, number] }
+      const glyphs = layerSlots.get(layer)!,
+        glyph = look.alphabet ? glyphs[Math.floor(random() * glyphs.length)] : glyphs[legacy.glyph]
+      const height = look.height ?? (legacy.glyph >= 6 ? 0.1 + legacy.height * 0.5 : legacy.height)
+      const width =
+        look.width ?? (legacy.glyph >= 6 ? 0.16 + legacy.height * 0.3 : legacy.height * 0.4)
+      const color = look.palette?.[Math.floor(random() * look.palette.length)] ?? look.color
+      return {
+        glyph,
+        height,
+        width,
+        absoluteHeight: true,
+        wind: look.wind ?? 1,
+        color:
+          color === undefined
+            ? (legacy.color as [number, number, number])
+            : (new THREE.Color(color).toArray() as [number, number, number]),
+      }
     },
   }
 }
@@ -125,7 +197,10 @@ export function buildScene(engine: AsciiEngine, source: SceneDoc, library: Prefa
   const placed: { doc: PlacedObject; object: THREE.Object3D }[] = []
   function dispose() {
     weather?.dispose()
-    for (const p of placed) { library[p.doc.prefab]?.dispose?.(p.object); engine.remove(p.object, { dispose: true }) }
+    for (const p of placed) {
+      library[p.doc.prefab]?.dispose?.(p.object)
+      engine.remove(p.object, { dispose: true })
+    }
     if (terrain) engine.remove(terrain.mesh, { dispose: true })
     for (const w of waters) engine.remove(w.mesh, { dispose: true })
     if (carpet) engine.remove(carpet.mesh, { dispose: true })
@@ -133,51 +208,94 @@ export function buildScene(engine: AsciiEngine, source: SceneDoc, library: Prefa
   try {
     // Recipes still linked by the scene being replaced stay until it is disposed.
     engine.setTextures(doc.textures ?? {}, { keepUsed: true })
-    for (const [name, prefab] of Object.entries(library)) if (prefab.style || doc.style?.types?.[name]?.authored) engine.setTypeStyle(name, prefab.style ?? {})
+    for (const [name, prefab] of Object.entries(library))
+      if (prefab.style || doc.style?.types?.[name]?.authored)
+        engine.setTypeStyle(name, prefab.style ?? {})
     if (doc.style) engine.setStyle(doc.style)
     terrain = doc.terrain ? createTerrain(doc.terrain) : undefined
     if (terrain) engine.add(terrain.mesh)
     for (const entry of doc.waters ?? []) {
-      const water = engine.createWater(entry.shape, { look: entry.look, level: entry.level, physics: entry.physics })
-      water.mesh.name = entry.name ?? ''; water.mesh.visible = entry.visible ?? true
+      const water = engine.createWater(entry.shape, {
+        look: entry.look,
+        level: entry.level,
+        physics: entry.physics,
+      })
+      water.mesh.name = entry.name ?? ''
+      water.mesh.visible = entry.visible ?? true
       waters.push(water)
       engine.add(water.mesh, { glyph: 'water' })
     }
     doc.objects.forEach(place)
-    carpet = doc.carpet && terrain ? engine.createCarpet(terrainCover(terrain, doc.carpet.count, doc.waters ?? []), doc.carpet.seed) : undefined
+    carpet =
+      doc.carpet && terrain
+        ? engine.createCarpet(
+            terrainCover(terrain, doc.carpet.count, doc.waters ?? []),
+            doc.carpet.seed,
+          )
+        : undefined
     if (carpet) engine.add(carpet.mesh, { glyph: 'carpet' })
     weather = createSceneWeather(engine, doc.environment, doc.terrain?.size)
-  } catch (error) { dispose(); engine.setTextures(previousTextures); engine.setStyle(previousStyle, { replace: true }); throw error }
+  } catch (error) {
+    dispose()
+    engine.setTextures(previousTextures)
+    engine.setStyle(previousStyle, { replace: true })
+    throw error
+  }
   function place(item: PlacedObject) {
     const prefab = library[item.prefab]
     if (!prefab) throw new Error(`ascii-engine: unknown prefab "${item.prefab}"`)
     const seed = item.seed ?? 48017
     const object = prefab.create({ seed, random: seededRandom(seed), item })
-    object.position.set(...item.position); object.rotation.y = item.rotation ?? 0; object.scale.setScalar(item.scale ?? 1)
+    object.position.set(...item.position)
+    object.rotation.y = item.rotation ?? 0
+    object.scale.setScalar(item.scale ?? 1)
     if (item.rotation3) object.rotation.set(...item.rotation3)
     if (item.scale3) object.scale.set(...item.scale3)
     object.visible = item.visible ?? true
     object.name = item.name ?? prefab.title
     object.userData.sceneId = item.id
     object.userData.prefab = item.prefab
-    try { engine.add(object, { type: prefab.style || doc.style?.types?.[item.prefab]?.authored ? item.prefab : undefined, ...item.options }) }
-    catch (error) { prefab.dispose?.(object); engine.remove(object, { dispose: true }); throw error }
+    try {
+      engine.add(object, {
+        type: prefab.style || doc.style?.types?.[item.prefab]?.authored ? item.prefab : undefined,
+        ...item.options,
+      })
+    } catch (error) {
+      prefab.dispose?.(object)
+      engine.remove(object, { dispose: true })
+      throw error
+    }
     placed.push({ doc: item, object })
     return object
   }
 
   return {
-    terrain, waters, placed,
+    terrain,
+    waters,
+    placed,
     /** Adds one object to the scene (and to the document). */
     place(item: PlacedObject) {
-      const next = parseScene({ version: 1, textures: doc.textures, objects: [{ ...item, id: item.id ?? crypto.randomUUID(), seed: item.seed ?? Math.floor(Math.random() * 4294967296) }] }, library).objects[0]
+      const next = parseScene(
+        {
+          version: 1,
+          textures: doc.textures,
+          objects: [
+            {
+              ...item,
+              id: item.id ?? crypto.randomUUID(),
+              seed: item.seed ?? Math.floor(Math.random() * 4294967296),
+            },
+          ],
+        },
+        library,
+      ).objects[0]
       const object = place(next)
       doc.objects.push(next)
       return object
     },
     /** Removes one placed object. */
     remove(object: THREE.Object3D) {
-      const i = placed.findIndex((p) => p.object === object)
+      const i = placed.findIndex(p => p.object === object)
       if (i < 0) return
       doc.objects.splice(doc.objects.indexOf(placed[i].doc), 1)
       library[placed[i].doc.prefab]?.dispose?.(object)
@@ -187,10 +305,16 @@ export function buildScene(engine: AsciiEngine, source: SceneDoc, library: Prefa
     /** Adds a water body (e.g. dug by the lake brush). */
     addWater(entry: SceneWater) {
       parseScene({ version: 1, objects: [], waters: [entry] })
-      const water = engine.createWater(entry.shape, { look: entry.look, level: entry.level, physics: entry.physics })
-      water.mesh.name = entry.name ?? ''; water.mesh.visible = entry.visible ?? true
-      engine.add(water.mesh, { glyph: 'water' }); waters.push(water)
-      doc.waters = [...doc.waters ?? [], entry]
+      const water = engine.createWater(entry.shape, {
+        look: entry.look,
+        level: entry.level,
+        physics: entry.physics,
+      })
+      water.mesh.name = entry.name ?? ''
+      water.mesh.visible = entry.visible ?? true
+      engine.add(water.mesh, { glyph: 'water' })
+      waters.push(water)
+      doc.waters = [...(doc.waters ?? []), entry]
       return water
     },
     /** Rebuilds the carpet after painting (blades are generated once). */
@@ -203,22 +327,32 @@ export function buildScene(engine: AsciiEngine, source: SceneDoc, library: Prefa
     },
     update(time: number) {
       weather?.update(time)
-      if (doc.environment?.weather === 'rain') for (const water of waters) water.rain(time, doc.environment.intensity ?? 1)
+      if (doc.environment?.weather === 'rain')
+        for (const water of waters) water.rain(time, doc.environment.intensity ?? 1)
       for (const p of placed) {
         library[p.doc.prefab]?.update?.(p.object, time)
-        if (p.object.visible) for (const water of waters) water.interact(p.object.uuid, p.object.position)
+        if (p.object.visible)
+          for (const water of waters) water.interact(p.object.uuid, p.object.position)
       }
     },
     /** The document, with the terrain as edited. */
     toJSON(): SceneDoc {
-      return JSON.parse(JSON.stringify({
-        ...doc, style: engine.exportStyle(), terrain: terrain?.toJSON() ?? doc.terrain,
-        objects: placed.map(({ doc: item, object }) => ({
-          ...item, name: object.name, visible: object.visible,
-          position: object.position.toArray(), rotation3: [object.rotation.x, object.rotation.y, object.rotation.z], scale3: object.scale.toArray(),
-          options: engine.instanceStyle(object),
-        })),
-      }))
+      return JSON.parse(
+        JSON.stringify({
+          ...doc,
+          style: engine.exportStyle(),
+          terrain: terrain?.toJSON() ?? doc.terrain,
+          objects: placed.map(({ doc: item, object }) => ({
+            ...item,
+            name: object.name,
+            visible: object.visible,
+            position: object.position.toArray(),
+            rotation3: [object.rotation.x, object.rotation.y, object.rotation.z],
+            scale3: object.scale.toArray(),
+            options: engine.instanceStyle(object),
+          })),
+        }),
+      )
     },
     dispose,
   }
@@ -228,7 +362,12 @@ export type BuiltScene = ReturnType<typeof buildScene>
 /* ---------- Chunks with edge connectors and rule-based generation ---------- */
 
 /** Connector names on each edge (e.g. 'trilha', 'riacho', 'mato'); equal names join. */
-export interface Connectors { n: string; e: string; s: string; w: string }
+export interface Connectors {
+  n: string
+  e: string
+  s: string
+  w: string
+}
 export interface ChunkDef {
   id: string
   connectors: Connectors
@@ -237,7 +376,11 @@ export interface ChunkDef {
   biome?: string
   scene?: SceneDoc
 }
-export interface ChunkCell { id: string; x: number; z: number }
+export interface ChunkCell {
+  id: string
+  x: number
+  z: number
+}
 
 /** Turns a chunk's connectors a quarter turn clockwise `times` times. */
 export function rotateConnectors(c: Connectors, times: number): Connectors {
@@ -251,16 +394,30 @@ export function rotateConnectors(c: Connectors, times: number): Connectors {
  * weighted by `weight`, deterministic for a seed). `fixed` pins chunks (the
  * camp at the start); `edge` is the connector required on the outer border.
  */
-export function generateChunkGrid(options: { library: ChunkDef[]; width: number; height: number; seed: number; fixed?: ChunkCell[]; edge?: string; biome?: string }) {
+export function generateChunkGrid(options: {
+  library: ChunkDef[]
+  width: number
+  height: number
+  seed: number
+  fixed?: ChunkCell[]
+  edge?: string
+  biome?: string
+}) {
   const { width, height } = options
-  const library = options.biome ? options.library.filter((c) => !c.biome || c.biome === options.biome) : options.library
+  const library = options.biome
+    ? options.library.filter(c => !c.biome || c.biome === options.biome)
+    : options.library
   let seed = options.seed >>> 0 || 1
-  const random = () => { seed = (Math.imul(seed, 1664525) + 1013904223) >>> 0; return seed / 4294967296 }
-  const byId = new Map(library.map((c) => [c.id, c]))
+  const random = () => {
+    seed = (Math.imul(seed, 1664525) + 1013904223) >>> 0
+    return seed / 4294967296
+  }
+  const byId = new Map(library.map(c => [c.id, c]))
   const grid: (ChunkDef | undefined)[] = new Array(width * height)
-  const fixed = new Map((options.fixed ?? []).map((f) => [f.z * width + f.x, f.id]))
+  const fixed = new Map((options.fixed ?? []).map(f => [f.z * width + f.x, f.id]))
   const fits = (c: ChunkDef, x: number, z: number) => {
-    const left = x > 0 ? grid[z * width + x - 1] : undefined, up = z > 0 ? grid[(z - 1) * width + x] : undefined
+    const left = x > 0 ? grid[z * width + x - 1] : undefined,
+      up = z > 0 ? grid[(z - 1) * width + x] : undefined
     if (left && left.connectors.e !== c.connectors.w) return false
     if (up && up.connectors.s !== c.connectors.n) return false
     if (options.edge !== undefined) {
@@ -270,7 +427,8 @@ export function generateChunkGrid(options: { library: ChunkDef[]; width: number;
       if (z === height - 1 && c.connectors.s !== options.edge) return false
     }
     // A pinned neighbour to the right or below must still be reachable.
-    const right = fixed.get(z * width + x + 1), down = fixed.get((z + 1) * width + x)
+    const right = fixed.get(z * width + x + 1),
+      down = fixed.get((z + 1) * width + x)
     if (x + 1 < width && right && byId.get(right)?.connectors.w !== c.connectors.e) return false
     if (z + 1 < height && down && byId.get(down)?.connectors.n !== c.connectors.s) return false
     return true
@@ -279,12 +437,17 @@ export function generateChunkGrid(options: { library: ChunkDef[]; width: number;
   const solve = (cell: number): boolean => {
     if (cell === width * height) return true
     if (++steps > 200000) return false
-    const x = cell % width, z = Math.floor(cell / width)
+    const x = cell % width,
+      z = Math.floor(cell / width)
     const pinned = fixed.get(cell)
-    let candidates = pinned ? [byId.get(pinned)!].filter(Boolean) : library.filter((c) => fits(c, x, z))
+    let candidates = pinned
+      ? [byId.get(pinned)!].filter(Boolean)
+      : library.filter(c => fits(c, x, z))
     if (pinned && candidates.length && !fits(candidates[0], x, z)) candidates = []
     // Weighted shuffle.
-    const order = candidates.map((c) => ({ c, k: Math.pow(random(), 1 / Math.max(.001, c.weight ?? 1)) })).sort((a, b) => b.k - a.k)
+    const order = candidates
+      .map(c => ({ c, k: Math.pow(random(), 1 / Math.max(0.001, c.weight ?? 1)) }))
+      .sort((a, b) => b.k - a.k)
     for (const { c } of order) {
       grid[cell] = c
       if (solve(cell + 1)) return true

@@ -12,10 +12,12 @@ const paths: Record<string, string> = {
   fire: '<path d="M12 2c4 7-2 6 2 10 2-1 3-3 3-5 7 9 2 14-4 14-8 0-10-8-5-13 0 3 1 4 2 4 2-3-2-5 2-10Z"/>',
   bridge: '<path d="M2 10h20M2 14h20M4 6v13M20 6v13M8 10v4M12 10v4M16 10v4M4 7c5 4 11 4 16 0"/>',
   ruin: '<path d="M3 21V8h5V3h5v5h7v13M8 21v-7h7v7M3 12h5M13 8v3h7M8 3v5"/>',
-  cylinder: '<ellipse cx="12" cy="5" rx="8" ry="3"/><path d="M4 5v14c0 4 16 4 16 0V5"/><path d="M4 18c0 4 16 4 16 0"/>',
+  cylinder:
+    '<ellipse cx="12" cy="5" rx="8" ry="3"/><path d="M4 5v14c0 4 16 4 16 0V5"/><path d="M4 18c0 4 16 4 16 0"/>',
   spark: '<path d="m12 2 3 7 7 3-7 3-3 7-3-7-7-3 7-3z"/>',
   terrain: '<path d="m2 20 7-15 5 8 3-5 5 12zM6 12l3 2 3-4"/>',
-  water: '<path d="M2 7c4-5 5 5 10 0s6 4 10 0M2 13c4-5 5 5 10 0s6 4 10 0M2 19c4-5 5 5 10 0s6 4 10 0"/>',
+  water:
+    '<path d="M2 7c4-5 5 5 10 0s6 4 10 0M2 13c4-5 5 5 10 0s6 4 10 0M2 19c4-5 5 5 10 0s6 4 10 0"/>',
   folder: '<path d="M2 5h8l2 3h10v12H2z"/>',
   import: '<path d="M12 2v13m-5-5 5 5 5-5M4 15v6h16v-6"/>',
   grid: '<path d="M3 3h18v18H3zM3 9h18M3 15h18M9 3v18M15 3v18"/>',
@@ -26,11 +28,28 @@ const paths: Record<string, string> = {
   pause: '<path d="M7 4v16M17 4v16"/>',
   plus: '<path d="M12 4v16M4 12h16"/>',
 }
-export function icon(name: string) { return `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${paths[name] ?? paths.cube}</svg>` }
+export function icon(name: string) {
+  return `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${paths[name] ?? paths.cube}</svg>`
+}
 export function assetInfo(key: string) {
   if (key.startsWith('asset-')) return { category: 'Imported', icon: 'cube', color: '#a899dd' }
   if (key.startsWith('fx:')) return { category: 'Effects', icon: 'spark', color: '#d5ad62' }
-  if (['bloco', 'cilindro', 'esfera'].includes(key)) return { category: 'Shapes', icon: key === 'cilindro' ? 'cylinder' : key === 'esfera' ? 'rock' : 'cube', color: '#89accc' }
-  if (['arvore', 'pedregulho', 'tronco-caido', 'pedras-em-pe'].includes(key)) return { category: 'Nature', icon: key === 'arvore' ? 'tree' : key === 'tronco-caido' ? 'cylinder' : 'rock', color: key === 'arvore' ? '#8bb68d' : '#a6b1a0' }
-  return { category: 'Buildings', icon: key === 'ponte' ? 'bridge' : key === 'ruina' ? 'ruin' : key === 'fogueira' ? 'fire' : 'cube', color: '#c9aa81' }
+  if (['bloco', 'cilindro', 'esfera'].includes(key))
+    return {
+      category: 'Shapes',
+      icon: key === 'cilindro' ? 'cylinder' : key === 'esfera' ? 'rock' : 'cube',
+      color: '#89accc',
+    }
+  if (['arvore', 'pedregulho', 'tronco-caido', 'pedras-em-pe'].includes(key))
+    return {
+      category: 'Nature',
+      icon: key === 'arvore' ? 'tree' : key === 'tronco-caido' ? 'cylinder' : 'rock',
+      color: key === 'arvore' ? '#8bb68d' : '#a6b1a0',
+    }
+  return {
+    category: 'Buildings',
+    icon:
+      key === 'ponte' ? 'bridge' : key === 'ruina' ? 'ruin' : key === 'fogueira' ? 'fire' : 'cube',
+    color: '#c9aa81',
+  }
 }

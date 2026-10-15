@@ -16,21 +16,14 @@ export {
   tagSurface,
   type SurfaceKind,
 } from '../surface'
-export {
-  createAsciiPass,
-  type AsciiPassHook,
-} from '../ascii'
+export { createAsciiPass, type AsciiPassHook } from '../ascii'
 export {
   createIllumination,
   illuminationGLSL,
   illuminationUniforms,
   type IlluminationOptions,
 } from '../illumination'
-export {
-  createExploration,
-  type LightObstacle,
-  type LightSource,
-} from '../exploration'
+export { createExploration, type LightObstacle, type LightSource } from '../exploration'
 export {
   surfaceMaterial,
   surfaceAtlas,
@@ -56,14 +49,8 @@ export {
   type CarpetLook,
   type GroundCover,
 } from './carpet'
-export {
-  createGlyphCloud,
-  PARTICLE_GLYPHS,
-  type GlyphCloud,
-} from './particle'
-export {
-  markScreen,
-} from './screen'
+export { createGlyphCloud, PARTICLE_GLYPHS, type GlyphCloud } from './particle'
+export { markScreen } from './screen'
 export {
   createWater,
   createWaterReflection,

@@ -10,7 +10,8 @@ const run = (command, args, env = process.env) =>
 
 run(process.execPath, ['scripts/preview-readme.mjs', '--github-pages', '--generate-only'])
 run('pnpm', ['--filter', '@ascii-engine/editor', 'build'], {
-  ...process.env, VITE_PUBLIC_DEMO: 'true',
+  ...process.env,
+  VITE_PUBLIC_DEMO: 'true',
 })
 
 // Replace only this script's generated artifact, so obsolete hashed bundles do not accumulate.

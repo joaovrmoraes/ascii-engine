@@ -8,7 +8,8 @@ describe('consumer-supplied renderer settings', () => {
   })
 
   it('does not share nested settings between engines', () => {
-    const first = engineStyle(), second = engineStyle()
+    const first = engineStyle(),
+      second = engineStyle()
     first.moon.position[0] = 99
     first.types.custom = { style: { glyph: 'body' } }
     expect(second.moon.position).toEqual(DEFAULT_ASCII_STYLE.moon.position)
@@ -16,10 +17,10 @@ describe('consumer-supplied renderer settings', () => {
   })
 
   it('owns a copy of the supplied type library', () => {
-    const source = { custom: { style: { glyph: 'body' as const, size: .2 } } }
+    const source = { custom: { style: { glyph: 'body' as const, size: 0.2 } } }
     const settings = engineStyle({ types: source, background: 0x123456 })
-    settings.types.custom.style!.size = .4
-    expect(source.custom.style.size).toBe(.2)
+    settings.types.custom.style!.size = 0.4
+    expect(source.custom.style.size).toBe(0.2)
     expect(settings.background).toBe(0x123456)
   })
 })

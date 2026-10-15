@@ -15,16 +15,34 @@ import type { SurfaceKind } from '../surface'
  * from their names and geometry (never from colour).
  */
 const KINDS: GlyphKind[] = ['screen', 'surface', 'body', 'carpet', 'particle', 'water']
-const SURFACES: SurfaceKind[] = ['reflection', 'snow', 'bark', 'wetgrass', 'wood', 'actor', 'stone', 'foliage', 'water', 'earth', 'glyph']
+const SURFACES: SurfaceKind[] = [
+  'reflection',
+  'snow',
+  'bark',
+  'wetgrass',
+  'wood',
+  'actor',
+  'stone',
+  'foliage',
+  'water',
+  'earth',
+  'glyph',
+]
 
 /** Folds Blender-style properties into `userData.glyph` / `userData.glyphStyle`. */
 export function normalizeGlyphData(userData: Record<string, unknown>) {
   let style: GlyphStyle = {}
   const raw = userData.glyphStyle ?? userData.glyph_style
-  if (typeof raw === 'string') { try { style = JSON.parse(raw) as GlyphStyle } catch { /* keep empty */ } }
-  else if (raw && typeof raw === 'object') style = { ...(raw as GlyphStyle) }
+  if (typeof raw === 'string') {
+    try {
+      style = JSON.parse(raw) as GlyphStyle
+    } catch {
+      /* keep empty */
+    }
+  } else if (raw && typeof raw === 'object') style = { ...(raw as GlyphStyle) }
   const surface = userData.glyph_surface ?? userData.glyphSurface
-  if (typeof surface === 'string' && SURFACES.includes(surface as SurfaceKind)) style.surface = surface as SurfaceKind
+  if (typeof surface === 'string' && SURFACES.includes(surface as SurfaceKind))
+    style.surface = surface as SurfaceKind
   const size = Number(userData.glyph_size ?? userData.glyphSize)
   if (Number.isFinite(size) && size > 0) style.size = size
   const glyph = typeof userData.glyph === 'string' ? userData.glyph.toLowerCase() : undefined
@@ -36,7 +54,10 @@ export function normalizeGlyphData(userData: Record<string, unknown>) {
 }
 
 const WORDS: [RegExp, SurfaceKind][] = [
-  [/leaf|leaves|foliage|crown|copa|folha|bush|arbusto|moss|musgo|grass|grama|reed|junco/i, 'foliage'],
+  [
+    /leaf|leaves|foliage|crown|copa|folha|bush|arbusto|moss|musgo|grass|grama|reed|junco/i,
+    'foliage',
+  ],
   [/bark|trunk|tronco|branch|galho|casca/i, 'bark'],
   [/wood|plank|tabua|tábua|madeira|crate|caixa|fence|cerca|bridge|ponte|beam|viga/i, 'wood'],
   [/rock|stone|pedra|rocha|boulder|wall|muro|brick|tijolo|crystal|cristal/i, 'stone'],
@@ -50,12 +71,21 @@ const WORDS: [RegExp, SurfaceKind][] = [
  * letter family comes from node/material names.
  */
 export function defaultGlyphStyle(mesh: THREE.Mesh): GlyphStyle {
-  const names = [mesh.name, mesh.parent?.name ?? '', ...[mesh.material].flat().map((m) => m.name)].join(' ')
+  const names = [
+    mesh.name,
+    mesh.parent?.name ?? '',
+    ...[mesh.material].flat().map(m => m.name),
+  ].join(' ')
   const surface = WORDS.find(([pattern]) => pattern.test(names))?.[1]
-  if (mesh instanceof THREE.SkinnedMesh) return { glyph: 'body', surface: surface ?? 'actor', size: .155 }
+  if (mesh instanceof THREE.SkinnedMesh)
+    return { glyph: 'body', surface: surface ?? 'actor', size: 0.155 }
   const g = mesh.geometry
-  const faceted = g instanceof THREE.DodecahedronGeometry || g instanceof THREE.IcosahedronGeometry || g instanceof THREE.OctahedronGeometry
-  if (surface === 'foliage' || surface === 'snow' || faceted) return { glyph: 'body', surface: surface ?? 'stone', size: .19 }
+  const faceted =
+    g instanceof THREE.DodecahedronGeometry ||
+    g instanceof THREE.IcosahedronGeometry ||
+    g instanceof THREE.OctahedronGeometry
+  if (surface === 'foliage' || surface === 'snow' || faceted)
+    return { glyph: 'body', surface: surface ?? 'stone', size: 0.19 }
   return { glyph: 'surface', surface }
 }
 
@@ -68,7 +98,10 @@ export function applyDefaultGlyphs(root: THREE.Object3D) {
       const style = defaultGlyphStyle(node)
       node.userData.glyph = style.glyph
       const { glyph: _glyph, ...rest } = style
-      node.userData.glyphStyle = { ...rest, ...(node.userData.glyphStyle as GlyphStyle | undefined) }
+      node.userData.glyphStyle = {
+        ...rest,
+        ...(node.userData.glyphStyle as GlyphStyle | undefined),
+      }
       node.userData.glyphDefault = true
     }
     for (const child of node.children) visit(child, marked)
@@ -88,19 +121,32 @@ export interface GlyphModel {
 }
 
 /** Wraps a loaded GLTF scene: defaults, parts and an animation mixer playing every clip. */
-export function prepareGlyphModel(scene: THREE.Group, animations: THREE.AnimationClip[] = []): GlyphModel {
+export function prepareGlyphModel(
+  scene: THREE.Group,
+  animations: THREE.AnimationClip[] = [],
+): GlyphModel {
   applyDefaultGlyphs(scene)
-  scene.traverse((node) => { if (node instanceof THREE.Mesh) { node.castShadow = true; node.receiveShadow = true } })
+  scene.traverse(node => {
+    if (node instanceof THREE.Mesh) {
+      node.castShadow = true
+      node.receiveShadow = true
+    }
+  })
   const parts: string[] = []
-  scene.traverse((node) => { if (node !== scene && node.name && !(node instanceof THREE.Bone)) parts.push(node.name) })
+  scene.traverse(node => {
+    if (node !== scene && node.name && !(node instanceof THREE.Bone)) parts.push(node.name)
+  })
   const mixer = new THREE.AnimationMixer(scene)
   for (const clip of animations) mixer.clipAction(clip).play()
-  return { scene, animations, mixer, parts, update: (dt) => mixer.update(dt) }
+  return { scene, animations, mixer, parts, update: dt => mixer.update(dt) }
 }
 
 /** Loads a .gltf/.glb from a URL or an ArrayBuffer. */
 export async function loadGlyphModel(source: string | ArrayBuffer): Promise<GlyphModel> {
   const loader = new GLTFLoader()
-  const gltf = typeof source === 'string' ? await loader.loadAsync(source) : await loader.parseAsync(source, '')
+  const gltf =
+    typeof source === 'string'
+      ? await loader.loadAsync(source)
+      : await loader.parseAsync(source, '')
   return prepareGlyphModel(gltf.scene, gltf.animations)
 }

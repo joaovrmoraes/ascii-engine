@@ -23,7 +23,8 @@ function imports(path) {
   const sources = []
   function visit(node) {
     if (ts.isImportDeclaration(node) || ts.isExportDeclaration(node)) {
-      if (node.moduleSpecifier && ts.isStringLiteral(node.moduleSpecifier)) sources.push(node.moduleSpecifier.text)
+      if (node.moduleSpecifier && ts.isStringLiteral(node.moduleSpecifier))
+        sources.push(node.moduleSpecifier.text)
     } else if (ts.isCallExpression(node) && node.expression.kind === ts.SyntaxKind.ImportKeyword) {
       if (ts.isStringLiteral(node.arguments[0])) sources.push(node.arguments[0].text)
       else failures.push(`Dynamic import must name its package contract: ${relative(root, path)}`)
@@ -42,29 +43,37 @@ function resolveSource(path, source) {
 }
 
 for (const name of packages) {
-  const directory = join(root, name), sources = files(join(directory, 'src'))
+  const directory = join(root, name),
+    sources = files(join(directory, 'src'))
   const config = join(directory, 'vite.config.ts')
   if (existsSync(config)) sources.push(config)
-  for (const path of sources) for (const source of imports(path)) {
-    if (source.startsWith('@ascii-engine/')) {
-      const dependency = source.split('/')[1]
-      const allowed = name === 'packages/engine' ? []
-        : name === 'packages/authoring' ? ['core']
-          : name === 'apps/automation' ? ['authoring']
-            : path === config ? ['core', 'authoring', 'automation'] : ['core', 'authoring']
-      if (!allowed.includes(dependency)) {
-        failures.push(`${relative(root, path)} imports an upstream application: ${source}`)
+  for (const path of sources)
+    for (const source of imports(path)) {
+      if (source.startsWith('@ascii-engine/')) {
+        const dependency = source.split('/')[1]
+        const allowed =
+          name === 'packages/engine'
+            ? []
+            : name === 'packages/authoring'
+              ? ['core']
+              : name === 'apps/automation'
+                ? ['authoring']
+                : path === config
+                  ? ['core', 'authoring', 'automation']
+                  : ['core', 'authoring']
+        if (!allowed.includes(dependency)) {
+          failures.push(`${relative(root, path)} imports an upstream application: ${source}`)
+        }
+        if (name === 'packages/authoring' && /\/core\/(pomorog|presets)/.test(source)) {
+          failures.push(`Document commands depend on an optional content library: ${source}`)
+        }
       }
-      if (name === 'packages/authoring' && /\/core\/(pomorog|presets)/.test(source)) {
-        failures.push(`Document commands depend on an optional content library: ${source}`)
+      if (!source.startsWith('.')) continue
+      const target = resolve(dirname(path), source)
+      if (!target.startsWith(directory + sep)) {
+        failures.push(`${relative(root, path)} imports another package's source: ${source}`)
       }
     }
-    if (!source.startsWith('.')) continue
-    const target = resolve(dirname(path), source)
-    if (!target.startsWith(directory + sep)) {
-      failures.push(`${relative(root, path)} imports another package's source: ${source}`)
-    }
-  }
 }
 
 const visited = new Set()
@@ -80,7 +89,8 @@ function visit(path) {
     if (source.startsWith('.')) {
       const next = resolveSource(path, source)
       if (!next) failures.push(`Unresolved core module: ${name} → ${source}`)
-      else if (!next.startsWith(engine + sep)) failures.push(`Core reaches outside its package: ${name}`)
+      else if (!next.startsWith(engine + sep))
+        failures.push(`Core reaches outside its package: ${name}`)
       else visit(next)
     } else if (source !== 'three' && !source.startsWith('three/')) {
       failures.push(`Core imports external adapter: ${name} → ${source}`)
@@ -93,12 +103,15 @@ for (const entry of ['.', './techniques', './world', './fx']) {
   visit(resolve(root, 'packages/engine', exports[entry]))
 }
 for (const entry of ['./presets', './pomorog']) {
-  if (!existsSync(resolve(root, 'packages/engine', exports[entry]))) failures.push(`Missing public entry: ${entry}`)
+  if (!existsSync(resolve(root, 'packages/engine', exports[entry])))
+    failures.push(`Missing public entry: ${entry}`)
 }
 
 if (failures.length) {
   failures.forEach(failure => console.error(failure))
   process.exitCode = 1
 } else {
-  console.log(`PASS package imports use public contracts; ${visited.size} generic core modules contain no optional preset or application dependency.`)
+  console.log(
+    `PASS package imports use public contracts; ${visited.size} generic core modules contain no optional preset or application dependency.`,
+  )
 }

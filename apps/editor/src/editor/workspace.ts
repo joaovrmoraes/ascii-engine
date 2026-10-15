@@ -4,7 +4,8 @@ import { createPanelLayout } from './layout'
 /** Docked editor shell. All controls are wired by the scene controller/main. */
 export function createWorkspace() {
   document.body.classList.add('authoring')
-  const root = document.createElement('div'); root.id = 'editor-workspace'
+  const root = document.createElement('div')
+  root.id = 'editor-workspace'
   root.innerHTML = `
     <header id="studio-toolbar" hidden><button data-k="close-studio">← Back to scene</button><strong>Studio</strong><nav aria-label="Studio workspace"><button data-studio-page="effects">Effects</button><button data-studio-page="atmosphere">Atmosphere</button><button data-studio-page="textures">Textures</button></nav><span data-studio-mode>Isolated preview · map paused</span></header>
     <header id="authoring-toolbar">
@@ -74,44 +75,108 @@ export function createWorkspace() {
   document.body.append(root)
   root.querySelector('[data-mount="panel"]')!.append(document.getElementById('panel')!)
   root.querySelector('[data-mount="selection"]')!.append(document.getElementById('selection')!)
-  const get = <T extends HTMLElement = HTMLElement>(selector: string) => root.querySelector<T>(selector)!
-  const sidebar = get('#authoring-sidebar'), hierarchy = get('#hierarchy'), toolbar = get('#authoring-toolbar')
+  const get = <T extends HTMLElement = HTMLElement>(selector: string) =>
+    root.querySelector<T>(selector)!
+  const sidebar = get('#authoring-sidebar'),
+    hierarchy = get('#hierarchy'),
+    toolbar = get('#authoring-toolbar')
   let pane = 'object'
   const selectPane = (next: string) => {
     pane = next
-    sidebar.querySelectorAll<HTMLElement>('[data-pane]').forEach(el => { el.hidden = el.dataset.pane !== next })
-    sidebar.querySelectorAll<HTMLButtonElement>('[data-tab]').forEach(el => { const active = el.dataset.tab === next; el.classList.toggle('active', active); el.setAttribute('aria-pressed', String(active)) })
+    sidebar.querySelectorAll<HTMLElement>('[data-pane]').forEach(el => {
+      el.hidden = el.dataset.pane !== next
+    })
+    sidebar.querySelectorAll<HTMLButtonElement>('[data-tab]').forEach(el => {
+      const active = el.dataset.tab === next
+      el.classList.toggle('active', active)
+      el.setAttribute('aria-pressed', String(active))
+    })
   }
-  sidebar.querySelectorAll<HTMLButtonElement>('[data-tab]').forEach(el => { el.onclick = () => selectPane(el.dataset.tab!) })
+  sidebar.querySelectorAll<HTMLButtonElement>('[data-tab]').forEach(el => {
+    el.onclick = () => selectPane(el.dataset.tab!)
+  })
   get('[data-k="view"]').onclick = () => selectPane(pane === 'view' ? 'object' : 'view')
   let studioPane: 'effects' | 'atmosphere' | 'textures' = 'effects'
   function showProject(tab: 'assets' | 'effects' | 'studio') {
-    if (tab === 'effects') { studioPane = 'effects'; tab = 'studio' }
+    if (tab === 'effects') {
+      studioPane = 'effects'
+      tab = 'studio'
+    }
     document.body.classList.toggle('studio-mode', tab === 'studio')
     get('#studio-toolbar').hidden = tab !== 'studio'
-    get('[data-studio-mode]').textContent = studioPane === 'atmosphere' ? 'Editing the live map' : 'Isolated preview · map paused'
+    get('[data-studio-mode]').textContent =
+      studioPane === 'atmosphere' ? 'Editing the live map' : 'Isolated preview · map paused'
     get('#asset-browser .asset-body').hidden = tab !== 'assets'
     get('#studio-workspace').hidden = tab !== 'studio'
     get('#effect-editor').hidden = tab !== 'studio' || studioPane !== 'effects'
     get('#atmosphere-studio').hidden = tab !== 'studio' || studioPane !== 'atmosphere'
     get('#texture-studio').hidden = tab !== 'studio' || studioPane !== 'textures'
     get('.asset-actions').hidden = tab !== 'assets'
-    root.querySelectorAll<HTMLButtonElement>('[data-project-tab]').forEach(button => { button.classList.toggle('active', button.dataset.projectTab === tab); button.setAttribute('aria-pressed', String(button.dataset.projectTab === tab)) })
-    root.querySelectorAll<HTMLButtonElement>('[data-studio-tab], [data-studio-page]').forEach(button => { const active = (button.dataset.studioTab ?? button.dataset.studioPage) === studioPane; button.classList.toggle('active', active); button.setAttribute('aria-pressed', String(active)) })
-    root.dispatchEvent(new CustomEvent('project-tab', { detail: tab === 'studio' ? studioPane : tab }))
+    root.querySelectorAll<HTMLButtonElement>('[data-project-tab]').forEach(button => {
+      button.classList.toggle('active', button.dataset.projectTab === tab)
+      button.setAttribute('aria-pressed', String(button.dataset.projectTab === tab))
+    })
+    root
+      .querySelectorAll<HTMLButtonElement>('[data-studio-tab], [data-studio-page]')
+      .forEach(button => {
+        const active = (button.dataset.studioTab ?? button.dataset.studioPage) === studioPane
+        button.classList.toggle('active', active)
+        button.setAttribute('aria-pressed', String(active))
+      })
+    root.dispatchEvent(
+      new CustomEvent('project-tab', { detail: tab === 'studio' ? studioPane : tab }),
+    )
   }
-  function showStudio(pane: typeof studioPane) { studioPane = pane; showProject('studio') }
-  root.querySelectorAll<HTMLButtonElement>('[data-project-tab]').forEach(button => { button.onclick = () => showProject(button.dataset.projectTab as 'assets' | 'studio') })
-  root.querySelectorAll<HTMLButtonElement>('[data-studio-tab], [data-studio-page]').forEach(button => { button.onclick = () => showStudio((button.dataset.studioTab ?? button.dataset.studioPage) as typeof studioPane) })
+  function showStudio(pane: typeof studioPane) {
+    studioPane = pane
+    showProject('studio')
+  }
+  root.querySelectorAll<HTMLButtonElement>('[data-project-tab]').forEach(button => {
+    button.onclick = () => showProject(button.dataset.projectTab as 'assets' | 'studio')
+  })
+  root
+    .querySelectorAll<HTMLButtonElement>('[data-studio-tab], [data-studio-page]')
+    .forEach(button => {
+      button.onclick = () =>
+        showStudio((button.dataset.studioTab ?? button.dataset.studioPage) as typeof studioPane)
+    })
   get('[data-k="close-studio"]').onclick = () => showProject('assets')
   const layout = createPanelLayout(root)
   get('[data-k="reset-layout"]').onclick = () => layout.reset()
-  root.querySelectorAll('.menu-items button, .menu-items label').forEach(el => el.addEventListener('click', () => root.querySelector('details')?.removeAttribute('open')))
-  selectPane('object'); showProject('assets')
+  root
+    .querySelectorAll('.menu-items button, .menu-items label')
+    .forEach(el =>
+      el.addEventListener('click', () => root.querySelector('details')?.removeAttribute('open')),
+    )
+  selectPane('object')
+  showProject('assets')
   return {
-    root, toolbar, hierarchy, sidebar, tools: get('#tools'), inspector: get('#object-inspector'), environment: get('#environment-settings'), assets: get('#asset-browser'), effectRoot: get('#effect-editor'), studioRoot: get('#atmosphere-studio'), textureRoot: get('#texture-studio'), get, selectPane, showProject, showStudio,
-    hint(text: string, cancel = false) { get('[data-k="instruction"]').textContent = text; get('[data-k="cancel"]').hidden = !cancel; get('#scene-hint').classList.toggle('placing', cancel) },
-    dispose() { layout.dispose(); document.body.append(document.getElementById('panel')!, document.getElementById('selection')!); root.remove(); document.body.classList.remove('authoring', 'previewing', 'studio-mode') },
+    root,
+    toolbar,
+    hierarchy,
+    sidebar,
+    tools: get('#tools'),
+    inspector: get('#object-inspector'),
+    environment: get('#environment-settings'),
+    assets: get('#asset-browser'),
+    effectRoot: get('#effect-editor'),
+    studioRoot: get('#atmosphere-studio'),
+    textureRoot: get('#texture-studio'),
+    get,
+    selectPane,
+    showProject,
+    showStudio,
+    hint(text: string, cancel = false) {
+      get('[data-k="instruction"]').textContent = text
+      get('[data-k="cancel"]').hidden = !cancel
+      get('#scene-hint').classList.toggle('placing', cancel)
+    },
+    dispose() {
+      layout.dispose()
+      document.body.append(document.getElementById('panel')!, document.getElementById('selection')!)
+      root.remove()
+      document.body.classList.remove('authoring', 'previewing', 'studio-mode')
+    },
   }
 }
 export type Workspace = ReturnType<typeof createWorkspace>

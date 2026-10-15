@@ -13,180 +13,604 @@ const output = process.argv[2] ?? '/tmp/ascii-api-verification'
 await mkdir(output, { recursive: true })
 const profile = await mkdtemp(join(tmpdir(), 'ascii-authoring-'))
 const port = 9800 + Math.floor(Math.random() * 100)
-const chrome = spawn('chromium', ['--headless=new', '--no-sandbox', '--use-angle=gl', '--enable-gpu', '--ignore-gpu-blocklist', '--hide-scrollbars', '--window-size=1600,1000', `--remote-debugging-port=${port}`, `--user-data-dir=${profile}`, 'about:blank'], { stdio: 'ignore' })
+const chrome = spawn(
+  'chromium',
+  [
+    '--headless=new',
+    '--no-sandbox',
+    '--use-angle=gl',
+    '--enable-gpu',
+    '--ignore-gpu-blocklist',
+    '--hide-scrollbars',
+    '--window-size=1600,1000',
+    `--remote-debugging-port=${port}`,
+    `--user-data-dir=${profile}`,
+    'about:blank',
+  ],
+  { stdio: 'ignore' },
+)
 const sleep = ms => new Promise(resolve => setTimeout(resolve, ms))
 let socket
 try {
   let targets
-  for (let i = 0; i < 100 && !targets; i++) { try { targets = await (await fetch(`http://127.0.0.1:${port}/json`)).json() } catch { await sleep(100) } }
+  for (let i = 0; i < 100 && !targets; i++) {
+    try {
+      targets = await (await fetch(`http://127.0.0.1:${port}/json`)).json()
+    } catch {
+      await sleep(100)
+    }
+  }
   socket = new WebSocket(targets.find(t => t.type === 'page').webSocketDebuggerUrl)
-  await new Promise(resolve => { socket.onopen = resolve })
+  await new Promise(resolve => {
+    socket.onopen = resolve
+  })
   let id = 0
-  const pending = new Map(), errors = []; let interceptedDrag
+  const pending = new Map(),
+    errors = []
+  let interceptedDrag
   socket.onmessage = event => {
     const data = JSON.parse(event.data)
     if (data.method === 'Input.dragIntercepted') interceptedDrag = data.params.data
-    if (data.method === 'Runtime.exceptionThrown') errors.push(data.params.exceptionDetails.text + ': ' + data.params.exceptionDetails.exception?.description)
+    if (data.method === 'Runtime.exceptionThrown')
+      errors.push(
+        data.params.exceptionDetails.text +
+          ': ' +
+          data.params.exceptionDetails.exception?.description,
+      )
     const request = pending.get(data.id)
-    if (request) { clearTimeout(request.timer); pending.delete(data.id); data.error ? request.reject(new Error(data.error.message)) : request.resolve(data.result) }
+    if (request) {
+      clearTimeout(request.timer)
+      pending.delete(data.id)
+      data.error ? request.reject(new Error(data.error.message)) : request.resolve(data.result)
+    }
   }
-  const send = (method, params = {}) => new Promise((resolve, reject) => {
-    const key = ++id, timer = setTimeout(() => { pending.delete(key); reject(new Error(`Timeout: ${method}`)) }, 45000)
-    pending.set(key, { resolve, reject, timer }); socket.send(JSON.stringify({ id: key, method, params }))
-  })
+  const send = (method, params = {}) =>
+    new Promise((resolve, reject) => {
+      const key = ++id,
+        timer = setTimeout(() => {
+          pending.delete(key)
+          reject(new Error(`Timeout: ${method}`))
+        }, 45000)
+      pending.set(key, { resolve, reject, timer })
+      socket.send(JSON.stringify({ id: key, method, params }))
+    })
   const evaluate = async expression => {
-    const response = await send('Runtime.evaluate', { expression, awaitPromise: true, returnByValue: true })
-    if (response.exceptionDetails) throw new Error(response.exceptionDetails.exception?.description ?? response.exceptionDetails.text)
+    const response = await send('Runtime.evaluate', {
+      expression,
+      awaitPromise: true,
+      returnByValue: true,
+    })
+    if (response.exceptionDetails)
+      throw new Error(
+        response.exceptionDetails.exception?.description ?? response.exceptionDetails.text,
+      )
     return response.result?.value
   }
-  const until = async expression => { for (let i = 0; i < 150; i++) { if (await evaluate(expression)) return; await sleep(100) }; throw new Error(`Timed out: ${expression}`) }
-  const action = async expression => { await evaluate(`(async () => { ${expression} })()`); await until('window.area && !area.state.includes("opening")'); await sleep(200) }
-  const check = async (title, expression) => { if (!await evaluate(expression)) throw new Error(`FAIL: ${title}`); console.log(`PASS ${title}`) }
-  const shot = async name => { await sleep(500); const result = await send('Page.captureScreenshot', { format: 'png' }); await writeFile(join(output, name + '.png'), Buffer.from(result.data, 'base64')) }
-  await send('Runtime.enable'); await send('Page.enable'); await send('Emulation.setFocusEmulationEnabled', { enabled: true })
+  const until = async expression => {
+    for (let i = 0; i < 150; i++) {
+      if (await evaluate(expression)) return
+      await sleep(100)
+    }
+    throw new Error(`Timed out: ${expression}`)
+  }
+  const action = async expression => {
+    await evaluate(`(async () => { ${expression} })()`)
+    await until('window.area && !area.state.includes("opening")')
+    await sleep(200)
+  }
+  const check = async (title, expression) => {
+    if (!(await evaluate(expression))) throw new Error(`FAIL: ${title}`)
+    console.log(`PASS ${title}`)
+  }
+  const shot = async name => {
+    await sleep(500)
+    const result = await send('Page.captureScreenshot', { format: 'png' })
+    await writeFile(join(output, name + '.png'), Buffer.from(result.data, 'base64'))
+  }
+  await send('Runtime.enable')
+  await send('Page.enable')
+  await send('Emulation.setFocusEmulationEnabled', { enabled: true })
   await send('Browser.setDownloadBehavior', { behavior: 'allow', downloadPath: output })
   await send('Page.navigate', { url: 'http://localhost:1440/?area=sandbox' })
   await until('!!window.area && !!document.querySelector("canvas[data-ready]")')
   await until('!!window.asciiEngineApi')
   const sessionId = await evaluate('asciiEngineApi.sessionId')
-  client = new Client({name:'ascii-integration-test',version:'1.0.0'})
-  await client.connect(new StdioClientTransport({command:process.execPath,args:[join(root,'apps/automation/node_modules/tsx/dist/cli.mjs'),join(root,'apps/automation/src/mcp.ts')],cwd:root,stderr:'pipe'}))
-  const invoke=async(name,args={},expectError=false)=>{
-    const result=await client.callTool({name,arguments:{sessionId,...args}})
-    if (expectError) { if(!result.isError) throw new Error('Expected error: '+name); return JSON.parse(result.content[0].text) }
-    if(result.isError) throw new Error(name+': '+result.content[0].text)
-    return result.content[0].type==='image'?result:JSON.parse(result.content[0].text)
+  client = new Client({ name: 'ascii-integration-test', version: '1.0.0' })
+  await client.connect(
+    new StdioClientTransport({
+      command: process.execPath,
+      args: [
+        join(root, 'apps/automation/node_modules/tsx/dist/cli.mjs'),
+        join(root, 'apps/automation/src/mcp.ts'),
+      ],
+      cwd: root,
+      stderr: 'pipe',
+    }),
+  )
+  const invoke = async (name, args = {}, expectError = false) => {
+    const result = await client.callTool({ name, arguments: { sessionId, ...args } })
+    if (expectError) {
+      if (!result.isError) throw new Error('Expected error: ' + name)
+      return JSON.parse(result.content[0].text)
+    }
+    if (result.isError) throw new Error(name + ': ' + result.content[0].text)
+    return result.content[0].type === 'image' ? result : JSON.parse(result.content[0].text)
   }
-  const assert=(condition,title)=>{if(!condition)throw new Error('FAIL '+title);console.log('PASS '+title)}
-  const tools=await client.listTools()
-  assert(tools.tools.length===16,'official MCP handshake and all 16 tools discoverable')
-  const sessions=await invoke('engine_sessions')
-  assert(sessions.some(s=>s.sessionId===sessionId),'isolated browser registered, session selected explicitly')
-  const catalog=await invoke('engine_reference',{topic:'catalog'})
-  assert(catalog.some(p=>p.id==='pedregulho')&&catalog.some(p=>p.id==='fogueira'),'MCP discovers actual editor prefab library')
-  const schema=await invoke('engine_reference',{topic:'commands'})
-  assert(!!schema.commands.items,'machine-readable command schema')
-  const water=await invoke('engine_reference',{topic:'water'})
-  const waterDefaults=await evaluate('core.DEFAULT_WATER_LOOK')
-  assert(JSON.stringify(water.defaults)===JSON.stringify(waterDefaults),'MCP water reference exposes generic rendering defaults')
-  let state=await invoke('scene_read',{full:true})
-  const initial=state.document
-  const commands=[
-    {op:'scene.replace',document:{version:1,name:'MCP-authored clearing',objects:[]}},
-    {op:'terrain.create',size:24,resolution:65},
-    {op:'terrain.layer',index:0,patch:{look:{alphabet:'XZ',size:.23},cover:{alphabet:'v*',height:.35,color:0x55aa88}}},
-    {op:'terrain.stroke',strokes:[{brush:'raise',x:1,z:-2,radius:5,strength:2},{brush:'paint',x:-3,z:0,radius:2,strength:1,layer:1}]},
-    {op:'scene.patch',patch:{carpet:{count:35000,seed:48}}},
-    {op:'water.paint',points:[{x:1,z:-2},{x:0,z:0},{x:-3,z:2}],radius:1,mode:'terrain'},
-    {op:'water.update',index:0,patch:{name:'MCP creek',visible:true,look:{alphabet:'~=',foamAlphabet:'*+',reflectionAlphabet:'A#',shallow:[.1,.3,.4],deep:[.02,.05,.12],rings:{enabled:true,alphabet:'|_-',size:1.4,lifetime:1},reflection:{strength:.6}}}},
-    {op:'object.add',object:{id:'fire',prefab:'fogueira',position:[-3,0,-1]}},
-    {op:'object.add',object:{id:'rock',prefab:'pedregulho',position:[0,1.2,-3]}},
-    {op:'scene.patch',patch:{style:{types:{pedregulho:{style:{size:.21},authored:{style:['size']}}}}}},
-    {op:'texture.define',id:'mcp-symbols',name:'MCP arrow ink',style:{alphabet:' ↑↗→↘↓↙←↖',font:'"DejaVu Sans", sans-serif',fontWeight:700,open:true,spacing:1.2,palette:[0x55aaff,0xaaffdd],lighting:'scene',rotation:.15},previewLighting:{brightness:1.1,background:0x080a10}},
-    {op:'texture.apply',id:'mcp-symbols',objectId:'rock'},
-    {op:'object.scatter',prefab:'arvore',count:8,seed:123,bounds:{minX:4,maxX:8,minZ:-6,maxZ:2},scale:[.7,1.1]},
-    {op:'effect.define',id:'fx:custom-blue',effect:{name:'Blue sparks',duration:2,loop:true,emitters:[{rate:12,life:2,shape:{kind:'sphere',radius:.25},velocity:[0,.5,0],glyphs:'.+*',color:[.2,.6,1],size:.16,glow:2}],light:{color:0x3388ff,intensity:8,distance:7,offset:[0,.7,0]}}},
-    {op:'object.add',object:{id:'blue',prefab:'fx:custom-blue',position:[-2,0,3]}},
-    {op:'atmosphere.set',style:{moon:{intensity:1.9,color:0xaabbff},inkTint:[.85,.95,1],fog:{color:0x0a1020,density:.018}}},
-    {op:'atmosphere.define',id:'blue-night',name:'Blue night',style:{moon:{intensity:2.2}}},
-    {op:'atmosphere.apply',id:'blue-night'},
-    {op:'camera.define',id:'wide',camera:{name:'MCP wide shot',projection:'orthographic',position:[10,12,16],rotation:[-.6,.3,0],span:10,aspect:16/9}},
-    {op:'camera.activate',id:'wide'},
-    {op:'environment.set',weather:'rain',intensity:.2},
+  const assert = (condition, title) => {
+    if (!condition) throw new Error('FAIL ' + title)
+    console.log('PASS ' + title)
+  }
+  const tools = await client.listTools()
+  assert(tools.tools.length === 16, 'official MCP handshake and all 16 tools discoverable')
+  const sessions = await invoke('engine_sessions')
+  assert(
+    sessions.some(s => s.sessionId === sessionId),
+    'isolated browser registered, session selected explicitly',
+  )
+  const catalog = await invoke('engine_reference', { topic: 'catalog' })
+  assert(
+    catalog.some(p => p.id === 'pedregulho') && catalog.some(p => p.id === 'fogueira'),
+    'MCP discovers actual editor prefab library',
+  )
+  const schema = await invoke('engine_reference', { topic: 'commands' })
+  assert(!!schema.commands.items, 'machine-readable command schema')
+  const water = await invoke('engine_reference', { topic: 'water' })
+  const waterDefaults = await evaluate('core.DEFAULT_WATER_LOOK')
+  assert(
+    JSON.stringify(water.defaults) === JSON.stringify(waterDefaults),
+    'MCP water reference exposes generic rendering defaults',
+  )
+  let state = await invoke('scene_read', { full: true })
+  const initial = state.document
+  const commands = [
+    { op: 'scene.replace', document: { version: 1, name: 'MCP-authored clearing', objects: [] } },
+    { op: 'terrain.create', size: 24, resolution: 65 },
+    {
+      op: 'terrain.layer',
+      index: 0,
+      patch: {
+        look: { alphabet: 'XZ', size: 0.23 },
+        cover: { alphabet: 'v*', height: 0.35, color: 0x55aa88 },
+      },
+    },
+    {
+      op: 'terrain.stroke',
+      strokes: [
+        { brush: 'raise', x: 1, z: -2, radius: 5, strength: 2 },
+        { brush: 'paint', x: -3, z: 0, radius: 2, strength: 1, layer: 1 },
+      ],
+    },
+    { op: 'scene.patch', patch: { carpet: { count: 35000, seed: 48 } } },
+    {
+      op: 'water.paint',
+      points: [
+        { x: 1, z: -2 },
+        { x: 0, z: 0 },
+        { x: -3, z: 2 },
+      ],
+      radius: 1,
+      mode: 'terrain',
+    },
+    {
+      op: 'water.update',
+      index: 0,
+      patch: {
+        name: 'MCP creek',
+        visible: true,
+        look: {
+          alphabet: '~=',
+          foamAlphabet: '*+',
+          reflectionAlphabet: 'A#',
+          shallow: [0.1, 0.3, 0.4],
+          deep: [0.02, 0.05, 0.12],
+          rings: { enabled: true, alphabet: '|_-', size: 1.4, lifetime: 1 },
+          reflection: { strength: 0.6 },
+        },
+      },
+    },
+    { op: 'object.add', object: { id: 'fire', prefab: 'fogueira', position: [-3, 0, -1] } },
+    { op: 'object.add', object: { id: 'rock', prefab: 'pedregulho', position: [0, 1.2, -3] } },
+    {
+      op: 'scene.patch',
+      patch: {
+        style: { types: { pedregulho: { style: { size: 0.21 }, authored: { style: ['size'] } } } },
+      },
+    },
+    {
+      op: 'texture.define',
+      id: 'mcp-symbols',
+      name: 'MCP arrow ink',
+      style: {
+        alphabet: ' ↑↗→↘↓↙←↖',
+        font: '"DejaVu Sans", sans-serif',
+        fontWeight: 700,
+        open: true,
+        spacing: 1.2,
+        palette: [0x55aaff, 0xaaffdd],
+        lighting: 'scene',
+        rotation: 0.15,
+      },
+      previewLighting: { brightness: 1.1, background: 0x080a10 },
+    },
+    { op: 'texture.apply', id: 'mcp-symbols', objectId: 'rock' },
+    {
+      op: 'object.scatter',
+      prefab: 'arvore',
+      count: 8,
+      seed: 123,
+      bounds: { minX: 4, maxX: 8, minZ: -6, maxZ: 2 },
+      scale: [0.7, 1.1],
+    },
+    {
+      op: 'effect.define',
+      id: 'fx:custom-blue',
+      effect: {
+        name: 'Blue sparks',
+        duration: 2,
+        loop: true,
+        emitters: [
+          {
+            rate: 12,
+            life: 2,
+            shape: { kind: 'sphere', radius: 0.25 },
+            velocity: [0, 0.5, 0],
+            glyphs: '.+*',
+            color: [0.2, 0.6, 1],
+            size: 0.16,
+            glow: 2,
+          },
+        ],
+        light: { color: 0x3388ff, intensity: 8, distance: 7, offset: [0, 0.7, 0] },
+      },
+    },
+    { op: 'object.add', object: { id: 'blue', prefab: 'fx:custom-blue', position: [-2, 0, 3] } },
+    {
+      op: 'atmosphere.set',
+      style: {
+        moon: { intensity: 1.9, color: 0xaabbff },
+        inkTint: [0.85, 0.95, 1],
+        fog: { color: 0x0a1020, density: 0.018 },
+      },
+    },
+    {
+      op: 'atmosphere.define',
+      id: 'blue-night',
+      name: 'Blue night',
+      style: { moon: { intensity: 2.2 } },
+    },
+    { op: 'atmosphere.apply', id: 'blue-night' },
+    {
+      op: 'camera.define',
+      id: 'wide',
+      camera: {
+        name: 'MCP wide shot',
+        projection: 'orthographic',
+        position: [10, 12, 16],
+        rotation: [-0.6, 0.3, 0],
+        span: 10,
+        aspect: 16 / 9,
+      },
+    },
+    { op: 'camera.activate', id: 'wide' },
+    { op: 'environment.set', weather: 'rain', intensity: 0.2 },
   ]
-  assert((await invoke('scene_validate',{commands})).valid,'complete batch validates without mutation')
-  state=await invoke('scene_apply',{revision:state.revision,commands,preview:true})
-  assert(state.preview&&state.scene.objects.length===11,'MCP creates terrain, continuous slope water, objects, custom effect, atmosphere and weather')
-  await check('pending preview visibly locks editing and offers accept/cancel', 'document.querySelector("#editor-workspace").inert && !document.querySelector("#ai-preview").hidden')
-  await invoke('editor_view',{focus:[0,1,-1],zoom:.55,angle:0,elevation:.65,paused:false})
-  const impact=await invoke('water_disturb',{index:0,x:0,z:0,strength:.2,radius:.8});assert(impact.revision===state.revision,'MCP water impact is transient and preserves document revision')
+  assert(
+    (await invoke('scene_validate', { commands })).valid,
+    'complete batch validates without mutation',
+  )
+  state = await invoke('scene_apply', { revision: state.revision, commands, preview: true })
+  assert(
+    state.preview && state.scene.objects.length === 11,
+    'MCP creates terrain, continuous slope water, objects, custom effect, atmosphere and weather',
+  )
+  await check(
+    'pending preview visibly locks editing and offers accept/cancel',
+    'document.querySelector("#editor-workspace").inert && !document.querySelector("#ai-preview").hidden',
+  )
+  await invoke('editor_view', {
+    focus: [0, 1, -1],
+    zoom: 0.55,
+    angle: 0,
+    elevation: 0.65,
+    paused: false,
+  })
+  const impact = await invoke('water_disturb', { index: 0, x: 0, z: 0, strength: 0.2, radius: 0.8 })
+  assert(
+    impact.revision === state.revision,
+    'MCP water impact is transient and preserves document revision',
+  )
   await shot('mcp-previa')
-  await invoke('scene_apply',{revision:state.revision-1,commands:[{op:'scene.patch',patch:{name:'Stale'}}],preview:false},true)
-  assert((await invoke('scene_read')).scene.name==='MCP-authored clearing','stale revision rejected without overwriting scene')
-  const canceled=await invoke('scene_preview',{revision:state.revision,action:'cancel'})
-  assert(!canceled.preview,'preview cancel returns to saved scene')
-  assert(JSON.stringify((await invoke('scene_read',{full:true})).document)===JSON.stringify(initial),'cancel restores entire original document')
-  state=await invoke('scene_apply',{revision:canceled.revision,commands,preview:true})
-  state=await invoke('scene_preview',{revision:state.revision,action:'accept'})
-  const committed=(await invoke('scene_read',{full:true})).document
-  assert(committed.terrain.layers[0].name==='musgo'&&committed.terrain.layers[0].look.alphabet==='XZ'&&committed.terrain.layers[0].cover.height===.35&&committed.waters[0].look.rings.enabled,'actual MCP authors floor, standing letters and water looks with stable layer IDs')
-  const texture=committed.textures['mcp-symbols'],rock=committed.objects.find(object=>object.id==='rock')
-  assert(texture.style.alphabet.includes('↑')&&texture.style.fontWeight===700&&texture.style.open&&texture.style.palette.length===2&&rock.options.alphabet===texture.style.alphabet,'real MCP defines and applies Unicode, font, visibility and palette texture controls')
-  assert(texture.previewLighting.brightness===1.1&&committed.style.brightness!==1.1,'MCP saves texture preview lights without applying them to scene lighting')
-  state=await invoke('scene_history',{revision:state.revision,action:'undo'})
-  assert(JSON.stringify((await invoke('scene_read',{full:true})).document)===JSON.stringify(initial),'entire AI batch undoes in a single step')
-  state=await invoke('scene_history',{revision:state.revision,action:'redo'})
-  assert(JSON.stringify((await invoke('scene_read',{full:true})).document)===JSON.stringify(committed),'redo restores full authored scene')
-  const resources=await evaluate('JSON.stringify(engine.resources)')
-  await invoke('scene_apply',{revision:state.revision,preview:false,commands:[{op:'object.add',object:{prefab:'missing',position:[0,0,0]}}]},true)
-  await invoke('scene_apply',{revision:state.revision,preview:false,commands:[{op:'asset.define',id:'bad',name:'bad.glb',source:'data:model/gltf-binary;base64,YmFk'}]},true)
-  assert(JSON.stringify((await invoke('scene_read',{full:true})).document)===JSON.stringify(committed)&&await evaluate('JSON.stringify(engine.resources)')===resources,'unknown prefab and broken model preserve scene and GPU resources')
-  const buffer=new Float32Array([-.5,0,0,.5,0,0,0,1,0])
-  const model={asset:{version:'2.0'},scene:0,scenes:[{nodes:[0]}],nodes:[{name:'blade',mesh:0}],meshes:[{primitives:[{attributes:{POSITION:0}}]}],buffers:[{uri:'mesh.bin',byteLength:buffer.byteLength}],bufferViews:[{buffer:0,byteLength:buffer.byteLength}],accessors:[{bufferView:0,componentType:5126,count:3,type:'VEC3',min:[-.5,0,0],max:[.5,1,0]}]}
-  const gltf=join(output,'model.gltf'), bin=join(output,'mesh.bin')
-  await writeFile(gltf,JSON.stringify(model));await writeFile(bin,Buffer.from(buffer.buffer))
-  await invoke('assets_import',{revision:state.revision,paths:[gltf],preview:false},true)
-  state=await invoke('assets_import',{revision:state.revision,paths:[gltf,bin],preview:false})
-  const imported=state.scene.assets.find(a=>a.name==='model.gltf')
-  assert(!!imported,'MCP imports local GLTF with explicit companion bytes')
-  state=await invoke('scene_apply',{revision:state.revision,preview:false,commands:[{op:'object.add',object:{id:'imported',prefab:imported.id,position:[-4,0,3],options:{glyph:'surface',surface:'stone'}}},{op:'texture.apply',id:'mcp-symbols',objectId:'imported',part:'blade'}]})
-  const inspected=await invoke('object_inspect',{id:'imported'})
-  assert(inspected.parts.some(p=>p.name==='blade'),'MCP inspects imported mesh parts')
-  assert((await invoke('scene_read',{full:true})).document.objects.find(object=>object.id==='imported').options.parts.blade.alphabet===texture.style.alphabet,'MCP applies a reusable texture to an imported named part')
-  state=await invoke('scene_apply',{revision:state.revision,preview:false,commands:[
-    {op:'object.add',object:{id:'linked',prefab:'bloco',position:[3,0,3]}},
-    {op:'texture.apply',id:'mcp-symbols',objectId:'linked',link:true}]})
-  assert((await invoke('object_inspect',{id:'linked'})).options.texture==='mcp-symbols','actual MCP stores a linked texture without copying fields')
-  await invoke('scene_apply',{revision:state.revision,preview:false,commands:[{op:'resource.remove',kind:'textures',id:'mcp-symbols'}]},true)
-  state=await invoke('scene_apply',{revision:state.revision,preview:false,commands:[{op:'texture.detach',objectId:'linked'}]})
-  const detached=await invoke('object_inspect',{id:'linked'})
-  assert(!detached.options.texture&&detached.options.alphabet===texture.style.alphabet,'actual MCP detach preserves the appearance recipe')
-  const capture=await invoke('editor_capture')
-  await writeFile(join(output,'mcp-cena.png'),Buffer.from(capture.content[0].data,'base64'))
-  assert(capture.content[0].mimeType==='image/png'&&capture.content[0].data.length>10000,'MCP returns actual rendered scene as image content')
-  assert((await invoke('engine_reference',{topic:'catalog'})).some(asset=>asset.id==='blue-night'&&asset.kind==='atmosphere'),'MCP atmosphere appears in asset catalog')
-  await invoke('editor_view',{cameraId:'wide'})
-  assert((await invoke('object_inspect',{id:'wide'})).camera.name==='MCP wide shot','MCP inspects a saved camera')
-  const cameraCapture=await invoke('editor_capture')
-  await writeFile(join(output,'mcp-camera.png'),Buffer.from(cameraCapture.content[0].data,'base64'))
-  await check('MCP selects a saved composition camera', `document.querySelector('#app > canvas').dataset.cameraView==='MCP wide shot' && engine.camera.position.x===10`)
-  await invoke('editor_view',{cameraId:null})
-  await invoke('editor_view',{studio:'effects'})
-  const effectCapture=await invoke('editor_capture')
-  await writeFile(join(output,'mcp-efeito-void.png'),Buffer.from(effectCapture.content[0].data,'base64'))
-  assert(effectCapture.content[0].data.length>1000,'MCP captures the isolated effect stage')
-  await check('API stage switch isolates preview', 'document.body.classList.contains("effect-studio-active") && !document.querySelector("#effect-preview").hidden')
-  await invoke('editor_view',{studio:'scene'})
-  const exported=join(output,'mcp-cenario.pomorog.json')
-  await invoke('scene_export',{path:exported,overwrite:true})
-  const data=JSON.parse(await readFile(exported,'utf8'))
-  assert(data.textures['mcp-symbols'].style.fontWeight===700&&data.textures['mcp-symbols'].previewLighting.brightness===1.1&&data.objects.find(object=>object.id==='imported').options.parts.blade.open,'MCP export retains texture assets, studio lights and named-part appearances')
-  assert(data.activeCamera==='wide'&&data.cameras.wide.span===10&&data.atmospheres['blue-night'].style.moon.intensity===2.2&&data.effects['fx:custom-blue']&&data.assets[imported.id].source.startsWith('data:')&&data.waters[0].shape.mask.heights.length===65*65,'export embeds models, effects, atmosphere, terrain and slope water')
-  await invoke('scene_export',{path:exported},true)
-  assert(JSON.parse(await readFile(exported,'utf8')).name===data.name,'export refuses accidental file overwrite')
-  state=await invoke('scene_open',{revision:state.revision,path:exported,preview:false})
-  assert(JSON.stringify((await invoke('scene_read',{full:true})).document)===JSON.stringify(data),'export and reopen through MCP preserve complete document')
-  assert(data.waters[0].name==='MCP creek'&&data.waters[0].visible===true,'MCP preserves optional water name and visibility')
-  const exportRevision=state.revision
-  const project=await invoke('project_export',{target:'pomorog',title:'MCP project'})
+  await invoke(
+    'scene_apply',
+    {
+      revision: state.revision - 1,
+      commands: [{ op: 'scene.patch', patch: { name: 'Stale' } }],
+      preview: false,
+    },
+    true,
+  )
+  assert(
+    (await invoke('scene_read')).scene.name === 'MCP-authored clearing',
+    'stale revision rejected without overwriting scene',
+  )
+  const canceled = await invoke('scene_preview', { revision: state.revision, action: 'cancel' })
+  assert(!canceled.preview, 'preview cancel returns to saved scene')
+  assert(
+    JSON.stringify((await invoke('scene_read', { full: true })).document) ===
+      JSON.stringify(initial),
+    'cancel restores entire original document',
+  )
+  state = await invoke('scene_apply', { revision: canceled.revision, commands, preview: true })
+  state = await invoke('scene_preview', { revision: state.revision, action: 'accept' })
+  const committed = (await invoke('scene_read', { full: true })).document
+  assert(
+    committed.terrain.layers[0].name === 'musgo' &&
+      committed.terrain.layers[0].look.alphabet === 'XZ' &&
+      committed.terrain.layers[0].cover.height === 0.35 &&
+      committed.waters[0].look.rings.enabled,
+    'actual MCP authors floor, standing letters and water looks with stable layer IDs',
+  )
+  const texture = committed.textures['mcp-symbols'],
+    rock = committed.objects.find(object => object.id === 'rock')
+  assert(
+    texture.style.alphabet.includes('↑') &&
+      texture.style.fontWeight === 700 &&
+      texture.style.open &&
+      texture.style.palette.length === 2 &&
+      rock.options.alphabet === texture.style.alphabet,
+    'real MCP defines and applies Unicode, font, visibility and palette texture controls',
+  )
+  assert(
+    texture.previewLighting.brightness === 1.1 && committed.style.brightness !== 1.1,
+    'MCP saves texture preview lights without applying them to scene lighting',
+  )
+  state = await invoke('scene_history', { revision: state.revision, action: 'undo' })
+  assert(
+    JSON.stringify((await invoke('scene_read', { full: true })).document) ===
+      JSON.stringify(initial),
+    'entire AI batch undoes in a single step',
+  )
+  state = await invoke('scene_history', { revision: state.revision, action: 'redo' })
+  assert(
+    JSON.stringify((await invoke('scene_read', { full: true })).document) ===
+      JSON.stringify(committed),
+    'redo restores full authored scene',
+  )
+  const resources = await evaluate('JSON.stringify(engine.resources)')
+  await invoke(
+    'scene_apply',
+    {
+      revision: state.revision,
+      preview: false,
+      commands: [{ op: 'object.add', object: { prefab: 'missing', position: [0, 0, 0] } }],
+    },
+    true,
+  )
+  await invoke(
+    'scene_apply',
+    {
+      revision: state.revision,
+      preview: false,
+      commands: [
+        {
+          op: 'asset.define',
+          id: 'bad',
+          name: 'bad.glb',
+          source: 'data:model/gltf-binary;base64,YmFk',
+        },
+      ],
+    },
+    true,
+  )
+  assert(
+    JSON.stringify((await invoke('scene_read', { full: true })).document) ===
+      JSON.stringify(committed) &&
+      (await evaluate('JSON.stringify(engine.resources)')) === resources,
+    'unknown prefab and broken model preserve scene and GPU resources',
+  )
+  const buffer = new Float32Array([-0.5, 0, 0, 0.5, 0, 0, 0, 1, 0])
+  const model = {
+    asset: { version: '2.0' },
+    scene: 0,
+    scenes: [{ nodes: [0] }],
+    nodes: [{ name: 'blade', mesh: 0 }],
+    meshes: [{ primitives: [{ attributes: { POSITION: 0 } }] }],
+    buffers: [{ uri: 'mesh.bin', byteLength: buffer.byteLength }],
+    bufferViews: [{ buffer: 0, byteLength: buffer.byteLength }],
+    accessors: [
+      {
+        bufferView: 0,
+        componentType: 5126,
+        count: 3,
+        type: 'VEC3',
+        min: [-0.5, 0, 0],
+        max: [0.5, 1, 0],
+      },
+    ],
+  }
+  const gltf = join(output, 'model.gltf'),
+    bin = join(output, 'mesh.bin')
+  await writeFile(gltf, JSON.stringify(model))
+  await writeFile(bin, Buffer.from(buffer.buffer))
+  await invoke('assets_import', { revision: state.revision, paths: [gltf], preview: false }, true)
+  state = await invoke('assets_import', {
+    revision: state.revision,
+    paths: [gltf, bin],
+    preview: false,
+  })
+  const imported = state.scene.assets.find(a => a.name === 'model.gltf')
+  assert(!!imported, 'MCP imports local GLTF with explicit companion bytes')
+  state = await invoke('scene_apply', {
+    revision: state.revision,
+    preview: false,
+    commands: [
+      {
+        op: 'object.add',
+        object: {
+          id: 'imported',
+          prefab: imported.id,
+          position: [-4, 0, 3],
+          options: { glyph: 'surface', surface: 'stone' },
+        },
+      },
+      { op: 'texture.apply', id: 'mcp-symbols', objectId: 'imported', part: 'blade' },
+    ],
+  })
+  const inspected = await invoke('object_inspect', { id: 'imported' })
+  assert(
+    inspected.parts.some(p => p.name === 'blade'),
+    'MCP inspects imported mesh parts',
+  )
+  assert(
+    (await invoke('scene_read', { full: true })).document.objects.find(
+      object => object.id === 'imported',
+    ).options.parts.blade.alphabet === texture.style.alphabet,
+    'MCP applies a reusable texture to an imported named part',
+  )
+  state = await invoke('scene_apply', {
+    revision: state.revision,
+    preview: false,
+    commands: [
+      { op: 'object.add', object: { id: 'linked', prefab: 'bloco', position: [3, 0, 3] } },
+      { op: 'texture.apply', id: 'mcp-symbols', objectId: 'linked', link: true },
+    ],
+  })
+  assert(
+    (await invoke('object_inspect', { id: 'linked' })).options.texture === 'mcp-symbols',
+    'actual MCP stores a linked texture without copying fields',
+  )
+  await invoke(
+    'scene_apply',
+    {
+      revision: state.revision,
+      preview: false,
+      commands: [{ op: 'resource.remove', kind: 'textures', id: 'mcp-symbols' }],
+    },
+    true,
+  )
+  state = await invoke('scene_apply', {
+    revision: state.revision,
+    preview: false,
+    commands: [{ op: 'texture.detach', objectId: 'linked' }],
+  })
+  const detached = await invoke('object_inspect', { id: 'linked' })
+  assert(
+    !detached.options.texture && detached.options.alphabet === texture.style.alphabet,
+    'actual MCP detach preserves the appearance recipe',
+  )
+  const capture = await invoke('editor_capture')
+  await writeFile(join(output, 'mcp-cena.png'), Buffer.from(capture.content[0].data, 'base64'))
+  assert(
+    capture.content[0].mimeType === 'image/png' && capture.content[0].data.length > 10000,
+    'MCP returns actual rendered scene as image content',
+  )
+  assert(
+    (await invoke('engine_reference', { topic: 'catalog' })).some(
+      asset => asset.id === 'blue-night' && asset.kind === 'atmosphere',
+    ),
+    'MCP atmosphere appears in asset catalog',
+  )
+  await invoke('editor_view', { cameraId: 'wide' })
+  assert(
+    (await invoke('object_inspect', { id: 'wide' })).camera.name === 'MCP wide shot',
+    'MCP inspects a saved camera',
+  )
+  const cameraCapture = await invoke('editor_capture')
+  await writeFile(
+    join(output, 'mcp-camera.png'),
+    Buffer.from(cameraCapture.content[0].data, 'base64'),
+  )
+  await check(
+    'MCP selects a saved composition camera',
+    `document.querySelector('#app > canvas').dataset.cameraView==='MCP wide shot' && engine.camera.position.x===10`,
+  )
+  await invoke('editor_view', { cameraId: null })
+  await invoke('editor_view', { studio: 'effects' })
+  const effectCapture = await invoke('editor_capture')
+  await writeFile(
+    join(output, 'mcp-efeito-void.png'),
+    Buffer.from(effectCapture.content[0].data, 'base64'),
+  )
+  assert(effectCapture.content[0].data.length > 1000, 'MCP captures the isolated effect stage')
+  await check(
+    'API stage switch isolates preview',
+    'document.body.classList.contains("effect-studio-active") && !document.querySelector("#effect-preview").hidden',
+  )
+  await invoke('editor_view', { studio: 'scene' })
+  const exported = join(output, 'mcp-cenario.pomorog.json')
+  await invoke('scene_export', { path: exported, overwrite: true })
+  const data = JSON.parse(await readFile(exported, 'utf8'))
+  assert(
+    data.textures['mcp-symbols'].style.fontWeight === 700 &&
+      data.textures['mcp-symbols'].previewLighting.brightness === 1.1 &&
+      data.objects.find(object => object.id === 'imported').options.parts.blade.open,
+    'MCP export retains texture assets, studio lights and named-part appearances',
+  )
+  assert(
+    data.activeCamera === 'wide' &&
+      data.cameras.wide.span === 10 &&
+      data.atmospheres['blue-night'].style.moon.intensity === 2.2 &&
+      data.effects['fx:custom-blue'] &&
+      data.assets[imported.id].source.startsWith('data:') &&
+      data.waters[0].shape.mask.heights.length === 65 * 65,
+    'export embeds models, effects, atmosphere, terrain and slope water',
+  )
+  await invoke('scene_export', { path: exported }, true)
+  assert(
+    JSON.parse(await readFile(exported, 'utf8')).name === data.name,
+    'export refuses accidental file overwrite',
+  )
+  state = await invoke('scene_open', { revision: state.revision, path: exported, preview: false })
+  assert(
+    JSON.stringify((await invoke('scene_read', { full: true })).document) === JSON.stringify(data),
+    'export and reopen through MCP preserve complete document',
+  )
+  assert(
+    data.waters[0].name === 'MCP creek' && data.waters[0].visible === true,
+    'MCP preserves optional water name and visibility',
+  )
+  const exportRevision = state.revision
+  const project = await invoke('project_export', { target: 'pomorog', title: 'MCP project' })
   let packaged
-  for(let attempt=0;attempt<100;attempt++) {
-    packaged=await invoke('project_export_status',{jobId:project.id})
-    if(packaged.status==='ready'||packaged.status==='failed') break
+  for (let attempt = 0; attempt < 100; attempt++) {
+    packaged = await invoke('project_export_status', { jobId: project.id })
+    if (packaged.status === 'ready' || packaged.status === 'failed') break
     await sleep(100)
   }
-  assert(packaged.status==='ready','MCP queues a portable project export and exposes its status')
-  const artifact=await fetch('http://127.0.0.1:1442/v1/exports/'+project.id+'/download')
-  assert(artifact.ok&&JSON.stringify(await artifact.json())===JSON.stringify(data),'ready project download equals the captured portable document')
-  assert((await invoke('scene_read')).revision===exportRevision,'project export does not mutate the editor revision')
-  const beforeHuman=state.revision
-  await action(`document.querySelector('[data-k="name"]').value='Human edit';document.querySelector('[data-k="name"]').dispatchEvent(new Event('change'))`)
-  await invoke('scene_apply',{revision:beforeHuman,preview:false,commands:[{op:'scene.patch',patch:{name:'Overwrite'}}]},true)
-  assert((await invoke('scene_read')).scene.name==='Human edit','human UI edits advance revision and block stale AI writes')
+  assert(packaged.status === 'ready', 'MCP queues a portable project export and exposes its status')
+  const artifact = await fetch('http://127.0.0.1:1442/v1/exports/' + project.id + '/download')
+  assert(
+    artifact.ok && JSON.stringify(await artifact.json()) === JSON.stringify(data),
+    'ready project download equals the captured portable document',
+  )
+  assert(
+    (await invoke('scene_read')).revision === exportRevision,
+    'project export does not mutate the editor revision',
+  )
+  const beforeHuman = state.revision
+  await action(
+    `document.querySelector('[data-k="name"]').value='Human edit';document.querySelector('[data-k="name"]').dispatchEvent(new Event('change'))`,
+  )
+  await invoke(
+    'scene_apply',
+    {
+      revision: beforeHuman,
+      preview: false,
+      commands: [{ op: 'scene.patch', patch: { name: 'Overwrite' } }],
+    },
+    true,
+  )
+  assert(
+    (await invoke('scene_read')).scene.name === 'Human edit',
+    'human UI edits advance revision and block stale AI writes',
+  )
   await shot('mcp-cena-editor')
-  if(errors.length)throw new Error(errors.join('\n'))
+  if (errors.length) throw new Error(errors.join('\n'))
   console.log('PASS no uncaught page exceptions')
 } finally {
-  await client?.close();socket?.close();chrome.kill();await sleep(500)
-  await rm(profile,{recursive:true,force:true,maxRetries:5,retryDelay:200})
+  await client?.close()
+  socket?.close()
+  chrome.kill()
+  await sleep(500)
+  await rm(profile, { recursive: true, force: true, maxRetries: 5, retryDelay: 200 })
 }

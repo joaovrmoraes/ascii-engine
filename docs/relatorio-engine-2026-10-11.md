@@ -32,18 +32,18 @@ proving a real game can consume the extracted core.
 
 ## Working and partial systems
 
-| System | Existing evidence | Limitation at audit time |
-| --- | --- | --- |
-| ASCII rendering | Six techniques: screen, surface, body, carpet, particle, water; lighting, shadows, depth/reflections | Narrow per-part alphabet/spacing/finish API |
-| Pomorog content | Forest, marsh, snow, mine, cathedral; ported models/weather/fire/combat | Code-built areas; final visual equivalence unapproved |
-| Per-part style | Selection/highlight, technique/family/body size and global/type/instance/part layers | Selection edits not collected by scene saving |
-| GLTF/GLB | Reader, Blender properties, animations/skinned glyphs; demo round-trips two GLBs | No persistent assets; imports outside SceneDoc; Three-exporter tests rather than production Blender files |
-| Terrain | Raise/lower/smooth/flatten/paint/dig; JSON heightmap | One finite area, no undo, chunk seams, drawn rivers/paths or advanced brushes; painting changes color/density, not layer technique |
-| Prefabs/scenes | Eight prefabs, place/remove, terrain/water/JSON/local storage | Code-defined library, no prefab editing/saving or UI transforms; some prefabs vary after reopen |
-| Chunks | Circuit, distance streaming, deterministic connector generator | Grid generator tested separately, not integrated into scene editor |
-| Effects | Emitters, bursts, data curves, light, attachment, budget, flipbooks/presets | JSON editor, no visual curves/audio/full event triggers or scene effect persistence |
-| Export | Web script with game.json and player mode without main panels | Known app content rather than complete project/asset packaging; desktop only historical compilation |
-| Quality | 25 core tests, TypeScript/build and six visual comparisons passed | No editor automation, save/reopen/import/export or long-session checks |
+| System          | Existing evidence                                                                                    | Limitation at audit time                                                                                                           |
+| --------------- | ---------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------- |
+| ASCII rendering | Six techniques: screen, surface, body, carpet, particle, water; lighting, shadows, depth/reflections | Narrow per-part alphabet/spacing/finish API                                                                                        |
+| Pomorog content | Forest, marsh, snow, mine, cathedral; ported models/weather/fire/combat                              | Code-built areas; final visual equivalence unapproved                                                                              |
+| Per-part style  | Selection/highlight, technique/family/body size and global/type/instance/part layers                 | Selection edits not collected by scene saving                                                                                      |
+| GLTF/GLB        | Reader, Blender properties, animations/skinned glyphs; demo round-trips two GLBs                     | No persistent assets; imports outside SceneDoc; Three-exporter tests rather than production Blender files                          |
+| Terrain         | Raise/lower/smooth/flatten/paint/dig; JSON heightmap                                                 | One finite area, no undo, chunk seams, drawn rivers/paths or advanced brushes; painting changes color/density, not layer technique |
+| Prefabs/scenes  | Eight prefabs, place/remove, terrain/water/JSON/local storage                                        | Code-defined library, no prefab editing/saving or UI transforms; some prefabs vary after reopen                                    |
+| Chunks          | Circuit, distance streaming, deterministic connector generator                                       | Grid generator tested separately, not integrated into scene editor                                                                 |
+| Effects         | Emitters, bursts, data curves, light, attachment, budget, flipbooks/presets                          | JSON editor, no visual curves/audio/full event triggers or scene effect persistence                                                |
+| Export          | Web script with game.json and player mode without main panels                                        | Known app content rather than complete project/asset packaging; desktop only historical compilation                                |
+| Quality         | 25 core tests, TypeScript/build and six visual comparisons passed                                    | No editor automation, save/reopen/import/export or long-session checks                                                             |
 
 The editor uses Vite + TypeScript + DOM, without React. Tauri was a minimal
 shell without native file commands. The core imported no editor, React,
@@ -154,14 +154,14 @@ close inspection against the “body made of letters” criterion.
 
 ## Recommended order
 
-| Order | Deliverable | Completion proof |
-| --- | --- | --- |
-| 1 | Reliable saving/reopening: styles, seeds, validation, disposal | Same edited scene in a fresh session; invalid files preserve current scene; no retained layers |
-| 2 | Authorable scene: persistent assets, hierarchy, transforms, duplicate, undo/redo | Build a clearing with tree, bridge, lake and imported model; save/export without editing TypeScript |
-| 3 | Unified scenes/prefabs/effects project | Load all data/assets; prefab edits update copies while retaining overrides |
-| 4 | Forest authorable through editor | Document supplies chunks/connectors/environment; edited map matches player map |
-| 5 | Repeat across the other four areas | Marsh/snow/mine/cathedral use shared systems and are compared with Pomorog |
-| 6 | Pomorog consumption/distribution | API-driven game events/animation/effects; validate desktop execution after web |
+| Order | Deliverable                                                                      | Completion proof                                                                                    |
+| ----- | -------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------- |
+| 1     | Reliable saving/reopening: styles, seeds, validation, disposal                   | Same edited scene in a fresh session; invalid files preserve current scene; no retained layers      |
+| 2     | Authorable scene: persistent assets, hierarchy, transforms, duplicate, undo/redo | Build a clearing with tree, bridge, lake and imported model; save/export without editing TypeScript |
+| 3     | Unified scenes/prefabs/effects project                                           | Load all data/assets; prefab edits update copies while retaining overrides                          |
+| 4     | Forest authorable through editor                                                 | Document supplies chunks/connectors/environment; edited map matches player map                      |
+| 5     | Repeat across the other four areas                                               | Marsh/snow/mine/cathedral use shared systems and are compared with Pomorog                          |
+| 6     | Pomorog consumption/distribution                                                 | API-driven game events/animation/effects; validate desktop execution after web                      |
 
 The first useful milestone: **build a scene, customize crown/trunk, add
 an external model, save, close, reopen identically and export**. It uses
@@ -172,15 +172,15 @@ Game rules do not need to enter `packages/engine` to reach this milestone.
 
 ## Audit validation
 
-| Check | Result |
-| --- | --- |
-| pnpm check | TypeScript, 25 tests in 7 files, build passed |
-| Editor | Test script only reported no tests yet |
-| Web build | 62 modules; main JS 896.18 kB / gzip 256.65 kB; >500 kB warning |
+| Check        | Result                                                                                                 |
+| ------------ | ------------------------------------------------------------------------------------------------------ |
+| pnpm check   | TypeScript, 25 tests in 7 files, build passed                                                          |
+| Editor       | Test script only reported no tests yet                                                                 |
+| Web build    | 62 modules; main JS 896.18 kB / gzip 256.65 kB; >500 kB warning                                        |
 | pnpm compare | Reference .0000, forest .0095, marsh .0272, snow .0041, mine .0134, cathedral .0088; all within limits |
-| cdpshot.mjs | Sandbox/GLTF/effects ready=true; swim clip and live effect emitters/glyphs |
-| Orca Browser | Sandbox opened, controls inspected, valid screenshot |
-| CDP probes | Reproduced lost styles, variable geometry, removed carpet updates and terrain-free scene error |
+| cdpshot.mjs  | Sandbox/GLTF/effects ready=true; swim clip and live effect emitters/glyphs                             |
+| Orca Browser | Sandbox opened, controls inspected, valid screenshot                                                   |
+| CDP probes   | Reproduced lost styles, variable geometry, removed carpet updates and terrain-free scene error         |
 
 New captures: [`captures/auditoria-2026-10-11/`](captures/auditoria-2026-10-11/).
 The [evidence record](captures/auditoria-2026-10-11/README.md) contains URLs,

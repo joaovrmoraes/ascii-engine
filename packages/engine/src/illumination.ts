@@ -21,7 +21,8 @@ export const inkLightsGLSL = `
 `
 export function inkLightUniforms() {
   return {
-    inkLightCount: { value: 0 }, atmosphereTint: { value: new THREE.Color(1, 1, 1) },
+    inkLightCount: { value: 0 },
+    atmosphereTint: { value: new THREE.Color(1, 1, 1) },
     inkLightPosition: { value: Array.from({ length: MAX_INK_LIGHTS }, () => new THREE.Vector4()) },
     inkLightColor: { value: Array.from({ length: MAX_INK_LIGHTS }, () => new THREE.Vector4()) },
   }
@@ -79,11 +80,16 @@ export const ABSENT = new THREE.Vector3(1e4, 0, 1e4)
 export function illuminationUniforms() {
   return {
     ...inkLightUniforms(),
-    inkFogColor: { value: new THREE.Color() }, inkFogDensity: { value: 0 },
-    explorationMap: { value: null as THREE.Texture | null }, illuminationEnabled: { value: 0 },
-    discoveryEnabled: { value: 0 }, stormFlash: { value: 0 },
-    explorationExtent: { value: 42 }, lanternPulse: { value: 1 },
-    lanternPosition: { value: ABSENT.clone() }, hearthPosition: { value: ABSENT.clone() },
+    inkFogColor: { value: new THREE.Color() },
+    inkFogDensity: { value: 0 },
+    explorationMap: { value: null as THREE.Texture | null },
+    illuminationEnabled: { value: 0 },
+    discoveryEnabled: { value: 0 },
+    stormFlash: { value: 0 },
+    explorationExtent: { value: 42 },
+    lanternPulse: { value: 1 },
+    lanternPosition: { value: ABSENT.clone() },
+    hearthPosition: { value: ABSENT.clone() },
   }
 }
 
@@ -105,12 +111,14 @@ export function createIllumination(options: IlluminationOptions = {}) {
   texture.minFilter = texture.magFilter = THREE.LinearFilter
   texture.generateMipmaps = false
   const uniforms = illuminationUniforms()
-  uniforms.explorationMap.value = texture; uniforms.illuminationEnabled.value = 1
+  uniforms.explorationMap.value = texture
+  uniforms.illuminationEnabled.value = 1
   uniforms.discoveryEnabled.value = interior ? 1 : 0
   uniforms.explorationExtent.value = field.extent
   let lastRefresh = -1
   return {
-    uniforms, interior,
+    uniforms,
+    interior,
     sample: interior ? field.sample : () => ({ visible: 1, explored: 1 }),
     /** Lantern and hearth positions; `null` removes one. */
     place(lantern: THREE.Vector3 | null, hearth: THREE.Vector3 | null) {
@@ -118,15 +126,22 @@ export function createIllumination(options: IlluminationOptions = {}) {
       uniforms.hearthPosition.value.copy(hearth ?? ABSENT)
     },
     update(time: number, dt: number) {
-      uniforms.lanternPulse.value = 1 + Math.sin(time * 3.7) * .035 + Math.sin(time * 7.3) * .018
+      uniforms.lanternPulse.value = 1 + Math.sin(time * 3.7) * 0.035 + Math.sin(time * 7.3) * 0.018
       if (!interior) return
-      if (lastRefresh < 0 || time - lastRefresh > .08) {
-        const lantern = uniforms.lanternPosition.value, hearth = uniforms.hearthPosition.value
-        field.illuminate([{ x: lantern.x, z: lantern.z, radius: 7.2 }, { x: hearth.x, z: hearth.z, radius: 4.6 }])
+      if (lastRefresh < 0 || time - lastRefresh > 0.08) {
+        const lantern = uniforms.lanternPosition.value,
+          hearth = uniforms.hearthPosition.value
+        field.illuminate([
+          { x: lantern.x, z: lantern.z, radius: 7.2 },
+          { x: hearth.x, z: hearth.z, radius: 4.6 },
+        ])
         lastRefresh = time
       }
-      field.advance(dt); texture.needsUpdate = true
+      field.advance(dt)
+      texture.needsUpdate = true
     },
-    dispose() { texture.dispose() },
+    dispose() {
+      texture.dispose()
+    },
   }
 }

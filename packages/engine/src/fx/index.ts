@@ -18,13 +18,6 @@ export {
   type GlyphConversion,
   type PixelSource,
 } from './flipbook'
-export {
-  parseEffect,
-} from './validation'
-export {
-  createEffectPrefabs,
-} from './prefabs'
-export {
-  DEFAULT_HEAT_GRID,
-  type HeatGridSpec,
-} from './heat'
+export { parseEffect } from './validation'
+export { createEffectPrefabs } from './prefabs'
+export { DEFAULT_HEAT_GRID, type HeatGridSpec } from './heat'

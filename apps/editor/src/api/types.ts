@@ -6,8 +6,16 @@ export interface AuthoringEditor {
   commit(): Promise<void>
   undo(redo?: boolean): Promise<void>
   lock(value: boolean): void
-  catalog(): { id: string; title: string; kind: 'builtin' | 'asset' | 'effect' | 'atmosphere' | 'texture' }[]
+  catalog(): {
+    id: string
+    title: string
+    kind: 'builtin' | 'asset' | 'effect' | 'atmosphere' | 'texture'
+  }[]
   inspect(id: string): unknown
   disturbWater(index: number, x: number, z: number, strength: number, radius: number): void
-  view(focus?: [number, number, number], studio?: 'scene' | 'effects' | 'atmosphere' | 'textures', cameraId?: string | null): void
+  view(
+    focus?: [number, number, number],
+    studio?: 'scene' | 'effects' | 'atmosphere' | 'textures',
+    cameraId?: string | null,
+  ): void
 }

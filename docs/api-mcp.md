@@ -62,24 +62,24 @@ origins. The HTTP API does not enable CORS for external sites.
 
 ## MCP tools
 
-| Tool | Operation |
-| --- | --- |
-| `engine_sessions` | Lists connected scenes, revision and pending preview. |
-| `engine_reference` | Live catalog, command schema, complete effect/water/style presets and document contract. |
-| `scene_read` | Reads scene and revision. `full: true` includes all arrays and embedded sources. |
-| `scene_validate` | Validates a batch and its references without editing. Models are decoded when applied. |
-| `scene_apply` | Applies a command batch. `preview: true` by default; `false` applies directly. |
-| `scene_preview` | `accept` saves the preview; `cancel` restores the previous scene. |
-| `scene_history` | `undo`/`redo` using the same history as the interface. |
-| `object_inspect` | Object document, parts, ASCII options and animation clips. |
-| `editor_view` | XYZ focus, horizontal angle, `elevation` in radians (0.02–π/2−0.01), zoom, pause, saved camera and Studio page. |
-| `water_disturb` | Transient impulse: `index`, `x`, `z`, `strength` (−1–1), `radius` (0.05–8 m). Does not change revision/history. |
-| `editor_capture` | Returns a rendered scene PNG as MCP image content. |
-| `assets_import` | Imports GLB or GLTF and companion files from explicit local paths. |
-| `scene_open` | Opens a local visual document, with preview or direct application. |
-| `scene_export` | Exports a document with embedded models/effects; requires `overwrite: true` to replace a file. |
-| `project_export` | Captures the current scene and queues `web`, `desktop` or `pomorog` with a title. No publication or revision change. |
-| `project_export_status` | Reads a job by `jobId` and its original `sessionId`; returns queued/building/ready/failed and artifact paths. |
+| Tool                    | Operation                                                                                                            |
+| ----------------------- | -------------------------------------------------------------------------------------------------------------------- |
+| `engine_sessions`       | Lists connected scenes, revision and pending preview.                                                                |
+| `engine_reference`      | Live catalog, command schema, complete effect/water/style presets and document contract.                             |
+| `scene_read`            | Reads scene and revision. `full: true` includes all arrays and embedded sources.                                     |
+| `scene_validate`        | Validates a batch and its references without editing. Models are decoded when applied.                               |
+| `scene_apply`           | Applies a command batch. `preview: true` by default; `false` applies directly.                                       |
+| `scene_preview`         | `accept` saves the preview; `cancel` restores the previous scene.                                                    |
+| `scene_history`         | `undo`/`redo` using the same history as the interface.                                                               |
+| `object_inspect`        | Object document, parts, ASCII options and animation clips.                                                           |
+| `editor_view`           | XYZ focus, horizontal angle, `elevation` in radians (0.02–π/2−0.01), zoom, pause, saved camera and Studio page.      |
+| `water_disturb`         | Transient impulse: `index`, `x`, `z`, `strength` (−1–1), `radius` (0.05–8 m). Does not change revision/history.      |
+| `editor_capture`        | Returns a rendered scene PNG as MCP image content.                                                                   |
+| `assets_import`         | Imports GLB or GLTF and companion files from explicit local paths.                                                   |
+| `scene_open`            | Opens a local visual document, with preview or direct application.                                                   |
+| `scene_export`          | Exports a document with embedded models/effects; requires `overwrite: true` to replace a file.                       |
+| `project_export`        | Captures the current scene and queues `web`, `desktop` or `pomorog` with a title. No publication or revision change. |
+| `project_export_status` | Reads a job by `jobId` and its original `sessionId`; returns queued/building/ready/failed and artifact paths.        |
 
 Recommended agent workflow: list sessions → read scene/revision → consult
 catalog and required references → build a batch → preview → capture and
@@ -99,17 +99,17 @@ editor may already have completed the operation.
 `engine_reference(topic: "commands")` returns the complete JSON Schema.
 Operations include:
 
-| Group | Commands |
-| --- | --- |
-| Full document | `scene.replace`, `scene.patch` |
-| Objects | `object.add`, `object.update`, `object.remove`, `object.scatter` |
-| Terrain | `terrain.create`, `terrain.stroke` |
-| Water | `water.paint`, `water.update`, `water.remove` |
-| Resources | `effect.define`, `asset.define`, `resource.remove` |
-| Environment | `atmosphere.set`, `environment.set` |
-| Saved atmospheres | `atmosphere.define`, `atmosphere.apply` |
-| Saved textures | `texture.define`, `texture.apply` |
-| Cameras | `camera.define`, `camera.update`, `camera.remove`, `camera.activate` |
+| Group             | Commands                                                             |
+| ----------------- | -------------------------------------------------------------------- |
+| Full document     | `scene.replace`, `scene.patch`                                       |
+| Objects           | `object.add`, `object.update`, `object.remove`, `object.scatter`     |
+| Terrain           | `terrain.create`, `terrain.stroke`                                   |
+| Water             | `water.paint`, `water.update`, `water.remove`                        |
+| Resources         | `effect.define`, `asset.define`, `resource.remove`                   |
+| Environment       | `atmosphere.set`, `environment.set`                                  |
+| Saved atmospheres | `atmosphere.define`, `atmosphere.apply`                              |
+| Saved textures    | `texture.define`, `texture.apply`                                    |
+| Cameras           | `camera.define`, `camera.update`, `camera.remove`, `camera.activate` |
 
 `scene.patch` recursively merges objects and replaces entire arrays.
 `unset` removes optional document fields. Use it to edit heightmaps,
@@ -327,7 +327,7 @@ These optional SceneDoc v1 extensions do not rewrite legacy recipes:
   (1–128 single characters each), `font`, `fontWeight` (400/700), `shallow`,
   `deep` (linear RGB triples), `depthScale` (.005–10 m), optional
   `reflection.strength` (0–4), and `rings: {enabled, alphabet?, color?, size?,
-  lifetime?}`. Ring radius is .05–20 m; lifetime .1–20 seconds. Depth colors
+lifetime?}`. Ring radius is .05–20 m; lifetime .1–20 seconds. Depth colors
   use initial/simulated depth, reaching deep at depthScale (default .5 m). Existing
   cell/flow/pondDrift/open/sheen/sparse/foam/bank/reflection fields retain their
   original meanings. Row sparsity controls empty water cells. Opt-in glyph

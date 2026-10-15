@@ -3,7 +3,19 @@ import { illuminationGLSL, illuminationUniforms } from './illumination'
 import { SURFACE_ALPHA } from './surface'
 
 const WORLD_GLYPH_ALPHA = SURFACE_ALPHA.glyph
-export const SCREEN_ALPHABETS = { generic: ' .,:;-~=+*ox%#@', actor: ' .:-=+*x%#@', foliage: '.,;vcoax%#', stone: ' .:-=coO0#', wood: '.:|/\\lIvt', earth: ' .,:coO*', water: ' ._-~=~', wetgrass: ' .,;v/\\', bark: ':|/\\Il', snow: ' .,:;~+*coO', reflection: ' .,:-=+*ox%' }
+export const SCREEN_ALPHABETS = {
+  generic: ' .,:;-~=+*ox%#@',
+  actor: ' .:-=+*x%#@',
+  foliage: '.,;vcoax%#',
+  stone: ' .:-=coO0#',
+  wood: '.:|/\\lIvt',
+  earth: ' .,:coO*',
+  water: ' ._-~=~',
+  wetgrass: ' .,;v/\\',
+  bark: ':|/\\Il',
+  snow: ' .,:;~+*coO',
+  reflection: ' .,:-=+*ox%',
+}
 
 /**
  * Biome effects enter the screen pass through hooks, never by import.
@@ -27,27 +39,45 @@ export function createAsciiPass(hooks: AsciiPassHook[] = []) {
   const alphabets = SCREEN_ALPHABETS
   let glyphs = ''
   const ranges: Record<string, [number, number]> = {}
-  for (const [key, letters] of Object.entries(alphabets)) { ranges[key] = [glyphs.length, letters.length]; glyphs += letters }
-  const edgeStart = glyphs.length; glyphs += '-|/\\'
+  for (const [key, letters] of Object.entries(alphabets)) {
+    ranges[key] = [glyphs.length, letters.length]
+    glyphs += letters
+  }
+  const edgeStart = glyphs.length
+  glyphs += '-|/\\'
   const atlas = document.createElement('canvas')
-  atlas.width = glyphs.length * 24; atlas.height = 32
+  atlas.width = glyphs.length * 24
+  atlas.height = 32
   const ctx = atlas.getContext('2d')!
-  ctx.fillStyle = '#000'; ctx.fillRect(0, 0, atlas.width, atlas.height)
-  ctx.fillStyle = '#fff'; ctx.font = '29px "Courier New", monospace'
-  ctx.textAlign = 'center'; ctx.textBaseline = 'middle'
+  ctx.fillStyle = '#000'
+  ctx.fillRect(0, 0, atlas.width, atlas.height)
+  ctx.fillStyle = '#fff'
+  ctx.font = '29px "Courier New", monospace'
+  ctx.textAlign = 'center'
+  ctx.textBaseline = 'middle'
   Array.from(glyphs).forEach((glyph, i) => ctx.fillText(glyph, i * 24 + 12, 17))
   const texture = new THREE.CanvasTexture(atlas)
-  texture.minFilter = THREE.LinearFilter; texture.magFilter = THREE.LinearFilter; texture.generateMipmaps = false
+  texture.minFilter = THREE.LinearFilter
+  texture.magFilter = THREE.LinearFilter
+  texture.generateMipmaps = false
   const range = (key: string) => `vec2(${ranges[key][0]}.0, ${ranges[key][1]}.0)`
   const material = new THREE.ShaderMaterial({
-    depthTest: true, depthWrite: true, depthFunc: THREE.AlwaysDepth,
+    depthTest: true,
+    depthWrite: true,
+    depthFunc: THREE.AlwaysDepth,
     uniforms: {
       ...illuminationUniforms(),
-      sceneTexture: { value: null }, sceneDepth: { value: null }, glyphTexture: { value: texture },
-      resolution: { value: new THREE.Vector2(1, 1) }, cellSize: { value: 6 }, brightness: { value: 1 }, debugScreen: { value: 0 },
-      inverseProjection: { value: new THREE.Matrix4() }, cameraWorld: { value: new THREE.Matrix4() },
+      sceneTexture: { value: null },
+      sceneDepth: { value: null },
+      glyphTexture: { value: texture },
+      resolution: { value: new THREE.Vector2(1, 1) },
+      cellSize: { value: 6 },
+      brightness: { value: 1 },
+      debugScreen: { value: 0 },
+      inverseProjection: { value: new THREE.Matrix4() },
+      cameraWorld: { value: new THREE.Matrix4() },
       contacts: { value: [new THREE.Vector4(100, 100, 0, 0), new THREE.Vector4(100, 100, 0, 0)] },
-      ...Object.assign({}, ...hooks.map((hook) => hook.uniforms ?? {})),
+      ...Object.assign({}, ...hooks.map(hook => hook.uniforms ?? {})),
     },
     vertexShader: `varying vec2 vUv; void main() { vUv = uv; gl_Position = vec4(position.xy, 0., 1.); }`,
     fragmentShader: `
@@ -58,7 +88,7 @@ export function createAsciiPass(hooks: AsciiPassHook[] = []) {
       uniform mat4 inverseProjection, cameraWorld;
       varying vec2 vUv;
       ${illuminationGLSL}
-      ${hooks.map((hook) => hook.declarations ?? '').join('\n')}
+      ${hooks.map(hook => hook.declarations ?? '').join('\n')}
       float hash(vec3 p) { return fract(sin(dot(p, vec3(127.1, 311.7, 74.7))) * 43758.5453); }
       float isKind(float a, float kind) { return 1. - step(.035, abs(a - kind)); }
       float contactShade(vec3 p) {
@@ -109,7 +139,7 @@ export function createAsciiPass(hooks: AsciiPassHook[] = []) {
           + texture2D(sceneTexture, center + vec2(offset.x, -offset.y)).rgb + texture2D(sceneTexture, center + vec2(-offset.x, offset.y)).rgb);
         vec3 color = pow(max(sampleColor, vec3(0.)), vec3(.4545));
         vec3 worldPoint = world.xyz / world.w;
-        ${hooks.map((hook) => hook.color ? `{ ${hook.color} }` : '').join('\n')}
+        ${hooks.map(hook => (hook.color ? `{ ${hook.color} }` : '')).join('\n')}
         vec2 lamps = localLights(worldPoint);
         color += earth * (vec3(.23,.20,.12) * lamps.x + vec3(.28,.15,.05) * lamps.y);
         float light = dot(color, vec3(.2126, .7152, .0722));
@@ -177,7 +207,17 @@ export function createAsciiPass(hooks: AsciiPassHook[] = []) {
       }
     `,
   })
-  const scene = new THREE.Scene(), geometry = new THREE.PlaneGeometry(2, 2)
+  const scene = new THREE.Scene(),
+    geometry = new THREE.PlaneGeometry(2, 2)
   scene.add(new THREE.Mesh(geometry, material))
-  return { scene, material, camera: new THREE.Camera(), dispose() { texture.dispose(); geometry.dispose(); material.dispose(); } }
+  return {
+    scene,
+    material,
+    camera: new THREE.Camera(),
+    dispose() {
+      texture.dispose()
+      geometry.dispose()
+      material.dispose()
+    },
+  }
 }

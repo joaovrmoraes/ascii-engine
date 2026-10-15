@@ -1,15 +1,15 @@
-import type { AsciiEngine,Brush,BuiltScene,SceneDoc } from "@ascii-engine/core"
-import type * as THREE from "three"
-import type { AreaOptions } from "../../areas/types"
-import type { createPrefabs } from "../../scene/prefabs"
-import type { createAtmosphereStudio } from "../atmosphere"
-import type { createSceneCameras } from "../cameras"
-import type { createEffectEditor } from "../effects"
-import type { createExportDialog } from "../exportDialog"
-import type { Gizmos } from "../gizmos"
-import type { createPlacementPreview } from "../placement"
-import type { createTextureStudio } from "../textures"
-import type { Workspace } from "../workspace"
+import type { AsciiEngine, Brush, BuiltScene, SceneDoc } from '@ascii-engine/core'
+import type * as THREE from 'three'
+import type { AreaOptions } from '../../areas/types'
+import type { createPrefabs } from '../../scene/prefabs'
+import type { createAtmosphereStudio } from '../atmosphere'
+import type { createSceneCameras } from '../cameras'
+import type { createEffectEditor } from '../effects'
+import type { createExportDialog } from '../exportDialog'
+import type { Gizmos } from '../gizmos'
+import type { createPlacementPreview } from '../placement'
+import type { createTextureStudio } from '../textures'
+import type { Workspace } from '../workspace'
 export type Tool = 'select' | Brush | 'water' | 'place' | 'erase'
 
 /** Live ports between editor modules and document/history coordination. */
@@ -55,14 +55,24 @@ export interface SandboxContext {
   readonly scene: BuiltScene
   readonly selected: THREE.Object3D | undefined
   selectedWater: number
-  readonly setMode: (mode: "translate" | "rotate" | "scale" | "hand" | "orbit", cancelPlacement?: boolean) => void
+  readonly setMode: (
+    mode: 'translate' | 'rotate' | 'scale' | 'hand' | 'orbit',
+    cancelPlacement?: boolean,
+  ) => void
   readonly sidebar: HTMLElement
   readonly signal: AbortController
   readonly snapshot: () => SceneDoc
   readonly syncTransformFields: () => void
   textureStudio: ReturnType<typeof createTextureStudio> | undefined
-  readonly tool: { kind: Tool; radius: number; strength: number; layer: number; prefab: string; waterMode: "terrain" | "level"; }
-  transformMode: "translate" | "rotate" | "scale" | "hand" | "orbit"
+  readonly tool: {
+    kind: Tool
+    radius: number
+    strength: number
+    layer: number
+    prefab: string
+    waterMode: 'terrain' | 'level'
+  }
+  transformMode: 'translate' | 'rotate' | 'scale' | 'hand' | 'orbit'
   readonly ui: Workspace | undefined
   readonly undo: (redo?: boolean) => Promise<void>
 }

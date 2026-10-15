@@ -3,10 +3,25 @@ import { createAsciiPass, type AsciiPassHook } from './ascii'
 import { ABSENT, createIllumination, MAX_INK_LIGHTS } from './illumination'
 import type { LightObstacle } from './exploration'
 import { DEFAULT_ASCII_STYLE, engineStyle, type AsciiStyle } from './config'
-import { glyphStyleSources, mergeGlyphStyles, nodeGlyphStyle, resolveGlyphStyle, type GlyphStyle, type LinkedGlyphStyle, type ObjectTypeStyle } from './style'
+import {
+  glyphStyleSources,
+  mergeGlyphStyles,
+  nodeGlyphStyle,
+  resolveGlyphStyle,
+  type GlyphStyle,
+  type LinkedGlyphStyle,
+  type ObjectTypeStyle,
+} from './style'
 import type { TextureAsset } from './world/texture'
 import type { SurfaceKind } from './surface'
-import { bodyUniforms, glyphBody, removeGlyphBody, updateGlyphBodies, updateSkinnedBody, type BodyRamp } from './techniques/body'
+import {
+  bodyUniforms,
+  glyphBody,
+  removeGlyphBody,
+  updateGlyphBodies,
+  updateSkinnedBody,
+  type BodyRamp,
+} from './techniques/body'
 import { createCarpet, type Carpet, type GroundCover } from './techniques/carpet'
 import { createGlyphCloud, type GlyphCloud } from './techniques/particle'
 import { markScreen } from './techniques/screen'
@@ -34,35 +49,67 @@ export interface AddOptions extends LinkedGlyphStyle {
   parts?: Record<string, LinkedGlyphStyle>
 }
 
-interface Entry { object: THREE.Object3D; options: AddOptions }
+interface Entry {
+  object: THREE.Object3D
+  options: AddOptions
+}
 
 /** Anything with a mirror the engine renders when it is the nearest water. */
 export interface WaterSource {
   mesh: THREE.Mesh
-  reflection: { render(renderer: THREE.WebGLRenderer, scene: THREE.Scene, camera: THREE.OrthographicCamera): void; dispose(): void }
+  reflection: {
+    render(
+      renderer: THREE.WebGLRenderer,
+      scene: THREE.Scene,
+      camera: THREE.OrthographicCamera,
+    ): void
+    dispose(): void
+  }
   /** Distance (m) from a point to the water, 0 inside. */
   distance(x: number, z: number): number
   reflectionLevel?(x: number, z: number): number
   updateDynamics?(dt: number, time: number): void
   interact?(id: string, position: THREE.Vector3, radius?: number): void
   look: { reflection: { enabled: boolean } }
-  uniforms: { time: { value: number }; reflection?: THREE.IUniform<THREE.Texture | null>; reflectionMatrix?: THREE.IUniform<THREE.Matrix4>; reflectionOn?: THREE.IUniform<number>; waterViewDirection?: THREE.IUniform<THREE.Vector3>; waterLightDirection?: THREE.IUniform<THREE.Vector3>; waterLightColor?: THREE.IUniform<THREE.Color>; waterLightPower?: THREE.IUniform<number>; waterReflectionLevel?: THREE.IUniform<number> }
+  uniforms: {
+    time: { value: number }
+    reflection?: THREE.IUniform<THREE.Texture | null>
+    reflectionMatrix?: THREE.IUniform<THREE.Matrix4>
+    reflectionOn?: THREE.IUniform<number>
+    waterViewDirection?: THREE.IUniform<THREE.Vector3>
+    waterLightDirection?: THREE.IUniform<THREE.Vector3>
+    waterLightColor?: THREE.IUniform<THREE.Color>
+    waterLightPower?: THREE.IUniform<number>
+    waterReflectionLevel?: THREE.IUniform<number>
+  }
   dispose(): void
 }
 
-const BODY_RAMPS: Partial<Record<SurfaceKind, BodyRamp>> = { actor: 'actor', foliage: 'foliage', stone: 'stone', snow: 'snow', bark: 'bark', wood: 'bark' }
+const BODY_RAMPS: Partial<Record<SurfaceKind, BodyRamp>> = {
+  actor: 'actor',
+  foliage: 'foliage',
+  stone: 'stone',
+  snow: 'snow',
+  bark: 'bark',
+  wood: 'bark',
+}
 
 /**
  * Creates the engine on a canvas. Objects enter with a declared technique
  * (`engine.add(mesh, { glyph: 'body' })`), whole or part by part.
  */
 export function createAsciiEngine(canvas: HTMLCanvasElement, options: AsciiEngineOptions = {}) {
-  const renderer = new THREE.WebGLRenderer({ canvas, antialias: false, powerPreference: 'high-performance' })
+  const renderer = new THREE.WebGLRenderer({
+    canvas,
+    antialias: false,
+    powerPreference: 'high-performance',
+  })
   const maxRatio = options.maxPixelRatio ?? 1.5
   renderer.setPixelRatio(Math.max(1, Math.min(window.devicePixelRatio, maxRatio)))
   // The screen pass applies gamma itself.
   renderer.outputColorSpace = THREE.LinearSRGBColorSpace
-  renderer.shadowMap.enabled = true; renderer.shadowMap.type = THREE.PCFShadowMap
+  renderer.shadowMap.enabled = true
+  renderer.shadowMap.type = THREE.PCFShadowMap
   // One standing clip plane, far away except during the water mirror: the
   // plane count never changes, so materials never switch programs per frame.
   renderer.clippingPlanes = [new THREE.Plane(new THREE.Vector3(0, 1, 0), 1e9)]
@@ -71,8 +118,10 @@ export function createAsciiEngine(canvas: HTMLCanvasElement, options: AsciiEngin
   let style = structuredClone(initialStyle)
   const scene = new THREE.Scene()
   /** Layers drawn after the screen pass, with depth (Pomorog render order). */
-  const carpetScene = new THREE.Scene(), waterScene = new THREE.Scene(), particleScene = new THREE.Scene()
-  const camera = new THREE.OrthographicCamera(-6, 6, 5, -5, .1, 90)
+  const carpetScene = new THREE.Scene(),
+    waterScene = new THREE.Scene(),
+    particleScene = new THREE.Scene()
+  const camera = new THREE.OrthographicCamera(-6, 6, 5, -5, 0.1, 90)
   const target = new THREE.WebGLRenderTarget(1, 1)
   const depth = new THREE.DepthTexture(1, 1, THREE.UnsignedIntType)
   target.depthTexture = depth
@@ -93,7 +142,9 @@ export function createAsciiEngine(canvas: HTMLCanvasElement, options: AsciiEngin
     for (const cloud of clouds) shareIllumination(cloud.uniforms)
   }
   const bodies = bodyUniforms()
-  const carpets: Carpet[] = [], clouds: GlyphCloud[] = [], waters: WaterSource[] = []
+  const carpets: Carpet[] = [],
+    clouds: GlyphCloud[] = [],
+    waters: WaterSource[] = []
   const streaks: RainStreaks[] = []
   /** Letter clouds over skinned meshes, re-skinned every frame. */
   let skinnedLetters: THREE.Points[] = []
@@ -106,43 +157,65 @@ export function createAsciiEngine(canvas: HTMLCanvasElement, options: AsciiEngin
   const types: Record<string, ObjectTypeStyle> = { ...style.types }
   let textures: Record<string, TextureAsset> = {}
 
-  const lights = new THREE.Group(); lights.name = 'ascii-style-lights'
+  const lights = new THREE.Group()
+  lights.name = 'ascii-style-lights'
   const hemisphere = new THREE.HemisphereLight()
-  const moon = new THREE.DirectionalLight(); moon.castShadow = true
-  moon.shadow.bias = -.001; moon.shadow.normalBias = .04
+  const moon = new THREE.DirectionalLight()
+  moon.castShadow = true
+  moon.shadow.bias = -0.001
+  moon.shadow.normalBias = 0.04
   const fill = new THREE.DirectionalLight()
-  lights.add(hemisphere, moon, moon.target, fill); scene.add(lights)
+  lights.add(hemisphere, moon, moon.target, fill)
+  scene.add(lights)
 
-  const lantern = { position: ABSENT.clone(), on: false }, hearth = { position: ABSENT.clone(), power: 1, on: false }
-  const actors = { hero: null as THREE.Vector3 | null, foe: null as THREE.Vector3 | null, foeHeight: 1 }
+  const lantern = { position: ABSENT.clone(), on: false },
+    hearth = { position: ABSENT.clone(), power: 1, on: false }
+  const actors = {
+    hero: null as THREE.Vector3 | null,
+    foe: null as THREE.Vector3 | null,
+    foeHeight: 1,
+  }
   const focus = new THREE.Vector3()
-  let width = 1, height = 1, time = 0
+  let width = 1,
+    height = 1,
+    time = 0
 
   function applyStyle() {
     scene.background = new THREE.Color(style.background)
     scene.fog = style.fog ? new THREE.FogExp2(style.fog.color, style.fog.density) : null
-    hemisphere.color.setHex(style.hemisphere.sky); hemisphere.groundColor.setHex(style.hemisphere.ground); hemisphere.intensity = style.hemisphere.intensity
-    moon.color.setHex(style.moon.color); moon.intensity = style.moon.intensity
+    hemisphere.color.setHex(style.hemisphere.sky)
+    hemisphere.groundColor.setHex(style.hemisphere.ground)
+    hemisphere.intensity = style.hemisphere.intensity
+    moon.color.setHex(style.moon.color)
+    moon.intensity = style.moon.intensity
     moon.position.set(...style.moon.position)
     moon.shadow.mapSize.set(style.moon.mapSize, style.moon.mapSize)
     const e = style.moon.shadowExtent
-    Object.assign(moon.shadow.camera, { left: -e, right: e, top: e, bottom: -e, far: 40 }); moon.shadow.camera.updateProjectionMatrix()
+    Object.assign(moon.shadow.camera, { left: -e, right: e, top: e, bottom: -e, far: 40 })
+    moon.shadow.camera.updateProjectionMatrix()
     moon.shadow.intensity = style.moon.shadowIntensity
-    fill.color.setHex(style.fill.color); fill.intensity = style.fill.intensity; fill.position.set(...style.fill.position)
+    fill.color.setHex(style.fill.color)
+    fill.intensity = style.fill.intensity
+    fill.position.set(...style.fill.position)
     for (const carpet of carpets) carpet.uniforms.brightness.value = style.brightness
   }
   applyStyle()
 
   /** Same uniform objects in every pass that lights ink (Pomorog `Object.assign`). */
-  function shareIllumination(uniforms: Record<string, THREE.IUniform>) { Object.assign(uniforms, illumination.uniforms) }
+  function shareIllumination(uniforms: Record<string, THREE.IUniform>) {
+    Object.assign(uniforms, illumination.uniforms)
+  }
   shareIllumination(ascii.material.uniforms)
   shareIllumination(bodies)
-  const lightPosition = new THREE.Vector3(), originalMoonColor = new THREE.Color(DEFAULT_ASCII_STYLE.moon.color)
+  const lightPosition = new THREE.Vector3(),
+    originalMoonColor = new THREE.Color(DEFAULT_ASCII_STYLE.moon.color)
 
   function resize() {
-    width = Math.max(canvas.clientWidth, 1); height = Math.max(canvas.clientHeight, 1)
+    width = Math.max(canvas.clientWidth, 1)
+    height = Math.max(canvas.clientHeight, 1)
     renderer.setSize(width, height, false)
-    const size = renderer.getDrawingBufferSize(new THREE.Vector2()); target.setSize(size.x, size.y)
+    const size = renderer.getDrawingBufferSize(new THREE.Vector2())
+    target.setSize(size.x, size.y)
     for (const cloud of clouds) cloud.occludeWith(depth, size.x, size.y)
     for (const layer of streaks) layer.occludeWith(depth, size.x, size.y)
     ascii.material.uniforms.resolution.value.set(width, height)
@@ -150,30 +223,47 @@ export function createAsciiEngine(canvas: HTMLCanvasElement, options: AsciiEngin
 
   // Per-part styling: every mesh resolves its own style; one part = one body.
   const materialCache = new Map<THREE.Material, Map<string, THREE.Material>>()
-  function variant(material: THREE.Material, key: string, make: (copy: THREE.Material) => THREE.Material) {
+  function variant(
+    material: THREE.Material,
+    key: string,
+    make: (copy: THREE.Material) => THREE.Material,
+  ) {
     let byKey = materialCache.get(material)
-    if (!byKey) materialCache.set(material, byKey = new Map())
+    if (!byKey) materialCache.set(material, (byKey = new Map()))
     let made = byKey.get(key)
     if (!made) {
       // `clone()` drops shader injections: carry them over (floor colour, snow cover…).
       const copy = material.clone()
       copy.onBeforeCompile = material.onBeforeCompile
-      if (Object.prototype.hasOwnProperty.call(material, 'customProgramCacheKey')) copy.customProgramCacheKey = material.customProgramCacheKey
-      made = make(copy); made.userData.asciiOriginal = material; byKey.set(key, made)
+      if (Object.prototype.hasOwnProperty.call(material, 'customProgramCacheKey'))
+        copy.customProgramCacheKey = material.customProgramCacheKey
+      made = make(copy)
+      made.userData.asciiOriginal = material
+      byKey.set(key, made)
     }
     return made
   }
-  function swapMaterials(mesh: THREE.Mesh, key: string, make: (copy: THREE.Material) => THREE.Material) {
+  function swapMaterials(
+    mesh: THREE.Mesh,
+    key: string,
+    make: (copy: THREE.Material) => THREE.Material,
+  ) {
     if (!mesh.userData.asciiOriginal) mesh.userData.asciiOriginal = mesh.material
     const original = mesh.userData.asciiOriginal as THREE.Material | THREE.Material[]
-    mesh.material = Array.isArray(original) ? original.map((m) => variant(m, key, make)) : variant(original, key, make)
+    mesh.material = Array.isArray(original)
+      ? original.map(m => variant(m, key, make))
+      : variant(original, key, make)
   }
 
   function apply(entry: Entry) {
     const { object, options: instance } = entry
     const type = instance.type ? types[instance.type] : undefined
-    if (instance.type && !type) throw new Error(`ascii-engine: unknown object type "${instance.type}"`)
-    const partNames = new Set([...Object.keys(type?.parts ?? {}), ...Object.keys(instance.parts ?? {})])
+    if (instance.type && !type)
+      throw new Error(`ascii-engine: unknown object type "${instance.type}"`)
+    const partNames = new Set([
+      ...Object.keys(type?.parts ?? {}),
+      ...Object.keys(instance.parts ?? {}),
+    ])
     const groups = new Map<string, { style: GlyphStyle; meshes: THREE.Object3D[] }>()
     const missing: string[] = []
     // The instance layer is the style fields only (not `type` and `parts`).
@@ -182,7 +272,12 @@ export function createAsciiEngine(canvas: HTMLCanvasElement, options: AsciiEngin
       if (id && !textures[id]) throw new Error(`ascii-engine: unknown texture "${id}"`)
       return id ? textures[id].style : undefined
     }
-    const visit = (node: THREE.Object3D, part: string | undefined, nodeStyle: GlyphStyle | undefined, defaults: GlyphStyle | undefined) => {
+    const visit = (
+      node: THREE.Object3D,
+      part: string | undefined,
+      nodeStyle: GlyphStyle | undefined,
+      defaults: GlyphStyle | undefined,
+    ) => {
       if (node.userData.glyphBodyOf) return
       // An object added on its own keeps its own styles (a tree inside a chunk).
       if (node !== object && entries.has(node)) return
@@ -190,29 +285,48 @@ export function createAsciiEngine(canvas: HTMLCanvasElement, options: AsciiEngin
       const own = nodeGlyphStyle(node.userData)
       if (own && node.userData.glyphDefault) defaults = { ...defaults, ...own }
       else if (own) nodeStyle = { ...nodeStyle, ...own }
-      if (node instanceof THREE.Mesh || node instanceof THREE.Points || node instanceof THREE.LineSegments) {
-        const layers = { defaults, global: style.glyphs, type, part, node: nodeStyle, texture: linked(instance.texture), texturePart: linked(part ? instance.parts?.[part]?.texture : undefined), instance: instanceStyle, instanceParts: instance.parts }
+      if (
+        node instanceof THREE.Mesh ||
+        node instanceof THREE.Points ||
+        node instanceof THREE.LineSegments
+      ) {
+        const layers = {
+          defaults,
+          global: style.glyphs,
+          type,
+          part,
+          node: nodeStyle,
+          texture: linked(instance.texture),
+          texturePart: linked(part ? instance.parts?.[part]?.texture : undefined),
+          instance: instanceStyle,
+          instanceParts: instance.parts,
+        }
         const style_ = resolveGlyphStyle(layers)
         if (!style_.glyph) missing.push(node.name || node.type)
         else {
-          node.userData.glyphResolved = style_; node.userData.glyphPart = part
+          node.userData.glyphResolved = style_
+          node.userData.glyphPart = part
           node.userData.glyphSources = glyphStyleSources(layers)
           // A body is the whole part (or whole object): one spacing hash.
           const key = `${part ?? ''}|${JSON.stringify(style_)}`
           let group = groups.get(key)
-          if (!group) groups.set(key, group = { style: style_, meshes: [] })
+          if (!group) groups.set(key, (group = { style: style_, meshes: [] }))
           group.meshes.push(node)
         }
       }
       for (const child of [...node.children]) visit(child, part, nodeStyle, defaults)
     }
     visit(object, undefined, undefined, undefined)
-    if (missing.length) throw new Error(`ascii-engine: no declared technique (glyph) on ${missing.slice(0, 5).join(', ')}`)
+    if (missing.length)
+      throw new Error(
+        `ascii-engine: no declared technique (glyph) on ${missing.slice(0, 5).join(', ')}`,
+      )
     for (const { style: s, meshes } of groups.values()) applyTechnique(s, meshes)
   }
 
   /** Shader materials write their own ID (water, legacy floors): leave them alone. */
-  const standardLike = (mesh: THREE.Mesh) => ![mesh.material].flat().some((m) => m instanceof THREE.ShaderMaterial)
+  const standardLike = (mesh: THREE.Mesh) =>
+    ![mesh.material].flat().some(m => m instanceof THREE.ShaderMaterial)
   function applyTechnique(s: GlyphStyle, nodes: THREE.Object3D[]) {
     const meshes = nodes.filter((n): n is THREE.Mesh => n instanceof THREE.Mesh)
     const tint = (copy: THREE.Material, appearance: GlyphStyle = s) => {
@@ -220,47 +334,73 @@ export function createAsciiEngine(canvas: HTMLCanvasElement, options: AsciiEngin
         if (appearance.palette) copy.color.setHex(0xffffff)
         else if (appearance.color !== undefined) copy.color.setHex(appearance.color)
         if (appearance.emissive !== undefined) copy.emissive.setHex(appearance.emissive)
-        if (appearance.emissiveIntensity !== undefined) copy.emissiveIntensity = appearance.emissiveIntensity
+        if (appearance.emissiveIntensity !== undefined)
+          copy.emissiveIntensity = appearance.emissiveIntensity
       }
       return copy
     }
     switch (s.glyph) {
       case 'surface':
-        for (const mesh of meshes.filter(standardLike)) swapMaterials(mesh, `surface:${JSON.stringify(s)}`, (copy) => {
-          if (!(copy instanceof THREE.MeshStandardMaterial)) return copy
-          const appearance = mesh.userData.terrainLooks ? mergeGlyphStyles(s, copy.userData.glyphStyle) : s
-          tint(copy, appearance)
-          if (mesh.userData.terrainLooks && appearance.color !== undefined) copy.vertexColors = false
-          if (appearance.surface) copy.userData.asciiSurface = appearance.surface
-          copy.userData.glyphResolved = appearance
-          return surfaceMaterial(copy, 'generic', appearance)
-        })
+        for (const mesh of meshes.filter(standardLike))
+          swapMaterials(mesh, `surface:${JSON.stringify(s)}`, copy => {
+            if (!(copy instanceof THREE.MeshStandardMaterial)) return copy
+            const appearance = mesh.userData.terrainLooks
+              ? mergeGlyphStyles(s, copy.userData.glyphStyle)
+              : s
+            tint(copy, appearance)
+            if (mesh.userData.terrainLooks && appearance.color !== undefined)
+              copy.vertexColors = false
+            if (appearance.surface) copy.userData.asciiSurface = appearance.surface
+            copy.userData.glyphResolved = appearance
+            return surfaceMaterial(copy, 'generic', appearance)
+          })
         return
       case 'screen':
-        for (const mesh of meshes.filter(standardLike)) swapMaterials(mesh, `screen:${s.surface ?? 'actor'}:${s.color ?? ''}`, (copy) => markScreen(tint(copy), s.surface ?? 'actor'))
+        for (const mesh of meshes.filter(standardLike))
+          swapMaterials(mesh, `screen:${s.surface ?? 'actor'}:${s.color ?? ''}`, copy =>
+            markScreen(tint(copy), s.surface ?? 'actor'),
+          )
         return
       case 'body': {
-        if (s.color !== undefined || s.palette || s.emissive !== undefined || s.emissiveIntensity !== undefined) for (const mesh of meshes.filter(standardLike)) swapMaterials(mesh, `body-color:${s.color}:${!!s.palette}:${s.emissive}:${s.emissiveIntensity}`, copy => tint(copy))
+        if (
+          s.color !== undefined ||
+          s.palette ||
+          s.emissive !== undefined ||
+          s.emissiveIntensity !== undefined
+        )
+          for (const mesh of meshes.filter(standardLike))
+            swapMaterials(
+              mesh,
+              `body-color:${s.color}:${!!s.palette}:${s.emissive}:${s.emissiveIntensity}`,
+              copy => tint(copy),
+            )
         const ramp = s.surface ? BODY_RAMPS[s.surface] : undefined
         const scenery = ramp && ramp !== 'actor'
-        skinnedLetters.push(...glyphBody(meshes, bodies, s.size ?? (scenery ? .19 : .155), 'actor', ramp, s))
+        skinnedLetters.push(
+          ...glyphBody(meshes, bodies, s.size ?? (scenery ? 0.19 : 0.155), 'actor', ramp, s),
+        )
         return
       }
       case 'carpet':
         for (const mesh of nodes) {
-          if (!carpets.some((c) => c.mesh === mesh)) throw new Error('ascii-engine: carpet must come from engine.createCarpet()')
+          if (!carpets.some(c => c.mesh === mesh))
+            throw new Error('ascii-engine: carpet must come from engine.createCarpet()')
           carpetScene.add(mesh)
         }
         return
       case 'particle':
         for (const mesh of nodes) {
-          if (!clouds.some((c) => c.mesh === mesh) && !streaks.some((r) => r.mesh === mesh)) throw new Error('ascii-engine: particle must come from engine.createParticles() or createRainStreaks()')
+          if (!clouds.some(c => c.mesh === mesh) && !streaks.some(r => r.mesh === mesh))
+            throw new Error(
+              'ascii-engine: particle must come from engine.createParticles() or createRainStreaks()',
+            )
           particleScene.add(mesh)
         }
         return
       case 'water':
         for (const mesh of nodes) {
-          if (!waters.some((w) => w.mesh === mesh)) throw new Error('ascii-engine: water must come from engine.createWater()')
+          if (!waters.some(w => w.mesh === mesh))
+            throw new Error('ascii-engine: water must come from engine.createWater()')
           if (!mesh.parent) scene.add(mesh)
         }
         return
@@ -278,7 +418,10 @@ export function createAsciiEngine(canvas: HTMLCanvasElement, options: AsciiEngin
     visit(entry.object)
     for (const mesh of meshes) {
       if (mesh.userData.glyphBodyMaterial) removeGlyphBody(mesh)
-      if (mesh.userData.asciiOriginal) { mesh.material = mesh.userData.asciiOriginal; delete mesh.userData.asciiOriginal }
+      if (mesh.userData.asciiOriginal) {
+        mesh.material = mesh.userData.asciiOriginal
+        delete mesh.userData.asciiOriginal
+      }
     }
   }
 
@@ -292,15 +435,29 @@ export function createAsciiEngine(canvas: HTMLCanvasElement, options: AsciiEngin
     debug,
     /** Debug post-pass override. Does not change authored object techniques or style. */
     setRenderMode(mode: 'glyphs' | 'screen' | 'raw') {
-      debug.raw = mode === 'raw'; debug.screen = mode === 'screen'
+      debug.raw = mode === 'raw'
+      debug.screen = mode === 'screen'
     },
-    get renderMode(): 'glyphs' | 'screen' | 'raw' { return debug.raw ? 'raw' : debug.screen ? 'screen' : 'glyphs' },
-    renderer, scene, camera, carpetScene, waterScene, particleScene,
+    get renderMode(): 'glyphs' | 'screen' | 'raw' {
+      return debug.raw ? 'raw' : debug.screen ? 'screen' : 'glyphs'
+    },
+    renderer,
+    scene,
+    camera,
+    carpetScene,
+    waterScene,
+    particleScene,
     lights: { hemisphere, moon, fill },
-    get style() { return style },
-    get time() { return time },
+    get style() {
+      return style
+    },
+    get time() {
+      return time
+    },
     /** Last frame step (clamped). */
-    get dt() { return lastDt },
+    get dt() {
+      return lastDt
+    },
 
     /**
      * Adds an object with a declared technique. Style layers, most specific
@@ -308,56 +465,89 @@ export function createAsciiEngine(canvas: HTMLCanvasElement, options: AsciiEngin
      * `parts[name]`. Parts are matched by node name and cover the subtree.
      */
     add<T extends THREE.Object3D>(object: T, options: AddOptions = {}): T {
-      object.traverse(node => { detachedLayers.get(node)?.(); detachedLayers.delete(node) })
+      object.traverse(node => {
+        detachedLayers.get(node)?.()
+        detachedLayers.delete(node)
+      })
       const entry: Entry = { object, options: { ...options, parts: { ...options.parts } } }
       const isLayer = object.userData.glyph === 'carpet' || object.userData.glyph === 'particle'
       if (!isLayer && !object.parent) scene.add(object)
-      try { apply(entry); entries.set(object, entry) }
-      catch (error) { unapply(entry); object.removeFromParent(); throw error }
+      try {
+        apply(entry)
+        entries.set(object, entry)
+      } catch (error) {
+        unapply(entry)
+        object.removeFromParent()
+        throw error
+      }
       return object
     },
     /** Takes an object out. `dispose`: free its geometry, materials and letters too. */
     remove(object: THREE.Object3D, options: { dispose?: boolean } = {}) {
-      if (options.dispose) object.traverse(node => { detachedLayers.get(node)?.(); detachedLayers.delete(node) })
+      if (options.dispose)
+        object.traverse(node => {
+          detachedLayers.get(node)?.()
+          detachedLayers.delete(node)
+        })
       const removed = new Set<THREE.Object3D>()
-      object.traverse((node) => removed.add(node))
+      object.traverse(node => removed.add(node))
       // Every object added below this one leaves too (a chunk and its trees).
-      object.traverse((node) => {
+      object.traverse(node => {
         const entry = entries.get(node)
-        if (entry) { unapply(entry); entries.delete(node) }
+        if (entry) {
+          unapply(entry)
+          entries.delete(node)
+        }
       })
       object.removeFromParent()
       // Detached layers must stop receiving updates, even when kept for reuse.
       const releasedLayers = new Set<THREE.Object3D>()
       const removeLayers = <T extends { mesh: THREE.Object3D; dispose(): void }>(list: T[]) => {
-        for (let i = list.length - 1; i >= 0; i--) if (removed.has(list[i].mesh)) {
-          const layer = list[i]
-          const gain = gains.get(layer)
-          gains.delete(layer)
-          list.splice(i, 1)
-          if (options.dispose) { layer.dispose(); releasedLayers.add(layer.mesh) }
-          else detachedLayers.set(layer.mesh, () => { list.push(layer); if (gain !== undefined) gains.set(layer, gain) })
-        }
+        for (let i = list.length - 1; i >= 0; i--)
+          if (removed.has(list[i].mesh)) {
+            const layer = list[i]
+            const gain = gains.get(layer)
+            gains.delete(layer)
+            list.splice(i, 1)
+            if (options.dispose) {
+              layer.dispose()
+              releasedLayers.add(layer.mesh)
+            } else
+              detachedLayers.set(layer.mesh, () => {
+                list.push(layer)
+                if (gain !== undefined) gains.set(layer, gain)
+              })
+          }
       }
-      removeLayers(carpets); removeLayers(clouds); removeLayers(streaks)
-      skinnedLetters = skinnedLetters.filter((points) => points.parent && !removed.has(points.parent))
+      removeLayers(carpets)
+      removeLayers(clouds)
+      removeLayers(streaks)
+      skinnedLetters = skinnedLetters.filter(points => points.parent && !removed.has(points.parent))
       if (!options.dispose) return
-      const geometries = new Set<THREE.BufferGeometry>(), materials = new Set<THREE.Material>()
-      object.traverse((node) => {
+      const geometries = new Set<THREE.BufferGeometry>(),
+        materials = new Set<THREE.Material>()
+      object.traverse(node => {
         if (releasedLayers.has(node)) return
         if (node instanceof THREE.InstancedMesh) node.dispose()
         if (node instanceof THREE.Mesh || node instanceof THREE.Points) {
           if (!node.userData.sharedGeometry) geometries.add(node.geometry)
-          for (const m of Array.isArray(node.material) ? node.material : [node.material]) materials.add(m)
+          for (const m of Array.isArray(node.material) ? node.material : [node.material])
+            materials.add(m)
         }
-        const water = waters.findIndex((w) => w.mesh === node)
-        if (water >= 0) { waters[water].dispose(); waters.splice(water, 1) }
+        const water = waters.findIndex(w => w.mesh === node)
+        if (water >= 0) {
+          waters[water].dispose()
+          waters.splice(water, 1)
+        }
       })
-      geometries.forEach((g) => g.dispose())
+      geometries.forEach(g => g.dispose())
       for (const m of materials) {
         if (m.userData.shared) continue
         const variants = materialCache.get(m)
-        if (variants) { variants.forEach((v) => v.dispose()); materialCache.delete(m) }
+        if (variants) {
+          variants.forEach(v => v.dispose())
+          materialCache.delete(m)
+        }
         m.dispose()
       }
     },
@@ -365,37 +555,72 @@ export function createAsciiEngine(canvas: HTMLCanvasElement, options: AsciiEngin
     setPartStyle(object: THREE.Object3D, part: string, partStyle: LinkedGlyphStyle) {
       const entry = entries.get(object)
       if (!entry) throw new Error('ascii-engine: object was not added with engine.add')
-      entry.options.parts = { ...entry.options.parts, [part]: { ...entry.options.parts?.[part], ...partStyle } }
-      unapply(entry); apply(entry)
+      entry.options.parts = {
+        ...entry.options.parts,
+        [part]: { ...entry.options.parts?.[part], ...partStyle },
+      }
+      unapply(entry)
+      apply(entry)
     },
     /** Changes the instance layer of one added object (all its parts unless they override). */
     setInstanceStyle(object: THREE.Object3D, instanceStyle: AddOptions) {
       const entry = entries.get(object)
       if (!entry) throw new Error('ascii-engine: object was not added with engine.add')
       entry.options = { ...entry.options, ...instanceStyle }
-      unapply(entry); apply(entry)
+      unapply(entry)
+      apply(entry)
     },
     /** Replaces the whole instance layer (fields absent from `options` are removed). */
     setInstanceOptions(object: THREE.Object3D, options: AddOptions) {
       const entry = entries.get(object)
       if (!entry) throw new Error('ascii-engine: object was not added with engine.add')
       entry.options = structuredClone(options)
-      unapply(entry); apply(entry)
+      unapply(entry)
+      apply(entry)
     },
     /** Registers or changes an object type; `part` changes that part in every instance. */
     setTypeStyle(typeName: string, typeStyle: ObjectTypeStyle) {
       const previous = types[typeName]
-      types[typeName] = { style: { ...previous?.style, ...typeStyle.style }, parts: { ...previous?.parts },
-        ...(previous?.authored || typeStyle.authored ? { authored: {
-          style: [...new Set([...(previous?.authored?.style ?? []), ...(typeStyle.authored?.style ?? [])])],
-          parts: { ...previous?.authored?.parts, ...Object.fromEntries(Object.entries(typeStyle.authored?.parts ?? {}).map(([part, keys]) => [part, [...new Set([...(previous?.authored?.parts?.[part] ?? []), ...keys])]])) },
-        } } : {}) }
-      for (const [part, partStyle] of Object.entries(typeStyle.parts ?? {})) types[typeName].parts![part] = { ...previous?.parts?.[part], ...partStyle }
-      for (const entry of entries.values()) if (entry.options.type === typeName) { unapply(entry); apply(entry) }
+      types[typeName] = {
+        style: { ...previous?.style, ...typeStyle.style },
+        parts: { ...previous?.parts },
+        ...(previous?.authored || typeStyle.authored
+          ? {
+              authored: {
+                style: [
+                  ...new Set([
+                    ...(previous?.authored?.style ?? []),
+                    ...(typeStyle.authored?.style ?? []),
+                  ]),
+                ],
+                parts: {
+                  ...previous?.authored?.parts,
+                  ...Object.fromEntries(
+                    Object.entries(typeStyle.authored?.parts ?? {}).map(([part, keys]) => [
+                      part,
+                      [...new Set([...(previous?.authored?.parts?.[part] ?? []), ...keys])],
+                    ]),
+                  ),
+                },
+              },
+            }
+          : {}),
+      }
+      for (const [part, partStyle] of Object.entries(typeStyle.parts ?? {}))
+        types[typeName].parts![part] = { ...previous?.parts?.[part], ...partStyle }
+      for (const entry of entries.values())
+        if (entry.options.type === typeName) {
+          unapply(entry)
+          apply(entry)
+        }
     },
-    getTypeStyle(typeName: string): ObjectTypeStyle | undefined { return types[typeName] },
+    getTypeStyle(typeName: string): ObjectTypeStyle | undefined {
+      return types[typeName]
+    },
     /** Object types known to the engine (preset types plus registered ones). */
-    get types() { return types as Readonly<Record<string, ObjectTypeStyle>> },
+    get types() {
+      return types as Readonly<Record<string, ObjectTypeStyle>>
+    },
 
     /**
      * What is under a screen point (NDC −1..1): the added object, the node hit,
@@ -406,46 +631,81 @@ export function createAsciiEngine(canvas: HTMLCanvasElement, options: AsciiEngin
       raycaster.setFromCamera(new THREE.Vector2(ndcX, ndcY), camera)
       for (const hit of raycaster.intersectObjects(scene.children, true)) {
         if (!(hit.object instanceof THREE.Mesh) || !hit.object.visible) continue
-        let ancestor: THREE.Object3D | null = hit.object.parent, hidden = false
-        while (ancestor) { if (!ancestor.visible) { hidden = true; break }; ancestor = ancestor.parent }
+        let ancestor: THREE.Object3D | null = hit.object.parent,
+          hidden = false
+        while (ancestor) {
+          if (!ancestor.visible) {
+            hidden = true
+            break
+          }
+          ancestor = ancestor.parent
+        }
         if (hidden) continue
-        let node: THREE.Object3D | null = hit.object, part: string | undefined
-        while (node && !entries.has(node)) { if (!part && node.name) part = node.name; node = node.parent }
+        let node: THREE.Object3D | null = hit.object,
+          part: string | undefined
+        while (node && !entries.has(node)) {
+          if (!part && node.name) part = node.name
+          node = node.parent
+        }
         if (!node) continue
         const entry = entries.get(node)!
         if (part === node.name) part = undefined
         return {
-          object: node, node: hit.object, part: (hit.object.userData.glyphPart as string | undefined) ?? part,
-          type: entry.options.type, style: hit.object.userData.glyphResolved as GlyphStyle | undefined,
-          instance: entry.options as AddOptions, point: hit.point,
+          object: node,
+          node: hit.object,
+          part: (hit.object.userData.glyphPart as string | undefined) ?? part,
+          type: entry.options.type,
+          style: hit.object.userData.glyphResolved as GlyphStyle | undefined,
+          instance: entry.options as AddOptions,
+          point: hit.point,
         }
       }
       return undefined
     },
     /** Style data (global layer and object types) as JSON-ready data. */
-    exportStyle(): Partial<AsciiStyle> { return JSON.parse(JSON.stringify({ ...style, types })) },
+    exportStyle(): Partial<AsciiStyle> {
+      return JSON.parse(JSON.stringify({ ...style, types }))
+    },
     /** Instance options of an added object (its own layer and its parts). */
-    instanceStyle(object: THREE.Object3D) { return entries.get(object)?.options },
+    instanceStyle(object: THREE.Object3D) {
+      return entries.get(object)?.options
+    },
     /** Update resources and re-resolve linked users without copying asset fields. */
     /** `keepUsed` retains current recipes still linked by added objects (e.g. while a replacement scene is built). */
     setTextures(next: Record<string, TextureAsset>, options: { keepUsed?: boolean } = {}) {
       const resolved = { ...next }
       for (const entry of entries.values()) {
-        const ids = [entry.options.texture, ...Object.values(entry.options.parts ?? {}).map(part => part.texture)]
-        for (const id of ids) if (id && !resolved[id]) {
-          if (options.keepUsed && textures[id]) resolved[id] = textures[id]
-          else throw new Error(`ascii-engine: texture is in use "${id}"`)
-        }
+        const ids = [
+          entry.options.texture,
+          ...Object.values(entry.options.parts ?? {}).map(part => part.texture),
+        ]
+        for (const id of ids)
+          if (id && !resolved[id]) {
+            if (options.keepUsed && textures[id]) resolved[id] = textures[id]
+            else throw new Error(`ascii-engine: texture is in use "${id}"`)
+          }
       }
       textures = structuredClone(resolved)
-      for (const entry of entries.values()) if (entry.options.texture || Object.values(entry.options.parts ?? {}).some(part => part.texture)) { unapply(entry); apply(entry) }
+      for (const entry of entries.values())
+        if (
+          entry.options.texture ||
+          Object.values(entry.options.parts ?? {}).some(part => part.texture)
+        ) {
+          unapply(entry)
+          apply(entry)
+        }
     },
-    get textures(): Readonly<Record<string, TextureAsset>> { return textures },
+    get textures(): Readonly<Record<string, TextureAsset>> {
+      return textures
+    },
 
     /** A carpet of standing letters; add `carpet.mesh` with `{ glyph: 'carpet' }`. */
     createCarpet(cover: GroundCover, seed = 48017) {
       let s = seed
-      const carpet = createCarpet(() => { s = (s * 1664525 + 1013904223) >>> 0; return s / 4294967296 }, cover)
+      const carpet = createCarpet(() => {
+        s = (s * 1664525 + 1013904223) >>> 0
+        return s / 4294967296
+      }, cover)
       shareIllumination(carpet.uniforms)
       carpet.uniforms.brightness.value = style.brightness
       carpets.push(carpet)
@@ -473,32 +733,70 @@ export function createAsciiEngine(canvas: HTMLCanvasElement, options: AsciiEngin
       if (next.types) Object.assign(types, next.types)
       applyStyle()
       // The global letter layer or object types changed: re-resolve every object.
-      if (options.replace || next.glyphs || next.types) for (const entry of entries.values()) { unapply(entry); apply(entry) }
+      if (options.replace || next.glyphs || next.types)
+        for (const entry of entries.values()) {
+          unapply(entry)
+          apply(entry)
+        }
       if (style.interior !== interior) rebuildIllumination()
     },
     /** Footprints that block the lantern's sight in interiors (discovery map). */
-    setObstacles(list: LightObstacle[]) { obstacles = list; rebuildIllumination() },
+    setObstacles(list: LightObstacle[]) {
+      obstacles = list
+      rebuildIllumination()
+    },
     /** Warm local lights that pick letters: the hero's lantern and the hearth. */
-    setLights(next: { lantern?: THREE.Vector3 | null; hearth?: THREE.Vector3 | null; hearthPower?: number }) {
-      if (next.lantern !== undefined) { lantern.on = !!next.lantern; lantern.position.copy(next.lantern ?? ABSENT) }
-      if (next.hearth !== undefined) { hearth.on = !!next.hearth; hearth.position.copy(next.hearth ?? ABSENT) }
+    setLights(next: {
+      lantern?: THREE.Vector3 | null
+      hearth?: THREE.Vector3 | null
+      hearthPower?: number
+    }) {
+      if (next.lantern !== undefined) {
+        lantern.on = !!next.lantern
+        lantern.position.copy(next.lantern ?? ABSENT)
+      }
+      if (next.hearth !== undefined) {
+        hearth.on = !!next.hearth
+        hearth.position.copy(next.hearth ?? ABSENT)
+      }
       if (next.hearthPower !== undefined) hearth.power = next.hearthPower
     },
     /** Hero and foe: grass parts around them, contact shadow under them. */
-    setActors(next: { hero?: THREE.Vector3 | null; foe?: THREE.Vector3 | null; foeHeight?: number }) {
+    setActors(next: {
+      hero?: THREE.Vector3 | null
+      foe?: THREE.Vector3 | null
+      foeHeight?: number
+    }) {
       if (next.hero !== undefined) actors.hero = next.hero
       if (next.foe !== undefined) actors.foe = next.foe
       if (next.foeHeight !== undefined) actors.foeHeight = next.foeHeight
     },
     /** Isometric framing: `focus + (sin a·15, 18, cos a·15)`, `a = π/7` by default. */
-    frame(target: THREE.Vector3, span: number, angle = Math.PI / 7, elevation = Math.atan2(18, 15)) {
+    frame(
+      target: THREE.Vector3,
+      span: number,
+      angle = Math.PI / 7,
+      elevation = Math.atan2(18, 15),
+    ) {
       focus.copy(target)
       const aspect = width / height
-      camera.left = -span * aspect; camera.right = span * aspect; camera.top = span; camera.bottom = -span
-      const distance = Math.hypot(15, 18), horizontal = Math.cos(elevation) * distance
-      camera.zoom = 1; camera.near = .1; camera.far = 90
-      camera.position.set(target.x + Math.sin(angle) * horizontal, target.y + Math.sin(elevation) * distance, target.z + Math.cos(angle) * horizontal)
-      camera.lookAt(target); camera.updateProjectionMatrix(); camera.updateMatrixWorld()
+      camera.left = -span * aspect
+      camera.right = span * aspect
+      camera.top = span
+      camera.bottom = -span
+      const distance = Math.hypot(15, 18),
+        horizontal = Math.cos(elevation) * distance
+      camera.zoom = 1
+      camera.near = 0.1
+      camera.far = 90
+      camera.position.set(
+        target.x + Math.sin(angle) * horizontal,
+        target.y + Math.sin(elevation) * distance,
+        target.z + Math.cos(angle) * horizontal,
+      )
+      camera.lookAt(target)
+      camera.updateProjectionMatrix()
+      camera.updateMatrixWorld()
     },
     /** A water body (§3.2); add `water.mesh` with `{ glyph: 'water' }`. */
     createWater(shape: WaterShape, waterOptions?: WaterOptions) {
@@ -507,8 +805,14 @@ export function createAsciiEngine(canvas: HTMLCanvasElement, options: AsciiEngin
       return water
     },
     /** Registers another water (e.g. the old marsh preset); add its mesh with `{ glyph: 'water' }`. */
-    addWater<T extends WaterSource>(water: T): T { water.mesh.userData.glyph = 'water'; waters.push(water); return water },
-    get waters() { return waters as readonly WaterSource[] },
+    addWater<T extends WaterSource>(water: T): T {
+      water.mesh.userData.glyph = 'water'
+      waters.push(water)
+      return water
+    },
+    get waters() {
+      return waters as readonly WaterSource[]
+    },
     /** 1 px rain strokes, occluded by the world; add `rain.mesh` with `{ glyph: 'particle' }`. */
     createRainStreaks(capacity = 800) {
       const layer = createRainStreaks(capacity)
@@ -519,7 +823,9 @@ export function createAsciiEngine(canvas: HTMLCanvasElement, options: AsciiEngin
       return layer
     },
     /** Extra ink for one particle layer (cloud or rain), multiplied by the style brightness. */
-    setGain(layer: GlyphCloud | RainStreaks, gain: number) { gains.set(layer, gain) },
+    setGain(layer: GlyphCloud | RainStreaks, gain: number) {
+      gains.set(layer, gain)
+    },
     /** Lazy effect system; registers only the recipes supplied by the consumer. */
     get fx(): EffectSystem {
       if (!effects) {
@@ -531,16 +837,30 @@ export function createAsciiEngine(canvas: HTMLCanvasElement, options: AsciiEngin
       return effects
     },
     /** Lightning flash 0–1: lights every ink (Pomorog `stormFlash`). */
-    setFlash(flash: number) { illumination.uniforms.stormFlash.value = flash },
-    set reflectionRange(metres: number) { reflectionRange = metres },
-    get size() { return { width, height } },
-    get resources() { return { objects: entries.size, carpets: carpets.length, particles: clouds.length, rain: streaks.length, waters: waters.length } },
+    setFlash(flash: number) {
+      illumination.uniforms.stormFlash.value = flash
+    },
+    set reflectionRange(metres: number) {
+      reflectionRange = metres
+    },
+    get size() {
+      return { width, height }
+    },
+    get resources() {
+      return {
+        objects: entries.size,
+        carpets: carpets.length,
+        particles: clouds.length,
+        rain: streaks.length,
+        waters: waters.length,
+      }
+    },
     resize,
 
     /** One frame. `dt` is clamped to [0, .08] (a negative step once blew up poses). */
     render(dt: number, options: { redraw?: boolean } = {}) {
       if (canvas.clientWidth !== width || canvas.clientHeight !== height) resize()
-      dt = options.redraw ? 0 : THREE.MathUtils.clamp(dt, 0, .08)
+      dt = options.redraw ? 0 : THREE.MathUtils.clamp(dt, 0, 0.08)
       time += dt
       camera.updateMatrixWorld()
       illumination.place(lantern.on ? lantern.position : null, hearth.on ? hearth.position : null)
@@ -551,52 +871,110 @@ export function createAsciiEngine(canvas: HTMLCanvasElement, options: AsciiEngin
       uniforms.inverseProjection.value.copy(camera.projectionMatrixInverse)
       uniforms.cameraWorld.value.copy(camera.matrixWorld)
       const contacts = uniforms.contacts.value as THREE.Vector4[]
-      if (actors.hero) contacts[0].set(actors.hero.x, actors.hero.z, .55, 1); else contacts[0].set(100, 100, 0, 0)
-      if (actors.foe) contacts[1].set(actors.foe.x, actors.foe.z, Math.max(.5, actors.foeHeight * .45), 1); else contacts[1].set(100, 100, 0, 0)
-      skinnedLetters = skinnedLetters.filter((points) => points.parent)
+      if (actors.hero) contacts[0].set(actors.hero.x, actors.hero.z, 0.55, 1)
+      else contacts[0].set(100, 100, 0, 0)
+      if (actors.foe)
+        contacts[1].set(actors.foe.x, actors.foe.z, Math.max(0.5, actors.foeHeight * 0.45), 1)
+      else contacts[1].set(100, 100, 0, 0)
+      skinnedLetters = skinnedLetters.filter(points => points.parent)
       if (skinnedLetters.length) {
         // Bones are usually siblings of the mesh: settle the whole graph first.
         scene.updateMatrixWorld()
         for (const points of skinnedLetters) updateSkinnedBody(points)
       }
-      updateGlyphBodies(bodies, camera, height, lantern.position, lantern.on ? style.bodyLantern : 0, hearth.position, hearth.on ? hearth.power : 0, style.bodyAmbient)
+      updateGlyphBodies(
+        bodies,
+        camera,
+        height,
+        lantern.position,
+        lantern.on ? style.bodyLantern : 0,
+        hearth.position,
+        hearth.on ? hearth.power : 0,
+        style.bodyAmbient,
+      )
       const hero = actors.hero ?? new THREE.Vector3(100, 0, 100)
-      for (const carpet of carpets) carpet.update(time, hero, actors.foe, camera, focus, style.inkTint ? 'moon' : style.atmosphere, style.brightness)
-      if (effects && effectLetters) { effectLetters.clear(); effects.update(dt, time, camera, options.redraw) }
+      for (const carpet of carpets)
+        carpet.update(
+          time,
+          hero,
+          actors.foe,
+          camera,
+          focus,
+          style.inkTint ? 'moon' : style.atmosphere,
+          style.brightness,
+        )
+      if (effects && effectLetters) {
+        effectLetters.clear()
+        effects.update(dt, time, camera, options.redraw)
+      }
       // Effects update their PointLights first. Sharing these uniforms makes
       // their colour/reach work on bodies, carpets, surfaces and particles.
       const ink = illumination.uniforms
-      const tint = style.inkTint ?? (style.atmosphere === 'dusk' ? [1.25, .8, .65] : style.atmosphere === 'ember' ? [1.5, .65, .36] : [1, 1, 1])
+      const tint =
+        style.inkTint ??
+        (style.atmosphere === 'dusk'
+          ? [1.25, 0.8, 0.65]
+          : style.atmosphere === 'ember'
+            ? [1.5, 0.65, 0.36]
+            : [1, 1, 1])
       ink.atmosphereTint.value.setRGB(tint[0], tint[1], tint[2])
-      bodies.sunPower.value = style.bodySceneLighting ? style.moon.intensity / DEFAULT_ASCII_STYLE.moon.intensity : 1
+      bodies.sunPower.value = style.bodySceneLighting
+        ? style.moon.intensity / DEFAULT_ASCII_STYLE.moon.intensity
+        : 1
       if (style.bodySceneLighting) {
         bodies.sunColor.value.setHex(style.moon.color)
-        bodies.sunColor.value.r /= originalMoonColor.r; bodies.sunColor.value.g /= originalMoonColor.g; bodies.sunColor.value.b /= originalMoonColor.b
-      } else bodies.sunColor.value.setRGB(1,1,1)
-      bodies.moon.value.set(...(style.bodySceneLighting ? style.moon.position : DEFAULT_ASCII_STYLE.moon.position)).normalize()
-      ink.inkFogDensity.value = style.inkFog ? style.fog?.density ?? 0 : 0
+        bodies.sunColor.value.r /= originalMoonColor.r
+        bodies.sunColor.value.g /= originalMoonColor.g
+        bodies.sunColor.value.b /= originalMoonColor.b
+      } else bodies.sunColor.value.setRGB(1, 1, 1)
+      bodies.moon.value
+        .set(...(style.bodySceneLighting ? style.moon.position : DEFAULT_ASCII_STYLE.moon.position))
+        .normalize()
+      ink.inkFogDensity.value = style.inkFog ? (style.fog?.density ?? 0) : 0
       ink.inkFogColor.value.setHex(style.fog?.color ?? style.background).convertLinearToSRGB()
       let count = 0
       scene.updateMatrixWorld()
       scene.traverseVisible(object => {
-        if (!(object instanceof THREE.PointLight) || object.intensity <= 0 || count >= MAX_INK_LIGHTS) return
+        if (
+          !(object instanceof THREE.PointLight) ||
+          object.intensity <= 0 ||
+          count >= MAX_INK_LIGHTS
+        )
+          return
         object.getWorldPosition(lightPosition)
         // The original Pomorog lantern/hearth already have dedicated ink terms.
-        if (lantern.on && lightPosition.distanceTo(lantern.position) < 1.5 || hearth.on && lightPosition.distanceTo(hearth.position) < 1.5) return
-        ink.inkLightPosition.value[count].set(lightPosition.x, lightPosition.y, lightPosition.z, object.distance || 20)
-        ink.inkLightColor.value[count].set(object.color.r, object.color.g, object.color.b, Math.min(8, object.intensity * .25))
+        if (
+          (lantern.on && lightPosition.distanceTo(lantern.position) < 1.5) ||
+          (hearth.on && lightPosition.distanceTo(hearth.position) < 1.5)
+        )
+          return
+        ink.inkLightPosition.value[count].set(
+          lightPosition.x,
+          lightPosition.y,
+          lightPosition.z,
+          object.distance || 20,
+        )
+        ink.inkLightColor.value[count].set(
+          object.color.r,
+          object.color.g,
+          object.color.b,
+          Math.min(8, object.intensity * 0.25),
+        )
         count++
       })
       ink.inkLightCount.value = count
       lastDt = dt
-      for (const cloud of clouds) cloud.commit(height, camera, style.brightness * (gains.get(cloud) ?? 1))
+      for (const cloud of clouds)
+        cloud.commit(height, camera, style.brightness * (gains.get(cloud) ?? 1))
       for (const layer of streaks) layer.commit(style.brightness * (gains.get(layer) ?? 1))
 
       // Draw order (visual-pipeline §2, recreate-from-zero step 10).
       // Visible waters share a mirror at equal levels (the most expensive pass).
       const near = actors.hero ?? focus
       const mirrors = new Map<number, WaterSource>()
-      const frustum = new THREE.Frustum().setFromProjectionMatrix(new THREE.Matrix4().multiplyMatrices(camera.projectionMatrix, camera.matrixWorldInverse))
+      const frustum = new THREE.Frustum().setFromProjectionMatrix(
+        new THREE.Matrix4().multiplyMatrices(camera.projectionMatrix, camera.matrixWorldInverse),
+      )
       renderer.autoClear = true
       for (const water of waters) {
         if (!options.redraw) {
@@ -605,20 +983,36 @@ export function createAsciiEngine(canvas: HTMLCanvasElement, options: AsciiEngin
           water.updateDynamics?.(dt, time)
         }
         water.uniforms.time.value = time
-        if (water.uniforms.waterViewDirection) camera.getWorldDirection(water.uniforms.waterViewDirection.value).negate()
-        if (water.uniforms.waterLightDirection) { moon.getWorldPosition(water.uniforms.waterLightDirection.value); moon.target.getWorldPosition(lightPosition); water.uniforms.waterLightDirection.value.sub(lightPosition).normalize() }
+        if (water.uniforms.waterViewDirection)
+          camera.getWorldDirection(water.uniforms.waterViewDirection.value).negate()
+        if (water.uniforms.waterLightDirection) {
+          moon.getWorldPosition(water.uniforms.waterLightDirection.value)
+          moon.target.getWorldPosition(lightPosition)
+          water.uniforms.waterLightDirection.value.sub(lightPosition).normalize()
+        }
         water.uniforms.waterLightColor?.value.copy(moon.color)
-        if (water.uniforms.waterLightPower) water.uniforms.waterLightPower.value = moon.intensity / 2.2
+        if (water.uniforms.waterLightPower)
+          water.uniforms.waterLightPower.value = moon.intensity / 2.2
         if (water.uniforms.reflectionOn) water.uniforms.reflectionOn.value = 0
         if (!water.mesh.parent || !water.mesh.visible || !water.look.reflection.enabled) continue
         water.mesh.updateWorldMatrix(true, false)
         if (!frustum.intersectsObject(water.mesh)) continue
-        if (water.distance(near.x, near.z) > reflectionRange + (camera.right - camera.left) / camera.zoom) continue
-        const level = water.reflectionLevel?.(near.x, near.z) ?? water.mesh.getWorldPosition(lightPosition).y
+        if (
+          water.distance(near.x, near.z) >
+          reflectionRange + (camera.right - camera.left) / camera.zoom
+        )
+          continue
+        const level =
+          water.reflectionLevel?.(near.x, near.z) ?? water.mesh.getWorldPosition(lightPosition).y
         water.mesh.userData.waterReflectionLevel = level
         if (water.uniforms.waterReflectionLevel) water.uniforms.waterReflectionLevel.value = level
         const previous = mirrors.get(level)
-        if (previous?.uniforms.reflection && previous.uniforms.reflectionMatrix && water.uniforms.reflection && water.uniforms.reflectionMatrix) {
+        if (
+          previous?.uniforms.reflection &&
+          previous.uniforms.reflectionMatrix &&
+          water.uniforms.reflection &&
+          water.uniforms.reflectionMatrix
+        ) {
           water.uniforms.reflection.value = previous.uniforms.reflection.value
           water.uniforms.reflectionMatrix.value.copy(previous.uniforms.reflectionMatrix.value)
         } else {
@@ -628,11 +1022,19 @@ export function createAsciiEngine(canvas: HTMLCanvasElement, options: AsciiEngin
         if (water.uniforms.reflectionOn) water.uniforms.reflectionOn.value = 1
       }
       ascii.material.uniforms.debugScreen.value = debug.screen ? 1 : 0
-      if (debug.raw) { renderer.setRenderTarget(null); renderer.render(scene, camera); return }
-      renderer.setRenderTarget(target); renderer.render(scene, camera)
-      renderer.setRenderTarget(null); renderer.render(ascii.scene, ascii.camera)
+      if (debug.raw) {
+        renderer.setRenderTarget(null)
+        renderer.render(scene, camera)
+        return
+      }
+      renderer.setRenderTarget(target)
+      renderer.render(scene, camera)
+      renderer.setRenderTarget(null)
+      renderer.render(ascii.scene, ascii.camera)
       renderer.autoClear = false
-      renderer.render(carpetScene, camera); renderer.render(waterScene, camera); renderer.render(particleScene, camera)
+      renderer.render(carpetScene, camera)
+      renderer.render(waterScene, camera)
+      renderer.render(particleScene, camera)
       renderer.autoClear = true
     },
 
@@ -644,7 +1046,12 @@ export function createAsciiEngine(canvas: HTMLCanvasElement, options: AsciiEngin
       for (const water of waters) water.dispose()
       for (const layer of streaks) layer.dispose()
       for (const byKey of materialCache.values()) for (const m of byKey.values()) m.dispose()
-      illumination.dispose(); moon.shadow.dispose(); depth.dispose(); target.dispose(); ascii.dispose(); renderer.dispose()
+      illumination.dispose()
+      moon.shadow.dispose()
+      depth.dispose()
+      target.dispose()
+      ascii.dispose()
+      renderer.dispose()
     },
   }
   resize()

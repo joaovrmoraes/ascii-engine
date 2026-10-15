@@ -14,8 +14,7 @@ const env = {
   GIT_COMMITTER_NAME: 'github-actions[bot]',
   GIT_COMMITTER_EMAIL: '41898282+github-actions[bot]@users.noreply.github.com',
 }
-const git = (args, cwd = root) =>
-  execFileSync('git', args, { cwd, env, encoding: 'utf8' }).trim()
+const git = (args, cwd = root) => execFileSync('git', args, { cwd, env, encoding: 'utf8' }).trim()
 const source = git(['rev-parse', 'HEAD'])
 const remote = git(['ls-remote', '--heads', 'origin', 'gh-pages'])
 let parent
@@ -29,8 +28,13 @@ git([`--git-dir=${gitDir}`, `--work-tree=${output}`, 'add', '--all', '--force'],
 const tree = git(['write-tree'])
 const changed = !parent || git(['rev-parse', `${parent}^{tree}`]) !== tree
 if (changed) {
-  const commit = git(['commit-tree', tree, ...(parent ? ['-p', parent] : []),
-    '-m', `Publish map demos from ${source}`])
+  const commit = git([
+    'commit-tree',
+    tree,
+    ...(parent ? ['-p', parent] : []),
+    '-m',
+    `Publish map demos from ${source}`,
+  ])
   console.log(`Hosting commit ${commit}, source ${source}`)
   if (!process.argv.includes('--dry-run')) {
     git(['push', 'origin', `${commit}:refs/heads/gh-pages`])

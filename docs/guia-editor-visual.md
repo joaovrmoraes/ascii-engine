@@ -339,7 +339,6 @@ lighting** and **Preview lighting**.
   preview · map paused**. Old texture preview rigs remain readable; **Save as
   atmosphere** converts an unmatched rig once and selects the new resource.
 
-
 Edits and saved presets preserve each part's technique and family unless you
 explicitly choose either. Techniques, visibility and lighting response have
 context: body-face visibility affects glyph bodies; gap tint affects occluded

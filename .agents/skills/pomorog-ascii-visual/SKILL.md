@@ -22,29 +22,29 @@ acrescente aqui com data.
 
 Três sintomas que o usuário rejeitou, com as palavras dele:
 
-| Sintoma | Causa | Correção |
-| --- | --- | --- |
-| "Filtro na tela, não nas coisas"; letras "nadam" quando a câmera anda | O objeto passou pelo passe de tela (`ascii.ts`) | Use uma das técnicas da seção 2 |
-| "3D com textura de ASCII", "rocha 3D com escritos em cima" | Fundo entre letras com cor/valor visível | Fundo `0` absoluto ou superfície invisível |
-| "Bola preenchida por letras, não árvore feita de letras" | Grade projetada na superfície de forma redonda/orgânica | Nuvem de letras (`glyphBody`), sem corpo visível |
+| Sintoma                                                               | Causa                                                   | Correção                                         |
+| --------------------------------------------------------------------- | ------------------------------------------------------- | ------------------------------------------------ |
+| "Filtro na tela, não nas coisas"; letras "nadam" quando a câmera anda | O objeto passou pelo passe de tela (`ascii.ts`)         | Use uma das técnicas da seção 2                  |
+| "3D com textura de ASCII", "rocha 3D com escritos em cima"            | Fundo entre letras com cor/valor visível                | Fundo `0` absoluto ou superfície invisível       |
+| "Bola preenchida por letras, não árvore feita de letras"              | Grade projetada na superfície de forma redonda/orgânica | Nuvem de letras (`glyphBody`), sem corpo visível |
 
 O sombreamento vem da **escolha da letra** (`. : - = + * x % # @`), em
 degraus, com cor plana por letra; não de um degradê de cor.
 
 ## 2. Qual técnica usar para cada coisa
 
-| Objeto | Técnica | Arquivo | Notas |
-| --- | --- | --- | --- |
-| Chão (todas as áreas) | Piso **iluminado** + grade de letras local | `worldGlyph.ts` (`glyphMaterial`), pisos em `forestWorld.ts`/`groundCover.ts`/`meadow.ts` | Recebe luar, sombras e luzes pontuais. Superfície `earth` |
-| Tapete do chão (grama, cascalho, musgo, crosta de neve) | Milhares de **letras de pé** instanciadas no mundo | `grass.ts` + receitas em `groundCover.ts` | É o que dá vida ao mapa; sem tapete o mapa "parece outro estilo" |
-| Construções, ponte, tábuas, troncos retos, adereços de caixa | Grade de letras na superfície (fundo quase preto, letra por degrau) | `worldGlyph.ts` | Usuário: "perfeito" |
-| Copas, folhagem, junco | **Nuvem de letras** aberta, corpo invisível | `glyphBody.ts` (rampa `foliage`) | Silhueta irregular e com buracos |
-| Pedras e rochas (de pedrinha a pedregulho), cristais | Nuvem de letras aberta, só faces da frente, mais densa e clara | `glyphBody.ts` (rampa `stone`) | Pedrinha = 1–2 caracteres. Nada de corpo escuro |
-| Criaturas | Modelos articulados (`beasts.ts`, `models.ts`) + nuvem de letras presa a cada membro | `glyphBody.ts` (rampa `actor`) | Silhueta de cor mínima (lê sobre neve) |
-| **Herói** | **Passe de tela antigo** (`markActorInk`) | `scene.ts` | Escolha explícita do usuário. Não troque sem pedido |
-| Água | Fileiras `~ - =` que correm, espuma, reflexo convertido em letras célula a célula | `worldGlyph.ts` (`worldWaterGLSL`) | Ver seção 5 |
-| Fogo, magia, poeira, terra, vagalumes | Glifos no mundo (`glyphCloud`), sem sprites borrados | `effects.ts` | Ver seção 6 |
-| Pântano (água e chuva) e neve (chão e flocos caindo) | Versão aprovada antiga | `swampEnvironment.ts`, `snowEnvironment.ts`, `ascii.ts` | Escolha do usuário; o resto do mapa segue a tabela |
+| Objeto                                                       | Técnica                                                                              | Arquivo                                                                                   | Notas                                                            |
+| ------------------------------------------------------------ | ------------------------------------------------------------------------------------ | ----------------------------------------------------------------------------------------- | ---------------------------------------------------------------- |
+| Chão (todas as áreas)                                        | Piso **iluminado** + grade de letras local                                           | `worldGlyph.ts` (`glyphMaterial`), pisos em `forestWorld.ts`/`groundCover.ts`/`meadow.ts` | Recebe luar, sombras e luzes pontuais. Superfície `earth`        |
+| Tapete do chão (grama, cascalho, musgo, crosta de neve)      | Milhares de **letras de pé** instanciadas no mundo                                   | `grass.ts` + receitas em `groundCover.ts`                                                 | É o que dá vida ao mapa; sem tapete o mapa "parece outro estilo" |
+| Construções, ponte, tábuas, troncos retos, adereços de caixa | Grade de letras na superfície (fundo quase preto, letra por degrau)                  | `worldGlyph.ts`                                                                           | Usuário: "perfeito"                                              |
+| Copas, folhagem, junco                                       | **Nuvem de letras** aberta, corpo invisível                                          | `glyphBody.ts` (rampa `foliage`)                                                          | Silhueta irregular e com buracos                                 |
+| Pedras e rochas (de pedrinha a pedregulho), cristais         | Nuvem de letras aberta, só faces da frente, mais densa e clara                       | `glyphBody.ts` (rampa `stone`)                                                            | Pedrinha = 1–2 caracteres. Nada de corpo escuro                  |
+| Criaturas                                                    | Modelos articulados (`beasts.ts`, `models.ts`) + nuvem de letras presa a cada membro | `glyphBody.ts` (rampa `actor`)                                                            | Silhueta de cor mínima (lê sobre neve)                           |
+| **Herói**                                                    | **Passe de tela antigo** (`markActorInk`)                                            | `scene.ts`                                                                                | Escolha explícita do usuário. Não troque sem pedido              |
+| Água                                                         | Fileiras `~ - =` que correm, espuma, reflexo convertido em letras célula a célula    | `worldGlyph.ts` (`worldWaterGLSL`)                                                        | Ver seção 5                                                      |
+| Fogo, magia, poeira, terra, vagalumes                        | Glifos no mundo (`glyphCloud`), sem sprites borrados                                 | `effects.ts`                                                                              | Ver seção 6                                                      |
+| Pântano (água e chuva) e neve (chão e flocos caindo)         | Versão aprovada antiga                                                               | `swampEnvironment.ts`, `snowEnvironment.ts`, `ascii.ts`                                   | Escolha do usuário; o resto do mapa segue a tabela               |
 
 `applyWorldGlyphs(root)` decide sozinho: `foliage`, neve de galho e todo
 `Dodecahedron/Icosahedron/Octahedron` sólido vão para `glyphBody`; o resto vira
@@ -54,6 +54,7 @@ classificação automática do `environment.ts`, que usa **HSL em sRGB**.
 ## 3. Receitas de construção
 
 ### Objeto novo de cenário
+
 1. Modele com `kit.box`/`kit.add` (ou `box`/`add` do `environment.ts`) na escala
    do herói (2,15 m de altura).
 2. Dê o tipo certo: `stone`, `wood`, `bark`, `earth`, `foliage`, `snow`.
@@ -63,7 +64,9 @@ classificação automática do `environment.ts`, que usa **HSL em sRGB**.
    material errado foi para `glyphMaterial`: troque o tipo ou a geometria.
 
 ### Bioma novo / outro mapa
+
 Replique a receita da floresta, que é o que funciona:
+
 1. **Piso iluminado** com cor calculada pela posição de mundo (shader) ou textura sRGB.
 2. **Tapete de letras** em `groundCover.ts`: escolha glifos (`| / \ v Y ! * o . ,`),
    paleta, altura, densidade/máscara e, se o mundo for infinito, `infinite`
@@ -72,6 +75,7 @@ Replique a receita da floresta, que é o que funciona:
 4. Luz: exterior com luar legível; interior com descoberta pela lanterna.
 
 ### Criatura nova
+
 - Quadrúpede ou artrópode: adicione uma entrada em `QUAD`/`BUG` (`beasts.ts`).
   Paleta própria (couro, ventre, escuro, olho emissivo), proporções e extras
   (orelhas, juba, chifres, presas, espinhos, cauda, asas, pinças, nº de olhos).
@@ -144,7 +148,7 @@ descansa e começa outra volta.
 
 - **Ritmo:** `paceAt(time)` programa trechos de 9 s (andar, correr ×2,1, parar e
   depois andar). A velocidade base é `solveBaseSpeed(distância que falta, tempo
-  que falta)`, já levando em conta a média do programa. Combate e saque param o herói; ele
+que falta)`, já levando em conta a média do programa. Combate e saque param o herói; ele
   recupera depois. Corrida tem animação própria: inclinação, braços, cadência e poeira.
 - **Fogueira:** fixa em `s = 0`. No descanso, ele vai pelo lado mais curto do
   circuito até o assento. Nunca teletransporte, nunca fogueira surgindo na tela.

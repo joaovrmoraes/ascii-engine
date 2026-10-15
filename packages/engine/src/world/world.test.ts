@@ -7,7 +7,8 @@ describe('circuit', () => {
   it('closes without a seam and rounds to whole chunks', () => {
     const loop = createCircuit(1590)
     expect(loop.length).toBe(1600)
-    const a = loop.point(0), b = loop.point(loop.length)
+    const a = loop.point(0),
+      b = loop.point(loop.length)
     expect(Math.hypot(a.x - b.x, a.z - b.z)).toBeLessThan(1e-6)
   })
   it('finds the arc length and the offset of points on the line', () => {
@@ -22,8 +23,16 @@ describe('circuit', () => {
 
 describe('chunk streamer', () => {
   it('keeps -1..+2 around the current chunk and wraps', () => {
-    const built: number[] = [], dropped: number[] = []
-    const streamer = createChunkStreamer({ count: 10, build: (k) => { built.push(k); return k }, dispose: (_, k) => dropped.push(k) })
+    const built: number[] = [],
+      dropped: number[] = []
+    const streamer = createChunkStreamer({
+      count: 10,
+      build: k => {
+        built.push(k)
+        return k
+      },
+      dispose: (_, k) => dropped.push(k),
+    })
     streamer.update(0)
     expect([...streamer.chunks.keys()].sort((a, b) => a - b)).toEqual([0, 1, 2, 9])
     streamer.update(1)
@@ -35,7 +44,7 @@ describe('chunk streamer', () => {
 
 describe('water shape', () => {
   it('is inside at the centre of a pond and outside far away', () => {
-    const pond = { kind: 'pond' as const, x: 2, z: 3, angle: .4, size: 3 }
+    const pond = { kind: 'pond' as const, x: 2, z: 3, angle: 0.4, size: 3 }
     expect(waterEdge(pond, 2, 3)).toBeGreaterThan(2)
     expect(waterEdge(pond, 12, 3)).toBeLessThan(0)
   })

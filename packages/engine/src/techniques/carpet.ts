@@ -25,7 +25,18 @@ export interface GroundCover {
   density: (x: number, z: number) => number
   y: (x: number, z: number) => number
   /** Glyph indices into | / \\ v Y ! * o . , and a colour for each blade. */
-  pick: (random: () => number, x: number, z: number) => { glyph: number; height: number; color: [number, number, number]; width?: number; wind?: number; absoluteHeight?: boolean }
+  pick: (
+    random: () => number,
+    x: number,
+    z: number,
+  ) => {
+    glyph: number
+    height: number
+    color: [number, number, number]
+    width?: number
+    wind?: number
+    absoluteHeight?: boolean
+  }
   glyphs?: GlyphSlot[]
   variableWind?: boolean
   /** Endless ground: blades wrap around the hero and a GLSL soil mask clears trail/banks. */
@@ -40,45 +51,84 @@ export const CARPET_GLYPHS = ['|', '/', '\\', 'v', 'Y', '!', '*', 'o', '.', ',']
 export function createCarpet(random: () => number, cover: GroundCover) {
   const glyphs = CARPET_GLYPHS
   const atlas = document.createElement('canvas')
-  atlas.width = glyphs.length * 32; atlas.height = 48
+  atlas.width = glyphs.length * 32
+  atlas.height = 48
   const ctx = atlas.getContext('2d')!
-  ctx.fillStyle = '#fff'; ctx.font = '34px monospace'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle'
+  ctx.fillStyle = '#fff'
+  ctx.font = '34px monospace'
+  ctx.textAlign = 'center'
+  ctx.textBaseline = 'middle'
   glyphs.forEach((glyph, i) => ctx.fillText(glyph, i * 32 + 16, 24))
-  const texture = cover.glyphs ? createGlyphGrid(cover.glyphs, 32, 48, 34, 24, true) : new THREE.CanvasTexture(atlas)
-  texture.minFilter = THREE.LinearMipmapLinearFilter; texture.magFilter = THREE.LinearFilter; texture.generateMipmaps = true
-  const offsets: number[] = [], shapes: number[] = [], colors: number[] = [], winds: number[] = []
+  const texture = cover.glyphs
+    ? createGlyphGrid(cover.glyphs, 32, 48, 34, 24, true)
+    : new THREE.CanvasTexture(atlas)
+  texture.minFilter = THREE.LinearMipmapLinearFilter
+  texture.magFilter = THREE.LinearFilter
+  texture.generateMipmaps = true
+  const offsets: number[] = [],
+    shapes: number[] = [],
+    colors: number[] = [],
+    winds: number[] = []
   // An endless carpet must fill the whole wrap span: Pomorog scattered 26 m
   // and wrapped 36 m, leaving a 10 m bare band that travelled with the hero.
-  const extent = cover.extent ?? cover.infinite?.span ?? 26, cx = cover.center?.x ?? 0, cz = cover.center?.z ?? 0
+  const extent = cover.extent ?? cover.infinite?.span ?? 26,
+    cx = cover.center?.x ?? 0,
+    cz = cover.center?.z ?? 0
   for (let i = 0; i < cover.count; i++) {
-    const x = cx + (random() - .5) * extent, z = cz + (random() - .5) * extent
+    const x = cx + (random() - 0.5) * extent,
+      z = cz + (random() - 0.5) * extent
     if (random() > cover.density(x, z)) continue
     const blade = cover.pick(random, x, z)
     offsets.push(x, cover.y(x, z), z)
-    shapes.push(blade.glyph, blade.width ?? (blade.glyph >= 6 ? .16 + blade.height * .3 : blade.height * .4), blade.absoluteHeight ? blade.height : blade.glyph >= 6 ? .1 + blade.height * .5 : blade.height, random() * 6.28)
+    shapes.push(
+      blade.glyph,
+      blade.width ?? (blade.glyph >= 6 ? 0.16 + blade.height * 0.3 : blade.height * 0.4),
+      blade.absoluteHeight
+        ? blade.height
+        : blade.glyph >= 6
+          ? 0.1 + blade.height * 0.5
+          : blade.height,
+      random() * 6.28,
+    )
     winds.push(blade.wind ?? 1)
     colors.push(...blade.color)
   }
   const base = new THREE.PlaneGeometry(1, 1, 1, 3)
-  base.translate(0, .5, 0)
+  base.translate(0, 0.5, 0)
   const geometry = new THREE.InstancedBufferGeometry()
   geometry.index = base.index
   geometry.attributes.position = base.attributes.position
   geometry.attributes.uv = base.attributes.uv
   geometry.setAttribute('offset', new THREE.InstancedBufferAttribute(new Float32Array(offsets), 3))
   geometry.setAttribute('shape', new THREE.InstancedBufferAttribute(new Float32Array(shapes), 4))
-  geometry.setAttribute('bladeColor', new THREE.InstancedBufferAttribute(new Float32Array(colors), 3))
-  if (cover.variableWind) geometry.setAttribute('windGain', new THREE.InstancedBufferAttribute(new Float32Array(winds), 1))
+  geometry.setAttribute(
+    'bladeColor',
+    new THREE.InstancedBufferAttribute(new Float32Array(colors), 3),
+  )
+  if (cover.variableWind)
+    geometry.setAttribute(
+      'windGain',
+      new THREE.InstancedBufferAttribute(new Float32Array(winds), 1),
+    )
   geometry.instanceCount = offsets.length / 3
   const trail = Array.from({ length: 12 }, () => new THREE.Vector4(100, 100, -100, 0))
   const material = new THREE.ShaderMaterial({
-    side: THREE.DoubleSide, depthWrite: true, depthTest: true,
+    side: THREE.DoubleSide,
+    depthWrite: true,
+    depthTest: true,
     uniforms: {
       ...illuminationUniforms(),
-      atlas: { value: texture }, time: { value: 0 }, brightness: { value: 1 }, right: { value: new THREE.Vector3(1, 0, 0) },
-      hero: { value: new THREE.Vector3() }, enemy: { value: new THREE.Vector3(100, 0, 100) },
-      trail: { value: trail }, focus: { value: new THREE.Vector3() }, tint: { value: new THREE.Color(1, 1, 1) },
-      glow: { value: [new THREE.Vector4(), new THREE.Vector4()] }, glowColor: { value: [new THREE.Color(), new THREE.Color()] },
+      atlas: { value: texture },
+      time: { value: 0 },
+      brightness: { value: 1 },
+      right: { value: new THREE.Vector3(1, 0, 0) },
+      hero: { value: new THREE.Vector3() },
+      enemy: { value: new THREE.Vector3(100, 0, 100) },
+      trail: { value: trail },
+      focus: { value: new THREE.Vector3() },
+      tint: { value: new THREE.Color(1, 1, 1) },
+      glow: { value: [new THREE.Vector4(), new THREE.Vector4()] },
+      glowColor: { value: [new THREE.Color(), new THREE.Color()] },
       ...(cover.infinite?.uniforms ?? {}),
     },
     vertexShader: `
@@ -153,33 +203,60 @@ export function createCarpet(random: () => number, cover: GroundCover) {
     `,
   })
   const mesh = new THREE.Mesh(geometry, material)
-  mesh.frustumCulled = false; mesh.userData.glyph = 'carpet'
-  const scene = new THREE.Scene(); scene.add(mesh)
+  mesh.frustumCulled = false
+  mesh.userData.glyph = 'carpet'
+  const scene = new THREE.Scene()
+  scene.add(mesh)
   const absent = new THREE.Vector3(100, 0, 100)
   let trailIndex = 0
   const last = new THREE.Vector3(100, 0, 100)
   return {
-    scene, mesh, uniforms: material.uniforms, count: geometry.instanceCount,
+    scene,
+    mesh,
+    uniforms: material.uniforms,
+    count: geometry.instanceCount,
     setGlow(index: number, light: THREE.PointLight) {
       const intensity = Math.min(1.5, light.intensity / 9)
-      ;(material.uniforms.glow.value as THREE.Vector4[])[index].set(light.position.x, light.position.y, light.position.z, intensity)
+      ;(material.uniforms.glow.value as THREE.Vector4[])[index].set(
+        light.position.x,
+        light.position.y,
+        light.position.z,
+        intensity,
+      )
       ;(material.uniforms.glowColor.value as THREE.Color[])[index].copy(light.color)
     },
-    update(time: number, hero: THREE.Vector3, enemy: THREE.Vector3 | null, camera: THREE.Camera, focus: THREE.Vector3, atmosphere: 'moon' | 'dusk' | 'ember', brightness: number) {
+    update(
+      time: number,
+      hero: THREE.Vector3,
+      enemy: THREE.Vector3 | null,
+      camera: THREE.Camera,
+      focus: THREE.Vector3,
+      atmosphere: 'moon' | 'dusk' | 'ember',
+      brightness: number,
+    ) {
       material.uniforms.time.value = time
       material.uniforms.brightness.value = brightness
       material.uniforms.hero.value.copy(hero)
       material.uniforms.enemy.value.copy(enemy ?? absent)
       material.uniforms.right.value.setFromMatrixColumn(camera.matrixWorld, 0)
       material.uniforms.focus.value.copy(focus)
-      material.uniforms.tint.value.setRGB(atmosphere === 'ember' ? 1.3 : 1, atmosphere === 'dusk' ? .85 : 1, atmosphere === 'ember' ? .6 : 1)
-      if (last.distanceToSquared(hero) > .06) {
+      material.uniforms.tint.value.setRGB(
+        atmosphere === 'ember' ? 1.3 : 1,
+        atmosphere === 'dusk' ? 0.85 : 1,
+        atmosphere === 'ember' ? 0.6 : 1,
+      )
+      if (last.distanceToSquared(hero) > 0.06) {
         trail[trailIndex].set(hero.x, hero.z, time, 1)
         trailIndex = (trailIndex + 1) % trail.length
         last.copy(hero)
       }
     },
-    dispose() { geometry.dispose(); base.dispose(); material.dispose(); texture.dispose() },
+    dispose() {
+      geometry.dispose()
+      base.dispose()
+      material.dispose()
+      texture.dispose()
+    },
   }
 }
 

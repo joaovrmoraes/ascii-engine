@@ -11,7 +11,9 @@
     "pages:build": "node scripts/build-pages.mjs",
     "test": "node --test scripts/export-args.test.mjs && pnpm -r test",
     "typecheck": "pnpm -r typecheck",
-    "check": "node scripts/check-package-boundaries.mjs && pnpm typecheck && pnpm test && pnpm build",
+    "format": "node scripts/format.mjs --write",
+    "format:check": "node scripts/format.mjs --check",
+    "check": "pnpm format:check && node scripts/check-package-boundaries.mjs && pnpm typecheck && pnpm test && pnpm build",
     "tauri": "pnpm --filter @ascii-engine/editor tauri",
     "compare": "node scripts/compare.mjs",
     "verify:visual": "node scripts/verify-visual.mjs",
@@ -26,5 +28,8 @@
     "export": "node scripts/export.mjs",
     "verify:water": "node scripts/verify-water.mjs"
   },
-  "packageManager": "pnpm@11.9.0"
+  "packageManager": "pnpm@11.9.0",
+  "devDependencies": {
+    "prettier": "3.9.10"
+  }
 }

@@ -12,7 +12,15 @@ export async function readDraft(): Promise<unknown> {
   const db = await database
   return new Promise((resolve, reject) => {
     const request = db.transaction('documents').objectStore('documents').get('current')
-    request.onsuccess = () => { try { resolve(request.result ?? JSON.parse(localStorage.getItem('ascii-engine:sandbox') ?? 'null')) } catch (error) { reject(error) } }
+    request.onsuccess = () => {
+      try {
+        resolve(
+          request.result ?? JSON.parse(localStorage.getItem('ascii-engine:sandbox') ?? 'null'),
+        )
+      } catch (error) {
+        reject(error)
+      }
+    }
     request.onerror = () => reject(request.error)
   })
 }

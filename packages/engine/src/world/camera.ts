@@ -15,8 +15,15 @@ export interface SceneCamera {
 
 /** The viewport must keep the declared aspect ratio to preserve composition. */
 export function applySceneCamera(camera: OrthographicCamera, view: SceneCamera) {
-  camera.position.set(...view.position); camera.rotation.set(...view.rotation, 'XYZ')
-  camera.zoom = 1; camera.left = -view.span * view.aspect; camera.right = view.span * view.aspect
-  camera.top = view.span; camera.bottom = -view.span; camera.near = view.near ?? .1; camera.far = view.far ?? 1000
-  camera.updateProjectionMatrix(); camera.updateMatrixWorld()
+  camera.position.set(...view.position)
+  camera.rotation.set(...view.rotation, 'XYZ')
+  camera.zoom = 1
+  camera.left = -view.span * view.aspect
+  camera.right = view.span * view.aspect
+  camera.top = view.span
+  camera.bottom = -view.span
+  camera.near = view.near ?? 0.1
+  camera.far = view.far ?? 1000
+  camera.updateProjectionMatrix()
+  camera.updateMatrixWorld()
 }

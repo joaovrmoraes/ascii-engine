@@ -7,33 +7,82 @@ import { spawn } from 'node:child_process'
 import { writeFileSync } from 'node:fs'
 
 const [url, out, first = '8000', count = '1', every = '1000'] = process.argv.slice(2)
-if (!url || !out) { console.error('uso: node cdpshot.mjs <url> <prefixo> [esperaMs] [quantidade] [intervaloMs]'); process.exit(1) }
+if (!url || !out) {
+  console.error('uso: node cdpshot.mjs <url> <prefixo> [esperaMs] [quantidade] [intervaloMs]')
+  process.exit(1)
+}
 const port = 9300 + Math.floor(Math.random() * 500)
 // --use-angle=gl usa a GPU real. Swiftshader roda a ~2 FPS e quebra o combate.
-const chrome = spawn('chromium', ['--headless=new', '--no-sandbox', '--use-angle=gl', '--enable-gpu', '--ignore-gpu-blocklist', '--hide-scrollbars',
-  '--window-size=1600,900', `--remote-debugging-port=${port}`, `--user-data-dir=${out}-prof`, 'about:blank'], { stdio: 'ignore' })
-const sleep = (ms) => new Promise((r) => setTimeout(r, ms))
+const chrome = spawn(
+  'chromium',
+  [
+    '--headless=new',
+    '--no-sandbox',
+    '--use-angle=gl',
+    '--enable-gpu',
+    '--ignore-gpu-blocklist',
+    '--hide-scrollbars',
+    '--window-size=1600,900',
+    `--remote-debugging-port=${port}`,
+    `--user-data-dir=${out}-prof`,
+    'about:blank',
+  ],
+  { stdio: 'ignore' },
+)
+const sleep = ms => new Promise(r => setTimeout(r, ms))
 let targets
-for (let i = 0; i < 50 && !targets; i++) { try { targets = await (await fetch(`http://127.0.0.1:${port}/json`)).json() } catch { await sleep(200) } }
-const page = targets.find((t) => t.type === 'page')
-const ws = new WebSocket(page.webSocketDebuggerUrl); await new Promise((r) => { ws.onopen = r })
-let id = 0; const pending = new Map()
-ws.onmessage = (m) => {
-  const d = JSON.parse(m.data)
-  if (d.method === 'Runtime.exceptionThrown' || (d.method === 'Runtime.consoleAPICalled' && /error|warn/.test(d.params.type))) console.log('PAGE', JSON.stringify(d.params).slice(0, 600))
-  if (pending.has(d.id)) { pending.get(d.id)(d); pending.delete(d.id) }
+for (let i = 0; i < 50 && !targets; i++) {
+  try {
+    targets = await (await fetch(`http://127.0.0.1:${port}/json`)).json()
+  } catch {
+    await sleep(200)
+  }
 }
-const send = (method, params = {}) => new Promise((r) => { const i = ++id; pending.set(i, r); ws.send(JSON.stringify({ id: i, method, params })) })
+const page = targets.find(t => t.type === 'page')
+const ws = new WebSocket(page.webSocketDebuggerUrl)
+await new Promise(r => {
+  ws.onopen = r
+})
+let id = 0
+const pending = new Map()
+ws.onmessage = m => {
+  const d = JSON.parse(m.data)
+  if (
+    d.method === 'Runtime.exceptionThrown' ||
+    (d.method === 'Runtime.consoleAPICalled' && /error|warn/.test(d.params.type))
+  )
+    console.log('PAGE', JSON.stringify(d.params).slice(0, 600))
+  if (pending.has(d.id)) {
+    pending.get(d.id)(d)
+    pending.delete(d.id)
+  }
+}
+const send = (method, params = {}) =>
+  new Promise(r => {
+    const i = ++id
+    pending.set(i, r)
+    ws.send(JSON.stringify({ id: i, method, params }))
+  })
 
-await send('Runtime.enable'); await send('Page.enable'); await send('Page.bringToFront')
+await send('Runtime.enable')
+await send('Page.enable')
+await send('Page.bringToFront')
 await send('Emulation.setFocusEmulationEnabled', { enabled: true })
 await send('Page.navigate', { url })
-if (process.env.PRE) { await sleep(3500); await send('Runtime.evaluate', { expression: process.env.PRE }) }
+if (process.env.PRE) {
+  await sleep(3500)
+  await send('Runtime.evaluate', { expression: process.env.PRE })
+}
 await sleep(Number(first))
 for (let i = 0; i < Number(count); i++) {
-  if (process.env.EXPR) console.log('state', (await send('Runtime.evaluate', { expression: process.env.EXPR })).result?.result?.value)
+  if (process.env.EXPR)
+    console.log(
+      'state',
+      (await send('Runtime.evaluate', { expression: process.env.EXPR })).result?.result?.value,
+    )
   const r = await send('Page.captureScreenshot', { format: 'png' })
   writeFileSync(`${out}-${String(i).padStart(2, '0')}.png`, Buffer.from(r.result.data, 'base64'))
   if (i < count - 1) await sleep(Number(every))
 }
-chrome.kill(); process.exit(0)
+chrome.kill()
+process.exit(0)

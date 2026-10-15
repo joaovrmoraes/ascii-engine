@@ -23,13 +23,13 @@ hand-tuning shaders for every case.
 The engine is ready when all **five Pomorog areas** can be authored through
 the editor with the quality of approved screenshots:
 
-| Area (game id) | Required engine features |
-| --- | --- |
-| Dark Forest (`dark_forest`) | circuit chunks, terrain, reflected lake/stream, bridge, `body` crowns, `carpet` grass, campfire |
-| Rain Marsh (`rain_marsh`) | legacy marsh water, rain with `\|_____\|` rings, wetland trees, shores |
-| Snow Pines (`snow_pines`) | snowy floor, falling snow, branch snow, pines |
-| Old Mine (`old_mine`) | dark interior revealed by light, tracks, beams, copper veins, rocks |
-| Sunken Cathedral (`sunken_cathedral`) | `surface` construction, reflected water, interior lighting |
+| Area (game id)                        | Required engine features                                                                        |
+| ------------------------------------- | ----------------------------------------------------------------------------------------------- |
+| Dark Forest (`dark_forest`)           | circuit chunks, terrain, reflected lake/stream, bridge, `body` crowns, `carpet` grass, campfire |
+| Rain Marsh (`rain_marsh`)             | legacy marsh water, rain with `\|_____\|` rings, wetland trees, shores                          |
+| Snow Pines (`snow_pines`)             | snowy floor, falling snow, branch snow, pines                                                   |
+| Old Mine (`old_mine`)                 | dark interior revealed by light, tracks, beams, copper veins, rocks                             |
+| Sunken Cathedral (`sunken_cathedral`) | `surface` construction, reflected water, interior lighting                                      |
 
 Work order: **Forest → Marsh → Snow → Mine → Cathedral**. Each is a milestone
 and pulls only the features it needs. Finish with owner-approved side-by-side
@@ -53,14 +53,14 @@ waterfalls, erosion, video import and others — follow this criterion.
 
 ## 3. Techniques
 
-| `GlyphKind` | Technique | Pomorog examples | Origin |
-| --- | --- | --- | --- |
-| `screen` | per-cell screen pass, actor alphabet | hero | `ascii.ts`, `actorInk.ts` |
-| `surface` | local glyph grid injected into materials, six steps | floor, bridge, buildings, crate, trunk | `worldGlyph.ts` |
-| `body` | open glyph sprite cloud or dark occluder | crowns, rocks, creatures | `glyphBody.ts` |
-| `carpet` | upright instanced letters, biome recipes | grass, ground cover | `grass.ts`, `groundCover.ts` |
-| `particle` | free glyphs | heat-grid fire, sparks, rain, snow, hits | `glyphCloud.ts`, `effects.ts` |
-| `water` | glyph water with planar reflections converted to letters | lakes, streams | `worldGlyph.ts`, `waterReflection.ts` |
+| `GlyphKind` | Technique                                                | Pomorog examples                         | Origin                                |
+| ----------- | -------------------------------------------------------- | ---------------------------------------- | ------------------------------------- |
+| `screen`    | per-cell screen pass, actor alphabet                     | hero                                     | `ascii.ts`, `actorInk.ts`             |
+| `surface`   | local glyph grid injected into materials, six steps      | floor, bridge, buildings, crate, trunk   | `worldGlyph.ts`                       |
+| `body`      | open glyph sprite cloud or dark occluder                 | crowns, rocks, creatures                 | `glyphBody.ts`                        |
+| `carpet`    | upright instanced letters, biome recipes                 | grass, ground cover                      | `grass.ts`, `groundCover.ts`          |
+| `particle`  | free glyphs                                              | heat-grid fire, sparks, rain, snow, hits | `glyphCloud.ts`, `effects.ts`         |
+| `water`     | glyph water with planar reflections converted to letters | lakes, streams                           | `worldGlyph.ts`, `waterReflection.ts` |
 
 Shared foundation: offscreen render target with depth and **material ID in
 alpha** (`surface.ts`, `glyph = .85`, always `toFixed(2)`).
@@ -83,7 +83,7 @@ different finishes for a tree's crown and trunk. Pomorog already uses
   animation such as sway/flicker.
 - More specific layers win:
   `global preset → object type → part type → model declarations → authored type fields
-  → object texture → instance → part texture → instance part`.
+→ object texture → instance → part texture → instance part`.
   Changing every tree crown differs from changing this tree's crown.
 - API: `engine.add(obj, { glyph, parts: { crown: { glyph: 'body', … }, trunk: { glyph: 'surface', … } } })`,
   `engine.setPartStyle(target, part, style)` and GLTF per-node
@@ -346,7 +346,6 @@ cell size are edited in Atmosphere; style preset files use the File menu.
 The toolbar and Display share a pause controller. Screen grid is explicitly
 a debug post-pass, never an authored style or exported document setting.
 
-
 **Water dynamics:** `world/waterDynamics.ts` integrates gravity-driven flow,
 depth and impulses on a shallow-water grid. `waters[].physics` stores depth,
 resistance, source and waves. Mesh/current/foam follow simulation; moving
@@ -509,13 +508,27 @@ Package scenes/games for web and Tauri desktop; Android/iOS follow.
 ```bash
 pnpm install
 pnpm dev                 # editor: http://localhost:1440
-pnpm check               # typecheck + tests + build
+pnpm format              # format versioned source, configuration and documentation
+pnpm format:check        # check formatting without writing
+pnpm check               # formatting + package boundaries + typecheck + tests + build
 pnpm tauri dev           # desktop editor
 node scripts/preview-readme.mjs  # local README/video preview: localhost:4178
 ```
 
 `pnpm check` also enforces package import direction and checks that generic
 renderer entries cannot reach optional presets or application code.
+
+Prettier is pinned in the workspace and uses a 100-column print width, two-space
+indentation, single quotes and no optional semicolons. Print width is a wrapping
+target, not a hard limit for strings, comments or template literals; embedded
+shader/HTML strings retain their contents. See [Prettier's print-width guide](https://prettier.io/docs/options#print-width).
+Formatting commands select Git-versioned files so untracked drafts are left
+alone; add new source files to Git before checking them. `.prettierignore`
+excludes the read-only reference archive, generated output, captured evidence,
+scene fixtures and generated lockfiles. Review formatting separately from
+behavior changes. The mechanical formatting commit is listed in
+`.git-blame-ignore-revs`; use `git blame --ignore-revs-file .git-blame-ignore-revs`
+or set `git config blame.ignoreRevsFile .git-blame-ignore-revs` locally.
 
 Headless captures: `.claude/skills/pomorog-ascii-visual/scripts/cdpshot.mjs`
 (Chromium with GPU and `--use-angle=gl`). Validate in **Orca Browser** too.
