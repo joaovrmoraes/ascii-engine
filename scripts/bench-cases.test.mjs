@@ -10,12 +10,16 @@ test('keeps reference URLs and exposes explicit capacity axes', () => {
   assert.match(benchmarkCase('water-visible-4').query, /water-policy=off&water-layout=visible$/)
   assert.match(benchmarkCase('water-grid-257').query, /resolution=257&water-policy=off$/)
   assert.equal(benchmarkCase('water-grid-513').count, 513)
+  assert.equal(benchmarkCase('water-scale-1024-pause').count, 1024)
+  assert.equal(benchmarkCase('water-scale-8192-pause').count, 8192)
 })
 test('rejects malformed, unbounded or ambiguous cases before launching Chromium', () => {
   for (const id of [
     'skinning-0',
     'skinning-513',
     'particles-257',
+    'water-scale-8193-pause',
+    'water-visible-513',
     'water-grid-130',
     'water-scale-2',
     'water-visible-4-pause',

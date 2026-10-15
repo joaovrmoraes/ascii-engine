@@ -1,3 +1,31 @@
+## 2026-10-15 — Capacity observer controls and bounded memory growth
+
+Capacity collection exposed three complete repeatability failures, retained in
+`scheduling-diagnostic/`: water-visible-8 (10.11%), skinning-256 (5.83%) and
+water-scale-128-pause (5.04%). CPU6/7 host traces show SMT sibling interference
+and scheduling delay during observed Orca helper work; exact per-process causal
+shares are not established. Direct same-version Node, non-login monitoring and
+Git-ignored per-run output reduce observer work. The first two full-point
+repeats pass (3.13% and 0.71%); the last will be repeated after this stage.
+
+The collector stages raw JSON and publishes complete portable links afterward;
+filesystem tests cover deferred publication, historical symlinks and recursive
+path guards. It recomputes round statistics from raw rows and preserves failed
+rounds. Historical Phase 2 reuse is explicit for future runs. Water growth
+beyond 512 records renderer VmHWM and requires a 4 GiB available-memory reserve
+under a linear peak projection; it reports resource bounds without claiming an
+FPS ceiling. The private water fixture ceiling grows to 8,192 for this guarded
+search. Core/solver/rendering code, seeds, clocks, counts and FPS/5% gates stay
+unchanged. `pnpm check` passes, including filesystem, memory-guard and live
+Linux VmHWM tests. Profiling on/off has exact state and byte-identical PNGs,
+with zero IndexedDB calls:
+[capture](captures/benchmarks-2026-10-15/capacity/observer-verification/water-scale-128-pause-on.png),
+[paired proof](captures/benchmarks-2026-10-15/capacity/observer-verification/parity.json),
+[check log](captures/benchmarks-2026-10-15/capacity/observer-verification/check.log).
+Orca's explicit-page fixture run and page-only cdpshot from the preceding
+capacity stage remain valid; application policy testing follows after timing.
+No push.
+
 # Development log
 
 Entries describe the state at each stage. Earlier limitations may have been

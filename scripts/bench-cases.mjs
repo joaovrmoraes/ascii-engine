@@ -9,7 +9,7 @@ export function benchmarkCase(id) {
   if (
     !Number.isInteger(count) ||
     count < 1 ||
-    count > (kind === 'water-grid' ? 513 : 512) ||
+    count > (kind === 'water-scale' ? 8192 : kind === 'water-grid' ? 513 : 512) ||
     (kind === 'particles' && count > 256)
   )
     throw new Error('Benchmark load out of range: ' + id)

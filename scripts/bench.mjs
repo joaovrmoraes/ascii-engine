@@ -5,6 +5,7 @@ import { join, resolve } from 'node:path'
 import { benchmarkBrowser } from './bench-browser.mjs'
 import { summarize as summary } from './bench-stats.mjs'
 import { benchmarkCase } from './bench-cases.mjs'
+import { memorySnapshot } from './bench-capacity-resources.mjs'
 
 const args = Object.fromEntries(
   process.argv
@@ -269,6 +270,7 @@ try {
           timestamp: new Date().toISOString(),
           frequencyKHz: await read('/sys/devices/system/cpu/cpu0/cpufreq/scaling_cur_freq'),
         }
+        before.memory = await memorySnapshot(before.rendererAffinity?.[0]?.pid)
         const result = await browser.evaluate(`benchmark.run(${warmup},${frames})`)
         await browser.check()
         environment.gpu = {
@@ -303,6 +305,7 @@ try {
           before,
           after: {
             timestamp: new Date().toISOString(),
+            memory: await memorySnapshot(before.rendererAffinity?.[0]?.pid),
             frequencyKHz: await read('/sys/devices/system/cpu/cpu0/cpufreq/scaling_cur_freq'),
           },
           metadata,

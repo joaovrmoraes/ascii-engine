@@ -11,10 +11,12 @@ export async function aggregatePoint(root, point) {
       readFile(resolve(root, file, '../environment.json'), 'utf8').then(JSON.parse),
     ),
   )
-  const all = []
+  const all = [],
+    roundStatistics = []
   const hashes = new Set()
   const sources = new Set()
-  const diagnostics = []
+  const diagnostics = [],
+    memoryPeaks = []
   for (let i = 0; i < 2; i++) {
     const env = environments[i],
       round = rounds[i]
@@ -34,7 +36,10 @@ export async function aggregatePoint(root, point) {
       throw new Error('Capacity protocol mismatch: ' + point.id)
     sources.add(env.sourceCommit)
     if (round.runs.length !== 5) throw new Error('Capacity requires five runs per round')
+    const roundRows = []
     for (const run of round.runs) {
+      if (run.after.memory?.renderer?.peakRssBytes)
+        memoryPeaks.push(run.after.memory.renderer.peakRssBytes)
       const m = run.metadata,
         pin = run.before.rendererAffinity
       if (
@@ -76,8 +81,10 @@ export async function aggregatePoint(root, point) {
         )
           throw new Error('Invalid capacity timing')
         all.push(row)
+        roundRows.push(row)
       }
     }
+    roundStatistics.push(summarize(roundRows))
   }
   if (hashes.size !== 1) throw new Error('Non-repeating fixed-step state: ' + point.id)
   if (sources.size !== 1 || new Set(environments.map(e => e.chromium.product)).size !== 1)
@@ -107,17 +114,20 @@ export async function aggregatePoint(root, point) {
     }
   }
   const stats = summarize(all),
-    repeatability = relativeDifference(rounds[0].summary.frameMs.p50, rounds[1].summary.frameMs.p50)
+    repeatability = relativeDifference(
+      roundStatistics[0].frameMs.p50,
+      roundStatistics[1].frameMs.p50,
+    )
   return {
     ...point,
     stats,
     repeatability,
     stable: repeatability <= 0.05,
-    capacityP95: Math.max(...rounds.map(r => r.summary.frameMs.p95)),
-    rounds: rounds.map(r => ({
-      frame: r.summary.frameMs,
-      cpu: r.summary.frameCpuMs,
-      gpu: r.summary.gpuMs,
+    capacityP95: Math.max(...roundStatistics.map(r => r.frameMs.p95)),
+    rounds: roundStatistics.map(r => ({
+      frame: r.frameMs,
+      cpu: r.frameCpuMs,
+      gpu: r.gpuMs,
     })),
     bottleneck: classifyBottleneck(stats.frameCpuMs.p50, stats.gpuMs.p50),
     sources: [...sources],
@@ -125,6 +135,7 @@ export async function aggregatePoint(root, point) {
     diagnostics,
     environment: environments[0],
     sampleCount: all.length,
+    peakRendererRssBytes: memoryPeaks.length ? Math.max(...memoryPeaks) : null,
     pointCountRange: [Math.min(...all.map(r => r.points)), Math.max(...all.map(r => r.points))],
   }
 }

@@ -9,7 +9,7 @@
     "mcp": "pnpm --silent --filter @ascii-engine/automation mcp",
     "build": "pnpm -r build",
     "pages:build": "node scripts/build-pages.mjs",
-    "test": "node --test scripts/export-args.test.mjs scripts/bench-stats.test.mjs scripts/bench-cases.test.mjs scripts/bench-capacity-data.test.mjs && pnpm -r test",
+    "test": "node --test scripts/export-args.test.mjs scripts/bench-stats.test.mjs scripts/bench-cases.test.mjs scripts/bench-capacity-data.test.mjs scripts/bench-capacity-files.test.mjs scripts/bench-capacity-resources.test.mjs && pnpm -r test",
     "typecheck": "pnpm -r typecheck",
     "format": "node scripts/format.mjs --write",
     "format:check": "node scripts/format.mjs --check",

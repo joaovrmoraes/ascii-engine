@@ -106,8 +106,8 @@ export function createBenchmarkScene(
   }
   const waterCalls: number[] = []
   if (name === 'water-scale') {
-    if (!Number.isInteger(waterCount) || waterCount < 1 || waterCount > 512)
-      throw new Error('Water count must be an integer in 1..512')
+    if (!Number.isInteger(waterCount) || waterCount < 1 || waterCount > 8192)
+      throw new Error('Water count must be an integer in 1..8192')
     const resolution = load.waterResolution ?? 129
     if (![65, 129, 257, 513].includes(resolution)) throw new Error('Unsupported water grid')
     const columns = Math.ceil(Math.sqrt(waterCount)),

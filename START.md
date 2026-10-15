@@ -648,3 +648,12 @@ editor/exported player. Capacity is the largest measured load meeting the worse
 round p95 budget (16.7/33.3 ms), using the Phase 2 uncapped controls. Mesh-grid
 resolution is reported separately from the solver's existing 129 cap. Offline
 and parity modes must keep full simulation; the generic core default stays full.
+
+The capacity collector stages per-run JSON in Git-ignored `.cache/bench-capacity/`
+and publishes to the requested capture folder after collection. Child runners use
+the same Node executable directly, avoiding version-manager work during a round.
+Water growth beyond 512 requires the previous point's highest renderer VmHWM,
+scaled by count, to fit available RAM while preserving 4 GiB for the system and
+other processes. It stops with a resource bound when that reserve cannot fit;
+this is distinct from an observed frame-time ceiling. The private load ceiling
+is 8,192, with no increase to the existing 129-wide physics solver.
