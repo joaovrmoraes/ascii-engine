@@ -4,6 +4,36 @@ Entries describe the state at each stage. Earlier limitations may have been
 resolved later; START.md and the editor guide describe the current scope.
 Historical filenames, reference IDs and captured interfaces are preserved.
 
+## 2026-10-15 — Generated Pages formatting and editor test teardown
+
+Excluded docs/index.html and docs/watch.html from Prettier with their generator
+identified in .prettierignore, then regenerated both from the current README.
+The generated gallery now also reflects the README's existing 16 MCP tools and
+project export description. Generated HTML stays in the generator's own format.
+
+Audited all outputs of build/Pages, showcase, exports and the independent video
+tool against files changed by 393b309. Only those two generated HTML files had
+been formatted. Other generated outputs already live under ignored dist/,
+target/, src-tauri/gen/, .cache/, exports/, docs/showcase/, docs/captures/ or
+docs/examples/. Video tool public/ and out/ are also explicitly excluded now.
+The editor index.html and Tauri base configuration are maintained inputs; the
+builds write separate output copies. Scripts and video source files are inputs,
+not generated files. No generator is required to emit Prettier-formatted output.
+
+Traced Vitest's open handle with async_hooks: the editor's Vite plugin started
+the bridge on 127.0.0.1:1442, while Vitest's middleware server had no HTTP server
+to emit the close event. Added an awaited, idempotent closeBundle teardown;
+the existing HTTP close path shares the same closure. Editor tests now exit
+normally both with an existing dev bridge and when they own the free port,
+which is released after teardown. No timeout suppression was added.
+
+Initial validation: editor tests with the hanging-process reporter, free-port
+release, format:check, production Pages build and verify:pages passed. Orca
+checked the isolated sandbox page 4d61c29e-ae0f-4880-a018-3d0e6313dbfe without
+editing the document. Two regeneration/check cycles on the committed fix are
+the remaining final validation; results will be recorded below. Owner plans
+remain untracked and untouched. No push or publication.
+
 ## 2026-10-15 — Consistent formatting and check gate
 
 Adopted pinned Prettier 3.9.10 with a 100-column wrapping target, two-space

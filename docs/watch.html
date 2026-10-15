@@ -1,417 +1,82 @@
 <!doctype html>
-<html lang="en"
-  ><head
-    ><meta charset="utf-8" /><meta
-      name="viewport"
-      content="width=device-width,initial-scale=1"
-    /><link
-      rel="icon"
-      href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Ctext y='26' font-size='28' font-family='monospace' fill='%23d3b27c'%3E%40%3C/text%3E%3C/svg%3E"
-    /><title>ASCII Engine — Live sandbox and feature videos</title>
-    <link rel="stylesheet" href="showcase/live-demos.css" />
-    <style>
-      :root{color-scheme:dark}*{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;background:#0d1117;color:#e6edf3;font:16px/1.65 system-ui,-apple-system,sans-serif}main{max-width:1080px;margin:32px auto;padding:40px 48px;border:1px solid #30363d;border-radius:8px}header{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap;color:#919ba7;font-size:13px;border-bottom:1px solid #30363d;padding-bottom:18px;margin-bottom:28px}h1{font-size:40px;letter-spacing:-1.2px;margin:0 0 14px}h2{font-size:26px;margin:48px 0 16px;padding-bottom:10px;border-bottom:1px solid #30363d}h3{font-size:22px;margin:42px 0 12px}p{margin:14px 0}a{color:#8bbaff;text-decoration:none}a:hover{text-decoration:underline}img,video{display:block;width:100%;height:auto;border-radius:6px;background:#050708}video{border:1px solid #30363d;aspect-ratio:16/9}code{font:14px/1.6 ui-monospace,monospace;background:#20262e;padding:3px 6px;border-radius:4px}pre{padding:18px 20px;overflow:auto;border-radius:6px;background:#161b22}pre code{padding:0;background:none}li{margin:7px 0}ul{padding-left:24px}nav{display:flex;flex-wrap:wrap;gap:8px 20px;margin:20px 0;font-size:14px}h1+p{font-size:22px}h1+p strong{font-weight:500}h3+ p{color:#b4beca}@media(max-width:700px){main{margin:0;border:0;border-radius:0;padding:24px 18px}h1{font-size:34px}h2{font-size:23px}header{font-size:12px}}
-    </style></head
-  ><body
-    ><main
-      ><header
-        ><span>ASCII ENGINE / LIVE SANDBOX / FEATURE VIDEOS</span
-        ><a href="https://github.com/joaovrmoraes/ascii-engine">View on GitHub</a></header
-      >
-      <nav aria-label="Explore"
-        ><a href="#try-in-your-browser">Live sandbox</a><a href="#01-terrain">Terrain</a
-        ><a href="#02-water-paths-and-wind">Water, paths and wind</a
-        ><a href="#03-objects-and-composition">Objects and composition</a
-        ><a href="#04-effects-and-lighting">Effects and lighting</a
-        ><a href="#05-atmosphere">Atmosphere</a
-        ><a href="#06-cameras-preview-and-export">Cameras, preview and export</a
-        ><a href="#07-texture-studio">Texture Studio</a
-        ><a href="#create-with-ai-through-mcp">AI / MCP</a></nav
-      >
-      <h1 id="ascii-engine">ASCII Engine</h1>
-      <p><strong>Build 3D worlds made of letters.</strong></p>
-      <p
-        >ASCII Engine is a visual engine and editor for creating ASCII 3D scenes. Sculpt terrain,
-        paint water, arrange objects and bring your world to life with wind, particles, lighting and
-        atmosphere. Letters follow the geometry and movement of the things they form.</p
-      >
-      <h2 id="try-in-your-browser">Try in your browser</h2>
-      <p
-        >Use the map buttons in the
-        <a href="https://joaovrmoraes.github.io/ascii-engine/#try-in-your-browser">live gallery</a>
-        to switch between five demos inside the page. No installation is needed.</p
-      >
-      <section class="live-demo" aria-label="Interactive map demo">
-        <div class="demo-map-buttons" role="group" aria-label="Choose a map"
-          ><button
-            type="button"
-            data-demo-map="dark_forest"
-            data-demo-url="sandbox/?area=dark_forest&amp;embed=1"
-            data-demo-open="sandbox/?area=dark_forest"
-            data-demo-description="explore the forest, animated characters and combat effects."
-            aria-pressed="true"
-            class="is-active"
-            >Dark Forest</button
-          >
-          <button
-            type="button"
-            data-demo-map="rain_marsh"
-            data-demo-url="sandbox/?area=rain_marsh&amp;embed=1"
-            data-demo-open="sandbox/?area=rain_marsh"
-            data-demo-description="explore rain, wetlands and water ripples."
-            aria-pressed="false"
-            >Rain Marsh</button
-          >
-          <button
-            type="button"
-            data-demo-map="snow_pines"
-            data-demo-url="sandbox/?area=snow_pines&amp;embed=1"
-            data-demo-open="sandbox/?area=snow_pines"
-            data-demo-description="explore snowy branches, falling snow and tracks."
-            aria-pressed="false"
-            >Snow Pines</button
-          >
-          <button
-            type="button"
-            data-demo-map="old_mine"
-            data-demo-url="sandbox/?area=old_mine&amp;embed=1"
-            data-demo-open="sandbox/?area=old_mine"
-            data-demo-description="explore tunnels and lantern lighting."
-            aria-pressed="false"
-            >Old Mine</button
-          >
-          <button
-            type="button"
-            data-demo-map="sunken_cathedral"
-            data-demo-url="sandbox/?area=sunken_cathedral&amp;embed=1"
-            data-demo-open="sandbox/?area=sunken_cathedral"
-            data-demo-description="explore ruins, reflected water and interior lighting."
-            aria-pressed="false"
-            >Sunken Cathedral</button
-          ></div
-        >
-        <div class="demo-viewer"
-          ><iframe
-            id="live-demo-frame"
-            src="sandbox/?area=dark_forest&amp;embed=1"
-            title="ASCII Engine live demo — Dark Forest"
-            loading="lazy"
-            allow="fullscreen"
-            allowfullscreen
-          ></iframe
-        ></div>
-        <div class="demo-map-summary"
-          ><p id="live-demo-description"
-            >explore the forest, animated characters and combat effects.</p
-          ><a id="live-demo-open" href="sandbox/?area=dark_forest" target="_blank" rel="noopener"
-            >Open separately ↗</a
-          ></div
-        >
-      </section>
-      <p
-        >Drag to rotate the demo camera, scroll to zoom and use the controls to adjust letters and
-        light or pause the animation. The demo menu contains these five maps for viewing. To create
-        scenes or work with AI/MCP, use the local editor setup described below.</p
-      >
-      <p
-        ><img
-          loading="lazy"
-          src="showcase/gifs/living-shore.gif"
-          alt="Living Shore: animated grass, water and fire made of letters"
-      /></p>
-      <h2 id="see-it-in-action">See it in action</h2>
-      <p
-        >These animated previews show what you can create with the editor, from shaping a map to
-        framing the finished scene. GIFs play directly in this README.
-        <a href="https://joaovrmoraes.github.io/ascii-engine/watch.html"
-          >Watch the full chapters with video players</a
-        >, or download them below. The <a href="showcase/index.html">local gallery</a> also works
-        from a checkout. Chapters 01–06 reuse existing footage with English captions; their captured
-        historical interface is Portuguese. Texture Studio shows the current English editor.</p
-      >
-      <h3 id="01-terrain">01 · Terrain</h3>
-      <p
-        >Create a map, sculpt its elevation and smooth slopes with brushes. Terrain and grass
-        coverage follow the shape you build.</p
-      >
-      <p
-        ><video
-          controls
-          playsinline
-          preload="none"
-          poster="showcase/gifs/01-terrain.gif"
-          aria-label="Terrain creation and sculpting"
-          src="showcase/videos/01-terrain.mp4"
-          ><a href="showcase/videos/01-terrain.mp4">Terrain creation and sculpting</a></video
-        ></p
-      >
-      <p><a href="showcase/videos/01-terrain.mp4?raw=true">Download the full video</a></p>
-      <h3 id="02-water-paths-and-wind">02 · Water, paths and wind</h3>
-      <p
-        >Paint a lake, shape its shoreline and clear a path through the grass. Move the camera
-        closer to see individual glyphs sway in the wind. Water and reflections are drawn in letters
-        too.</p
-      >
-      <p
-        ><video
-          controls
-          playsinline
-          preload="none"
-          poster="showcase/gifs/02-water.gif"
-          aria-label="Lake, paths and grass in the wind"
-          src="showcase/videos/02-water.mp4"
-          ><a href="showcase/videos/02-water.mp4">Lake, paths and grass in the wind</a></video
-        ></p
-      >
-      <p><a href="showcase/videos/02-water.mp4?raw=true">Download the full video</a></p>
-      <h3 id="03-objects-and-composition">03 · Objects and composition</h3>
-      <p
-        >Choose trees, rocks, ruins and logs from the asset library. Preview objects in the scene
-        before placing them, then adjust their position, rotation and scale with the inspector or
-        transform gizmos.</p
-      >
-      <p
-        ><video
-          controls
-          playsinline
-          preload="none"
-          poster="showcase/gifs/03-objects.gif"
-          aria-label="Composing with trees, rocks and ruins"
-          src="showcase/videos/03-objects.mp4"
-          ><a href="showcase/videos/03-objects.mp4">Composing with trees, rocks and ruins</a></video
-        ></p
-      >
-      <p><a href="showcase/videos/03-objects.mp4?raw=true">Download the full video</a></p>
-      <h3 id="04-effects-and-lighting">04 · Effects and lighting</h3>
-      <p
-        >Build a fire in the effect studio. Adjust its layers, sparks and light, save the effect to
-        the asset library and place it in the scene to illuminate the surrounding objects and
-        grass.</p
-      >
-      <p
-        ><video
-          controls
-          playsinline
-          preload="none"
-          poster="showcase/gifs/04-effects.gif"
-          aria-label="Fire, particles and lighting"
-          src="showcase/videos/04-effects.mp4"
-          ><a href="showcase/videos/04-effects.mp4">Fire, particles and lighting</a></video
-        ></p
-      >
-      <p><a href="showcase/videos/04-effects.mp4?raw=true">Download the full video</a></p>
-      <h3 id="05-atmosphere">05 · Atmosphere</h3>
-      <p
-        >Explore dusk and moonlight on the same scene. Adjust exposure, color, light direction,
-        shadows and fog, then save an atmosphere to reuse in other compositions.</p
-      >
-      <p
-        ><video
-          controls
-          playsinline
-          preload="none"
-          poster="showcase/gifs/05-atmosphere.gif"
-          aria-label="Lighting, moonlight and atmosphere"
-          src="showcase/videos/05-atmosphere.mp4"
-          ><a href="showcase/videos/05-atmosphere.mp4">Lighting, moonlight and atmosphere</a></video
-        ></p
-      >
-      <p><a href="showcase/videos/05-atmosphere.mp4?raw=true">Download the full video</a></p>
-      <h3 id="06-cameras-preview-and-export">06 · Cameras, preview and export</h3>
-      <p
-        >Observe animated water, place a camera with a live thumbnail and choose the initial
-        framing. Save the editable map, export its scene document and preview the composition with
-        animated grass, water and fire.</p
-      >
-      <p
-        ><video
-          controls
-          playsinline
-          preload="none"
-          poster="showcase/gifs/06-camera.gif"
-          aria-label="Cameras, animated water and export"
-          src="showcase/videos/06-camera.mp4"
-          ><a href="showcase/videos/06-camera.mp4">Cameras, animated water and export</a></video
-        ></p
-      >
-      <p><a href="showcase/videos/06-camera.mp4?raw=true">Download the full video</a></p>
-      <h3 id="07-texture-studio">07 · Texture Studio</h3>
-      <p
-        >Select an object or named part and shape its appearance in an isolated preview. Choose
-        letters and fonts, adjust size, spacing, colors and contrast, or show only the letters. Tune
-        the preview lights, then apply and save the texture to reuse on another object.</p
-      >
-      <p
-        ><video
-          controls
-          playsinline
-          preload="none"
-          poster="showcase/gifs/07-textures.gif"
-          aria-label="Editing letters, visibility, colors and lighting in Texture Studio"
-          src="https://github.com/joaovrmoraes/ascii-engine/releases/download/v0.1.0/07-textures.mp4"
-          ><a
-            href="https://github.com/joaovrmoraes/ascii-engine/releases/download/v0.1.0/07-textures.mp4"
-            >Editing letters, visibility, colors and lighting in Texture Studio</a
-          ></video
-        ></p
-      >
-      <p
-        ><a
-          href="https://github.com/joaovrmoraes/ascii-engine/releases/download/v0.1.0/07-textures.mp4"
-          >Download the full video</a
-        ></p
-      >
-      <h2 id="create-with-ai-through-mcp">Create with AI through MCP</h2>
-      <p
-        >An AI agent can run the complete supported visual authoring workflow through the local MCP
-        server: create a scene, inspect its rendered result, adjust it and export an editable
-        document. Once the editor and client are connected, the agent can perform these operations
-        without manual interface clicks.</p
-      >
-      <ul
-        ><li>Sculpt terrain, paint water, arrange objects and import GLTF/GLB models.</li
-        ><li>Edit named model parts; create and reuse textures, effects and atmospheres.</li
-        ><li>Adjust letters, fonts, colors, lighting, fog, weather and composition cameras.</li
-        ><li>Read the live catalog, preview edits, inspect PNG captures and undo/redo.</li
-        ><li>Save and reopen portable scenes with embedded models and reusable assets.</li></ul
-      >
-      <p
-        ><strong>Example prompt:</strong> “Create a moonlit clearing with a lake and trees. Give the
-        tree crowns green arrow glyphs with no solid body, save that texture, show me a preview and
-        export the editable scene.”</p
-      >
-      <p
-        ><img
-          loading="lazy"
-          src="showcase/posters/mcp-authoring.png"
-          alt="A scene created and inspected through the real MCP connection"
-      /></p>
-      <p
-        >The server exposes 14 tools. <code>scene_apply</code> accepts atomic batches;
-        <code>scene.patch</code> and <code>scene.replace</code> cover every supported
-        <code>SceneDoc</code> field. Each accepted batch shares the editor's undo history. This
-        covers the visual features currently implemented; gameplay rules and unsupported rendering
-        features require additional development. MCP runs locally and needs an open editor session
-        and an MCP-capable AI client.</p
-      >
-      <p
-        >Start the editor with <code>pnpm dev</code>, then configure your client using the
-        <a href="https://github.com/joaovrmoraes/ascii-engine/blob/main/.mcp.example.json"
-          >MCP configuration example</a
-        >, replacing the example paths with your checkout. Follow the
-        <a href="https://github.com/joaovrmoraes/ascii-engine/blob/main/docs/api-mcp.md"
-          >connection guide and tool reference</a
-        >
-        for setup and commands.</p
-      >
-      <h2 id="what-you-can-create">What you can create</h2>
-      <ul
-        ><li
-          ><strong>Maps and items:</strong> brush-based terrain, paths, water, built-in assets and
-          imported GLTF/GLB models.</li
-        ><li
-          ><strong>Per-part styles:</strong> give a tree's crown and trunk, or individual parts of a
-          model, their own glyph technique, alphabet, size and color.</li
-        ><li
-          ><strong>Reusable effects:</strong> particle layers, fire, smoke, sparks and lights, with
-          an isolated preview and recipes saved to the library.</li
-        ><li
-          ><strong>Reusable textures:</strong> letters, fonts, visibility, palettes and preview
-          lights, applied to whole objects or named parts and saved to the library.</li
-        ><li><strong>Environments:</strong> lighting, shadows, fog, rain and snow.</li
-        ><li
-          ><strong>Compositions:</strong> saved orthographic cameras, aspect ratios, live thumbnails
-          and preview through the initial camera.</li
-        ><li
-          ><strong>Editable scenes:</strong> undo/redo, a local draft, saving, reopening and JSON
-          export.</li
-        ></ul
-      >
-      <p
-        >The project grew out of <strong>Pomorog's</strong> visual style. Its demos include Dark
-        Forest, Rain Marsh, Snow Pines, Old Mine and Sunken Cathedral, along with animated
-        characters and scripted combat encounters.</p
-      >
-      <h2 id="try-it">Try it</h2>
-      <p>Requires Node.js and pnpm. The workspace uses pnpm <strong>11.9.0</strong>.</p>
-      <pre><code>pnpm install
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Ctext y='26' font-size='28' font-family='monospace' fill='%23d3b27c'%3E%40%3C/text%3E%3C/svg%3E"><title>ASCII Engine — Live sandbox and feature videos</title>
+<link rel="stylesheet" href="showcase/live-demos.css">
+<style>
+:root{color-scheme:dark}*{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;background:#0d1117;color:#e6edf3;font:16px/1.65 system-ui,-apple-system,sans-serif}main{max-width:1080px;margin:32px auto;padding:40px 48px;border:1px solid #30363d;border-radius:8px}header{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap;color:#919ba7;font-size:13px;border-bottom:1px solid #30363d;padding-bottom:18px;margin-bottom:28px}h1{font-size:40px;letter-spacing:-1.2px;margin:0 0 14px}h2{font-size:26px;margin:48px 0 16px;padding-bottom:10px;border-bottom:1px solid #30363d}h3{font-size:22px;margin:42px 0 12px}p{margin:14px 0}a{color:#8bbaff;text-decoration:none}a:hover{text-decoration:underline}img,video{display:block;width:100%;height:auto;border-radius:6px;background:#050708}video{border:1px solid #30363d;aspect-ratio:16/9}code{font:14px/1.6 ui-monospace,monospace;background:#20262e;padding:3px 6px;border-radius:4px}pre{padding:18px 20px;overflow:auto;border-radius:6px;background:#161b22}pre code{padding:0;background:none}li{margin:7px 0}ul{padding-left:24px}nav{display:flex;flex-wrap:wrap;gap:8px 20px;margin:20px 0;font-size:14px}h1+p{font-size:22px}h1+p strong{font-weight:500}h3+ p{color:#b4beca}@media(max-width:700px){main{margin:0;border:0;border-radius:0;padding:24px 18px}h1{font-size:34px}h2{font-size:23px}header{font-size:12px}}
+</style></head><body><main><header><span>ASCII ENGINE / LIVE SANDBOX / FEATURE VIDEOS</span><a href="https://github.com/joaovrmoraes/ascii-engine">View on GitHub</a></header>
+<nav aria-label="Explore"><a href="#try-in-your-browser">Live sandbox</a><a href="#01-terrain">Terrain</a><a href="#02-water-paths-and-wind">Water, paths and wind</a><a href="#03-objects-and-composition">Objects and composition</a><a href="#04-effects-and-lighting">Effects and lighting</a><a href="#05-atmosphere">Atmosphere</a><a href="#06-cameras-preview-and-export">Cameras, preview and export</a><a href="#07-texture-studio">Texture Studio</a><a href="#create-with-ai-through-mcp">AI / MCP</a></nav>
+<h1 id="ascii-engine">ASCII Engine</h1>
+<p><strong>Build 3D worlds made of letters.</strong></p>
+<p>ASCII Engine is a visual engine and editor for creating ASCII 3D scenes. Sculpt terrain, paint water, arrange objects and bring your world to life with wind, particles, lighting and atmosphere. Letters follow the geometry and movement of the things they form.</p>
+<h2 id="try-in-your-browser">Try in your browser</h2>
+<p>Use the map buttons in the <a href="https://joaovrmoraes.github.io/ascii-engine/#try-in-your-browser">live gallery</a> to switch between five demos inside the page. No installation is needed.</p>
+<section class="live-demo" aria-label="Interactive map demo">
+  <div class="demo-map-buttons" role="group" aria-label="Choose a map"><button type="button" data-demo-map="dark_forest" data-demo-url="sandbox/?area=dark_forest&amp;embed=1" data-demo-open="sandbox/?area=dark_forest" data-demo-description="explore the forest, animated characters and combat effects." aria-pressed="true" class="is-active">Dark Forest</button>
+<button type="button" data-demo-map="rain_marsh" data-demo-url="sandbox/?area=rain_marsh&amp;embed=1" data-demo-open="sandbox/?area=rain_marsh" data-demo-description="explore rain, wetlands and water ripples." aria-pressed="false">Rain Marsh</button>
+<button type="button" data-demo-map="snow_pines" data-demo-url="sandbox/?area=snow_pines&amp;embed=1" data-demo-open="sandbox/?area=snow_pines" data-demo-description="explore snowy branches, falling snow and tracks." aria-pressed="false">Snow Pines</button>
+<button type="button" data-demo-map="old_mine" data-demo-url="sandbox/?area=old_mine&amp;embed=1" data-demo-open="sandbox/?area=old_mine" data-demo-description="explore tunnels and lantern lighting." aria-pressed="false">Old Mine</button>
+<button type="button" data-demo-map="sunken_cathedral" data-demo-url="sandbox/?area=sunken_cathedral&amp;embed=1" data-demo-open="sandbox/?area=sunken_cathedral" data-demo-description="explore ruins, reflected water and interior lighting." aria-pressed="false">Sunken Cathedral</button></div>
+  <div class="demo-viewer"><iframe id="live-demo-frame" src="sandbox/?area=dark_forest&amp;embed=1" title="ASCII Engine live demo — Dark Forest" loading="lazy" allow="fullscreen" allowfullscreen></iframe></div>
+  <div class="demo-map-summary"><p id="live-demo-description">explore the forest, animated characters and combat effects.</p><a id="live-demo-open" href="sandbox/?area=dark_forest" target="_blank" rel="noopener">Open separately ↗</a></div>
+</section>
+<p>Drag to rotate the demo camera, scroll to zoom and use the controls to adjust letters and light or pause the animation. The demo menu contains these five maps for viewing. To create scenes or work with AI/MCP, use the local editor setup described below.</p>
+<p><img loading="lazy" src="showcase/gifs/living-shore.gif" alt="Living Shore: animated grass, water and fire made of letters"></p>
+<h2 id="see-it-in-action">See it in action</h2>
+<p>These animated previews show what you can create with the editor, from shaping a map to framing the finished scene. GIFs play directly in this README. <a href="https://joaovrmoraes.github.io/ascii-engine/watch.html">Watch the full chapters with video players</a>, or download them below. The <a href="showcase/index.html">local gallery</a> also works from a checkout. Chapters 01–06 reuse existing footage with English captions; their captured historical interface is Portuguese. Texture Studio shows the current English editor.</p>
+<h3 id="01-terrain">01 · Terrain</h3>
+<p>Create a map, sculpt its elevation and smooth slopes with brushes. Terrain and grass coverage follow the shape you build.</p>
+<p><video controls playsinline preload="none" poster="showcase/gifs/01-terrain.gif" aria-label="Terrain creation and sculpting" src="showcase/videos/01-terrain.mp4"><a href="showcase/videos/01-terrain.mp4">Terrain creation and sculpting</a></video></p>
+<p><a href="showcase/videos/01-terrain.mp4?raw=true">Download the full video</a></p>
+<h3 id="02-water-paths-and-wind">02 · Water, paths and wind</h3>
+<p>Paint a lake, shape its shoreline and clear a path through the grass. Move the camera closer to see individual glyphs sway in the wind. Water and reflections are drawn in letters too.</p>
+<p><video controls playsinline preload="none" poster="showcase/gifs/02-water.gif" aria-label="Lake, paths and grass in the wind" src="showcase/videos/02-water.mp4"><a href="showcase/videos/02-water.mp4">Lake, paths and grass in the wind</a></video></p>
+<p><a href="showcase/videos/02-water.mp4?raw=true">Download the full video</a></p>
+<h3 id="03-objects-and-composition">03 · Objects and composition</h3>
+<p>Choose trees, rocks, ruins and logs from the asset library. Preview objects in the scene before placing them, then adjust their position, rotation and scale with the inspector or transform gizmos.</p>
+<p><video controls playsinline preload="none" poster="showcase/gifs/03-objects.gif" aria-label="Composing with trees, rocks and ruins" src="showcase/videos/03-objects.mp4"><a href="showcase/videos/03-objects.mp4">Composing with trees, rocks and ruins</a></video></p>
+<p><a href="showcase/videos/03-objects.mp4?raw=true">Download the full video</a></p>
+<h3 id="04-effects-and-lighting">04 · Effects and lighting</h3>
+<p>Build a fire in the effect studio. Adjust its layers, sparks and light, save the effect to the asset library and place it in the scene to illuminate the surrounding objects and grass.</p>
+<p><video controls playsinline preload="none" poster="showcase/gifs/04-effects.gif" aria-label="Fire, particles and lighting" src="showcase/videos/04-effects.mp4"><a href="showcase/videos/04-effects.mp4">Fire, particles and lighting</a></video></p>
+<p><a href="showcase/videos/04-effects.mp4?raw=true">Download the full video</a></p>
+<h3 id="05-atmosphere">05 · Atmosphere</h3>
+<p>Explore dusk and moonlight on the same scene. Adjust exposure, color, light direction, shadows and fog, then save an atmosphere to reuse in other compositions.</p>
+<p><video controls playsinline preload="none" poster="showcase/gifs/05-atmosphere.gif" aria-label="Lighting, moonlight and atmosphere" src="showcase/videos/05-atmosphere.mp4"><a href="showcase/videos/05-atmosphere.mp4">Lighting, moonlight and atmosphere</a></video></p>
+<p><a href="showcase/videos/05-atmosphere.mp4?raw=true">Download the full video</a></p>
+<h3 id="06-cameras-preview-and-export">06 · Cameras, preview and export</h3>
+<p>Observe animated water, place a camera with a live thumbnail and choose the initial framing. Save the editable map, export its scene document and preview the composition with animated grass, water and fire.</p>
+<p><video controls playsinline preload="none" poster="showcase/gifs/06-camera.gif" aria-label="Cameras, animated water and export" src="showcase/videos/06-camera.mp4"><a href="showcase/videos/06-camera.mp4">Cameras, animated water and export</a></video></p>
+<p><a href="showcase/videos/06-camera.mp4?raw=true">Download the full video</a></p>
+<h3 id="07-texture-studio">07 · Texture Studio</h3>
+<p>Select an object or named part and shape its appearance in an isolated preview. Choose letters and fonts, adjust size, spacing, colors and contrast, or show only the letters. Tune the preview lights, then apply and save the texture to reuse on another object.</p>
+<p><video controls playsinline preload="none" poster="showcase/gifs/07-textures.gif" aria-label="Editing letters, visibility, colors and lighting in Texture Studio" src="https://github.com/joaovrmoraes/ascii-engine/releases/download/v0.1.0/07-textures.mp4"><a href="https://github.com/joaovrmoraes/ascii-engine/releases/download/v0.1.0/07-textures.mp4">Editing letters, visibility, colors and lighting in Texture Studio</a></video></p>
+<p><a href="https://github.com/joaovrmoraes/ascii-engine/releases/download/v0.1.0/07-textures.mp4">Download the full video</a></p>
+<h2 id="create-with-ai-through-mcp">Create with AI through MCP</h2>
+<p>An AI agent can run the complete supported visual authoring workflow through the local MCP server: create a scene, inspect its rendered result, adjust it and export an editable document. Once the editor and client are connected, the agent can perform these operations without manual interface clicks.</p>
+<ul><li>Sculpt terrain, paint water, arrange objects and import GLTF/GLB models.</li><li>Edit named model parts; create and reuse textures, effects and atmospheres.</li><li>Adjust letters, fonts, colors, lighting, fog, weather and composition cameras.</li><li>Read the live catalog, preview edits, inspect PNG captures and undo/redo.</li><li>Save and reopen portable scenes with embedded models and reusable assets.</li><li>Queue Web/Tauri project exports and read their build status through MCP.</li></ul>
+<p><strong>Example prompt:</strong> “Create a moonlit clearing with a lake and trees. Give the tree crowns green arrow glyphs with no solid body, save that texture, show me a preview and export the editable scene.”</p>
+<p><img loading="lazy" src="showcase/posters/mcp-authoring.png" alt="A scene created and inspected through the real MCP connection"></p>
+<p>The server exposes 16 tools. <code>scene_apply</code> accepts atomic batches; <code>scene.patch</code> and <code>scene.replace</code> cover every supported <code>SceneDoc</code> field. Each accepted batch shares the editor's undo history. This covers the visual features currently implemented; gameplay rules and unsupported rendering features require additional development. MCP runs locally and needs an open editor session and an MCP-capable AI client.</p>
+<p>Start the editor with <code>pnpm dev</code>, then configure your client using the <a href="https://github.com/joaovrmoraes/ascii-engine/blob/main/.mcp.example.json">MCP configuration example</a>, replacing the example paths with your checkout. Follow the <a href="https://github.com/joaovrmoraes/ascii-engine/blob/main/docs/api-mcp.md">connection guide and tool reference</a> for setup and commands.</p>
+<h2 id="what-you-can-create">What you can create</h2>
+<ul><li><strong>Maps and items:</strong> brush-based terrain, paths, water, built-in assets and imported GLTF/GLB models.</li><li><strong>Per-part styles:</strong> give a tree's crown and trunk, or individual parts of a model, their own glyph technique, alphabet, size and color.</li><li><strong>Reusable effects:</strong> particle layers, fire, smoke, sparks and lights, with an isolated preview and recipes saved to the library.</li><li><strong>Reusable textures:</strong> letters, fonts, visibility, palettes and preview lights, applied to whole objects or named parts and saved to the library.</li><li><strong>Environments:</strong> lighting, shadows, fog, rain and snow.</li><li><strong>Compositions:</strong> saved orthographic cameras, aspect ratios, live thumbnails and preview through the initial camera.</li><li><strong>Editable scenes:</strong> undo/redo, a local draft, saving, reopening and JSON export.</li></ul>
+<p>The project grew out of <strong>Pomorog's</strong> visual style. Its demos include Dark Forest, Rain Marsh, Snow Pines, Old Mine and Sunken Cathedral, along with animated characters and scripted combat encounters.</p>
+<h2 id="try-it">Try it</h2>
+<p>Requires Node.js and pnpm. The workspace uses pnpm <strong>11.9.0</strong>.</p>
+<pre><code>pnpm install
 pnpm dev</code></pre>
-      <p
-        >Open <a href="http://localhost:1440">localhost:1440</a> to create a scene.
-        <a href="http://localhost:1440/?area=dark_forest">Dark Forest</a> shows the character,
-        creature and combat effect demo.</p
-      >
-      <p
-        >In the editor, <strong>W</strong> moves, <strong>E</strong> rotates,
-        <strong>R</strong> scales and <strong>O</strong> activates orbit. Drag assets from the
-        library into the scene. Open <strong>Studio</strong> for effects, atmospheres and textures,
-        and <strong>Preview</strong> to view the animated composition.</p
-      >
-      <p>Export a web demo without the editor panels:</p>
-      <pre><code>pnpm export -- --title &quot;Dark Forest&quot; --area dark_forest</code></pre>
-      <p
-        >The output is <code>exports/dark-forest/web/</code> and can be served over HTTP. Saved
-        scenes can also be exported with <code>--scene path/to/scene.ascii.json</code>.</p
-      >
-      <h2 id="project-status">Project status</h2>
-      <p
-        >In development. The current release covers visual content creation, editing and export. The
-        player runs scenes and existing demos. Gameplay components and scripts attached to objects
-        through the editor are a future stage; demo combat follows a programmed sequence.</p
-      >
-      <h2 id="development">Development</h2>
-      <p
-        >The core in <code>packages/engine</code> uses TypeScript and Three.js, with glyph
-        techniques declared per object and per part. The editor in <code>apps/editor</code> uses
-        Vite and includes a Tauri desktop shell. Data authoring and the API/MCP automation bridge
-        live in separate modules.</p
-      >
-      <p
-        >The renderer accepts appearance and effect libraries explicitly. Import specialized APIs
-        through <code>@ascii-engine/core/techniques</code>, <code>/world</code> or <code>/fx</code>;
-        optional Pomorog recipes use <code>/pomorog</code>. See the
-        <a
-          href="https://github.com/joaovrmoraes/ascii-engine/blob/main/docs/decisions/0003-package-boundaries.md"
-          >package boundary decision</a
-        >.</p
-      >
-      <pre><code>pnpm check              # types, tests and build
+<p>Open <a href="http://localhost:1440">localhost:1440</a> to create a scene. <a href="http://localhost:1440/?area=dark_forest">Dark Forest</a> shows the character, creature and combat effect demo.</p>
+<p>In the editor, <strong>W</strong> moves, <strong>E</strong> rotates, <strong>R</strong> scales and <strong>O</strong> activates orbit. Drag assets from the library into the scene. Open <strong>Studio</strong> for effects, atmospheres and textures, and <strong>Preview</strong> to view the animated composition.</p>
+<p>Export a web demo without the editor panels:</p>
+<pre><code>pnpm export -- --title &quot;Dark Forest&quot; --area dark_forest</code></pre>
+<p>The output is <code>exports/dark-forest/web/</code> and can be served over HTTP. Saved scenes can also be exported with <code>--scene path/to/scene.ascii.json</code>.</p>
+<h2 id="project-status">Project status</h2>
+<p>In development. The current release covers visual content creation, editing and export. The player runs scenes and existing demos. Gameplay components and scripts attached to objects through the editor are a future stage; demo combat follows a programmed sequence.</p>
+<h2 id="development">Development</h2>
+<p>The core in <code>packages/engine</code> uses TypeScript and Three.js, with glyph techniques declared per object and per part. The editor in <code>apps/editor</code> uses Vite and includes a Tauri desktop shell. Data authoring and the API/MCP automation bridge live in separate modules.</p>
+<p>The renderer accepts appearance and effect libraries explicitly. Import specialized APIs through <code>@ascii-engine/core/techniques</code>, <code>/world</code> or <code>/fx</code>; optional Pomorog recipes use <code>/pomorog</code>. See the <a href="https://github.com/joaovrmoraes/ascii-engine/blob/main/docs/decisions/0003-package-boundaries.md">package boundary decision</a>.</p>
+<pre><code>pnpm check              # types, tests and build
 pnpm compare            # visual demo comparison; requires pnpm dev
 pnpm verify:authoring   # editor interaction checks; requires pnpm dev</code></pre>
-      <h2 id="documentation">Documentation</h2>
-      <ul
-        ><li
-          ><a
-            href="https://github.com/joaovrmoraes/ascii-engine/blob/main/docs/guia-editor-visual.md"
-            >Visual editor guide</a
-          >: tools and creation workflow.</li
-        ><li><a href="examples/">Example scenes</a>: documents to open in the editor.</li
-        ><li
-          ><a href="https://github.com/joaovrmoraes/ascii-engine/blob/main/docs/api-mcp.md"
-            >Authoring API and MCP</a
-          >: tools and agent integration.</li
-        ><li
-          ><a href="https://github.com/joaovrmoraes/ascii-engine/blob/main/START.md"
-            >Architecture and plan</a
-          >: principles, systems and milestones.</li
-        ><li
-          ><a href="https://github.com/joaovrmoraes/ascii-engine/blob/main/docs/log.md"
-            >Development log</a
-          >: changes and validation.</li
-        ><li
-          ><a
-            href="https://github.com/joaovrmoraes/ascii-engine/blob/main/reference/pomorog/README.md"
-            >Visual origin: Pomorog</a
-          >: read-only reference.</li
-        ><li
-          ><a href="https://github.com/joaovrmoraes/ascii-engine/blob/main/AGENTS.md"
-            >Agent instructions</a
-          >.</li
-        ></ul
-      ></main
-    ><script type="module" src="showcase/live-demos.js"></script
-    ><script>
-      document.querySelectorAll('video').forEach(video=>video.addEventListener('play',()=>document.querySelectorAll('video').forEach(other=>{if(other!==video)other.pause()})));
-    </script></body
-  ></html
->
+<h2 id="documentation">Documentation</h2>
+<ul><li><a href="https://github.com/joaovrmoraes/ascii-engine/blob/main/docs/guia-editor-visual.md">Visual editor guide</a>: tools and creation workflow.</li><li><a href="examples/">Example scenes</a>: documents to open in the editor.</li><li><a href="https://github.com/joaovrmoraes/ascii-engine/blob/main/docs/api-mcp.md">Authoring API and MCP</a>: tools and agent integration.</li><li><a href="https://github.com/joaovrmoraes/ascii-engine/blob/main/START.md">Architecture and plan</a>: principles, systems and milestones.</li><li><a href="https://github.com/joaovrmoraes/ascii-engine/blob/main/docs/log.md">Development log</a>: changes and validation.</li><li><a href="https://github.com/joaovrmoraes/ascii-engine/blob/main/reference/pomorog/README.md">Visual origin: Pomorog</a>: read-only reference.</li><li><a href="https://github.com/joaovrmoraes/ascii-engine/blob/main/AGENTS.md">Agent instructions</a>.</li></ul></main><script type="module" src="showcase/live-demos.js"></script><script>document.querySelectorAll('video').forEach(video=>video.addEventListener('play',()=>document.querySelectorAll('video').forEach(other=>{if(other!==video)other.pause()})));</script></body></html>
