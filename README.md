@@ -185,6 +185,14 @@ pnpm export -- --title "Dark Forest" --area dark_forest
 The output is `exports/dark-forest/web/` and can be served over HTTP.
 Saved scenes can also be exported with `--scene path/to/scene.ascii.json`.
 
+## Performance
+
+The [performance study](docs/performance.md) includes capacity tables and nine
+reproducible charts for this i5-12450H / Chromium headless / ANGLE GL profile.
+Optimized JavaScript makes the reference skinning step 45× faster and frame p50
+52% lower. Hidden water pauses in the editor and exported player; offline/parity
+views simulate everything. WebAssembly is **rejected for now**.
+
 ## Project status
 
 In development. The current release covers visual content creation,

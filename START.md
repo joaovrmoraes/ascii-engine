@@ -513,7 +513,9 @@ pnpm format:check        # check formatting without writing
 pnpm check               # formatting + package boundaries + typecheck + tests + build
 pnpm bench --round=round-1 # fixed-step CPU/GPU study; repeat with round-2
 pnpm bench --uncapped --round=uncapped-round-1 # repeat with uncapped-round-2
-pnpm bench:report         # summarize uncapped rounds and bottlenecks; stop before Phase 2
+pnpm bench:report         # summarize the retained uncapped Phase 1 rounds
+pnpm bench:capacity       # collect/resume the optimized-JS capacity matrix
+pnpm bench:charts         # regenerate nine SVGs and capacity tables from raw JSON
 pnpm tauri dev           # desktop editor
 node scripts/preview-readme.mjs  # local README/video preview: localhost:4178
 ```
@@ -565,8 +567,9 @@ fresh loads per scene, serially. Results, environment and raw samples go under
 `pnpm bench --verify --out=.cache/bench-study` checks exact state/visual parity
 with profiling on/off and forbids IndexedDB calls. The report applies the
 owner-confirmed [ADR 0004](docs/decisions/0004-webassembly-for-simulation.md),
-which remains Proposed. Phase 2 now evaluates optimized JS and optional offscreen
-water scheduling; WASM/GPU alternatives remain outside the authorized work.
+now **Rejected for now** after optimized JS, algorithmic water scheduling and
+capacity measurements. No WASM/GPU skinning or additional toolchain was needed.
+See the [performance page](docs/performance.md) for measured bounds and plots.
 
 The Phase 1 methodology amendment adds `--uncapped`, launching Chromium with
 `--disable-gpu-vsync --disable-frame-rate-limit` while keeping fixed simulation
@@ -653,15 +656,23 @@ The [Phase 2 report](docs/captures/benchmarks-2026-10-15/phase-2/README.md)
 records optimized JS as the skinning baseline (45.38× isolated, 52.41% frame
 p50 gain), exact parity and water results for all four map sizes. All ten
 before/after cases repeat within 5%. The water decision depends on map size;
-four paused waters remain a borderline numeric target. ADR 0004 stays Proposed,
-stopped after Phase 2. Regenerate its tables with `node scripts/bench-phase2-report.mjs`.
+four paused waters remain a borderline numeric target. This report preserves
+its Phase 2 decision point; the final ADR now rejects WASM for now. Regenerate
+the historical tables with `node scripts/bench-phase2-report.mjs`.
 
-The owner authorized a final [capacity study](docs/captures/benchmarks-2026-10-15/capacity/README.md)
-and static performance charts, plus default offscreen-water pausing in the live
-editor/exported player. Capacity is the largest measured load meeting the worse
-round p95 budget (16.7/33.3 ms), using the Phase 2 uncapped controls. Mesh-grid
-resolution is reported separately from the solver's existing 129 cap. Offline
-and parity modes must keep full simulation; the generic core default stays full.
+The completed [capacity study](docs/captures/benchmarks-2026-10-15/capacity/README.md)
+and [performance page](docs/performance.md) close the investigation with nine
+static SVG charts. Capacity is the largest measured load meeting the worse-round
+p95 budget (16.7/33.3 ms), using the Phase 2 uncapped controls. At 60/30 fps:
+128/256 fixture creatures, 2/4 all-updating or simultaneously visible waters,
+4/24 effect groups, and 129/257 mesh widths. Pausing hidden waters supports
+2,048 at 60 fps and at least 4,096 at 30 fps; the next 8,192 load exceeds the
+memory projection/reserve and is unmeasured, not an observed FPS ceiling.
+Mesh-grid resolution is separate from the solver's existing 129 cap. These
+are independent-axis, fitted-fixture results on this hardware, not a combined
+scene promise. Offline/parity modes keep full simulation; the generic core
+stays full. Larger visible workloads and weaker platforms trigger profiling
+under the unchanged ADR rule, rather than automatic WASM adoption.
 
 The capacity collector stages per-run JSON in Git-ignored `.cache/bench-capacity/`
 and publishes to the requested capture folder after collection. Child runners use

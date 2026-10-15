@@ -70,6 +70,8 @@ pnpm dev</code></pre>
 <p>Export a web demo without the editor panels:</p>
 <pre><code>pnpm export -- --title &quot;Dark Forest&quot; --area dark_forest</code></pre>
 <p>The output is <code>exports/dark-forest/web/</code> and can be served over HTTP. Saved scenes can also be exported with <code>--scene path/to/scene.ascii.json</code>.</p>
+<h2 id="performance">Performance</h2>
+<p>The <a href="https://github.com/joaovrmoraes/ascii-engine/blob/main/docs/performance.md">performance study</a> includes capacity tables and nine reproducible charts for this i5-12450H / Chromium headless / ANGLE GL profile. Optimized JavaScript makes the reference skinning step 45× faster and frame p50 52% lower. Hidden water pauses in the editor and exported player; offline/parity views simulate everything. WebAssembly is <strong>rejected for now</strong>.</p>
 <h2 id="project-status">Project status</h2>
 <p>In development. The current release covers visual content creation, editing and export. The player runs scenes and existing demos. Gameplay components and scripts attached to objects through the editor are a future stage; demo combat follows a programmed sequence.</p>
 <h2 id="development">Development</h2>

@@ -1,0 +1,20 @@
+{
+  "relativeDocumentLinks": 69,
+  "missing": [],
+  "charts": [
+    "docs/captures/benchmarks-2026-10-15/charts/capacity-effects.svg",
+    "docs/captures/benchmarks-2026-10-15/charts/capacity-skinning.svg",
+    "docs/captures/benchmarks-2026-10-15/charts/capacity-water-grid.svg",
+    "docs/captures/benchmarks-2026-10-15/charts/capacity-water-loaded-off.svg",
+    "docs/captures/benchmarks-2026-10-15/charts/capacity-water-loaded-pause.svg",
+    "docs/captures/benchmarks-2026-10-15/charts/capacity-water-visible.svg",
+    "docs/captures/benchmarks-2026-10-15/charts/cpu-vs-gpu.svg",
+    "docs/captures/benchmarks-2026-10-15/charts/skinning-before-after.svg",
+    "docs/captures/benchmarks-2026-10-15/charts/water-scale.svg"
+  ],
+  "adrStatus": "Rejected for now",
+  "originalPlansUnchanged": {
+    "docs/editor-consolidation-plan.md": "902a2dc97c95e8f5ffb90e79c1b09f1bc48230d610cdbf78d5e3316154b53916",
+    "docs/wasm-performance-study-plan.md": "b96faa37b3d657add64b4513e1822ff04c72cd4365f21690c0299254873884b4"
+  }
+}
