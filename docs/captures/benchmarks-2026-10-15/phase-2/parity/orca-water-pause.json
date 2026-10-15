@@ -1,0 +1,11 @@
+{
+  "id": "d4271cb4-0b2e-43b6-8a33-db0a1feae83e",
+  "ok": true,
+  "result": {
+    "result": "{\"configuration\":{\"carpetSeed\":48017,\"cover\":1800,\"dt\":0.016666666666666666,\"expectedVisible\":1,\"externalImpulses\":false,\"mapWidth\":1024,\"name\":\"water-scale\",\"reflection\":true,\"seed\":4242,\"spacing\":64,\"waterCells\":133128,\"waterCount\":8,\"waterPolicy\":\"pause\",\"waterResolution\":129,\"waterWidth\":28},\"diagnostics\":{\"waterCalls\":[121,0,0,0,0,0,0,0]},\"fingerprint\":{\"hash\":\"6508faae\",\"skinnedPoints\":0,\"time\":1.9999999999999978,\"values\":931932,\"visibleWaterHash\":\"e4375ba3\"},\"gpuQueue\":{\"completedFrames\":120,\"completionClock\":\"CPU-observed asynchronous fence completion; includes polling delay\",\"limit\":2,\"peak\":2,\"pollCallbacks\":130,\"polling\":\"non-nested 1 ms timers and task submissions; no spin or blocking GPU wait\",\"scheduler\":\"task\",\"totalSchedulerCpuMs\":2.105000004172325}}",
+    "origin": "http://localhost:1440/?bench=water-scale&waters=8&water-policy=pause&queue=2"
+  },
+  "_meta": {
+    "runtimeId": "38cf1741-6edd-47a2-b539-0f58b1abc24e"
+  }
+}

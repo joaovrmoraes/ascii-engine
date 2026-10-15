@@ -1,0 +1,23 @@
+{
+  "dt": 0.016666666666666666,
+  "stepsPaused": 120,
+  "maxFrozen": 0,
+  "frozenCalls": [
+    121,
+    0
+  ],
+  "resume": {
+    "maximum": 0,
+    "values": 166410,
+    "time": 2.0166666666666644,
+    "diagnostics": {
+      "waterCalls": [
+        121,
+        1
+      ]
+    },
+    "externalDisturbChangesState": true
+  },
+  "behavior": "Only engine-scheduled integration/upload/actor contacts pause; shader clock and explicit external calls continue",
+  "storageCalls": 0
+}

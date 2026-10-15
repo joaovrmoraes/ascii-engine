@@ -5,9 +5,12 @@ import { BENCHMARK_DT, BENCHMARK_SCENES, createBenchmarkScene, type BenchmarkSce
 const params = new URLSearchParams(location.search)
 const name = params.get('bench') as BenchmarkScene
 if (!BENCHMARK_SCENES.includes(name)) throw new Error('Unknown benchmark scene')
+const waterPolicy = params.get('water-policy') ?? 'off'
+if (!['off', 'pause'].includes(waterPolicy)) throw new Error('Unknown water policy')
 const canvas = document.querySelector('canvas')!
 const engine = createAsciiEngine(canvas, {
   maxPixelRatio: 1,
+  offscreenWater: waterPolicy === 'pause' ? { mode: 'pause', margin: 4 } : undefined,
   profiling: params.get('profile') !== 'off',
 })
 const { area, configuration, diagnostics } = createBenchmarkScene(
@@ -15,6 +18,7 @@ const { area, configuration, diagnostics } = createBenchmarkScene(
   name,
   Number(params.get('waters') ?? 1),
 )
+if (name === 'water-scale') configuration.waterPolicy = waterPolicy
 const camera = {
   focus: [0, 0.6, 0],
   span: name.startsWith('water') ? 17 : 9,
@@ -63,7 +67,31 @@ function fingerprint() {
       add(dynamics.foam)
     }
   }
-  return { hash: hash.toString(16), values, skinnedPoints, time: engine.time }
+  let visibleWaterHash: string | undefined
+  if (name === 'water-scale') {
+    const water = engine.waters[0] as ReturnType<typeof engine.createWater>
+    let visible = 2166136261
+    for (const array of [
+      water.mesh.geometry.attributes.position.array,
+      water.mesh.geometry.attributes.normal.array,
+      water.dynamics.depth,
+      water.dynamics.flowX,
+      water.dynamics.flowZ,
+      water.dynamics.foam,
+      water.uniforms.waterDynamics.value.image.data!,
+    ]) {
+      const bytes = new Uint8Array(new Float32Array(Array.from(array)).buffer)
+      for (const byte of bytes) visible = Math.imul(visible ^ byte, 16777619) >>> 0
+    }
+    visibleWaterHash = visible.toString(16)
+  }
+  return {
+    hash: hash.toString(16),
+    values,
+    skinnedPoints,
+    time: engine.time,
+    ...(visibleWaterHash ? { visibleWaterHash } : {}),
+  }
 }
 
 let hasRun = false,

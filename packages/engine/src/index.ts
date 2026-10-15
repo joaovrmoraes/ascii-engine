@@ -15,3 +15,5 @@ export { SCREEN_ALPHABETS } from './ascii'
 export * from './techniques/index'
 export * from './world/index'
 export * from './fx/index'
+
+export type { OffscreenWaterPolicy } from './world/waterScheduling'

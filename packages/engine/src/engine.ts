@@ -30,8 +30,11 @@ import { createWater, type WaterOptions, type WaterShape } from './techniques/wa
 import { createRainStreaks, type RainStreaks } from './weather/rain'
 import { createEffectSystem, type EffectDef, type EffectSystem } from './fx/effects'
 import { createRenderProfiler, type EngineStats, type WaterUpdateTimings } from './profiling'
+import { createWaterUpdateGate, type OffscreenWaterPolicy } from './world/waterScheduling'
 
 export interface AsciiEngineOptions {
+  /** Opt-in camera-dependent pause of offscreen water physics/upload. Default: update all. */
+  offscreenWater?: OffscreenWaterPolicy
   /** Optional CPU sections, draw counters and asynchronous GPU elapsed queries. */
   profiling?: boolean
   style?: Partial<AsciiStyle>
@@ -102,6 +105,9 @@ const BODY_RAMPS: Partial<Record<SurfaceKind, BodyRamp>> = {
  * (`engine.add(mesh, { glyph: 'body' })`), whole or part by part.
  */
 export function createAsciiEngine(canvas: HTMLCanvasElement, options: AsciiEngineOptions = {}) {
+  const waterUpdateGate = options.offscreenWater
+    ? createWaterUpdateGate(options.offscreenWater)
+    : undefined
   const renderer = new THREE.WebGLRenderer({
     canvas,
     antialias: false,
@@ -993,7 +999,7 @@ export function createAsciiEngine(canvas: HTMLCanvasElement, options: AsciiEngin
       )
       renderer.autoClear = true
       for (const water of waters) {
-        if (!options.redraw) {
+        if (!options.redraw && (!waterUpdateGate || waterUpdateGate(water.mesh, frustum))) {
           if (actors.hero) water.interact?.('hero', actors.hero)
           if (actors.foe) water.interact?.('foe', actors.foe)
           water.updateDynamics?.(dt, time, profiler?.timings)

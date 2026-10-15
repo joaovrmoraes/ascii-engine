@@ -4,6 +4,41 @@ Entries describe the state at each stage. Earlier limitations may have been
 resolved later; START.md and the editor guide describe the current scope.
 Historical filenames, reference IDs and captured interfaces are preserved.
 
+## 2026-10-15 — Optional offscreen water pause, default remains update-all
+
+Added runtime offscreenWater={mode:'pause',margin:4}. Only waters whose full
+world bounding sphere misses the enlarged camera frustum skip engine-scheduled
+physics, CPU texture/geometry preparation and actor contacts. Default absence
+retains the original unconditional updates; SceneDoc and editor/player defaults
+are unchanged. Conservative bounds include parent transforms. On re-entry the
+water integrates only the current dt; no elapsed-time catch-up. Global shader
+and ring clocks continue, including wind phase. Explicit rain/disturb/refresh
+calls are never intercepted. Camera history therefore affects simulation and
+this option is not enabled by default for deterministic v0.2 documents.
+
+Validation: pnpm check passed (177 tests), with frustum-margin/world-transform
+coverage. Against preserved original core, visible water positions, normals,
+depth, flows and foam have maximum difference 0 after 1,200 steps in all four
+variants; image RMSE 0 in each. During 120 hidden steps the second water's arrays
+stay exact and its update count is 0; when the camera returns it matches a
+single fresh step (166,410 compared values, max difference 0). Explicit disturb
+still modifies its flow. Benchmark metadata also hashes visible geometry,
+physics and texture data separately, so all measured modes can check parity.
+
+Optimized skinning measured on clean source 5fd0824: two rounds × five fresh
+loads × 600 warm-up/600 measured. Skinning p50/p95 0.305/0.485 ms versus
+13.840/15.545 ms; full-frame 7.070/10.225 versus 14.855/16.750 ms (52.41% p50
+improvement). Round frame difference 1.63%; original 1.11%. CPU/GPU p50 changes
+from 14.565/6.461 to 1.115/3.650 ms. Skinning is now 4.31% of a GPU-dominant
+frame; this front stops with optimized JS as baseline, without GPU/WASM.
+
+pnpm compare has the same four historical failing areas (reference, forest,
+snow, cathedral), no new failures; marsh and mine pass. Controlled equal-clock
+comparison remains exact. [Water array/image parity](captures/benchmarks-2026-10-15/phase-2/parity/water.json),
+[pause/resume semantics](captures/benchmarks-2026-10-15/phase-2/parity/water-resume.json),
+[visible capture](captures/benchmarks-2026-10-15/phase-2/parity/water-scale-8-1200-after.png).
+All four off/on scaling measurements remain pending. No push.
+
 ## 2026-10-15 — Reuse source vertices and bone matrices in JS skinning
 
 The standard body path skins each distinct source vertex once per frame and
@@ -61,7 +96,7 @@ profiles are losslessly gzipped; the reproducer is scripts/profile-skinning.mjs.
 
 Added seeded water-scale URLs (waters=1/2/4/8), each a 129-square grid, 64 m
 apart across a 1,024 m floor. One water is visible; the others remain loaded.
-A sloped seeded bed sustains flow without external rain/actor disturbances.
+A sloped seeded bed initializes flow without external rain/actor disturbances.
 The runner accepts --scenes=skinning,water-scale-8-off and retains fresh loads,
 fixed dt, uncapped task scheduling and two-frame GPU backpressure. Array
 snapshots expose every skinned letter position/normal and water state for

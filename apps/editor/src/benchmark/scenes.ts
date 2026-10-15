@@ -99,7 +99,7 @@ export function createBenchmarkScene(engine: AsciiEngine, name: BenchmarkScene, 
       const shape = createWaterPaint(28, 129)
       shape.x = i * 64
       shape.mask!.values.fill(1)
-      // A seeded sloping bed maintains flow without out-of-render rain/actor impulses.
+      // A seeded sloping bed initializes flow without out-of-render rain/actor impulses.
       shape.mask!.heights = Array.from(
         { length: 129 ** 2 },
         (_, j) => (Math.floor(j / 129) - 64) * 0.001 + Math.sin(j * 0.017 + BENCHMARK_SEED) * 0.002,

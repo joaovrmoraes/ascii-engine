@@ -593,3 +593,16 @@ checked with scripts/verify-simulation.mjs against the preserved original core.
 (one visible 129×129 water, others 64 m apart). `pnpm bench --uncapped
 --scenes=skinning,water-scale-8-off` selects workloads without changing the
 Phase 1 defaults. Phase 2 evidence is retained in the dated capture directory.
+
+`createAsciiEngine(canvas, { offscreenWater: { mode: 'pause', margin: 4 } })`
+opts into camera-dependent scheduling. The default remains absent/update-all.
+A water's entire world-space bounding sphere must miss the frustum enlarged
+by 4 metres before engine-driven integration, geometry/texture preparation and
+actor contacts skip. Bounds are conservative and include parent transforms.
+On return it advances only the current dt, with no catch-up; visible waters
+retain identical states and images. Shader/ring clocks continue globally, so
+wind phase can jump on return. Explicit rain/disturb/refresh API calls still
+modify hidden waters. Paused/offscreen simulation therefore depends on camera
+history and external calls. This runtime policy is not stored in SceneDoc,
+not enabled in the editor/player and not suitable as an implicit deterministic
+v0.2 default. Enabling it by default requires the owner's separate decision.
