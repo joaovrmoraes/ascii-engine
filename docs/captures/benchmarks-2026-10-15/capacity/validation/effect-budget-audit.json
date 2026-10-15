@@ -1,0 +1,152 @@
+{
+  "protocol": "Untimed instrumentation audit over the same 600 warm-up + 600 measured steps; no accepted timing is replaced",
+  "results": [
+    {
+      "load": 1,
+      "effects": 3,
+      "maximumLive": 162,
+      "cappedFrames": 0,
+      "maximumDrawn": 241,
+      "drawBufferCappedFrames": 0,
+      "budget": 6000,
+      "fingerprint": {
+        "hash": "f6196753",
+        "values": 24036,
+        "skinnedPoints": 0,
+        "time": 20.000000000000146
+      },
+      "effectStats": {
+        "letters": 157,
+        "effects": 3,
+        "emitters": 8,
+        "budget": 6000
+      }
+    },
+    {
+      "load": 2,
+      "effects": 6,
+      "maximumLive": 320,
+      "cappedFrames": 0,
+      "maximumDrawn": 483,
+      "drawBufferCappedFrames": 0,
+      "budget": 6000,
+      "fingerprint": {
+        "hash": "7d10605c",
+        "values": 24036,
+        "skinnedPoints": 0,
+        "time": 20.000000000000146
+      },
+      "effectStats": {
+        "letters": 311,
+        "effects": 6,
+        "emitters": 16,
+        "budget": 6000
+      }
+    },
+    {
+      "load": 4,
+      "effects": 12,
+      "maximumLive": 637,
+      "cappedFrames": 0,
+      "maximumDrawn": 955,
+      "drawBufferCappedFrames": 0,
+      "budget": 6000,
+      "fingerprint": {
+        "hash": "ef2269d5",
+        "values": 24036,
+        "skinnedPoints": 0,
+        "time": 20.000000000000146
+      },
+      "effectStats": {
+        "letters": 618,
+        "effects": 12,
+        "emitters": 32,
+        "budget": 6000
+      }
+    },
+    {
+      "load": 8,
+      "effects": 24,
+      "maximumLive": 1262,
+      "cappedFrames": 0,
+      "maximumDrawn": 1923,
+      "drawBufferCappedFrames": 0,
+      "budget": 6000,
+      "fingerprint": {
+        "hash": "b595c690",
+        "values": 24036,
+        "skinnedPoints": 0,
+        "time": 20.000000000000146
+      },
+      "effectStats": {
+        "letters": 1243,
+        "effects": 24,
+        "emitters": 64,
+        "budget": 6000
+      }
+    },
+    {
+      "load": 16,
+      "effects": 48,
+      "maximumLive": 2521,
+      "cappedFrames": 0,
+      "maximumDrawn": 3847,
+      "drawBufferCappedFrames": 0,
+      "budget": 6000,
+      "fingerprint": {
+        "hash": "8d1735ad",
+        "values": 24036,
+        "skinnedPoints": 0,
+        "time": 20.000000000000146
+      },
+      "effectStats": {
+        "letters": 2458,
+        "effects": 48,
+        "emitters": 128,
+        "budget": 6000
+      }
+    },
+    {
+      "load": 24,
+      "effects": 72,
+      "maximumLive": 3767,
+      "cappedFrames": 0,
+      "maximumDrawn": 5774,
+      "drawBufferCappedFrames": 0,
+      "budget": 6000,
+      "fingerprint": {
+        "hash": "7dc3dd2",
+        "values": 24036,
+        "skinnedPoints": 0,
+        "time": 20.000000000000146
+      },
+      "effectStats": {
+        "letters": 3734,
+        "effects": 72,
+        "emitters": 192,
+        "budget": 6000
+      }
+    },
+    {
+      "load": 32,
+      "effects": 96,
+      "maximumLive": 5028,
+      "cappedFrames": 0,
+      "maximumDrawn": 7658,
+      "drawBufferCappedFrames": 0,
+      "budget": 6000,
+      "fingerprint": {
+        "hash": "7b365326",
+        "values": 24036,
+        "skinnedPoints": 0,
+        "time": 20.000000000000146
+      },
+      "effectStats": {
+        "letters": 4939,
+        "effects": 96,
+        "emitters": 256,
+        "budget": 6000
+      }
+    }
+  ]
+}

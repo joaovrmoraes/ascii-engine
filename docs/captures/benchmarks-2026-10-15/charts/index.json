@@ -1,0 +1,74 @@
+{
+  "charts": [
+    {
+      "file": "skinning-before-after.svg",
+      "sha256": "0079efde1912a64814bc71d25877ad6e0be9a92008544d23c329a44a311e1932",
+      "sources": [
+        "5bc6077d6173627d21ccda7d9f3b81a94279a03e",
+        "5fd0824b59e8383a9b4dbc850470b0a4ffe6a546"
+      ]
+    },
+    {
+      "file": "cpu-vs-gpu.svg",
+      "sha256": "dcac659982fc0ec3993cfb70eda82e683ec82d72b3f655341e2146680a6ff1e1",
+      "sources": [
+        "5bc6077d6173627d21ccda7d9f3b81a94279a03e",
+        "5fd0824b59e8383a9b4dbc850470b0a4ffe6a546",
+        "af0413faaeba79437c1da8f45f846dd088a8a46d"
+      ]
+    },
+    {
+      "file": "water-scale.svg",
+      "sha256": "0c5400005aa4160d91aed5a45fca919c379626268b66072be8956f1a8a838b78",
+      "sources": [
+        "4f5120c7cc5245d6f12b66354eb691a6f65244c2"
+      ]
+    },
+    {
+      "file": "capacity-skinning.svg",
+      "sha256": "12a8404ba2da06b94738351e8b19e224d83e8c502a605b41c7243abdd3847133",
+      "sources": [
+        "4264ce1316b22e69ea745a393d43c4627fe72cab"
+      ]
+    },
+    {
+      "file": "capacity-water-loaded-off.svg",
+      "sha256": "a299adaad0c1dbf0ccbd4d3acf874f14c712f53580552112d5da5547957731aa",
+      "sources": [
+        "4f5120c7cc5245d6f12b66354eb691a6f65244c2"
+      ]
+    },
+    {
+      "file": "capacity-water-loaded-pause.svg",
+      "sha256": "d96b9e0faf61311e1d852816fe425439677ec7b53066718c5c66f0e5beb5276c",
+      "sources": [
+        "4264ce1316b22e69ea745a393d43c4627fe72cab",
+        "4f5120c7cc5245d6f12b66354eb691a6f65244c2",
+        "62ed9f7ecee15857112892d0d87b81203dfae634"
+      ]
+    },
+    {
+      "file": "capacity-water-visible.svg",
+      "sha256": "0cdaa105f2d2cc51ed32c11b52cb64a89d64e4487937c3d651c8a5acd9da081d",
+      "sources": [
+        "4264ce1316b22e69ea745a393d43c4627fe72cab",
+        "4f5120c7cc5245d6f12b66354eb691a6f65244c2"
+      ]
+    },
+    {
+      "file": "capacity-effects.svg",
+      "sha256": "fdafd1c5dea25c47e8719834b33a74cbdfae0871dc7a84ff0537ca2c9992dd02",
+      "sources": [
+        "4264ce1316b22e69ea745a393d43c4627fe72cab"
+      ]
+    },
+    {
+      "file": "capacity-water-grid.svg",
+      "sha256": "811bb1c89ccaab6bdb6d4d23109cc07fb98b8a6c0cbdab8f3e43e1f32c4fa4ad",
+      "sources": [
+        "4264ce1316b22e69ea745a393d43c4627fe72cab",
+        "4f5120c7cc5245d6f12b66354eb691a6f65244c2"
+      ]
+    }
+  ]
+}

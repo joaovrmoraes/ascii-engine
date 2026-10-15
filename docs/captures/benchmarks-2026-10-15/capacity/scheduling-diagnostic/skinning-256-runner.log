@@ -1,0 +1,366 @@
+$ node scripts/bench-capacity.mjs --out=docs/captures/benchmarks-2026-10-15/capacity --axes=water-visible,particles,skinning,water-loaded-pause
+START water-visible-8-round-1 water-visible-8 1/5; 600 warm-up + 600 measured frames
+DONE water-visible-8 1: frame p50/p95=39.130/40.750 ms; CPU p50=38.720 ms; GPU p50=9.639 ms
+START water-visible-8-round-1 water-visible-8 2/5; 600 warm-up + 600 measured frames
+DONE water-visible-8 2: frame p50/p95=42.445/48.245 ms; CPU p50=41.965 ms; GPU p50=10.180 ms
+START water-visible-8-round-1 water-visible-8 3/5; 600 warm-up + 600 measured frames
+DONE water-visible-8 3: frame p50/p95=39.285/41.880 ms; CPU p50=38.865 ms; GPU p50=9.120 ms
+START water-visible-8-round-1 water-visible-8 4/5; 600 warm-up + 600 measured frames
+DONE water-visible-8 4: frame p50/p95=40.895/46.455 ms; CPU p50=40.475 ms; GPU p50=9.841 ms
+START water-visible-8-round-1 water-visible-8 5/5; 600 warm-up + 600 measured frames
+DONE water-visible-8 5: frame p50/p95=44.735/53.485 ms; CPU p50=44.280 ms; GPU p50=9.697 ms
+START water-visible-8-round-2 water-visible-8 1/5; 600 warm-up + 600 measured frames
+DONE water-visible-8 1: frame p50/p95=39.195/41.005 ms; CPU p50=38.765 ms; GPU p50=9.304 ms
+START water-visible-8-round-2 water-visible-8 2/5; 600 warm-up + 600 measured frames
+DONE water-visible-8 2: frame p50/p95=40.330/45.235 ms; CPU p50=39.900 ms; GPU p50=9.326 ms
+START water-visible-8-round-2 water-visible-8 3/5; 600 warm-up + 600 measured frames
+DONE water-visible-8 3: frame p50/p95=42.505/47.470 ms; CPU p50=42.045 ms; GPU p50=9.474 ms
+START water-visible-8-round-2 water-visible-8 4/5; 600 warm-up + 600 measured frames
+DONE water-visible-8 4: frame p50/p95=39.250/41.430 ms; CPU p50=38.830 ms; GPU p50=8.939 ms
+START water-visible-8-round-2 water-visible-8 5/5; 600 warm-up + 600 measured frames
+DONE water-visible-8 5: frame p50/p95=39.225/40.940 ms; CPU p50=38.800 ms; GPU p50=9.394 ms
+CAPACITY water-visible 8 {"frame":{"p50":40.01500000059605,"p95":47.17500000074506,"p99":53.559999998658895},"p95WorstRound":48.69500000029802,"bottleneck":"CPU","repeatability":0.03132769770308605,"capped":false}
+START particles-1-round-1 particles-1 1/5; 600 warm-up + 600 measured frames
+DONE particles-1 1: frame p50/p95=9.140/11.610 ms; CPU p50=0.415 ms; GPU p50=4.596 ms
+START particles-1-round-1 particles-1 2/5; 600 warm-up + 600 measured frames
+DONE particles-1 2: frame p50/p95=9.375/11.640 ms; CPU p50=0.430 ms; GPU p50=4.619 ms
+START particles-1-round-1 particles-1 3/5; 600 warm-up + 600 measured frames
+DONE particles-1 3: frame p50/p95=9.340/11.335 ms; CPU p50=0.425 ms; GPU p50=5.408 ms
+START particles-1-round-1 particles-1 4/5; 600 warm-up + 600 measured frames
+DONE particles-1 4: frame p50/p95=9.185/11.690 ms; CPU p50=0.495 ms; GPU p50=4.609 ms
+START particles-1-round-1 particles-1 5/5; 600 warm-up + 600 measured frames
+DONE particles-1 5: frame p50/p95=9.325/11.850 ms; CPU p50=0.455 ms; GPU p50=4.604 ms
+START particles-1-round-2 particles-1 1/5; 600 warm-up + 600 measured frames
+DONE particles-1 1: frame p50/p95=9.100/11.670 ms; CPU p50=0.515 ms; GPU p50=4.612 ms
+START particles-1-round-2 particles-1 2/5; 600 warm-up + 600 measured frames
+DONE particles-1 2: frame p50/p95=9.200/11.740 ms; CPU p50=0.515 ms; GPU p50=4.615 ms
+START particles-1-round-2 particles-1 3/5; 600 warm-up + 600 measured frames
+DONE particles-1 3: frame p50/p95=9.115/11.525 ms; CPU p50=0.485 ms; GPU p50=4.602 ms
+START particles-1-round-2 particles-1 4/5; 600 warm-up + 600 measured frames
+DONE particles-1 4: frame p50/p95=9.300/11.275 ms; CPU p50=0.430 ms; GPU p50=4.604 ms
+START particles-1-round-2 particles-1 5/5; 600 warm-up + 600 measured frames
+DONE particles-1 5: frame p50/p95=9.385/11.505 ms; CPU p50=0.425 ms; GPU p50=5.426 ms
+CAPACITY particles 1 {"frame":{"p50":9.260000001639128,"p95":11.620000001043081,"p99":12.820000000298023},"p95WorstRound":11.660000000149012,"bottleneck":"GPU","repeatability":0.006482982430140256,"capped":false}
+START particles-2-round-1 particles-2 1/5; 600 warm-up + 600 measured frames
+DONE particles-2 1: frame p50/p95=10.560/12.575 ms; CPU p50=0.485 ms; GPU p50=6.542 ms
+START particles-2-round-1 particles-2 2/5; 600 warm-up + 600 measured frames
+DONE particles-2 2: frame p50/p95=10.755/13.070 ms; CPU p50=0.505 ms; GPU p50=6.532 ms
+START particles-2-round-1 particles-2 3/5; 600 warm-up + 600 measured frames
+DONE particles-2 3: frame p50/p95=10.690/13.055 ms; CPU p50=0.550 ms; GPU p50=6.494 ms
+START particles-2-round-1 particles-2 4/5; 600 warm-up + 600 measured frames
+DONE particles-2 4: frame p50/p95=10.695/12.980 ms; CPU p50=0.535 ms; GPU p50=6.530 ms
+START particles-2-round-1 particles-2 5/5; 600 warm-up + 600 measured frames
+DONE particles-2 5: frame p50/p95=10.440/13.420 ms; CPU p50=0.665 ms; GPU p50=5.599 ms
+START particles-2-round-2 particles-2 1/5; 600 warm-up + 600 measured frames
+DONE particles-2 1: frame p50/p95=10.670/13.680 ms; CPU p50=0.675 ms; GPU p50=5.607 ms
+START particles-2-round-2 particles-2 2/5; 600 warm-up + 600 measured frames
+DONE particles-2 2: frame p50/p95=10.580/13.430 ms; CPU p50=0.665 ms; GPU p50=5.639 ms
+START particles-2-round-2 particles-2 3/5; 600 warm-up + 600 measured frames
+DONE particles-2 3: frame p50/p95=10.490/13.130 ms; CPU p50=0.635 ms; GPU p50=5.634 ms
+START particles-2-round-2 particles-2 4/5; 600 warm-up + 600 measured frames
+DONE particles-2 4: frame p50/p95=10.680/12.690 ms; CPU p50=0.470 ms; GPU p50=6.601 ms
+START particles-2-round-2 particles-2 5/5; 600 warm-up + 600 measured frames
+DONE particles-2 5: frame p50/p95=10.155/12.840 ms; CPU p50=0.465 ms; GPU p50=6.364 ms
+CAPACITY particles 2 {"frame":{"p50":10.600000001490116,"p95":13.109999999403954,"p99":14.094999998807907},"p95WorstRound":13.205000001937151,"bottleneck":"GPU","repeatability":0.0070738032773487785,"capped":false}
+START particles-4-round-1 particles-4 1/5; 600 warm-up + 600 measured frames
+DONE particles-4 1: frame p50/p95=13.600/15.385 ms; CPU p50=0.580 ms; GPU p50=9.855 ms
+START particles-4-round-1 particles-4 2/5; 600 warm-up + 600 measured frames
+DONE particles-4 2: frame p50/p95=13.740/15.960 ms; CPU p50=0.675 ms; GPU p50=10.143 ms
+START particles-4-round-1 particles-4 3/5; 600 warm-up + 600 measured frames
+DONE particles-4 3: frame p50/p95=13.840/15.615 ms; CPU p50=0.685 ms; GPU p50=10.170 ms
+START particles-4-round-1 particles-4 4/5; 600 warm-up + 600 measured frames
+DONE particles-4 4: frame p50/p95=13.740/15.890 ms; CPU p50=0.680 ms; GPU p50=9.271 ms
+START particles-4-round-1 particles-4 5/5; 600 warm-up + 600 measured frames
+DONE particles-4 5: frame p50/p95=13.790/16.000 ms; CPU p50=0.640 ms; GPU p50=10.191 ms
+START particles-4-round-2 particles-4 1/5; 600 warm-up + 600 measured frames
+DONE particles-4 1: frame p50/p95=13.785/15.600 ms; CPU p50=0.695 ms; GPU p50=9.244 ms
+START particles-4-round-2 particles-4 2/5; 600 warm-up + 600 measured frames
+DONE particles-4 2: frame p50/p95=13.800/15.805 ms; CPU p50=0.680 ms; GPU p50=10.111 ms
+START particles-4-round-2 particles-4 3/5; 600 warm-up + 600 measured frames
+DONE particles-4 3: frame p50/p95=13.825/15.960 ms; CPU p50=0.690 ms; GPU p50=10.124 ms
+START particles-4-round-2 particles-4 4/5; 600 warm-up + 600 measured frames
+DONE particles-4 4: frame p50/p95=13.600/15.515 ms; CPU p50=0.585 ms; GPU p50=10.079 ms
+START particles-4-round-2 particles-4 5/5; 600 warm-up + 600 measured frames
+DONE particles-4 5: frame p50/p95=13.690/15.405 ms; CPU p50=0.590 ms; GPU p50=10.073 ms
+CAPACITY particles 4 {"frame":{"p50":13.759999997913837,"p95":15.719999998807907,"p99":16.679999999701977},"p95WorstRound":15.794999998062849,"bottleneck":"GPU","repeatability":0.001453488339628637,"capped":false}
+START particles-8-round-1 particles-8 1/5; 600 warm-up + 600 measured frames
+DONE particles-8 1: frame p50/p95=17.385/19.020 ms; CPU p50=0.805 ms; GPU p50=13.378 ms
+START particles-8-round-1 particles-8 2/5; 600 warm-up + 600 measured frames
+DONE particles-8 2: frame p50/p95=17.240/18.905 ms; CPU p50=0.785 ms; GPU p50=13.384 ms
+START particles-8-round-1 particles-8 3/5; 600 warm-up + 600 measured frames
+DONE particles-8 3: frame p50/p95=17.285/18.855 ms; CPU p50=0.795 ms; GPU p50=13.376 ms
+START particles-8-round-1 particles-8 4/5; 600 warm-up + 600 measured frames
+DONE particles-8 4: frame p50/p95=17.620/19.340 ms; CPU p50=0.955 ms; GPU p50=13.513 ms
+START particles-8-round-1 particles-8 5/5; 600 warm-up + 600 measured frames
+DONE particles-8 5: frame p50/p95=17.515/19.030 ms; CPU p50=0.945 ms; GPU p50=13.471 ms
+START particles-8-round-2 particles-8 1/5; 600 warm-up + 600 measured frames
+DONE particles-8 1: frame p50/p95=17.645/19.245 ms; CPU p50=1.000 ms; GPU p50=13.486 ms
+START particles-8-round-2 particles-8 2/5; 600 warm-up + 600 measured frames
+DONE particles-8 2: frame p50/p95=17.400/19.055 ms; CPU p50=0.830 ms; GPU p50=13.388 ms
+START particles-8-round-2 particles-8 3/5; 600 warm-up + 600 measured frames
+DONE particles-8 3: frame p50/p95=17.185/18.885 ms; CPU p50=0.810 ms; GPU p50=13.367 ms
+START particles-8-round-2 particles-8 4/5; 600 warm-up + 600 measured frames
+DONE particles-8 4: frame p50/p95=17.540/19.360 ms; CPU p50=0.910 ms; GPU p50=13.544 ms
+START particles-8-round-2 particles-8 5/5; 600 warm-up + 600 measured frames
+DONE particles-8 5: frame p50/p95=17.575/19.100 ms; CPU p50=0.910 ms; GPU p50=13.497 ms
+CAPACITY particles 8 {"frame":{"p50":17.440000001341105,"p95":19.109999999403954,"p99":19.990000002086163},"p95WorstRound":19.12000000104308,"bottleneck":"GPU","repeatability":0.0037265301039444104,"capped":false}
+START particles-16-round-1 particles-16 1/5; 600 warm-up + 600 measured frames
+DONE particles-16 1: frame p50/p95=24.305/25.765 ms; CPU p50=1.310 ms; GPU p50=20.261 ms
+START particles-16-round-1 particles-16 2/5; 600 warm-up + 600 measured frames
+DONE particles-16 2: frame p50/p95=23.935/25.230 ms; CPU p50=1.140 ms; GPU p50=20.234 ms
+START particles-16-round-1 particles-16 3/5; 600 warm-up + 600 measured frames
+DONE particles-16 3: frame p50/p95=23.880/25.210 ms; CPU p50=1.150 ms; GPU p50=20.223 ms
+START particles-16-round-1 particles-16 4/5; 600 warm-up + 600 measured frames
+DONE particles-16 4: frame p50/p95=23.910/25.015 ms; CPU p50=1.135 ms; GPU p50=20.225 ms
+START particles-16-round-1 particles-16 5/5; 600 warm-up + 600 measured frames
+DONE particles-16 5: frame p50/p95=23.855/25.060 ms; CPU p50=1.140 ms; GPU p50=20.214 ms
+START particles-16-round-2 particles-16 1/5; 600 warm-up + 600 measured frames
+DONE particles-16 1: frame p50/p95=23.885/25.020 ms; CPU p50=1.135 ms; GPU p50=20.207 ms
+START particles-16-round-2 particles-16 2/5; 600 warm-up + 600 measured frames
+DONE particles-16 2: frame p50/p95=24.115/25.480 ms; CPU p50=1.205 ms; GPU p50=20.273 ms
+START particles-16-round-2 particles-16 3/5; 600 warm-up + 600 measured frames
+DONE particles-16 3: frame p50/p95=24.085/25.315 ms; CPU p50=1.205 ms; GPU p50=20.251 ms
+START particles-16-round-2 particles-16 4/5; 600 warm-up + 600 measured frames
+DONE particles-16 4: frame p50/p95=23.940/25.160 ms; CPU p50=1.150 ms; GPU p50=20.195 ms
+START particles-16-round-2 particles-16 5/5; 600 warm-up + 600 measured frames
+DONE particles-16 5: frame p50/p95=23.915/25.045 ms; CPU p50=1.145 ms; GPU p50=20.230 ms
+CAPACITY particles 16 {"frame":{"p50":23.99499999731779,"p95":25.280000001192093,"p99":25.969999998807907},"p95WorstRound":25.33500000089407,"bottleneck":"GPU","repeatability":0.0014587892113020141,"capped":false}
+START particles-24-round-1 particles-24 1/5; 600 warm-up + 600 measured frames
+DONE particles-24 1: frame p50/p95=30.770/31.945 ms; CPU p50=1.545 ms; GPU p50=27.241 ms
+START particles-24-round-1 particles-24 2/5; 600 warm-up + 600 measured frames
+DONE particles-24 2: frame p50/p95=30.785/31.850 ms; CPU p50=1.570 ms; GPU p50=27.213 ms
+START particles-24-round-1 particles-24 3/5; 600 warm-up + 600 measured frames
+DONE particles-24 3: frame p50/p95=30.995/32.320 ms; CPU p50=1.570 ms; GPU p50=27.239 ms
+START particles-24-round-1 particles-24 4/5; 600 warm-up + 600 measured frames
+DONE particles-24 4: frame p50/p95=30.930/32.265 ms; CPU p50=1.550 ms; GPU p50=27.238 ms
+START particles-24-round-1 particles-24 5/5; 600 warm-up + 600 measured frames
+DONE particles-24 5: frame p50/p95=30.920/32.275 ms; CPU p50=1.640 ms; GPU p50=27.234 ms
+START particles-24-round-2 particles-24 1/5; 600 warm-up + 600 measured frames
+DONE particles-24 1: frame p50/p95=31.665/33.185 ms; CPU p50=1.995 ms; GPU p50=27.321 ms
+START particles-24-round-2 particles-24 2/5; 600 warm-up + 600 measured frames
+DONE particles-24 2: frame p50/p95=31.250/32.915 ms; CPU p50=1.715 ms; GPU p50=27.250 ms
+START particles-24-round-2 particles-24 3/5; 600 warm-up + 600 measured frames
+DONE particles-24 3: frame p50/p95=30.965/32.265 ms; CPU p50=1.665 ms; GPU p50=27.224 ms
+START particles-24-round-2 particles-24 4/5; 600 warm-up + 600 measured frames
+DONE particles-24 4: frame p50/p95=30.935/32.180 ms; CPU p50=1.590 ms; GPU p50=27.248 ms
+START particles-24-round-2 particles-24 5/5; 600 warm-up + 600 measured frames
+DONE particles-24 5: frame p50/p95=30.995/32.320 ms; CPU p50=1.690 ms; GPU p50=27.235 ms
+CAPACITY particles 24 {"frame":{"p50":31,"p95":32.48499999940395,"p99":33.399999998509884},"p95WorstRound":32.7200000025332,"bottleneck":"GPU","repeatability":0.007741935551166534,"capped":false}
+START particles-32-round-1 particles-32 1/5; 600 warm-up + 600 measured frames
+DONE particles-32 1: frame p50/p95=41.540/42.605 ms; CPU p50=1.950 ms; GPU p50=38.318 ms
+START particles-32-round-1 particles-32 2/5; 600 warm-up + 600 measured frames
+DONE particles-32 2: frame p50/p95=41.535/42.545 ms; CPU p50=1.905 ms; GPU p50=38.286 ms
+START particles-32-round-1 particles-32 3/5; 600 warm-up + 600 measured frames
+DONE particles-32 3: frame p50/p95=41.600/42.920 ms; CPU p50=2.050 ms; GPU p50=38.204 ms
+START particles-32-round-1 particles-32 4/5; 600 warm-up + 600 measured frames
+DONE particles-32 4: frame p50/p95=41.560/42.660 ms; CPU p50=1.895 ms; GPU p50=38.303 ms
+START particles-32-round-1 particles-32 5/5; 600 warm-up + 600 measured frames
+DONE particles-32 5: frame p50/p95=41.575/42.705 ms; CPU p50=2.010 ms; GPU p50=38.186 ms
+START particles-32-round-2 particles-32 1/5; 600 warm-up + 600 measured frames
+DONE particles-32 1: frame p50/p95=41.840/43.135 ms; CPU p50=2.130 ms; GPU p50=38.194 ms
+START particles-32-round-2 particles-32 2/5; 600 warm-up + 600 measured frames
+DONE particles-32 2: frame p50/p95=41.540/42.585 ms; CPU p50=1.965 ms; GPU p50=38.292 ms
+START particles-32-round-2 particles-32 3/5; 600 warm-up + 600 measured frames
+DONE particles-32 3: frame p50/p95=41.570/42.565 ms; CPU p50=1.965 ms; GPU p50=38.254 ms
+START particles-32-round-2 particles-32 4/5; 600 warm-up + 600 measured frames
+DONE particles-32 4: frame p50/p95=41.580/42.635 ms; CPU p50=1.925 ms; GPU p50=38.327 ms
+START particles-32-round-2 particles-32 5/5; 600 warm-up + 600 measured frames
+DONE particles-32 5: frame p50/p95=41.600/42.670 ms; CPU p50=1.900 ms; GPU p50=38.229 ms
+CAPACITY particles 32 {"frame":{"p50":41.58500000089407,"p95":42.71499999985099,"p99":43.36999999731779},"p95WorstRound":42.73999999836087,"bottleneck":"GPU","repeatability":0.0010820558596320036,"capped":false}
+START skinning-1-round-1 skinning-1 1/5; 600 warm-up + 600 measured frames
+DONE skinning-1 1: frame p50/p95=7.845/10.880 ms; CPU p50=0.425 ms; GPU p50=3.511 ms
+START skinning-1-round-1 skinning-1 2/5; 600 warm-up + 600 measured frames
+DONE skinning-1 2: frame p50/p95=7.740/10.420 ms; CPU p50=0.450 ms; GPU p50=3.479 ms
+START skinning-1-round-1 skinning-1 3/5; 600 warm-up + 600 measured frames
+DONE skinning-1 3: frame p50/p95=7.860/10.750 ms; CPU p50=0.415 ms; GPU p50=3.494 ms
+START skinning-1-round-1 skinning-1 4/5; 600 warm-up + 600 measured frames
+DONE skinning-1 4: frame p50/p95=7.645/10.315 ms; CPU p50=0.425 ms; GPU p50=3.458 ms
+START skinning-1-round-1 skinning-1 5/5; 600 warm-up + 600 measured frames
+DONE skinning-1 5: frame p50/p95=7.685/10.635 ms; CPU p50=0.410 ms; GPU p50=3.500 ms
+START skinning-1-round-2 skinning-1 1/5; 600 warm-up + 600 measured frames
+DONE skinning-1 1: frame p50/p95=7.560/9.890 ms; CPU p50=0.490 ms; GPU p50=3.502 ms
+START skinning-1-round-2 skinning-1 2/5; 600 warm-up + 600 measured frames
+DONE skinning-1 2: frame p50/p95=7.690/10.000 ms; CPU p50=0.390 ms; GPU p50=3.502 ms
+START skinning-1-round-2 skinning-1 3/5; 600 warm-up + 600 measured frames
+DONE skinning-1 3: frame p50/p95=7.685/10.490 ms; CPU p50=0.390 ms; GPU p50=3.508 ms
+START skinning-1-round-2 skinning-1 4/5; 600 warm-up + 600 measured frames
+DONE skinning-1 4: frame p50/p95=7.710/9.930 ms; CPU p50=0.390 ms; GPU p50=3.505 ms
+START skinning-1-round-2 skinning-1 5/5; 600 warm-up + 600 measured frames
+DONE skinning-1 5: frame p50/p95=7.735/10.650 ms; CPU p50=0.390 ms; GPU p50=3.507 ms
+CAPACITY skinning 1 {"frame":{"p50":7.714999999850988,"p95":10.445000000298023,"p99":11.859999999403954},"p95WorstRound":10.640000000596046,"bottleneck":"GPU","repeatability":0.010382868518673247,"capped":false}
+START skinning-2-round-1 skinning-2 1/5; 600 warm-up + 600 measured frames
+DONE skinning-2 1: frame p50/p95=7.920/10.550 ms; CPU p50=0.450 ms; GPU p50=3.522 ms
+START skinning-2-round-1 skinning-2 2/5; 600 warm-up + 600 measured frames
+DONE skinning-2 2: frame p50/p95=7.735/10.520 ms; CPU p50=0.440 ms; GPU p50=3.519 ms
+START skinning-2-round-1 skinning-2 3/5; 600 warm-up + 600 measured frames
+DONE skinning-2 3: frame p50/p95=7.655/10.580 ms; CPU p50=0.460 ms; GPU p50=3.529 ms
+START skinning-2-round-1 skinning-2 4/5; 600 warm-up + 600 measured frames
+DONE skinning-2 4: frame p50/p95=7.685/10.740 ms; CPU p50=0.435 ms; GPU p50=3.523 ms
+START skinning-2-round-1 skinning-2 5/5; 600 warm-up + 600 measured frames
+DONE skinning-2 5: frame p50/p95=7.770/10.715 ms; CPU p50=0.460 ms; GPU p50=3.511 ms
+START skinning-2-round-2 skinning-2 1/5; 600 warm-up + 600 measured frames
+DONE skinning-2 1: frame p50/p95=7.780/10.500 ms; CPU p50=0.445 ms; GPU p50=3.513 ms
+START skinning-2-round-2 skinning-2 2/5; 600 warm-up + 600 measured frames
+DONE skinning-2 2: frame p50/p95=7.725/10.585 ms; CPU p50=0.460 ms; GPU p50=3.518 ms
+START skinning-2-round-2 skinning-2 3/5; 600 warm-up + 600 measured frames
+DONE skinning-2 3: frame p50/p95=7.765/10.440 ms; CPU p50=0.480 ms; GPU p50=3.503 ms
+START skinning-2-round-2 skinning-2 4/5; 600 warm-up + 600 measured frames
+DONE skinning-2 4: frame p50/p95=7.810/10.740 ms; CPU p50=0.480 ms; GPU p50=3.486 ms
+START skinning-2-round-2 skinning-2 5/5; 600 warm-up + 600 measured frames
+DONE skinning-2 5: frame p50/p95=7.875/10.655 ms; CPU p50=0.475 ms; GPU p50=3.517 ms
+CAPACITY skinning 2 {"frame":{"p50":7.774999998509884,"p95":10.614999998360872,"p99":12.03999999910593},"p95WorstRound":10.635000001639128,"bottleneck":"GPU","repeatability":0.007726980345084372,"capped":false}
+START skinning-4-round-1 skinning-4 1/5; 600 warm-up + 600 measured frames
+DONE skinning-4 1: frame p50/p95=8.050/10.855 ms; CPU p50=0.755 ms; GPU p50=3.515 ms
+START skinning-4-round-1 skinning-4 2/5; 600 warm-up + 600 measured frames
+DONE skinning-4 2: frame p50/p95=8.095/10.890 ms; CPU p50=0.695 ms; GPU p50=3.513 ms
+START skinning-4-round-1 skinning-4 3/5; 600 warm-up + 600 measured frames
+DONE skinning-4 3: frame p50/p95=8.205/11.355 ms; CPU p50=0.795 ms; GPU p50=3.515 ms
+START skinning-4-round-1 skinning-4 4/5; 600 warm-up + 600 measured frames
+DONE skinning-4 4: frame p50/p95=8.145/11.190 ms; CPU p50=0.740 ms; GPU p50=3.515 ms
+START skinning-4-round-1 skinning-4 5/5; 600 warm-up + 600 measured frames
+DONE skinning-4 5: frame p50/p95=8.115/10.995 ms; CPU p50=0.645 ms; GPU p50=3.513 ms
+START skinning-4-round-2 skinning-4 1/5; 600 warm-up + 600 measured frames
+DONE skinning-4 1: frame p50/p95=7.920/10.840 ms; CPU p50=0.590 ms; GPU p50=3.527 ms
+START skinning-4-round-2 skinning-4 2/5; 600 warm-up + 600 measured frames
+DONE skinning-4 2: frame p50/p95=7.800/10.215 ms; CPU p50=0.580 ms; GPU p50=3.566 ms
+START skinning-4-round-2 skinning-4 3/5; 600 warm-up + 600 measured frames
+DONE skinning-4 3: frame p50/p95=8.030/10.790 ms; CPU p50=0.625 ms; GPU p50=3.538 ms
+START skinning-4-round-2 skinning-4 4/5; 600 warm-up + 600 measured frames
+DONE skinning-4 4: frame p50/p95=8.015/10.545 ms; CPU p50=0.615 ms; GPU p50=3.518 ms
+START skinning-4-round-2 skinning-4 5/5; 600 warm-up + 600 measured frames
+DONE skinning-4 5: frame p50/p95=8.050/10.815 ms; CPU p50=0.625 ms; GPU p50=3.525 ms
+CAPACITY skinning 4 {"frame":{"p50":8.054999999701977,"p95":10.894999999552965,"p99":11.910000000149012},"p95WorstRound":11.065000001341105,"bottleneck":"GPU","repeatability":0.01926063963248302,"capped":false}
+START skinning-8-round-1 skinning-8 1/5; 600 warm-up + 600 measured frames
+DONE skinning-8 1: frame p50/p95=8.485/11.540 ms; CPU p50=1.050 ms; GPU p50=3.594 ms
+START skinning-8-round-1 skinning-8 2/5; 600 warm-up + 600 measured frames
+DONE skinning-8 2: frame p50/p95=8.330/11.330 ms; CPU p50=1.015 ms; GPU p50=3.594 ms
+START skinning-8-round-1 skinning-8 3/5; 600 warm-up + 600 measured frames
+DONE skinning-8 3: frame p50/p95=8.135/10.715 ms; CPU p50=0.770 ms; GPU p50=3.621 ms
+START skinning-8-round-1 skinning-8 4/5; 600 warm-up + 600 measured frames
+DONE skinning-8 4: frame p50/p95=8.105/10.635 ms; CPU p50=0.765 ms; GPU p50=3.646 ms
+START skinning-8-round-1 skinning-8 5/5; 600 warm-up + 600 measured frames
+DONE skinning-8 5: frame p50/p95=8.015/10.945 ms; CPU p50=0.780 ms; GPU p50=3.587 ms
+START skinning-8-round-2 skinning-8 1/5; 600 warm-up + 600 measured frames
+DONE skinning-8 1: frame p50/p95=8.250/11.035 ms; CPU p50=0.855 ms; GPU p50=3.590 ms
+START skinning-8-round-2 skinning-8 2/5; 600 warm-up + 600 measured frames
+DONE skinning-8 2: frame p50/p95=8.180/11.055 ms; CPU p50=0.820 ms; GPU p50=3.586 ms
+START skinning-8-round-2 skinning-8 3/5; 600 warm-up + 600 measured frames
+DONE skinning-8 3: frame p50/p95=8.285/11.240 ms; CPU p50=0.820 ms; GPU p50=3.597 ms
+START skinning-8-round-2 skinning-8 4/5; 600 warm-up + 600 measured frames
+DONE skinning-8 4: frame p50/p95=8.265/10.940 ms; CPU p50=0.885 ms; GPU p50=3.608 ms
+START skinning-8-round-2 skinning-8 5/5; 600 warm-up + 600 measured frames
+DONE skinning-8 5: frame p50/p95=8.225/10.895 ms; CPU p50=0.840 ms; GPU p50=3.593 ms
+CAPACITY skinning 8 {"frame":{"p50":8.234999999403954,"p95":11.04000000283122,"p99":12.099999997764826},"p95WorstRound":11.054999999701977,"bottleneck":"GPU","repeatability":0.0024286581117048,"capped":false}
+START skinning-16-round-1 skinning-16 1/5; 600 warm-up + 600 measured frames
+DONE skinning-16 1: frame p50/p95=8.655/11.185 ms; CPU p50=1.180 ms; GPU p50=3.780 ms
+START skinning-16-round-1 skinning-16 2/5; 600 warm-up + 600 measured frames
+DONE skinning-16 2: frame p50/p95=8.710/11.095 ms; CPU p50=1.185 ms; GPU p50=3.792 ms
+START skinning-16-round-1 skinning-16 3/5; 600 warm-up + 600 measured frames
+DONE skinning-16 3: frame p50/p95=8.585/11.210 ms; CPU p50=1.250 ms; GPU p50=3.778 ms
+START skinning-16-round-1 skinning-16 4/5; 600 warm-up + 600 measured frames
+DONE skinning-16 4: frame p50/p95=8.605/11.325 ms; CPU p50=1.200 ms; GPU p50=3.792 ms
+START skinning-16-round-1 skinning-16 5/5; 600 warm-up + 600 measured frames
+DONE skinning-16 5: frame p50/p95=8.585/11.030 ms; CPU p50=1.175 ms; GPU p50=3.787 ms
+START skinning-16-round-2 skinning-16 1/5; 600 warm-up + 600 measured frames
+DONE skinning-16 1: frame p50/p95=8.440/10.860 ms; CPU p50=1.195 ms; GPU p50=3.785 ms
+START skinning-16-round-2 skinning-16 2/5; 600 warm-up + 600 measured frames
+DONE skinning-16 2: frame p50/p95=8.545/11.360 ms; CPU p50=1.180 ms; GPU p50=3.785 ms
+START skinning-16-round-2 skinning-16 3/5; 600 warm-up + 600 measured frames
+DONE skinning-16 3: frame p50/p95=8.695/11.615 ms; CPU p50=1.365 ms; GPU p50=3.747 ms
+START skinning-16-round-2 skinning-16 4/5; 600 warm-up + 600 measured frames
+DONE skinning-16 4: frame p50/p95=8.730/11.760 ms; CPU p50=1.300 ms; GPU p50=3.738 ms
+START skinning-16-round-2 skinning-16 5/5; 600 warm-up + 600 measured frames
+DONE skinning-16 5: frame p50/p95=8.800/11.540 ms; CPU p50=1.305 ms; GPU p50=3.754 ms
+CAPACITY skinning 16 {"frame":{"p50":8.635000001639128,"p95":11.344999998807907,"p99":12.320000000298023},"p95WorstRound":11.529999997466803,"bottleneck":"GPU","repeatability":0.002314814331747121,"capped":false}
+START skinning-32-round-1 skinning-32 1/5; 600 warm-up + 600 measured frames
+DONE skinning-32 1: frame p50/p95=9.045/12.215 ms; CPU p50=2.140 ms; GPU p50=3.586 ms
+START skinning-32-round-1 skinning-32 2/5; 600 warm-up + 600 measured frames
+DONE skinning-32 2: frame p50/p95=8.985/12.110 ms; CPU p50=2.380 ms; GPU p50=3.578 ms
+START skinning-32-round-1 skinning-32 3/5; 600 warm-up + 600 measured frames
+DONE skinning-32 3: frame p50/p95=9.155/12.080 ms; CPU p50=2.180 ms; GPU p50=3.594 ms
+START skinning-32-round-1 skinning-32 4/5; 600 warm-up + 600 measured frames
+DONE skinning-32 4: frame p50/p95=9.125/12.040 ms; CPU p50=2.025 ms; GPU p50=3.586 ms
+START skinning-32-round-1 skinning-32 5/5; 600 warm-up + 600 measured frames
+DONE skinning-32 5: frame p50/p95=9.010/11.630 ms; CPU p50=1.970 ms; GPU p50=3.580 ms
+START skinning-32-round-2 skinning-32 1/5; 600 warm-up + 600 measured frames
+DONE skinning-32 1: frame p50/p95=8.880/11.650 ms; CPU p50=2.030 ms; GPU p50=3.562 ms
+START skinning-32-round-2 skinning-32 2/5; 600 warm-up + 600 measured frames
+DONE skinning-32 2: frame p50/p95=9.040/11.930 ms; CPU p50=1.965 ms; GPU p50=3.578 ms
+START skinning-32-round-2 skinning-32 3/5; 600 warm-up + 600 measured frames
+DONE skinning-32 3: frame p50/p95=8.930/11.395 ms; CPU p50=2.015 ms; GPU p50=3.586 ms
+START skinning-32-round-2 skinning-32 4/5; 600 warm-up + 600 measured frames
+DONE skinning-32 4: frame p50/p95=9.155/11.805 ms; CPU p50=1.995 ms; GPU p50=3.587 ms
+START skinning-32-round-2 skinning-32 5/5; 600 warm-up + 600 measured frames
+DONE skinning-32 5: frame p50/p95=9.185/12.125 ms; CPU p50=2.135 ms; GPU p50=3.589 ms
+CAPACITY skinning 32 {"frame":{"p50":9.054999999701977,"p95":11.905000001192093,"p99":12.880000002682209},"p95WorstRound":12.060000002384186,"bottleneck":"GPU","repeatability":0.003313086824194398,"capped":false}
+START skinning-64-round-1 skinning-64 1/5; 600 warm-up + 600 measured frames
+DONE skinning-64 1: frame p50/p95=10.515/13.400 ms; CPU p50=3.930 ms; GPU p50=4.108 ms
+START skinning-64-round-1 skinning-64 2/5; 600 warm-up + 600 measured frames
+DONE skinning-64 2: frame p50/p95=10.725/13.685 ms; CPU p50=4.500 ms; GPU p50=4.070 ms
+START skinning-64-round-1 skinning-64 3/5; 600 warm-up + 600 measured frames
+DONE skinning-64 3: frame p50/p95=10.585/13.905 ms; CPU p50=4.685 ms; GPU p50=4.095 ms
+START skinning-64-round-1 skinning-64 4/5; 600 warm-up + 600 measured frames
+DONE skinning-64 4: frame p50/p95=9.910/12.750 ms; CPU p50=3.745 ms; GPU p50=3.811 ms
+START skinning-64-round-1 skinning-64 5/5; 600 warm-up + 600 measured frames
+DONE skinning-64 5: frame p50/p95=9.755/12.205 ms; CPU p50=3.730 ms; GPU p50=3.812 ms
+START skinning-64-round-2 skinning-64 1/5; 600 warm-up + 600 measured frames
+DONE skinning-64 1: frame p50/p95=9.925/12.590 ms; CPU p50=3.745 ms; GPU p50=3.799 ms
+START skinning-64-round-2 skinning-64 2/5; 600 warm-up + 600 measured frames
+DONE skinning-64 2: frame p50/p95=9.685/12.210 ms; CPU p50=3.690 ms; GPU p50=3.807 ms
+START skinning-64-round-2 skinning-64 3/5; 600 warm-up + 600 measured frames
+DONE skinning-64 3: frame p50/p95=10.030/12.985 ms; CPU p50=3.770 ms; GPU p50=3.846 ms
+START skinning-64-round-2 skinning-64 4/5; 600 warm-up + 600 measured frames
+DONE skinning-64 4: frame p50/p95=10.240/13.260 ms; CPU p50=3.810 ms; GPU p50=4.070 ms
+START skinning-64-round-2 skinning-64 5/5; 600 warm-up + 600 measured frames
+DONE skinning-64 5: frame p50/p95=10.265/13.510 ms; CPU p50=3.770 ms; GPU p50=4.668 ms
+CAPACITY skinning 64 {"frame":{"p50":10.125,"p95":13.200000002980232,"p99":14.494999997317791},"p95WorstRound":13.32999999821186,"bottleneck":"mixed","repeatability":0.024679170046906396,"capped":false}
+START skinning-128-round-1 skinning-128 1/5; 600 warm-up + 600 measured frames
+DONE skinning-128 1: frame p50/p95=12.100/15.445 ms; CPU p50=7.610 ms; GPU p50=6.177 ms
+START skinning-128-round-1 skinning-128 2/5; 600 warm-up + 600 measured frames
+DONE skinning-128 2: frame p50/p95=12.035/15.045 ms; CPU p50=7.595 ms; GPU p50=6.024 ms
+START skinning-128-round-1 skinning-128 3/5; 600 warm-up + 600 measured frames
+DONE skinning-128 3: frame p50/p95=11.720/14.710 ms; CPU p50=7.505 ms; GPU p50=5.846 ms
+START skinning-128-round-1 skinning-128 4/5; 600 warm-up + 600 measured frames
+DONE skinning-128 4: frame p50/p95=12.045/14.750 ms; CPU p50=7.680 ms; GPU p50=6.054 ms
+START skinning-128-round-1 skinning-128 5/5; 600 warm-up + 600 measured frames
+DONE skinning-128 5: frame p50/p95=12.125/15.220 ms; CPU p50=7.570 ms; GPU p50=6.130 ms
+START skinning-128-round-2 skinning-128 1/5; 600 warm-up + 600 measured frames
+DONE skinning-128 1: frame p50/p95=11.785/14.625 ms; CPU p50=7.575 ms; GPU p50=5.850 ms
+START skinning-128-round-2 skinning-128 2/5; 600 warm-up + 600 measured frames
+DONE skinning-128 2: frame p50/p95=11.865/14.625 ms; CPU p50=7.620 ms; GPU p50=5.786 ms
+START skinning-128-round-2 skinning-128 3/5; 600 warm-up + 600 measured frames
+DONE skinning-128 3: frame p50/p95=12.010/14.715 ms; CPU p50=7.580 ms; GPU p50=5.843 ms
+START skinning-128-round-2 skinning-128 4/5; 600 warm-up + 600 measured frames
+DONE skinning-128 4: frame p50/p95=12.060/14.900 ms; CPU p50=7.585 ms; GPU p50=6.023 ms
+START skinning-128-round-2 skinning-128 5/5; 600 warm-up + 600 measured frames
+DONE skinning-128 5: frame p50/p95=11.935/14.920 ms; CPU p50=7.565 ms; GPU p50=5.917 ms
+CAPACITY skinning 128 {"frame":{"p50":11.979999996721745,"p95":14.900000005960464,"p99":16.600000001490116},"p95WorstRound":15,"bottleneck":"CPU","repeatability":0.0054291087964573655,"capped":false}
+START skinning-256-round-1 skinning-256 1/5; 600 warm-up + 600 measured frames
+DONE skinning-256 1: frame p50/p95=17.720/24.035 ms; CPU p50=16.510 ms; GPU p50=10.199 ms
+START skinning-256-round-1 skinning-256 2/5; 600 warm-up + 600 measured frames
+DONE skinning-256 2: frame p50/p95=17.700/23.705 ms; CPU p50=16.635 ms; GPU p50=10.333 ms
+START skinning-256-round-1 skinning-256 3/5; 600 warm-up + 600 measured frames
+DONE skinning-256 3: frame p50/p95=16.325/21.230 ms; CPU p50=15.595 ms; GPU p50=9.316 ms
+START skinning-256-round-1 skinning-256 4/5; 600 warm-up + 600 measured frames
+DONE skinning-256 4: frame p50/p95=16.170/20.390 ms; CPU p50=15.485 ms; GPU p50=9.271 ms
+START skinning-256-round-1 skinning-256 5/5; 600 warm-up + 600 measured frames
+DONE skinning-256 5: frame p50/p95=16.105/22.140 ms; CPU p50=15.385 ms; GPU p50=9.487 ms
+START skinning-256-round-2 skinning-256 1/5; 600 warm-up + 600 measured frames
+DONE skinning-256 1: frame p50/p95=16.075/20.705 ms; CPU p50=15.375 ms; GPU p50=9.222 ms
+START skinning-256-round-2 skinning-256 2/5; 600 warm-up + 600 measured frames
+DONE skinning-256 2: frame p50/p95=17.955/23.150 ms; CPU p50=16.880 ms; GPU p50=10.384 ms
+START skinning-256-round-2 skinning-256 3/5; 600 warm-up + 600 measured frames
+DONE skinning-256 3: frame p50/p95=17.770/23.030 ms; CPU p50=16.845 ms; GPU p50=10.260 ms
+START skinning-256-round-2 skinning-256 4/5; 600 warm-up + 600 measured frames
+DONE skinning-256 4: frame p50/p95=22.975/29.460 ms; CPU p50=21.085 ms; GPU p50=14.019 ms
+START skinning-256-round-2 skinning-256 5/5; 600 warm-up + 600 measured frames
+DONE skinning-256 5: frame p50/p95=16.595/22.145 ms; CPU p50=15.530 ms; GPU p50=9.685 ms
+file:///home/joao/orca/workspaces/ascii-engine/threadfin/scripts/bench-capacity.mjs:131
+      throw new Error(
+            ^
+
+Error: Frame p50 gate failed for skinning-256: 5.83%; raw rounds preserved
+    at file:///home/joao/orca/workspaces/ascii-engine/threadfin/scripts/bench-capacity.mjs:131:13
+
+Node.js v26.10.0
+[ELIFECYCLE] Command failed with exit code 1.

@@ -1,0 +1,141 @@
+$ node scripts/bench-capacity.mjs --out=docs/captures/benchmarks-2026-10-15/capacity --axes=water-loaded-off,water-grid,water-visible,particles,skinning,water-loaded-pause
+CAPACITY water-loaded-off 1 {"frame":{"p50":7.969999998807907,"p95":10.725000001490116,"p99":11.924999997019768},"p95WorstRound":10.839999999850988,"bottleneck":"mixed","repeatability":0.013178537396427298,"capped":false}
+CAPACITY water-loaded-off 2 {"frame":{"p50":10.339999999850988,"p95":13.190000001341105,"p99":17.260000001639128},"p95WorstRound":13.440000001341105,"bottleneck":"CPU","repeatability":0.012572534108712037,"capped":false}
+CAPACITY water-loaded-off 4 {"frame":{"p50":19.644999999552965,"p95":23.75,"p99":31.440000001341105},"p95WorstRound":24.375,"bottleneck":"CPU","repeatability":0.024194575397066372,"capped":false}
+CAPACITY water-loaded-off 8 {"frame":{"p50":37.01000000163913,"p95":42.99000000208616,"p99":58.314999997615814},"p95WorstRound":43.50499999895692,"bottleneck":"CPU","repeatability":0.010952606347153953,"capped":false}
+START water-grid-65-round-1 water-grid-65 1/5; 600 warm-up + 600 measured frames
+DONE water-grid-65 1: frame p50/p95=7.345/9.400 ms; CPU p50=1.405 ms; GPU p50=4.043 ms
+START water-grid-65-round-1 water-grid-65 2/5; 600 warm-up + 600 measured frames
+DONE water-grid-65 2: frame p50/p95=7.225/9.750 ms; CPU p50=1.375 ms; GPU p50=4.035 ms
+START water-grid-65-round-1 water-grid-65 3/5; 600 warm-up + 600 measured frames
+DONE water-grid-65 3: frame p50/p95=7.365/9.800 ms; CPU p50=1.410 ms; GPU p50=4.033 ms
+START water-grid-65-round-1 water-grid-65 4/5; 600 warm-up + 600 measured frames
+DONE water-grid-65 4: frame p50/p95=7.395/10.130 ms; CPU p50=1.420 ms; GPU p50=4.033 ms
+START water-grid-65-round-1 water-grid-65 5/5; 600 warm-up + 600 measured frames
+DONE water-grid-65 5: frame p50/p95=7.340/10.455 ms; CPU p50=1.420 ms; GPU p50=4.032 ms
+START water-grid-65-round-2 water-grid-65 1/5; 600 warm-up + 600 measured frames
+DONE water-grid-65 1: frame p50/p95=7.475/10.415 ms; CPU p50=1.395 ms; GPU p50=4.041 ms
+START water-grid-65-round-2 water-grid-65 2/5; 600 warm-up + 600 measured frames
+DONE water-grid-65 2: frame p50/p95=7.250/9.915 ms; CPU p50=1.395 ms; GPU p50=4.032 ms
+START water-grid-65-round-2 water-grid-65 3/5; 600 warm-up + 600 measured frames
+DONE water-grid-65 3: frame p50/p95=7.215/9.785 ms; CPU p50=1.365 ms; GPU p50=4.034 ms
+START water-grid-65-round-2 water-grid-65 4/5; 600 warm-up + 600 measured frames
+DONE water-grid-65 4: frame p50/p95=7.240/11.150 ms; CPU p50=1.390 ms; GPU p50=4.029 ms
+START water-grid-65-round-2 water-grid-65 5/5; 600 warm-up + 600 measured frames
+DONE water-grid-65 5: frame p50/p95=7.710/10.155 ms; CPU p50=1.555 ms; GPU p50=4.052 ms
+CAPACITY water-grid 65 {"frame":{"p50":7.339999999850988,"p95":10.175000000745058,"p99":11.609999999403954},"p95WorstRound":10.405000001192093,"bottleneck":"GPU","repeatability":0.0027247955787869024,"capped":false}
+CAPACITY water-grid 129 {"frame":{"p50":7.969999998807907,"p95":10.725000001490116,"p99":11.924999997019768},"p95WorstRound":10.839999999850988,"bottleneck":"mixed","repeatability":0.013178537396427298,"capped":false}
+START water-grid-257-round-1 water-grid-257 1/5; 600 warm-up + 600 measured frames
+DONE water-grid-257 1: frame p50/p95=15.990/21.360 ms; CPU p50=15.495 ms; GPU p50=5.951 ms
+START water-grid-257-round-1 water-grid-257 2/5; 600 warm-up + 600 measured frames
+DONE water-grid-257 2: frame p50/p95=14.370/17.140 ms; CPU p50=13.985 ms; GPU p50=6.248 ms
+START water-grid-257-round-1 water-grid-257 3/5; 600 warm-up + 600 measured frames
+DONE water-grid-257 3: frame p50/p95=14.000/16.885 ms; CPU p50=13.670 ms; GPU p50=7.301 ms
+START water-grid-257-round-1 water-grid-257 4/5; 600 warm-up + 600 measured frames
+DONE water-grid-257 4: frame p50/p95=14.200/16.965 ms; CPU p50=13.815 ms; GPU p50=6.931 ms
+START water-grid-257-round-1 water-grid-257 5/5; 600 warm-up + 600 measured frames
+DONE water-grid-257 5: frame p50/p95=14.065/16.925 ms; CPU p50=13.710 ms; GPU p50=7.307 ms
+START water-grid-257-round-2 water-grid-257 1/5; 600 warm-up + 600 measured frames
+DONE water-grid-257 1: frame p50/p95=14.100/17.295 ms; CPU p50=13.755 ms; GPU p50=7.304 ms
+START water-grid-257-round-2 water-grid-257 2/5; 600 warm-up + 600 measured frames
+DONE water-grid-257 2: frame p50/p95=13.940/16.985 ms; CPU p50=13.595 ms; GPU p50=6.558 ms
+START water-grid-257-round-2 water-grid-257 3/5; 600 warm-up + 600 measured frames
+DONE water-grid-257 3: frame p50/p95=14.515/18.005 ms; CPU p50=14.135 ms; GPU p50=6.181 ms
+START water-grid-257-round-2 water-grid-257 4/5; 600 warm-up + 600 measured frames
+DONE water-grid-257 4: frame p50/p95=14.490/18.380 ms; CPU p50=14.075 ms; GPU p50=5.714 ms
+START water-grid-257-round-2 water-grid-257 5/5; 600 warm-up + 600 measured frames
+DONE water-grid-257 5: frame p50/p95=14.250/17.325 ms; CPU p50=13.860 ms; GPU p50=6.534 ms
+CAPACITY water-grid 257 {"frame":{"p50":14.319999996572733,"p95":17.899999998509884,"p99":22.37000000104308},"p95WorstRound":18.109999999403954,"bottleneck":"CPU","repeatability":0.0097731239513667,"capped":false}
+START water-grid-513-round-1 water-grid-513 1/5; 600 warm-up + 600 measured frames
+DONE water-grid-513 1: frame p50/p95=49.220/54.280 ms; CPU p50=48.865 ms; GPU p50=14.361 ms
+START water-grid-513-round-1 water-grid-513 2/5; 600 warm-up + 600 measured frames
+DONE water-grid-513 2: frame p50/p95=47.725/53.890 ms; CPU p50=47.425 ms; GPU p50=14.001 ms
+START water-grid-513-round-1 water-grid-513 3/5; 600 warm-up + 600 measured frames
+DONE water-grid-513 3: frame p50/p95=49.440/54.490 ms; CPU p50=49.055 ms; GPU p50=14.011 ms
+START water-grid-513-round-1 water-grid-513 4/5; 600 warm-up + 600 measured frames
+DONE water-grid-513 4: frame p50/p95=48.715/54.265 ms; CPU p50=48.375 ms; GPU p50=15.232 ms
+START water-grid-513-round-1 water-grid-513 5/5; 600 warm-up + 600 measured frames
+DONE water-grid-513 5: frame p50/p95=53.175/62.615 ms; CPU p50=52.665 ms; GPU p50=12.069 ms
+START water-grid-513-round-2 water-grid-513 1/5; 600 warm-up + 600 measured frames
+DONE water-grid-513 1: frame p50/p95=49.275/54.480 ms; CPU p50=48.890 ms; GPU p50=13.975 ms
+START water-grid-513-round-2 water-grid-513 2/5; 600 warm-up + 600 measured frames
+DONE water-grid-513 2: frame p50/p95=46.905/52.245 ms; CPU p50=46.600 ms; GPU p50=13.289 ms
+START water-grid-513-round-2 water-grid-513 3/5; 600 warm-up + 600 measured frames
+DONE water-grid-513 3: frame p50/p95=48.990/54.335 ms; CPU p50=48.640 ms; GPU p50=14.853 ms
+START water-grid-513-round-2 water-grid-513 4/5; 600 warm-up + 600 measured frames
+DONE water-grid-513 4: frame p50/p95=46.090/48.920 ms; CPU p50=45.815 ms; GPU p50=14.689 ms
+START water-grid-513-round-2 water-grid-513 5/5; 600 warm-up + 600 measured frames
+DONE water-grid-513 5: frame p50/p95=46.370/49.670 ms; CPU p50=46.095 ms; GPU p50=13.987 ms
+CAPACITY water-grid 513 {"frame":{"p50":48.730000000447035,"p95":55.78000000119209,"p99":63.46499999985099},"p95WorstRound":57.60999999940395,"bottleneck":"CPU","repeatability":0.0286361763622095,"capped":false}
+CAPACITY water-visible 1 {"frame":{"p50":7.969999998807907,"p95":10.725000001490116,"p99":11.924999997019768},"p95WorstRound":10.839999999850988,"bottleneck":"mixed","repeatability":0.013178537396427298,"capped":false}
+START water-visible-2-round-1 water-visible-2 1/5; 600 warm-up + 600 measured frames
+DONE water-visible-2 1: frame p50/p95=10.440/11.410 ms; CPU p50=10.120 ms; GPU p50=4.769 ms
+START water-visible-2-round-1 water-visible-2 2/5; 600 warm-up + 600 measured frames
+DONE water-visible-2 2: frame p50/p95=10.035/10.640 ms; CPU p50=9.765 ms; GPU p50=5.554 ms
+START water-visible-2-round-1 water-visible-2 3/5; 600 warm-up + 600 measured frames
+DONE water-visible-2 3: frame p50/p95=9.905/10.670 ms; CPU p50=9.610 ms; GPU p50=5.558 ms
+START water-visible-2-round-1 water-visible-2 4/5; 600 warm-up + 600 measured frames
+DONE water-visible-2 4: frame p50/p95=10.145/10.810 ms; CPU p50=9.860 ms; GPU p50=5.553 ms
+START water-visible-2-round-1 water-visible-2 5/5; 600 warm-up + 600 measured frames
+DONE water-visible-2 5: frame p50/p95=9.835/10.740 ms; CPU p50=9.550 ms; GPU p50=5.550 ms
+START water-visible-2-round-2 water-visible-2 1/5; 600 warm-up + 600 measured frames
+DONE water-visible-2 1: frame p50/p95=9.745/10.385 ms; CPU p50=9.460 ms; GPU p50=5.273 ms
+START water-visible-2-round-2 water-visible-2 2/5; 600 warm-up + 600 measured frames
+DONE water-visible-2 2: frame p50/p95=10.725/11.960 ms; CPU p50=10.395 ms; GPU p50=5.875 ms
+START water-visible-2-round-2 water-visible-2 3/5; 600 warm-up + 600 measured frames
+DONE water-visible-2 3: frame p50/p95=10.430/12.245 ms; CPU p50=10.110 ms; GPU p50=5.265 ms
+START water-visible-2-round-2 water-visible-2 4/5; 600 warm-up + 600 measured frames
+DONE water-visible-2 4: frame p50/p95=10.310/11.150 ms; CPU p50=9.990 ms; GPU p50=5.554 ms
+START water-visible-2-round-2 water-visible-2 5/5; 600 warm-up + 600 measured frames
+DONE water-visible-2 5: frame p50/p95=11.200/15.580 ms; CPU p50=10.810 ms; GPU p50=4.589 ms
+CAPACITY water-visible 2 {"frame":{"p50":10.28999999910593,"p95":11.780000001192093,"p99":13.934999998658895},"p95WorstRound":12.385000001639128,"bottleneck":"CPU","repeatability":0.040816326707933136,"capped":false}
+START water-visible-4-round-1 water-visible-4 1/5; 600 warm-up + 600 measured frames
+DONE water-visible-4 1: frame p50/p95=19.935/21.695 ms; CPU p50=19.605 ms; GPU p50=8.927 ms
+START water-visible-4-round-1 water-visible-4 2/5; 600 warm-up + 600 measured frames
+DONE water-visible-4 2: frame p50/p95=19.495/20.560 ms; CPU p50=19.180 ms; GPU p50=9.736 ms
+START water-visible-4-round-1 water-visible-4 3/5; 600 warm-up + 600 measured frames
+DONE water-visible-4 3: frame p50/p95=19.780/21.780 ms; CPU p50=19.495 ms; GPU p50=10.392 ms
+START water-visible-4-round-1 water-visible-4 4/5; 600 warm-up + 600 measured frames
+DONE water-visible-4 4: frame p50/p95=20.305/23.040 ms; CPU p50=19.955 ms; GPU p50=10.488 ms
+START water-visible-4-round-1 water-visible-4 5/5; 600 warm-up + 600 measured frames
+DONE water-visible-4 5: frame p50/p95=20.925/24.475 ms; CPU p50=20.540 ms; GPU p50=10.411 ms
+START water-visible-4-round-2 water-visible-4 1/5; 600 warm-up + 600 measured frames
+DONE water-visible-4 1: frame p50/p95=20.170/22.920 ms; CPU p50=19.825 ms; GPU p50=10.397 ms
+START water-visible-4-round-2 water-visible-4 2/5; 600 warm-up + 600 measured frames
+DONE water-visible-4 2: frame p50/p95=20.065/22.410 ms; CPU p50=19.745 ms; GPU p50=11.326 ms
+START water-visible-4-round-2 water-visible-4 3/5; 600 warm-up + 600 measured frames
+DONE water-visible-4 3: frame p50/p95=20.135/22.255 ms; CPU p50=19.790 ms; GPU p50=11.338 ms
+START water-visible-4-round-2 water-visible-4 4/5; 600 warm-up + 600 measured frames
+DONE water-visible-4 4: frame p50/p95=21.310/25.380 ms; CPU p50=20.950 ms; GPU p50=10.407 ms
+START water-visible-4-round-2 water-visible-4 5/5; 600 warm-up + 600 measured frames
+DONE water-visible-4 5: frame p50/p95=19.785/21.980 ms; CPU p50=19.455 ms; GPU p50=11.333 ms
+CAPACITY water-visible 4 {"frame":{"p50":20.179999999701977,"p95":23.29500000178814,"p99":26.225000001490116},"p95WorstRound":23.515000000596046,"bottleneck":"CPU","repeatability":0.0027258082505799636,"capped":false}
+START water-visible-8-round-1 water-visible-8 1/5; 600 warm-up + 600 measured frames
+DONE water-visible-8 1: frame p50/p95=37.375/39.605 ms; CPU p50=37.055 ms; GPU p50=12.872 ms
+START water-visible-8-round-1 water-visible-8 2/5; 600 warm-up + 600 measured frames
+DONE water-visible-8 2: frame p50/p95=37.460/39.315 ms; CPU p50=37.130 ms; GPU p50=12.859 ms
+START water-visible-8-round-1 water-visible-8 3/5; 600 warm-up + 600 measured frames
+DONE water-visible-8 3: frame p50/p95=40.910/44.785 ms; CPU p50=40.540 ms; GPU p50=12.873 ms
+START water-visible-8-round-1 water-visible-8 4/5; 600 warm-up + 600 measured frames
+DONE water-visible-8 4: frame p50/p95=37.345/40.755 ms; CPU p50=37.035 ms; GPU p50=11.804 ms
+START water-visible-8-round-1 water-visible-8 5/5; 600 warm-up + 600 measured frames
+DONE water-visible-8 5: frame p50/p95=40.820/46.665 ms; CPU p50=40.435 ms; GPU p50=12.815 ms
+START water-visible-8-round-2 water-visible-8 1/5; 600 warm-up + 600 measured frames
+DONE water-visible-8 1: frame p50/p95=48.615/57.205 ms; CPU p50=48.065 ms; GPU p50=10.230 ms
+START water-visible-8-round-2 water-visible-8 2/5; 600 warm-up + 600 measured frames
+DONE water-visible-8 2: frame p50/p95=41.840/49.255 ms; CPU p50=41.385 ms; GPU p50=9.731 ms
+START water-visible-8-round-2 water-visible-8 3/5; 600 warm-up + 600 measured frames
+DONE water-visible-8 3: frame p50/p95=42.715/48.855 ms; CPU p50=42.250 ms; GPU p50=9.894 ms
+START water-visible-8-round-2 water-visible-8 4/5; 600 warm-up + 600 measured frames
+DONE water-visible-8 4: frame p50/p95=41.810/47.195 ms; CPU p50=41.340 ms; GPU p50=9.687 ms
+START water-visible-8-round-2 water-visible-8 5/5; 600 warm-up + 600 measured frames
+DONE water-visible-8 5: frame p50/p95=42.675/47.130 ms; CPU p50=42.220 ms; GPU p50=10.691 ms
+file:///home/joao/orca/workspaces/ascii-engine/threadfin/scripts/bench-capacity.mjs:131
+      throw new Error(
+            ^
+
+Error: Frame p50 gate failed for water-visible-8: 10.11%; raw rounds preserved
+    at file:///home/joao/orca/workspaces/ascii-engine/threadfin/scripts/bench-capacity.mjs:131:13
+
+Node.js v26.10.0
+[ELIFECYCLE] Command failed with exit code 1.

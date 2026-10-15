@@ -29,7 +29,8 @@
     "verify:gltf": "node scripts/verify-gltf-appearance.mjs",
     "export": "node scripts/export.mjs",
     "verify:water": "node scripts/verify-water.mjs",
-    "bench:capacity": "node scripts/bench-capacity.mjs"
+    "bench:capacity": "node scripts/bench-capacity.mjs",
+    "bench:charts": "node scripts/bench-charts.mjs"
   },
   "packageManager": "pnpm@11.9.0",
   "devDependencies": {

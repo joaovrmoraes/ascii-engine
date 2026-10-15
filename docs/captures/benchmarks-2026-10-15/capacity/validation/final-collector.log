@@ -1,0 +1,129 @@
+Raw data stays in ignored staging until collection completes: /home/joao/orca/workspaces/ascii-engine/threadfin/.cache/bench-capacity/2a82617edcd0
+START water-scale-128-pause-round-1 water-scale-128-pause 1/5; 600 warm-up + 600 measured frames
+DONE water-scale-128-pause 1: frame p50/p95=9.930/13.485 ms; CPU p50=6.685 ms; GPU p50=4.513 ms
+START water-scale-128-pause-round-1 water-scale-128-pause 2/5; 600 warm-up + 600 measured frames
+DONE water-scale-128-pause 2: frame p50/p95=9.970/13.550 ms; CPU p50=7.380 ms; GPU p50=4.523 ms
+START water-scale-128-pause-round-1 water-scale-128-pause 3/5; 600 warm-up + 600 measured frames
+DONE water-scale-128-pause 3: frame p50/p95=9.025/12.175 ms; CPU p50=5.875 ms; GPU p50=4.482 ms
+START water-scale-128-pause-round-1 water-scale-128-pause 4/5; 600 warm-up + 600 measured frames
+DONE water-scale-128-pause 4: frame p50/p95=9.595/12.505 ms; CPU p50=6.025 ms; GPU p50=4.484 ms
+START water-scale-128-pause-round-1 water-scale-128-pause 5/5; 600 warm-up + 600 measured frames
+DONE water-scale-128-pause 5: frame p50/p95=9.120/12.265 ms; CPU p50=5.915 ms; GPU p50=4.483 ms
+START water-scale-128-pause-round-2 water-scale-128-pause 1/5; 600 warm-up + 600 measured frames
+DONE water-scale-128-pause 1: frame p50/p95=9.080/12.075 ms; CPU p50=5.895 ms; GPU p50=4.477 ms
+START water-scale-128-pause-round-2 water-scale-128-pause 2/5; 600 warm-up + 600 measured frames
+DONE water-scale-128-pause 2: frame p50/p95=9.525/12.815 ms; CPU p50=7.235 ms; GPU p50=4.498 ms
+START water-scale-128-pause-round-2 water-scale-128-pause 3/5; 600 warm-up + 600 measured frames
+DONE water-scale-128-pause 3: frame p50/p95=9.360/12.935 ms; CPU p50=6.635 ms; GPU p50=4.492 ms
+START water-scale-128-pause-round-2 water-scale-128-pause 4/5; 600 warm-up + 600 measured frames
+DONE water-scale-128-pause 4: frame p50/p95=8.985/11.825 ms; CPU p50=5.700 ms; GPU p50=4.483 ms
+START water-scale-128-pause-round-2 water-scale-128-pause 5/5; 600 warm-up + 600 measured frames
+DONE water-scale-128-pause 5: frame p50/p95=9.140/12.155 ms; CPU p50=5.910 ms; GPU p50=4.489 ms
+CAPACITY water-loaded-pause 128 {"frame":{"p50":9.384999997913837,"p95":12.675000004470348,"p99":14.035000003874302},"p95WorstRound":13.009999997913837,"bottleneck":"CPU","repeatability":0.03458366618242214,"capped":false}
+START water-scale-256-pause-round-1 water-scale-256-pause 1/5; 600 warm-up + 600 measured frames
+DONE water-scale-256-pause 1: frame p50/p95=8.830/11.850 ms; CPU p50=6.240 ms; GPU p50=4.475 ms
+START water-scale-256-pause-round-1 water-scale-256-pause 2/5; 600 warm-up + 600 measured frames
+DONE water-scale-256-pause 2: frame p50/p95=9.275/12.175 ms; CPU p50=6.370 ms; GPU p50=4.477 ms
+START water-scale-256-pause-round-1 water-scale-256-pause 3/5; 600 warm-up + 600 measured frames
+DONE water-scale-256-pause 3: frame p50/p95=9.095/11.790 ms; CPU p50=6.095 ms; GPU p50=4.478 ms
+START water-scale-256-pause-round-1 water-scale-256-pause 4/5; 600 warm-up + 600 measured frames
+DONE water-scale-256-pause 4: frame p50/p95=9.045/12.050 ms; CPU p50=6.095 ms; GPU p50=4.483 ms
+START water-scale-256-pause-round-1 water-scale-256-pause 5/5; 600 warm-up + 600 measured frames
+DONE water-scale-256-pause 5: frame p50/p95=9.085/11.770 ms; CPU p50=6.010 ms; GPU p50=4.487 ms
+START water-scale-256-pause-round-2 water-scale-256-pause 1/5; 600 warm-up + 600 measured frames
+DONE water-scale-256-pause 1: frame p50/p95=9.135/11.910 ms; CPU p50=6.065 ms; GPU p50=4.491 ms
+START water-scale-256-pause-round-2 water-scale-256-pause 2/5; 600 warm-up + 600 measured frames
+DONE water-scale-256-pause 2: frame p50/p95=9.085/11.830 ms; CPU p50=6.055 ms; GPU p50=4.487 ms
+START water-scale-256-pause-round-2 water-scale-256-pause 3/5; 600 warm-up + 600 measured frames
+DONE water-scale-256-pause 3: frame p50/p95=9.020/11.800 ms; CPU p50=6.050 ms; GPU p50=4.494 ms
+START water-scale-256-pause-round-2 water-scale-256-pause 4/5; 600 warm-up + 600 measured frames
+DONE water-scale-256-pause 4: frame p50/p95=9.080/11.875 ms; CPU p50=6.110 ms; GPU p50=4.500 ms
+START water-scale-256-pause-round-2 water-scale-256-pause 5/5; 600 warm-up + 600 measured frames
+DONE water-scale-256-pause 5: frame p50/p95=9.390/12.260 ms; CPU p50=6.390 ms; GPU p50=4.476 ms
+CAPACITY water-loaded-pause 256 {"frame":{"p50":9.099999994039536,"p95":11.950000002980232,"p99":12.754999995231628},"p95WorstRound":11.975000001490116,"bottleneck":"CPU","repeatability":0.003298516617297163,"capped":false}
+START water-scale-512-pause-round-1 water-scale-512-pause 1/5; 600 warm-up + 600 measured frames
+DONE water-scale-512-pause 1: frame p50/p95=9.480/12.270 ms; CPU p50=7.255 ms; GPU p50=4.488 ms
+START water-scale-512-pause-round-1 water-scale-512-pause 2/5; 600 warm-up + 600 measured frames
+DONE water-scale-512-pause 2: frame p50/p95=9.375/12.390 ms; CPU p50=7.395 ms; GPU p50=4.483 ms
+START water-scale-512-pause-round-1 water-scale-512-pause 3/5; 600 warm-up + 600 measured frames
+DONE water-scale-512-pause 3: frame p50/p95=9.000/11.605 ms; CPU p50=7.660 ms; GPU p50=4.470 ms
+START water-scale-512-pause-round-1 water-scale-512-pause 4/5; 600 warm-up + 600 measured frames
+DONE water-scale-512-pause 4: frame p50/p95=8.210/10.715 ms; CPU p50=7.090 ms; GPU p50=4.438 ms
+START water-scale-512-pause-round-1 water-scale-512-pause 5/5; 600 warm-up + 600 measured frames
+DONE water-scale-512-pause 5: frame p50/p95=8.325/11.190 ms; CPU p50=7.265 ms; GPU p50=4.420 ms
+START water-scale-512-pause-round-2 water-scale-512-pause 1/5; 600 warm-up + 600 measured frames
+DONE water-scale-512-pause 1: frame p50/p95=8.370/9.885 ms; CPU p50=7.485 ms; GPU p50=4.467 ms
+START water-scale-512-pause-round-2 water-scale-512-pause 2/5; 600 warm-up + 600 measured frames
+DONE water-scale-512-pause 2: frame p50/p95=8.110/9.915 ms; CPU p50=7.230 ms; GPU p50=4.460 ms
+START water-scale-512-pause-round-2 water-scale-512-pause 3/5; 600 warm-up + 600 measured frames
+DONE water-scale-512-pause 3: frame p50/p95=8.835/11.060 ms; CPU p50=7.475 ms; GPU p50=4.642 ms
+START water-scale-512-pause-round-2 water-scale-512-pause 4/5; 600 warm-up + 600 measured frames
+DONE water-scale-512-pause 4: frame p50/p95=9.310/11.380 ms; CPU p50=7.595 ms; GPU p50=5.077 ms
+START water-scale-512-pause-round-2 water-scale-512-pause 5/5; 600 warm-up + 600 measured frames
+DONE water-scale-512-pause 5: frame p50/p95=8.520/10.135 ms; CPU p50=7.730 ms; GPU p50=4.481 ms
+CAPACITY water-loaded-pause 512 {"frame":{"p50":8.75,"p95":11.630000002682209,"p99":12.629999995231628},"p95WorstRound":12.009999997913837,"bottleneck":"CPU","repeatability":0.00856897977928132,"capped":false}
+START water-scale-1024-pause-round-1 water-scale-1024-pause 1/5; 600 warm-up + 600 measured frames
+DONE water-scale-1024-pause 1: frame p50/p95=9.365/10.580 ms; CPU p50=8.960 ms; GPU p50=5.075 ms
+START water-scale-1024-pause-round-1 water-scale-1024-pause 2/5; 600 warm-up + 600 measured frames
+DONE water-scale-1024-pause 2: frame p50/p95=8.680/9.610 ms; CPU p50=8.330 ms; GPU p50=4.639 ms
+START water-scale-1024-pause-round-1 water-scale-1024-pause 3/5; 600 warm-up + 600 measured frames
+DONE water-scale-1024-pause 3: frame p50/p95=8.580/9.190 ms; CPU p50=8.240 ms; GPU p50=4.640 ms
+START water-scale-1024-pause-round-1 water-scale-1024-pause 4/5; 600 warm-up + 600 measured frames
+DONE water-scale-1024-pause 4: frame p50/p95=8.740/9.715 ms; CPU p50=8.380 ms; GPU p50=4.921 ms
+START water-scale-1024-pause-round-1 water-scale-1024-pause 5/5; 600 warm-up + 600 measured frames
+DONE water-scale-1024-pause 5: frame p50/p95=8.820/9.615 ms; CPU p50=8.455 ms; GPU p50=4.660 ms
+START water-scale-1024-pause-round-2 water-scale-1024-pause 1/5; 600 warm-up + 600 measured frames
+DONE water-scale-1024-pause 1: frame p50/p95=8.635/9.265 ms; CPU p50=8.285 ms; GPU p50=4.636 ms
+START water-scale-1024-pause-round-2 water-scale-1024-pause 2/5; 600 warm-up + 600 measured frames
+DONE water-scale-1024-pause 2: frame p50/p95=8.830/9.710 ms; CPU p50=8.475 ms; GPU p50=4.838 ms
+START water-scale-1024-pause-round-2 water-scale-1024-pause 3/5; 600 warm-up + 600 measured frames
+DONE water-scale-1024-pause 3: frame p50/p95=8.780/9.930 ms; CPU p50=8.395 ms; GPU p50=4.851 ms
+START water-scale-1024-pause-round-2 water-scale-1024-pause 4/5; 600 warm-up + 600 measured frames
+DONE water-scale-1024-pause 4: frame p50/p95=8.825/9.670 ms; CPU p50=8.470 ms; GPU p50=4.843 ms
+START water-scale-1024-pause-round-2 water-scale-1024-pause 5/5; 600 warm-up + 600 measured frames
+DONE water-scale-1024-pause 5: frame p50/p95=8.780/9.665 ms; CPU p50=8.420 ms; GPU p50=4.846 ms
+CAPACITY water-loaded-pause 1024 {"frame":{"p50":8.784999996423721,"p95":9.859999999403954,"p99":11.065000005066395},"p95WorstRound":9.929999999701977,"bottleneck":"CPU","repeatability":0.0034129694192428133,"capped":false}
+START water-scale-2048-pause-round-1 water-scale-2048-pause 1/5; 600 warm-up + 600 measured frames
+DONE water-scale-2048-pause 1: frame p50/p95=11.785/12.815 ms; CPU p50=11.465 ms; GPU p50=5.866 ms
+START water-scale-2048-pause-round-1 water-scale-2048-pause 2/5; 600 warm-up + 600 measured frames
+DONE water-scale-2048-pause 2: frame p50/p95=11.660/12.615 ms; CPU p50=11.340 ms; GPU p50=5.910 ms
+START water-scale-2048-pause-round-1 water-scale-2048-pause 3/5; 600 warm-up + 600 measured frames
+DONE water-scale-2048-pause 3: frame p50/p95=12.345/13.210 ms; CPU p50=12.035 ms; GPU p50=6.247 ms
+START water-scale-2048-pause-round-1 water-scale-2048-pause 4/5; 600 warm-up + 600 measured frames
+DONE water-scale-2048-pause 4: frame p50/p95=12.525/14.045 ms; CPU p50=12.150 ms; GPU p50=5.923 ms
+START water-scale-2048-pause-round-1 water-scale-2048-pause 5/5; 600 warm-up + 600 measured frames
+DONE water-scale-2048-pause 5: frame p50/p95=12.790/15.510 ms; CPU p50=12.405 ms; GPU p50=6.623 ms
+START water-scale-2048-pause-round-2 water-scale-2048-pause 1/5; 600 warm-up + 600 measured frames
+DONE water-scale-2048-pause 1: frame p50/p95=15.045/17.150 ms; CPU p50=14.580 ms; GPU p50=7.569 ms
+START water-scale-2048-pause-round-2 water-scale-2048-pause 2/5; 600 warm-up + 600 measured frames
+DONE water-scale-2048-pause 2: frame p50/p95=11.780/12.845 ms; CPU p50=11.465 ms; GPU p50=5.900 ms
+START water-scale-2048-pause-round-2 water-scale-2048-pause 3/5; 600 warm-up + 600 measured frames
+DONE water-scale-2048-pause 3: frame p50/p95=12.760/14.230 ms; CPU p50=12.370 ms; GPU p50=6.626 ms
+START water-scale-2048-pause-round-2 water-scale-2048-pause 4/5; 600 warm-up + 600 measured frames
+DONE water-scale-2048-pause 4: frame p50/p95=11.870/12.735 ms; CPU p50=11.570 ms; GPU p50=5.898 ms
+START water-scale-2048-pause-round-2 water-scale-2048-pause 5/5; 600 warm-up + 600 measured frames
+DONE water-scale-2048-pause 5: frame p50/p95=11.645/12.550 ms; CPU p50=11.335 ms; GPU p50=6.235 ms
+CAPACITY water-loaded-pause 2048 {"frame":{"p50":12.255000002682209,"p95":15.294999994337559,"p99":16.759999997913837},"p95WorstRound":15.865000002086163,"bottleneck":"CPU","repeatability":0.004899959362787138,"capped":false}
+START water-scale-4096-pause-round-1 water-scale-4096-pause 1/5; 600 warm-up + 600 measured frames
+DONE water-scale-4096-pause 1: frame p50/p95=18.745/21.490 ms; CPU p50=18.360 ms; GPU p50=9.587 ms
+START water-scale-4096-pause-round-1 water-scale-4096-pause 2/5; 600 warm-up + 600 measured frames
+DONE water-scale-4096-pause 2: frame p50/p95=17.460/19.105 ms; CPU p50=17.155 ms; GPU p50=9.594 ms
+START water-scale-4096-pause-round-1 water-scale-4096-pause 3/5; 600 warm-up + 600 measured frames
+DONE water-scale-4096-pause 3: frame p50/p95=20.005/23.265 ms; CPU p50=19.595 ms; GPU p50=11.692 ms
+START water-scale-4096-pause-round-1 water-scale-4096-pause 4/5; 600 warm-up + 600 measured frames
+DONE water-scale-4096-pause 4: frame p50/p95=17.915/19.470 ms; CPU p50=17.595 ms; GPU p50=8.807 ms
+START water-scale-4096-pause-round-1 water-scale-4096-pause 5/5; 600 warm-up + 600 measured frames
+DONE water-scale-4096-pause 5: frame p50/p95=18.165/19.895 ms; CPU p50=17.830 ms; GPU p50=8.804 ms
+START water-scale-4096-pause-round-2 water-scale-4096-pause 1/5; 600 warm-up + 600 measured frames
+DONE water-scale-4096-pause 1: frame p50/p95=17.705/19.330 ms; CPU p50=17.395 ms; GPU p50=9.590 ms
+START water-scale-4096-pause-round-2 water-scale-4096-pause 2/5; 600 warm-up + 600 measured frames
+DONE water-scale-4096-pause 2: frame p50/p95=17.805/19.320 ms; CPU p50=17.480 ms; GPU p50=9.601 ms
+START water-scale-4096-pause-round-2 water-scale-4096-pause 3/5; 600 warm-up + 600 measured frames
+DONE water-scale-4096-pause 3: frame p50/p95=17.650/19.215 ms; CPU p50=17.325 ms; GPU p50=8.815 ms
+START water-scale-4096-pause-round-2 water-scale-4096-pause 4/5; 600 warm-up + 600 measured frames
+DONE water-scale-4096-pause 4: frame p50/p95=19.230/21.685 ms; CPU p50=18.845 ms; GPU p50=10.549 ms
+START water-scale-4096-pause-round-2 water-scale-4096-pause 5/5; 600 warm-up + 600 measured frames
+DONE water-scale-4096-pause 5: frame p50/p95=19.070/21.445 ms; CPU p50=18.680 ms; GPU p50=10.550 ms
+CAPACITY water-loaded-pause 4096 {"frame":{"p50":18.25,"p95":21.110000006854534,"p99":22.884999997913837},"p95WorstRound":21.510000005364418,"bottleneck":"CPU","repeatability":0.0019180703644725607,"capped":false}
+RESOURCE BOUND water-loaded-pause {"allowed":false,"load":8192,"previousLoad":4096,"previousPeakBytes":7072329728,"availableBytes":12450537472,"reserveBytes":4294967296,"projectedPeakBytes":14144659456,"reason":"Previous maximum renderer VmHWM scaled by count; reserve remains for system and other processes"}
+Capacity manifest /home/joao/orca/workspaces/ascii-engine/threadfin/.cache/capacity/collected/manifest.json

@@ -1,0 +1,1686 @@
+{
+  "protocol": {
+    "seed": 4242,
+    "dt": 0.016666666666666666,
+    "warmup": 600,
+    "frames": 600,
+    "runs": 5,
+    "rounds": 2,
+    "uncapped": true,
+    "rendererCpu": 6,
+    "extensions": false,
+    "freshProcess": true,
+    "queue": 2,
+    "capacity": "worst of two round frame p95; thresholds 16.7 and 33.3 ms",
+    "maximum": "largest measured passing load; no interpolation",
+    "safety": "Larger waters require the 4 GiB memory reserve below; stop at an FPS/resource bound or 8192 waters",
+    "observerControl": "After two preserved repeatability failures: collect remaining raw runs in Git-ignored .cache; direct Node 26.10.0 with its bin first in child PATH; non-login monitoring shells; no machine power/affinity/simulation/viewport/clock changes. Copy finished raw files to docs only after measurement.",
+    "initialSafety": "at most 512 loaded waters; report a resource/untested bound if no budget crossing",
+    "waterMemorySafety": {
+      "initialGuard": 512,
+      "maximumWaters": 8192,
+      "reserveBytes": 4294967296,
+      "rule": "Beyond 512, require previous measured maximum renderer VmHWM scaled by count to fit available memory minus the reserve; stop as resource-bound otherwise"
+    }
+  },
+  "source": "4264ce1316b22e69ea745a393d43c4627fe72cab",
+  "axes": {
+    "water-loaded-off": {
+      "label": "Loaded waters, pause off",
+      "points": [
+        {
+          "id": "water-scale-1-off",
+          "axis": "water-loaded-off",
+          "load": 1,
+          "files": [
+            "../phase-2/water-scale-1-round-1/water-scale-1-off.json",
+            "../phase-2/water-scale-1-round-2/water-scale-1-off.json"
+          ],
+          "reused": "Phase 2: same optimized core, 28 m bed, camera, 129 grid, CPU6/fresh/no-extensions protocol",
+          "frame": {
+            "p50": 7.969999998807907,
+            "p95": 10.725000001490116,
+            "p99": 11.924999997019768
+          },
+          "cpu": {
+            "p50": 4.6049999967217445,
+            "p95": 7.25,
+            "p99": 7.6900000013411045
+          },
+          "gpu": {
+            "p50": 4.444583,
+            "p95": 7.016718,
+            "p99": 7.416562
+          },
+          "capacityP95": 10.839999999850988,
+          "repeatability": 0.013178537396427298,
+          "bottleneck": "mixed",
+          "stable": true,
+          "capped": false,
+          "crossed30": false,
+          "hash": "a902d504",
+          "pointCountRange": [
+            0,
+            0
+          ]
+        },
+        {
+          "id": "water-scale-2-off",
+          "axis": "water-loaded-off",
+          "load": 2,
+          "files": [
+            "../phase-2/water-scale-2-round-1/water-scale-2-off.json",
+            "../phase-2/water-scale-2-round-2/water-scale-2-off.json"
+          ],
+          "reused": "Phase 2: same optimized core, 28 m bed, camera, 129 grid, CPU6/fresh/no-extensions protocol",
+          "frame": {
+            "p50": 10.339999999850988,
+            "p95": 13.190000001341105,
+            "p99": 17.260000001639128
+          },
+          "cpu": {
+            "p50": 9.945000000298023,
+            "p95": 12.519999999552965,
+            "p99": 16.775000002235174
+          },
+          "gpu": {
+            "p50": 4.820104,
+            "p95": 7.368072,
+            "p99": 8.082395
+          },
+          "capacityP95": 13.440000001341105,
+          "repeatability": 0.012572534108712037,
+          "bottleneck": "CPU",
+          "stable": true,
+          "capped": false,
+          "crossed30": false,
+          "hash": "301f5d49",
+          "pointCountRange": [
+            0,
+            0
+          ]
+        },
+        {
+          "id": "water-scale-4-off",
+          "axis": "water-loaded-off",
+          "load": 4,
+          "files": [
+            "../phase-2/water-scale-4-round-1/water-scale-4-off.json",
+            "../phase-2/water-scale-4-round-2/water-scale-4-off.json"
+          ],
+          "reused": "Phase 2: same optimized core, 28 m bed, camera, 129 grid, CPU6/fresh/no-extensions protocol",
+          "frame": {
+            "p50": 19.644999999552965,
+            "p95": 23.75,
+            "p99": 31.440000001341105
+          },
+          "cpu": {
+            "p50": 19.29500000178814,
+            "p95": 23.350000001490116,
+            "p99": 30.96499999985099
+          },
+          "gpu": {
+            "p50": 8.124375,
+            "p95": 11.981093,
+            "p99": 13.578906
+          },
+          "capacityP95": 24.375,
+          "repeatability": 0.024194575397066372,
+          "bottleneck": "CPU",
+          "stable": true,
+          "capped": false,
+          "crossed30": false,
+          "hash": "bfcc17e1",
+          "pointCountRange": [
+            0,
+            0
+          ]
+        },
+        {
+          "id": "water-scale-8-off",
+          "axis": "water-loaded-off",
+          "load": 8,
+          "files": [
+            "../phase-2/water-scale-8-round-1/water-scale-8-off.json",
+            "../phase-2/water-scale-8-round-2/water-scale-8-off.json"
+          ],
+          "reused": "Phase 2: same optimized core, 28 m bed, camera, 129 grid, CPU6/fresh/no-extensions protocol",
+          "frame": {
+            "p50": 37.01000000163913,
+            "p95": 42.99000000208616,
+            "p99": 58.314999997615814
+          },
+          "cpu": {
+            "p50": 36.66000000014901,
+            "p95": 42.62000000104308,
+            "p99": 57.85999999940395
+          },
+          "gpu": {
+            "p50": 9.579791,
+            "p95": 14.914843,
+            "p99": 18.134687
+          },
+          "capacityP95": 43.50499999895692,
+          "repeatability": 0.010952606347153953,
+          "bottleneck": "CPU",
+          "stable": true,
+          "capped": false,
+          "crossed30": true,
+          "hash": "505fa661",
+          "pointCountRange": [
+            0,
+            0
+          ]
+        }
+      ],
+      "status": "both-budgets-crossed",
+      "capacity60": {
+        "budget": 16.7,
+        "maximum": 2,
+        "frameP95": 13.440000001341105,
+        "nextFail": 4,
+        "lowerBound": false
+      },
+      "capacity30": {
+        "budget": 33.3,
+        "maximum": 4,
+        "frameP95": 24.375,
+        "nextFail": 8,
+        "lowerBound": false
+      }
+    },
+    "water-grid": {
+      "label": "One visible water: geometry grid width",
+      "points": [
+        {
+          "id": "water-grid-65",
+          "axis": "water-grid",
+          "load": 65,
+          "files": [
+            "water-grid-65-round-1/water-grid-65.json",
+            "water-grid-65-round-2/water-grid-65.json"
+          ],
+          "frame": {
+            "p50": 7.339999999850988,
+            "p95": 10.175000000745058,
+            "p99": 11.609999999403954
+          },
+          "cpu": {
+            "p50": 1.4100000001490116,
+            "p95": 2.274999998509884,
+            "p99": 2.5599999986588955
+          },
+          "gpu": {
+            "p50": 4.035729,
+            "p95": 5.379739,
+            "p99": 7.316145
+          },
+          "capacityP95": 10.405000001192093,
+          "repeatability": 0.0027247955787869024,
+          "bottleneck": "GPU",
+          "stable": true,
+          "capped": false,
+          "crossed30": false,
+          "hash": "3e2182fd",
+          "pointCountRange": [
+            0,
+            0
+          ]
+        },
+        {
+          "id": "water-grid-129",
+          "axis": "water-grid",
+          "load": 129,
+          "files": [
+            "../phase-2/water-scale-1-round-1/water-scale-1-off.json",
+            "../phase-2/water-scale-1-round-2/water-scale-1-off.json"
+          ],
+          "reused": "Phase 2: same optimized core, 28 m bed, camera, 129 grid, CPU6/fresh/no-extensions protocol",
+          "frame": {
+            "p50": 7.969999998807907,
+            "p95": 10.725000001490116,
+            "p99": 11.924999997019768
+          },
+          "cpu": {
+            "p50": 4.6049999967217445,
+            "p95": 7.25,
+            "p99": 7.6900000013411045
+          },
+          "gpu": {
+            "p50": 4.444583,
+            "p95": 7.016718,
+            "p99": 7.416562
+          },
+          "capacityP95": 10.839999999850988,
+          "repeatability": 0.013178537396427298,
+          "bottleneck": "mixed",
+          "stable": true,
+          "capped": false,
+          "crossed30": false,
+          "hash": "a902d504",
+          "pointCountRange": [
+            0,
+            0
+          ]
+        },
+        {
+          "id": "water-grid-257",
+          "axis": "water-grid",
+          "load": 257,
+          "files": [
+            "water-grid-257-round-1/water-grid-257.json",
+            "water-grid-257-round-2/water-grid-257.json"
+          ],
+          "frame": {
+            "p50": 14.319999996572733,
+            "p95": 17.899999998509884,
+            "p99": 22.37000000104308
+          },
+          "cpu": {
+            "p50": 13.945000000298023,
+            "p95": 17.449999999254942,
+            "p99": 21.969999998807907
+          },
+          "gpu": {
+            "p50": 6.590625,
+            "p95": 8.529583,
+            "p99": 10.243177
+          },
+          "capacityP95": 18.109999999403954,
+          "repeatability": 0.0097731239513667,
+          "bottleneck": "CPU",
+          "stable": true,
+          "capped": false,
+          "crossed30": false,
+          "hash": "20b32c3e",
+          "pointCountRange": [
+            0,
+            0
+          ]
+        },
+        {
+          "id": "water-grid-513",
+          "axis": "water-grid",
+          "load": 513,
+          "files": [
+            "water-grid-513-round-1/water-grid-513.json",
+            "water-grid-513-round-2/water-grid-513.json"
+          ],
+          "frame": {
+            "p50": 48.730000000447035,
+            "p95": 55.78000000119209,
+            "p99": 63.46499999985099
+          },
+          "cpu": {
+            "p50": 48.389999996870756,
+            "p95": 55.309999998658895,
+            "p99": 62.96000000089407
+          },
+          "gpu": {
+            "p50": 13.984062,
+            "p95": 20.920416,
+            "p99": 25.935625
+          },
+          "capacityP95": 57.60999999940395,
+          "repeatability": 0.0286361763622095,
+          "bottleneck": "CPU",
+          "stable": true,
+          "capped": false,
+          "crossed30": true,
+          "hash": "be4d7960",
+          "pointCountRange": [
+            0,
+            0
+          ]
+        }
+      ],
+      "status": "both-budgets-crossed",
+      "capacity60": {
+        "budget": 16.7,
+        "maximum": 129,
+        "frameP95": 10.839999999850988,
+        "nextFail": 257,
+        "lowerBound": false
+      },
+      "capacity30": {
+        "budget": 33.3,
+        "maximum": 257,
+        "frameP95": 18.109999999403954,
+        "nextFail": 513,
+        "lowerBound": false
+      }
+    },
+    "water-visible": {
+      "label": "Simultaneously visible waters",
+      "points": [
+        {
+          "id": "water-visible-1",
+          "axis": "water-visible",
+          "load": 1,
+          "files": [
+            "../phase-2/water-scale-1-round-1/water-scale-1-off.json",
+            "../phase-2/water-scale-1-round-2/water-scale-1-off.json"
+          ],
+          "reused": "Phase 2: same optimized core, 28 m bed, camera, 129 grid, CPU6/fresh/no-extensions protocol",
+          "frame": {
+            "p50": 7.969999998807907,
+            "p95": 10.725000001490116,
+            "p99": 11.924999997019768
+          },
+          "cpu": {
+            "p50": 4.6049999967217445,
+            "p95": 7.25,
+            "p99": 7.6900000013411045
+          },
+          "gpu": {
+            "p50": 4.444583,
+            "p95": 7.016718,
+            "p99": 7.416562
+          },
+          "capacityP95": 10.839999999850988,
+          "repeatability": 0.013178537396427298,
+          "bottleneck": "mixed",
+          "stable": true,
+          "capped": false,
+          "crossed30": false,
+          "hash": "a902d504",
+          "pointCountRange": [
+            0,
+            0
+          ]
+        },
+        {
+          "id": "water-visible-2",
+          "axis": "water-visible",
+          "load": 2,
+          "files": [
+            "water-visible-2-round-1/water-visible-2.json",
+            "water-visible-2-round-2/water-visible-2.json"
+          ],
+          "frame": {
+            "p50": 10.28999999910593,
+            "p95": 11.780000001192093,
+            "p99": 13.934999998658895
+          },
+          "cpu": {
+            "p50": 9.984999999403954,
+            "p95": 11.359999999403954,
+            "p99": 13.609999999403954
+          },
+          "gpu": {
+            "p50": 5.549635,
+            "p95": 6.212812,
+            "p99": 6.585312
+          },
+          "capacityP95": 12.385000001639128,
+          "repeatability": 0.040816326707933136,
+          "bottleneck": "CPU",
+          "stable": true,
+          "capped": false,
+          "crossed30": false,
+          "hash": "301f5d49",
+          "pointCountRange": [
+            0,
+            0
+          ]
+        },
+        {
+          "id": "water-visible-4",
+          "axis": "water-visible",
+          "load": 4,
+          "files": [
+            "water-visible-4-round-1/water-visible-4.json",
+            "water-visible-4-round-2/water-visible-4.json"
+          ],
+          "frame": {
+            "p50": 20.179999999701977,
+            "p95": 23.29500000178814,
+            "p99": 26.225000001490116
+          },
+          "cpu": {
+            "p50": 19.84000000357628,
+            "p95": 22.92000000178814,
+            "p99": 25.875
+          },
+          "gpu": {
+            "p50": 10.404791,
+            "p95": 12.362135,
+            "p99": 13.615833
+          },
+          "capacityP95": 23.515000000596046,
+          "repeatability": 0.0027258082505799636,
+          "bottleneck": "CPU",
+          "stable": true,
+          "capped": false,
+          "crossed30": false,
+          "hash": "bfcc17e1",
+          "pointCountRange": [
+            0,
+            0
+          ]
+        },
+        {
+          "id": "water-visible-8",
+          "axis": "water-visible",
+          "load": 8,
+          "files": [
+            "water-visible-8-round-1/water-visible-8.json",
+            "water-visible-8-round-2/water-visible-8.json"
+          ],
+          "frame": {
+            "p50": 40.01500000059605,
+            "p95": 47.17500000074506,
+            "p99": 53.559999998658895
+          },
+          "cpu": {
+            "p50": 39.57500000298023,
+            "p95": 46.685000002384186,
+            "p99": 52.99500000104308
+          },
+          "gpu": {
+            "p50": 9.524895,
+            "p95": 14.279895,
+            "p99": 23.119686
+          },
+          "capacityP95": 48.69500000029802,
+          "repeatability": 0.03132769770308605,
+          "bottleneck": "CPU",
+          "stable": true,
+          "capped": false,
+          "crossed30": true,
+          "hash": "505fa661",
+          "pointCountRange": [
+            0,
+            0
+          ]
+        }
+      ],
+      "status": "both-budgets-crossed",
+      "capacity60": {
+        "budget": 16.7,
+        "maximum": 2,
+        "frameP95": 12.385000001639128,
+        "nextFail": 4,
+        "lowerBound": false
+      },
+      "capacity30": {
+        "budget": 33.3,
+        "maximum": 4,
+        "frameP95": 23.515000000596046,
+        "nextFail": 8,
+        "lowerBound": false
+      }
+    },
+    "particles": {
+      "label": "Simultaneous effect groups (3 effects each)",
+      "points": [
+        {
+          "id": "particles-1",
+          "axis": "particles",
+          "load": 1,
+          "files": [
+            "particles-1-round-1/particles-1.json",
+            "particles-1-round-2/particles-1.json"
+          ],
+          "frame": {
+            "p50": 9.260000001639128,
+            "p95": 11.620000001043081,
+            "p99": 12.820000000298023
+          },
+          "cpu": {
+            "p50": 0.44999999925494194,
+            "p95": 0.7400000020861626,
+            "p99": 0.8550000004470348
+          },
+          "gpu": {
+            "p50": 4.609843,
+            "p95": 7.862916,
+            "p99": 8.031145
+          },
+          "capacityP95": 11.660000000149012,
+          "repeatability": 0.006482982430140256,
+          "bottleneck": "GPU",
+          "stable": true,
+          "capped": false,
+          "crossed30": false,
+          "hash": "f6196753",
+          "pointCountRange": [
+            135,
+            241
+          ]
+        },
+        {
+          "id": "particles-2",
+          "axis": "particles",
+          "load": 2,
+          "files": [
+            "particles-2-round-1/particles-2.json",
+            "particles-2-round-2/particles-2.json"
+          ],
+          "frame": {
+            "p50": 10.600000001490116,
+            "p95": 13.109999999403954,
+            "p99": 14.094999998807907
+          },
+          "cpu": {
+            "p50": 0.5450000017881393,
+            "p95": 0.8850000016391277,
+            "p99": 1.0450000017881393
+          },
+          "gpu": {
+            "p50": 5.660416,
+            "p95": 8.959322,
+            "p99": 9.183697
+          },
+          "capacityP95": 13.205000001937151,
+          "repeatability": 0.0070738032773487785,
+          "bottleneck": "GPU",
+          "stable": true,
+          "capped": false,
+          "crossed30": false,
+          "hash": "7d10605c",
+          "pointCountRange": [
+            278,
+            476
+          ]
+        },
+        {
+          "id": "particles-4",
+          "axis": "particles",
+          "load": 4,
+          "files": [
+            "particles-4-round-1/particles-4.json",
+            "particles-4-round-2/particles-4.json"
+          ],
+          "frame": {
+            "p50": 13.759999997913837,
+            "p95": 15.719999998807907,
+            "p99": 16.679999999701977
+          },
+          "cpu": {
+            "p50": 0.6350000016391277,
+            "p95": 1.0850000008940697,
+            "p99": 1.2549999989569187
+          },
+          "gpu": {
+            "p50": 10.106666,
+            "p95": 11.444739,
+            "p99": 12.199791
+          },
+          "capacityP95": 15.794999998062849,
+          "repeatability": 0.001453488339628637,
+          "bottleneck": "GPU",
+          "stable": true,
+          "capped": false,
+          "crossed30": false,
+          "hash": "ef2269d5",
+          "pointCountRange": [
+            556,
+            955
+          ]
+        },
+        {
+          "id": "particles-8",
+          "axis": "particles",
+          "load": 8,
+          "files": [
+            "particles-8-round-1/particles-8.json",
+            "particles-8-round-2/particles-8.json"
+          ],
+          "frame": {
+            "p50": 17.440000001341105,
+            "p95": 19.109999999403954,
+            "p99": 19.990000002086163
+          },
+          "cpu": {
+            "p50": 0.8499999977648258,
+            "p95": 1.4649999998509884,
+            "p99": 1.625
+          },
+          "gpu": {
+            "p50": 13.435312,
+            "p95": 14.611354,
+            "p99": 15.357187
+          },
+          "capacityP95": 19.12000000104308,
+          "repeatability": 0.0037265301039444104,
+          "bottleneck": "GPU",
+          "stable": true,
+          "capped": false,
+          "crossed30": false,
+          "hash": "b595c690",
+          "pointCountRange": [
+            1104,
+            1903
+          ]
+        },
+        {
+          "id": "particles-16",
+          "axis": "particles",
+          "load": 16,
+          "files": [
+            "particles-16-round-1/particles-16.json",
+            "particles-16-round-2/particles-16.json"
+          ],
+          "frame": {
+            "p50": 23.99499999731779,
+            "p95": 25.280000001192093,
+            "p99": 25.969999998807907
+          },
+          "cpu": {
+            "p50": 1.1649999991059303,
+            "p95": 2.074999999254942,
+            "p99": 2.3599999994039536
+          },
+          "gpu": {
+            "p50": 20.234375,
+            "p95": 21.000364,
+            "p99": 21.299375
+          },
+          "capacityP95": 25.33500000089407,
+          "repeatability": 0.0014587892113020141,
+          "bottleneck": "GPU",
+          "stable": true,
+          "capped": false,
+          "crossed30": false,
+          "hash": "8d1735ad",
+          "pointCountRange": [
+            2236,
+            3810
+          ]
+        },
+        {
+          "id": "particles-24",
+          "axis": "particles",
+          "load": 24,
+          "files": [
+            "particles-24-round-1/particles-24.json",
+            "particles-24-round-2/particles-24.json"
+          ],
+          "frame": {
+            "p50": 31,
+            "p95": 32.48499999940395,
+            "p99": 33.399999998509884
+          },
+          "cpu": {
+            "p50": 1.625,
+            "p95": 2.8599999994039536,
+            "p99": 3.1799999997019768
+          },
+          "gpu": {
+            "p50": 27.245781,
+            "p95": 27.896875,
+            "p99": 28.30026
+          },
+          "capacityP95": 32.7200000025332,
+          "repeatability": 0.007741935551166534,
+          "bottleneck": "GPU",
+          "stable": true,
+          "capped": false,
+          "crossed30": false,
+          "hash": "7dc3dd2",
+          "pointCountRange": [
+            3331,
+            5689
+          ]
+        },
+        {
+          "id": "particles-32",
+          "axis": "particles",
+          "load": 32,
+          "files": [
+            "particles-32-round-1/particles-32.json",
+            "particles-32-round-2/particles-32.json"
+          ],
+          "frame": {
+            "p50": 41.58500000089407,
+            "p95": 42.71499999985099,
+            "p99": 43.36999999731779
+          },
+          "cpu": {
+            "p50": 1.9600000008940697,
+            "p95": 2.719999998807907,
+            "p99": 3.6200000010430813
+          },
+          "gpu": {
+            "p50": 38.254791,
+            "p95": 39.174166,
+            "p99": 39.460989
+          },
+          "capacityP95": 42.73999999836087,
+          "repeatability": 0.0010820558596320036,
+          "bottleneck": "GPU",
+          "stable": true,
+          "capped": false,
+          "crossed30": true,
+          "hash": "7b365326",
+          "pointCountRange": [
+            4433,
+            7606
+          ]
+        }
+      ],
+      "status": "both-budgets-crossed",
+      "capacity60": {
+        "budget": 16.7,
+        "maximum": 4,
+        "frameP95": 15.794999998062849,
+        "nextFail": 8,
+        "lowerBound": false
+      },
+      "capacity30": {
+        "budget": 33.3,
+        "maximum": 24,
+        "frameP95": 32.7200000025332,
+        "nextFail": 32,
+        "lowerBound": false
+      }
+    },
+    "skinning": {
+      "label": "Visible skinned creatures",
+      "points": [
+        {
+          "id": "skinning-1",
+          "axis": "skinning",
+          "load": 1,
+          "files": [
+            "skinning-1-round-1/skinning-1.json",
+            "skinning-1-round-2/skinning-1.json"
+          ],
+          "frame": {
+            "p50": 7.714999999850988,
+            "p95": 10.445000000298023,
+            "p99": 11.859999999403954
+          },
+          "cpu": {
+            "p50": 0.4100000001490116,
+            "p95": 0.6500000022351742,
+            "p99": 0.7650000005960464
+          },
+          "gpu": {
+            "p50": 3.500833,
+            "p95": 6.740625,
+            "p99": 6.901406
+          },
+          "capacityP95": 10.640000000596046,
+          "repeatability": 0.010382868518673247,
+          "bottleneck": "GPU",
+          "stable": true,
+          "capped": false,
+          "crossed30": false,
+          "hash": "d2db9db",
+          "pointCountRange": [
+            1094,
+            1094
+          ]
+        },
+        {
+          "id": "skinning-2",
+          "axis": "skinning",
+          "load": 2,
+          "files": [
+            "skinning-2-round-1/skinning-2.json",
+            "skinning-2-round-2/skinning-2.json"
+          ],
+          "frame": {
+            "p50": 7.774999998509884,
+            "p95": 10.614999998360872,
+            "p99": 12.03999999910593
+          },
+          "cpu": {
+            "p50": 0.4599999971687794,
+            "p95": 0.7100000008940697,
+            "p99": 0.8550000004470348
+          },
+          "gpu": {
+            "p50": 3.51677,
+            "p95": 6.799218,
+            "p99": 6.924895
+          },
+          "capacityP95": 10.635000001639128,
+          "repeatability": 0.007726980345084372,
+          "bottleneck": "GPU",
+          "stable": true,
+          "capped": false,
+          "crossed30": false,
+          "hash": "f2e2b380",
+          "pointCountRange": [
+            2188,
+            2188
+          ]
+        },
+        {
+          "id": "skinning-4",
+          "axis": "skinning",
+          "load": 4,
+          "files": [
+            "skinning-4-round-1/skinning-4.json",
+            "skinning-4-round-2/skinning-4.json"
+          ],
+          "frame": {
+            "p50": 8.054999999701977,
+            "p95": 10.894999999552965,
+            "p99": 11.910000000149012
+          },
+          "cpu": {
+            "p50": 0.6549999974668026,
+            "p95": 1.055000003427267,
+            "p99": 1.2750000022351742
+          },
+          "gpu": {
+            "p50": 3.518593,
+            "p95": 6.850104,
+            "p99": 7.074739
+          },
+          "capacityP95": 11.065000001341105,
+          "repeatability": 0.01926063963248302,
+          "bottleneck": "GPU",
+          "stable": true,
+          "capped": false,
+          "crossed30": false,
+          "hash": "60c73f82",
+          "pointCountRange": [
+            4708,
+            4708
+          ]
+        },
+        {
+          "id": "skinning-8",
+          "axis": "skinning",
+          "load": 8,
+          "files": [
+            "skinning-8-round-1/skinning-8.json",
+            "skinning-8-round-2/skinning-8.json"
+          ],
+          "frame": {
+            "p50": 8.234999999403954,
+            "p95": 11.04000000283122,
+            "p99": 12.099999997764826
+          },
+          "cpu": {
+            "p50": 0.8299999982118607,
+            "p95": 1.4299999997019768,
+            "p99": 1.675000000745058
+          },
+          "gpu": {
+            "p50": 3.597447,
+            "p95": 6.923802,
+            "p99": 7.146041
+          },
+          "capacityP95": 11.054999999701977,
+          "repeatability": 0.0024286581117048,
+          "bottleneck": "GPU",
+          "stable": true,
+          "capped": false,
+          "crossed30": false,
+          "hash": "e6eaa517",
+          "pointCountRange": [
+            9173,
+            9173
+          ]
+        },
+        {
+          "id": "skinning-16",
+          "axis": "skinning",
+          "load": 16,
+          "files": [
+            "skinning-16-round-1/skinning-16.json",
+            "skinning-16-round-2/skinning-16.json"
+          ],
+          "frame": {
+            "p50": 8.635000001639128,
+            "p95": 11.344999998807907,
+            "p99": 12.320000000298023
+          },
+          "cpu": {
+            "p50": 1.2149999998509884,
+            "p95": 2.0599999986588955,
+            "p99": 2.4599999971687794
+          },
+          "gpu": {
+            "p50": 3.768125,
+            "p95": 7.075104,
+            "p99": 7.20375
+          },
+          "capacityP95": 11.529999997466803,
+          "repeatability": 0.002314814331747121,
+          "bottleneck": "GPU",
+          "stable": true,
+          "capped": false,
+          "crossed30": false,
+          "hash": "9c18f5c9",
+          "pointCountRange": [
+            18179,
+            18179
+          ]
+        },
+        {
+          "id": "skinning-32",
+          "axis": "skinning",
+          "load": 32,
+          "files": [
+            "skinning-32-round-1/skinning-32.json",
+            "skinning-32-round-2/skinning-32.json"
+          ],
+          "frame": {
+            "p50": 9.054999999701977,
+            "p95": 11.905000001192093,
+            "p99": 12.880000002682209
+          },
+          "cpu": {
+            "p50": 2.060000002384186,
+            "p95": 3.540000006556511,
+            "p99": 4.245000004768372
+          },
+          "gpu": {
+            "p50": 3.585104,
+            "p95": 6.942395,
+            "p99": 7.077447
+          },
+          "capacityP95": 12.060000002384186,
+          "repeatability": 0.003313086824194398,
+          "bottleneck": "GPU",
+          "stable": true,
+          "capped": false,
+          "crossed30": false,
+          "hash": "c82f3fc3",
+          "pointCountRange": [
+            36503,
+            36503
+          ]
+        },
+        {
+          "id": "skinning-64",
+          "axis": "skinning",
+          "load": 64,
+          "files": [
+            "skinning-64-round-1/skinning-64.json",
+            "skinning-64-round-2/skinning-64.json"
+          ],
+          "frame": {
+            "p50": 10.125,
+            "p95": 13.200000002980232,
+            "p99": 14.494999997317791
+          },
+          "cpu": {
+            "p50": 3.844999998807907,
+            "p95": 6.5150000005960464,
+            "p99": 7.574999995529652
+          },
+          "gpu": {
+            "p50": 4.036927,
+            "p95": 7.118541,
+            "p99": 7.797552
+          },
+          "capacityP95": 13.32999999821186,
+          "repeatability": 0.024679170046906396,
+          "bottleneck": "mixed",
+          "stable": true,
+          "capped": false,
+          "crossed30": false,
+          "hash": "18b6de7e",
+          "pointCountRange": [
+            72325,
+            72325
+          ]
+        },
+        {
+          "id": "skinning-128",
+          "axis": "skinning",
+          "load": 128,
+          "files": [
+            "skinning-128-round-1/skinning-128.json",
+            "skinning-128-round-2/skinning-128.json"
+          ],
+          "frame": {
+            "p50": 11.979999996721745,
+            "p95": 14.900000005960464,
+            "p99": 16.600000001490116
+          },
+          "cpu": {
+            "p50": 7.590000003576279,
+            "p95": 11.784999996423721,
+            "p99": 13.304999999701977
+          },
+          "gpu": {
+            "p50": 5.971979,
+            "p95": 8.565677,
+            "p99": 9.207395
+          },
+          "capacityP95": 15,
+          "repeatability": 0.0054291087964573655,
+          "bottleneck": "CPU",
+          "stable": true,
+          "capped": false,
+          "crossed30": false,
+          "hash": "cad65aca",
+          "pointCountRange": [
+            144670,
+            144670
+          ]
+        },
+        {
+          "id": "skinning-256",
+          "axis": "skinning",
+          "load": 256,
+          "files": [
+            "skinning-256-round-1/skinning-256.json",
+            "skinning-256-round-2/skinning-256.json"
+          ],
+          "frame": {
+            "p50": 16.935000002384186,
+            "p95": 22.74499999731779,
+            "p99": 25.654999993741512
+          },
+          "cpu": {
+            "p50": 15.769999995827675,
+            "p95": 19.864999994635582,
+            "p99": 24.375
+          },
+          "gpu": {
+            "p50": 9.882395,
+            "p95": 14.097604,
+            "p99": 15.817187
+          },
+          "capacityP95": 23.024999998509884,
+          "repeatability": 0.007079646297774194,
+          "bottleneck": "CPU",
+          "stable": true,
+          "capped": false,
+          "crossed30": false,
+          "hash": "b698cecc",
+          "pointCountRange": [
+            286366,
+            286366
+          ]
+        },
+        {
+          "id": "skinning-512",
+          "axis": "skinning",
+          "load": 512,
+          "files": [
+            "skinning-512-round-1/skinning-512.json",
+            "skinning-512-round-2/skinning-512.json"
+          ],
+          "frame": {
+            "p50": 29.885000005364418,
+            "p95": 34.39000000059605,
+            "p99": 39.53999999910593
+          },
+          "cpu": {
+            "p50": 29.484999999403954,
+            "p95": 33.78999999910593,
+            "p99": 39.00500000268221
+          },
+          "gpu": {
+            "p50": 16.026927,
+            "p95": 24.47776,
+            "p99": 27.242864
+          },
+          "capacityP95": 35.3399999961257,
+          "repeatability": 0.04496059739654358,
+          "bottleneck": "CPU",
+          "stable": true,
+          "capped": false,
+          "crossed30": true,
+          "hash": "bac416f6",
+          "pointCountRange": [
+            571751,
+            571751
+          ]
+        }
+      ],
+      "status": "both-budgets-crossed",
+      "capacity60": {
+        "budget": 16.7,
+        "maximum": 128,
+        "frameP95": 15,
+        "nextFail": 256,
+        "lowerBound": false
+      },
+      "capacity30": {
+        "budget": 33.3,
+        "maximum": 256,
+        "frameP95": 23.024999998509884,
+        "nextFail": 512,
+        "lowerBound": false
+      }
+    },
+    "water-loaded-pause": {
+      "label": "Loaded waters, pause on",
+      "points": [
+        {
+          "id": "water-scale-1-pause",
+          "axis": "water-loaded-pause",
+          "load": 1,
+          "files": [
+            "../phase-2/water-scale-1-round-1/water-scale-1-pause.json",
+            "../phase-2/water-scale-1-round-2/water-scale-1-pause.json"
+          ],
+          "reused": "Phase 2: same optimized core, 28 m bed, camera, 129 grid, CPU6/fresh/no-extensions protocol",
+          "frame": {
+            "p50": 7.980000000447035,
+            "p95": 10.644999999552965,
+            "p99": 11.619999997317791
+          },
+          "cpu": {
+            "p50": 4.649999998509884,
+            "p95": 7.459999997168779,
+            "p99": 7.919999998062849
+          },
+          "gpu": {
+            "p50": 4.444375,
+            "p95": 7.061979,
+            "p99": 7.351979
+          },
+          "capacityP95": 10.745000001043081,
+          "repeatability": 0.015028177961683984,
+          "bottleneck": "mixed",
+          "stable": true,
+          "capped": false,
+          "crossed30": false,
+          "hash": "a902d504",
+          "pointCountRange": [
+            0,
+            0
+          ]
+        },
+        {
+          "id": "water-scale-2-pause",
+          "axis": "water-loaded-pause",
+          "load": 2,
+          "files": [
+            "../phase-2/water-scale-2-round-1/water-scale-2-pause.json",
+            "../phase-2/water-scale-2-round-2/water-scale-2-pause.json"
+          ],
+          "reused": "Phase 2: same optimized core, 28 m bed, camera, 129 grid, CPU6/fresh/no-extensions protocol",
+          "frame": {
+            "p50": 8.054999999701977,
+            "p95": 10.53999999910593,
+            "p99": 11.705000001937151
+          },
+          "cpu": {
+            "p50": 5.245000001043081,
+            "p95": 8.144999999552965,
+            "p99": 8.800000000745058
+          },
+          "gpu": {
+            "p50": 4.438437,
+            "p95": 7.044114,
+            "p99": 7.380468
+          },
+          "capacityP95": 10.824999999254942,
+          "repeatability": 0.008690254537630431,
+          "bottleneck": "mixed",
+          "stable": true,
+          "capped": false,
+          "crossed30": false,
+          "hash": "b5bbd7e3",
+          "pointCountRange": [
+            0,
+            0
+          ]
+        },
+        {
+          "id": "water-scale-4-pause",
+          "axis": "water-loaded-pause",
+          "load": 4,
+          "files": [
+            "../phase-2/water-scale-4-round-1/water-scale-4-pause.json",
+            "../phase-2/water-scale-4-round-2/water-scale-4-pause.json"
+          ],
+          "reused": "Phase 2: same optimized core, 28 m bed, camera, 129 grid, CPU6/fresh/no-extensions protocol",
+          "frame": {
+            "p50": 8.17000000178814,
+            "p95": 11.394999999552965,
+            "p99": 13.315000001341105
+          },
+          "cpu": {
+            "p50": 5.3900000005960464,
+            "p95": 8.410000000149012,
+            "p99": 9.769999999552965
+          },
+          "gpu": {
+            "p50": 4.437916,
+            "p95": 7.145104,
+            "p99": 7.753802
+          },
+          "capacityP95": 11.855000000447035,
+          "repeatability": 0.0012239899524661894,
+          "bottleneck": "CPU",
+          "stable": true,
+          "capped": false,
+          "crossed30": false,
+          "hash": "1b9f50e7",
+          "pointCountRange": [
+            0,
+            0
+          ]
+        },
+        {
+          "id": "water-scale-8-pause",
+          "axis": "water-loaded-pause",
+          "load": 8,
+          "files": [
+            "../phase-2/water-scale-8-round-1/water-scale-8-pause.json",
+            "../phase-2/water-scale-8-round-2/water-scale-8-pause.json"
+          ],
+          "reused": "Phase 2: same optimized core, 28 m bed, camera, 129 grid, CPU6/fresh/no-extensions protocol",
+          "frame": {
+            "p50": 7.915000002831221,
+            "p95": 10.620000001043081,
+            "p99": 11.990000002086163
+          },
+          "cpu": {
+            "p50": 5.129999998956919,
+            "p95": 7.804999999701977,
+            "p99": 8.640000000596046
+          },
+          "gpu": {
+            "p50": 4.433958,
+            "p95": 6.682604,
+            "p99": 7.698802
+          },
+          "capacityP95": 10.714999999850988,
+          "repeatability": 0.007575757406497466,
+          "bottleneck": "mixed",
+          "stable": true,
+          "capped": false,
+          "crossed30": false,
+          "hash": "efb6945f",
+          "pointCountRange": [
+            0,
+            0
+          ]
+        },
+        {
+          "id": "water-scale-16-pause",
+          "axis": "water-loaded-pause",
+          "load": 16,
+          "files": [
+            "water-scale-16-pause-round-1/water-scale-16-pause.json",
+            "water-scale-16-pause-round-2/water-scale-16-pause.json"
+          ],
+          "frame": {
+            "p50": 9.179999999701977,
+            "p95": 12.16499999910593,
+            "p99": 13.17000000178814
+          },
+          "cpu": {
+            "p50": 5.575000002980232,
+            "p95": 8.83500000089407,
+            "p99": 9.390000000596046
+          },
+          "gpu": {
+            "p50": 4.493593,
+            "p95": 7.945781,
+            "p99": 8.165989
+          },
+          "capacityP95": 12.344999998807907,
+          "repeatability": 0.021282401129123395,
+          "bottleneck": "CPU",
+          "stable": true,
+          "capped": false,
+          "crossed30": false,
+          "hash": "b10699ef",
+          "pointCountRange": [
+            0,
+            0
+          ]
+        },
+        {
+          "id": "water-scale-32-pause",
+          "axis": "water-loaded-pause",
+          "load": 32,
+          "files": [
+            "water-scale-32-pause-round-1/water-scale-32-pause.json",
+            "water-scale-32-pause-round-2/water-scale-32-pause.json"
+          ],
+          "frame": {
+            "p50": 9.21000000089407,
+            "p95": 12.280000001192093,
+            "p99": 13.274999998509884
+          },
+          "cpu": {
+            "p50": 5.600000001490116,
+            "p95": 9.04500000178814,
+            "p99": 9.660000003874302
+          },
+          "gpu": {
+            "p50": 4.491406,
+            "p95": 7.916875,
+            "p99": 8.144062
+          },
+          "capacityP95": 12.484999999403954,
+          "repeatability": 0.03040173736861147,
+          "bottleneck": "CPU",
+          "stable": true,
+          "capped": false,
+          "crossed30": false,
+          "hash": "a5a4ed0f",
+          "pointCountRange": [
+            0,
+            0
+          ]
+        },
+        {
+          "id": "water-scale-64-pause",
+          "axis": "water-loaded-pause",
+          "load": 64,
+          "files": [
+            "water-scale-64-pause-round-1/water-scale-64-pause.json",
+            "water-scale-64-pause-round-2/water-scale-64-pause.json"
+          ],
+          "frame": {
+            "p50": 9.044999994337559,
+            "p95": 11.780000001192093,
+            "p99": 12.744999997317791
+          },
+          "cpu": {
+            "p50": 5.505000002682209,
+            "p95": 8.700000002980232,
+            "p99": 9.524999998509884
+          },
+          "gpu": {
+            "p50": 4.482135,
+            "p95": 7.911666,
+            "p99": 8.060312
+          },
+          "capacityP95": 12,
+          "repeatability": 0.027685492798116978,
+          "bottleneck": "CPU",
+          "stable": true,
+          "capped": false,
+          "crossed30": false,
+          "hash": "9a333bcf",
+          "pointCountRange": [
+            0,
+            0
+          ]
+        },
+        {
+          "id": "water-scale-128-pause",
+          "axis": "water-loaded-pause",
+          "load": 128,
+          "files": [
+            "water-scale-128-pause-round-1/water-scale-128-pause.json",
+            "water-scale-128-pause-round-2/water-scale-128-pause.json"
+          ],
+          "frame": {
+            "p50": 9.384999997913837,
+            "p95": 12.675000004470348,
+            "p99": 14.035000003874302
+          },
+          "cpu": {
+            "p50": 6.2349999994039536,
+            "p95": 9.469999998807907,
+            "p99": 10.330000005662441
+          },
+          "gpu": {
+            "p50": 4.495416,
+            "p95": 7.955937,
+            "p99": 8.310156
+          },
+          "capacityP95": 13.009999997913837,
+          "repeatability": 0.03458366618242214,
+          "bottleneck": "CPU",
+          "stable": true,
+          "capped": false,
+          "crossed30": false,
+          "hash": "acc3344f",
+          "pointCountRange": [
+            0,
+            0
+          ],
+          "peakRendererRssBytes": 491819008
+        },
+        {
+          "id": "water-scale-256-pause",
+          "axis": "water-loaded-pause",
+          "load": 256,
+          "files": [
+            "water-scale-256-pause-round-1/water-scale-256-pause.json",
+            "water-scale-256-pause-round-2/water-scale-256-pause.json"
+          ],
+          "frame": {
+            "p50": 9.099999994039536,
+            "p95": 11.950000002980232,
+            "p99": 12.754999995231628
+          },
+          "cpu": {
+            "p50": 6.1400000005960464,
+            "p95": 9.299999997019768,
+            "p99": 10.685000002384186
+          },
+          "gpu": {
+            "p50": 4.482916,
+            "p95": 7.905885,
+            "p99": 8.040989
+          },
+          "capacityP95": 11.975000001490116,
+          "repeatability": 0.003298516617297163,
+          "bottleneck": "CPU",
+          "stable": true,
+          "capped": false,
+          "crossed30": false,
+          "hash": "8c8a414f",
+          "pointCountRange": [
+            0,
+            0
+          ],
+          "peakRendererRssBytes": 710615040
+        },
+        {
+          "id": "water-scale-512-pause",
+          "axis": "water-loaded-pause",
+          "load": 512,
+          "files": [
+            "water-scale-512-pause-round-1/water-scale-512-pause.json",
+            "water-scale-512-pause-round-2/water-scale-512-pause.json"
+          ],
+          "frame": {
+            "p50": 8.75,
+            "p95": 11.630000002682209,
+            "p99": 12.629999995231628
+          },
+          "cpu": {
+            "p50": 7.450000002980232,
+            "p95": 9.665000006556511,
+            "p99": 11.380000002682209
+          },
+          "gpu": {
+            "p50": 4.476406,
+            "p95": 5.862864,
+            "p99": 7.985572
+          },
+          "capacityP95": 12.009999997913837,
+          "repeatability": 0.00856897977928132,
+          "bottleneck": "CPU",
+          "stable": true,
+          "capped": false,
+          "crossed30": false,
+          "hash": "4cb85b4f",
+          "pointCountRange": [
+            0,
+            0
+          ],
+          "peakRendererRssBytes": 1135669248
+        },
+        {
+          "id": "water-scale-1024-pause",
+          "axis": "water-loaded-pause",
+          "load": 1024,
+          "files": [
+            "water-scale-1024-pause-round-1/water-scale-1024-pause.json",
+            "water-scale-1024-pause-round-2/water-scale-1024-pause.json"
+          ],
+          "frame": {
+            "p50": 8.784999996423721,
+            "p95": 9.859999999403954,
+            "p99": 11.065000005066395
+          },
+          "cpu": {
+            "p50": 8.424999997019768,
+            "p95": 9.214999996125698,
+            "p99": 10.314999997615814
+          },
+          "gpu": {
+            "p50": 4.840156,
+            "p95": 5.107291,
+            "p99": 5.719843
+          },
+          "capacityP95": 9.929999999701977,
+          "repeatability": 0.0034129694192428133,
+          "bottleneck": "CPU",
+          "stable": true,
+          "capped": false,
+          "crossed30": false,
+          "hash": "cf948f4f",
+          "pointCountRange": [
+            0,
+            0
+          ],
+          "peakRendererRssBytes": 2028822528
+        },
+        {
+          "id": "water-scale-2048-pause",
+          "axis": "water-loaded-pause",
+          "load": 2048,
+          "files": [
+            "water-scale-2048-pause-round-1/water-scale-2048-pause.json",
+            "water-scale-2048-pause-round-2/water-scale-2048-pause.json"
+          ],
+          "frame": {
+            "p50": 12.255000002682209,
+            "p95": 15.294999994337559,
+            "p99": 16.759999997913837
+          },
+          "cpu": {
+            "p50": 11.910000003874302,
+            "p95": 14.830000005662441,
+            "p99": 16.240000002086163
+          },
+          "gpu": {
+            "p50": 6.233854,
+            "p95": 7.574843,
+            "p99": 8.153229
+          },
+          "capacityP95": 15.865000002086163,
+          "repeatability": 0.004899959362787138,
+          "bottleneck": "CPU",
+          "stable": true,
+          "capped": false,
+          "crossed30": false,
+          "hash": "df4cf74f",
+          "pointCountRange": [
+            0,
+            0
+          ],
+          "peakRendererRssBytes": 3758768128
+        },
+        {
+          "id": "water-scale-4096-pause",
+          "axis": "water-loaded-pause",
+          "load": 4096,
+          "files": [
+            "water-scale-4096-pause-round-1/water-scale-4096-pause.json",
+            "water-scale-4096-pause-round-2/water-scale-4096-pause.json"
+          ],
+          "frame": {
+            "p50": 18.25,
+            "p95": 21.110000006854534,
+            "p99": 22.884999997913837
+          },
+          "cpu": {
+            "p50": 17.91499999910593,
+            "p95": 20.71500000357628,
+            "p99": 22.46000000089407
+          },
+          "gpu": {
+            "p50": 9.59802,
+            "p95": 11.702447,
+            "p99": 12.038229
+          },
+          "capacityP95": 21.510000005364418,
+          "repeatability": 0.0019180703644725607,
+          "bottleneck": "CPU",
+          "stable": true,
+          "capped": false,
+          "crossed30": false,
+          "hash": "26bdc74f",
+          "pointCountRange": [
+            0,
+            0
+          ],
+          "peakRendererRssBytes": 7072329728
+        }
+      ],
+      "status": "resource-bound",
+      "capacity60": {
+        "budget": 16.7,
+        "maximum": 2048,
+        "frameP95": 15.865000002086163,
+        "nextFail": 4096,
+        "lowerBound": false
+      },
+      "capacity30": {
+        "budget": 33.3,
+        "maximum": 4096,
+        "frameP95": 21.510000005364418,
+        "nextFail": null,
+        "lowerBound": true
+      },
+      "resourceLimit": {
+        "allowed": false,
+        "load": 8192,
+        "previousLoad": 4096,
+        "previousPeakBytes": 7072329728,
+        "availableBytes": 12450537472,
+        "reserveBytes": 4294967296,
+        "projectedPeakBytes": 14144659456,
+        "reason": "Previous maximum renderer VmHWM scaled by count; reserve remains for system and other processes"
+      }
+    }
+  },
+  "diagnostics": [
+    {
+      "point": {
+        "id": "water-visible-8",
+        "axis": "water-visible",
+        "load": 8,
+        "files": [
+          "scheduling-diagnostic/water-visible-8-round-1/water-visible-8.json",
+          "scheduling-diagnostic/water-visible-8-round-2/water-visible-8.json"
+        ]
+      },
+      "frameP50Difference": 0.1011,
+      "reason": "Two unchanged fixed-step rounds differ by 10.11%; P-core pin and hashes agree. CPU6 frequency sampled 2.86–4.11 GHz; transient other-process CPU activity observed. Exact attribution is not established; preserve all data and repeat both rounds after that transient process exited."
+    },
+    {
+      "point": {
+        "id": "skinning-256",
+        "axis": "skinning",
+        "load": 256,
+        "files": [
+          "scheduling-diagnostic/skinning-256-round-1/skinning-256.json",
+          "scheduling-diagnostic/skinning-256-round-2/skinning-256.json"
+        ]
+      },
+      "frameP50Difference": 0.0583,
+      "reason": "SMT sibling pressure and observer/tool activity: slow run CPU7 busy 52.95%, main thread run delay 3.68%, versus 5.82% and 0.34% in a fast run; CPU6 stays near 4.1 GHz. gh/mise helper processes have Orca ancestry. Retain both rounds; retry complete point with raw output in Git-ignored cache and direct same-version Node, then copy data to docs after all measurements."
+    },
+    {
+      "point": {
+        "id": "water-scale-128-pause",
+        "axis": "water-loaded-pause",
+        "load": 128,
+        "files": [
+          "scheduling-diagnostic/water-scale-128-pause-round-1/water-scale-128-pause.json",
+          "scheduling-diagnostic/water-scale-128-pause-round-2/water-scale-128-pause.json"
+        ]
+      },
+      "frameP50Difference": 0.050393700787401616,
+      "reason": "5.04% frame gate failure. CPU p50 drift 4.30%, GPU p50 drift 1.30%; gradual observer/scheduling drift. Preserve every sample and repeat complete point after validating automated staging, direct child Node and memory controls. No threshold or sample-count change."
+    }
+  ]
+}

@@ -1,3 +1,41 @@
+## 2026-10-15 — Measured JS capacity and reproducible SVG figures
+
+The capacity matrix is complete: 42 axis points reference 40 distinct two-round
+case cohorts (the same one-water control is reused across axes). Each cohort
+has five fresh Chromium processes per round, 600 warm-up/600 measured frames,
+fixed 1/60 s/seed, uncapped tasks, two asynchronous GPU frames, CPU6 and no
+extensions. All accepted frame-p50 repeatability gates pass; maximum difference
+is 4.50%. Three complete failed points remain as diagnostics.
+
+Worse-round p95 bounds give 128/256 skinned creatures at 60/30 fps, 2/4 loaded
+waters without pause, 2/4 visible waters, 4/24 effect groups (12/72 effects),
+and 129/257 water mesh widths (solver stays capped at 129). Offscreen pause
+allows 2,048 loaded waters at 60 fps and at least 4,096 at 30 fps. Their next
+8,192-water load is resource-bound: projected renderer VmHWM 13.173 GiB versus
+11.595 GiB available before the 4 GiB reserve. This is not a measured FPS ceiling;
+VmHWM includes fingerprint allocations outside timed frames.
+
+[Point tables](captures/benchmarks-2026-10-15/capacity/results.md),
+[raw manifest/environment links](captures/benchmarks-2026-10-15/capacity/manifest.json),
+[derived summary](captures/benchmarks-2026-10-15/capacity/summary.json),
+[chart index](captures/benchmarks-2026-10-15/charts/index.json).
+`pnpm bench:charts` uses only Node's standard library, recomputes statistics
+from raw samples and generates nine zero-based, labeled SVGs with explicit
+backgrounds and hardware/browser/source footers. Two runs produce byte-identical
+SVGs, index, summary and tables:
+[idempotence](captures/benchmarks-2026-10-15/capacity/validation/chart-idempotence.json).
+All nine SVG text layouts fit their viewboxes. Inspected page-only previews:
+[skinning](captures/benchmarks-2026-10-15/capacity/validation/skinning-before-after-preview.png),
+[paused water](captures/benchmarks-2026-10-15/capacity/validation/capacity-water-loaded-pause-preview.png).
+
+`pnpm check` passes (185 tests). The untimed effect audit reproduces every
+case hash, observes all 1,201 steps and finds zero budget/buffer clipping;
+maxima are 5,028 live letters and 7,658 drawn points:
+[audit](captures/benchmarks-2026-10-15/capacity/validation/effect-budget-audit.json).
+Benchmark URLs never access the editor draft. No WASM/GPU skinning/toolchain
+or engine math changes; the owner-authorized live water defaults are next.
+No push.
+
 ## 2026-10-15 — Capacity observer controls and bounded memory growth
 
 Capacity collection exposed three complete repeatability failures, retained in
