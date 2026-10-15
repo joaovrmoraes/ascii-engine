@@ -4,6 +4,28 @@ Entries describe the state at each stage. Earlier limitations may have been
 resolved later; START.md and the editor guide describe the current scope.
 Historical filenames, reference IDs and captured interfaces are preserved.
 
+## 2026-10-15 — Consolidation review, group 7 and final validation
+
+Confirmed visible rain glyph rings with Simulate water unchecked: scene rain
+uses the nonempty wet mask independently of physics. Rendered comparison changes
+116 pixels above 8/255, and rings stay transient. Added browser coverage and
+captures; no water renderer change was needed or made. Isolated Orca verified
+physics=false, unchecked control, 515 wet cells and an active ring. Additional
+Orca checks confirmed Detach then Apply edits only the target, preserving users.
+
+Final validation: pnpm check (11 CLI + 148 workspace tests), textures 106,
+authoring 84, actual stdio MCP/API 39, water 28 plus eight bank views, export 11,
+and display 21 passed with dev running. Web and Linux native exports used literal
+flag-like titles correctly; native window remains untested. Historical item and
+terrain SceneDocs match original world captures exactly (RMSE 0). No baselines
+were changed. The temporary prior-source comparison server was stopped.
+
+[Review evidence and logs](captures/editor-review-fix-2026-10-15/README.md).
+Orca commands used a separate profile and explicit editor page; owner draft was
+not edited. Orca image capture timed out, so inspected GPU Chromium captures
+provide the visual evidence. All seven groups have local commits, with no push.
+Untracked owner plans were preserved outside the commits.
+
 ## 2026-10-15 — Consolidation review, group 6: explicit debug/comparison
 
 Inspected compare.mjs and baseline metadata: current comparison views have no

@@ -1,0 +1,11 @@
+{
+  "id": "c8b54e22-9889-445c-b45f-c237ebdc292d",
+  "ok": true,
+  "result": {
+    "result": "{\"assetSelection\":\"\",\"otherLink\":\"ink\",\"shared\":\"AB\",\"target\":\"LOCAL\"}",
+    "origin": "http://localhost:1440/?area=sandbox"
+  },
+  "_meta": {
+    "runtimeId": "38cf1741-6edd-47a2-b539-0f58b1abc24e"
+  }
+}

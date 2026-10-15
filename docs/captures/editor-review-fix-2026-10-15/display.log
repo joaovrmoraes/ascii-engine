@@ -1,0 +1,22 @@
+$ node scripts/verify-display.mjs .cache/review-fix/group6-display
+PASS reference raw is live debug without changing recipes
+PASS reference screen is live debug without changing recipes
+PASS reference letters is live debug without changing recipes
+PASS dark_forest raw is live debug without changing recipes
+PASS dark_forest screen is live debug without changing recipes
+PASS dark_forest letters is live debug without changing recipes
+PASS rain_marsh raw is live debug without changing recipes
+PASS rain_marsh screen is live debug without changing recipes
+PASS rain_marsh letters is live debug without changing recipes
+PASS snow_pines raw is live debug without changing recipes
+PASS snow_pines screen is live debug without changing recipes
+PASS snow_pines letters is live debug without changing recipes
+PASS old_mine raw is live debug without changing recipes
+PASS old_mine screen is live debug without changing recipes
+PASS old_mine letters is live debug without changing recipes
+PASS sunken_cathedral raw is live debug without changing recipes
+PASS sunken_cathedral screen is live debug without changing recipes
+PASS sunken_cathedral letters is live debug without changing recipes
+PASS old ascii=screen URL remains explicitly labeled legacy comparison
+PASS leaving legacy comparison rebuilds the normal recipe and enables debug separately
+PASS no uncaught page exceptions

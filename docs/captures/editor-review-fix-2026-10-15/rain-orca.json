@@ -1,0 +1,11 @@
+{
+  "id": "6a466853-7fbe-4be5-9493-2e17d2d83539",
+  "ok": true,
+  "result": {
+    "result": "{\"checkbox\":false,\"physicsEnabled\":false,\"rings\":1,\"wetCells\":515}",
+    "origin": "http://localhost:1440/?area=sandbox"
+  },
+  "_meta": {
+    "runtimeId": "38cf1741-6edd-47a2-b539-0f58b1abc24e"
+  }
+}

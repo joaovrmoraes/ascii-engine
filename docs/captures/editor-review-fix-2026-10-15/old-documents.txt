@@ -1,0 +1,4 @@
+World crop: 1048x340+232+132.
+item-roundtrip.json versus original stage 1 world crop: RMSE 0 (0).
+mapa-prova.pomorog.json versus original terrain world crop: RMSE 0 (0).
+Existing baselines were not regenerated.

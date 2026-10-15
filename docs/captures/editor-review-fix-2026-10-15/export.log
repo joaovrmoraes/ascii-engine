@@ -1,0 +1,15 @@
+$ node scripts/verify-export.mjs .cache/review-fix/final-export
+PASS web packaging queues without mutating the scene
+BUILD web: building
+PASS web build ready
+PASS literal flag-like title --desktop is preserved without changing the target
+PASS web ready download is available in the dialog
+PASS desktop packaging queues without mutating the scene
+BUILD desktop: building
+BUILD desktop: building
+PASS desktop build ready
+PASS literal flag-like title --scene is preserved without changing the target
+PASS desktop ready download is available in the dialog
+PASS exported Web player runs from a relative subfolder without editor UI
+PASS player preserves linked recipes and hidden water
+PASS no uncaught page exceptions
