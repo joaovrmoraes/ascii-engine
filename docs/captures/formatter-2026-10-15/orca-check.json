@@ -1,0 +1,11 @@
+{
+  "id": "2ef07d5a-dd49-4607-b75f-269a868b5390",
+  "ok": true,
+  "result": {
+    "result": "{\"canvas\":true,\"name\":\"Meu item\",\"objects\":3}",
+    "origin": "http://localhost:1440/?area=sandbox"
+  },
+  "_meta": {
+    "runtimeId": "38cf1741-6edd-47a2-b539-0f58b1abc24e"
+  }
+}

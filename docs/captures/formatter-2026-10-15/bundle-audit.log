@@ -1,0 +1,5 @@
+PASS all 4 generated JS/CSS assets are byte-identical to the pre-format export.
+index-DO74hWO9.css
+client-DDgAskfy.js
+index-DSeSIUpF.js
+transport-aK0xItEK.js

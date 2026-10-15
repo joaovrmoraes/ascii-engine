@@ -4,6 +4,32 @@ Entries describe the state at each stage. Earlier limitations may have been
 resolved later; START.md and the editor guide describe the current scope.
 Historical filenames, reference IDs and captured interfaces are preserved.
 
+## 2026-10-15 — Consistent formatting and check gate
+
+Adopted pinned Prettier 3.9.10 with a 100-column wrapping target, two-space
+indentation, single quotes and no optional semicolons. Added pnpm format and
+format:check; pnpm check now runs the formatting gate first. Commands select
+Git-versioned files and exclude reference archives, generated output, scene
+fixtures and captured evidence. Untracked owner plans were preserved. Embedded
+shader/HTML strings keep their contents and may exceed the wrapping target.
+
+The other agent's terminal was confirmed idle before formatting. Isolated
+formatting/tooling commit 393b309 changes 182 files; its full hash is recorded
+in .git-blame-ignore-revs. An audit confirms 176 modified files match Prettier
+applied directly to their previous contents; START/package/lockfile changes
+only configure and document the formatter. No renderer behavior was changed.
+
+Validation: pnpm check passed (11 CLI + 148 workspace tests), verify:authoring
+84 and verify:textures 106 passed with pnpm dev running. All four generated
+JS/CSS assets match the previous build byte for byte. The historical item
+SceneDoc has before/after world RMSE 0. An isolated Orca profile opened that
+document at localhost:1440/?area=sandbox using explicit page
+4d61c29e-ae0f-4880-a018-3d0e6313dbfe; owner draft was not edited. Captures use
+the page-only headless Chromium helper. Orca image-capture follow-up and native
+desktop testing are deferred at the owner's request. No push.
+
+[Formatting evidence, captures and validation logs](captures/formatter-2026-10-15/README.md).
+
 ## 2026-10-15 — Consolidation review, group 7 and final validation
 
 Confirmed visible rain glyph rings with Simulate water unchecked: scene rain

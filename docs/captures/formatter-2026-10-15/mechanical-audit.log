@@ -1,0 +1,1 @@
+PASS 176 modified files match Prettier applied directly to HEAD; only START.md, package.json and the lockfile contain formatter setup.
