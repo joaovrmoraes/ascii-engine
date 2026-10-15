@@ -4,6 +4,28 @@ Entries describe the state at each stage. Earlier limitations may have been
 resolved later; START.md and the editor guide describe the current scope.
 Historical filenames, reference IDs and captured interfaces are preserved.
 
+## 2026-10-15 — Retain the unpinned water repeatability failure
+
+Two complete original-protocol water rounds on clean source 0a4e072 retain
+48,000 measured frames (8 variants × 5 fresh loads × 600 frames × 2 rounds),
+plus equal warm-up. All state hashes, timer samples and GPU fences complete.
+Frame p50 repeatability fails for one water/off (6.16%, 7.630→8.115 ms) and
+eight waters/pause (5.79%, 7.880→8.350 ms); the other six variants pass. These
+are diagnostic results, not accepted final performance evidence. No threshold,
+run count, percentile or failed run was changed/discarded.
+
+Passive host samples show main-thread migration over P CPUs 0–7 and E CPUs
+8–11. One-water step per-run p50 spans 0.740–1.490 ms. For one water/off, median
+CPU differs 1.50%, GPU range 0.14%, but mean frame also moves 7.823→8.482 ms:
+this is not solely a median artifact. Heterogeneous CPU residency is observed;
+coarse samples do not prove it is the only source of scheduler/GPU-tail noise.
+
+[Full failed rounds and gate table](captures/benchmarks-2026-10-15/phase-2/unpinned-diagnostic/README.md).
+The partial processor/frequency/temperature trace starts during round 1. A
+P-core residency control is being tested without changing machine power,
+GPU flags, dt, seeds, counts or acceptance thresholds. Final water results
+remain pending. The option remains disabled by default. No push.
+
 ## 2026-10-15 — Optional offscreen water pause, default remains update-all
 
 Added runtime offscreenWater={mode:'pause',margin:4}. Only waters whose full

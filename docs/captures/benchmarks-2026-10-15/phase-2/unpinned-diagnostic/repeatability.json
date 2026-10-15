@@ -1,0 +1,66 @@
+[
+  {
+    "waters": 1,
+    "policy": "off",
+    "round1": 7.630000002682209,
+    "round2": 8.115000002086163,
+    "differencePercent": 6.160685922604907,
+    "pass": false
+  },
+  {
+    "waters": 1,
+    "policy": "pause",
+    "round1": 7.774999998509884,
+    "round2": 8.044999998062849,
+    "differencePercent": 3.4134007536214703,
+    "pass": true
+  },
+  {
+    "waters": 2,
+    "policy": "off",
+    "round1": 10.370000001043081,
+    "round2": 10.440000001341105,
+    "differencePercent": 0.6727534866891243,
+    "pass": true
+  },
+  {
+    "waters": 2,
+    "policy": "pause",
+    "round1": 7.949999999254942,
+    "round2": 7.930000003427267,
+    "differencePercent": 0.25188911617502224,
+    "pass": true
+  },
+  {
+    "waters": 4,
+    "policy": "off",
+    "round1": 19.655000001192093,
+    "round2": 19.83999999985099,
+    "differencePercent": 0.9368274396962124,
+    "pass": true
+  },
+  {
+    "waters": 4,
+    "policy": "pause",
+    "round1": 8.410000000149012,
+    "round2": 8.629999998956919,
+    "differencePercent": 2.5821596105569276,
+    "pass": true
+  },
+  {
+    "waters": 8,
+    "policy": "off",
+    "round1": 38.100000001490116,
+    "round2": 38.064999997615814,
+    "differencePercent": 0.09190574115331913,
+    "pass": true
+  },
+  {
+    "waters": 8,
+    "policy": "pause",
+    "round1": 7.880000002682209,
+    "round2": 8.350000001490116,
+    "differencePercent": 5.791743668355908,
+    "pass": false
+  }
+]
