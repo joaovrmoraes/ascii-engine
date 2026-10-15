@@ -4,6 +4,21 @@ Entries describe the state at each stage. Earlier limitations may have been
 resolved later; START.md and the editor guide describe the current scope.
 Historical filenames, reference IDs and captured interfaces are preserved.
 
+## 2026-10-15 — Consolidation review, group 1: visible texture links
+
+Reviewed and adopted the existing uncommitted core/authoring implementation:
+object texture → instance → part texture → instance part; linkTexture clears
+only recipe-defined local fields, including unlinked parts for object links.
+Detach preserves the new ordering. setInstanceOptions replaces the entire layer.
+Integrated the helper in all library drops, Studio Apply and isolated previews;
+replaced fields are reported. Updated START, API/MCP descriptions and schema.
+Existing texture validation tests were retained alongside relink/part tests.
+
+Validation: pnpm check (147 tests), verify:textures (104 checks), actual mesh
+relink after Detach, and a pinned isolated Orca profile passed. Owner draft was
+not edited. [Capture](captures/editor-review-fix-2026-10-15/relinked-after-detach.png).
+The preexisting keepUsed/scene registry edits remain for group 5. No push.
+
 ## 2026-10-15 — Editor consolidation stage 7: panels and project files
 
 Water inspector now has Name, Visible and XYZ (shape.x / level / shape.z),

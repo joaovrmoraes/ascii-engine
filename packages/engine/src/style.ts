@@ -102,7 +102,9 @@ export interface StyleLayers {
 
 /**
  * Most specific wins:
- * global preset → object type → type of part → node data → instance → part of the instance.
+ * global preset → object type → type of part → node data → linked object texture
+ * → instance → linked part texture → part of the instance.
+ * A part link sits above object-wide local fields, so linking a part is always visible.
  */
 function glyphLayers(layers: StyleLayers): [string, GlyphStyle | undefined][] {
   const part = layers.part
@@ -111,8 +113,8 @@ function glyphLayers(layers: StyleLayers): [string, GlyphStyle | undefined][] {
     ['type part', part ? layers.type?.parts?.[part] : undefined], ['model part', layers.node],
     ['authored type', authored(layers.type?.style, layers.type?.authored?.style)],
     ['authored type part', part ? authored(layers.type?.parts?.[part], layers.type?.authored?.parts?.[part]) : undefined],
-    ['linked texture', layers.texture], ['linked part texture', layers.texturePart],
-    ['instance', layers.instance], ['instance part', part ? layers.instanceParts?.[part] : undefined]]
+    ['linked texture', layers.texture], ['instance', layers.instance],
+    ['linked part texture', layers.texturePart], ['instance part', part ? layers.instanceParts?.[part] : undefined]]
 }
 export function resolveGlyphStyle(layers: StyleLayers): GlyphStyle {
   return mergeGlyphStyles(...glyphLayers(layers).map(([, style]) => style))

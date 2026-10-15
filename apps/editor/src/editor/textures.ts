@@ -14,7 +14,7 @@ export function createTextureStudio(root: HTMLElement, callbacks: {
   selected(): string | undefined
   select(id: string): void
   save(id: string, asset: TextureAsset): Promise<void>
-  apply(id: string, part: string, style: GlyphStyle, scope: TextureScope, textureId?: string): Promise<void>
+  apply(id: string, part: string, style: GlyphStyle, scope: TextureScope, textureId?: string): Promise<string[] | void>
   detach(id: string, part?: string): Promise<void>
   remove(id: string): Promise<void>
   type(id: string): string | undefined
@@ -281,7 +281,7 @@ export function createTextureStudio(root: HTMLElement, callbacks: {
   }
   async function apply() {
     if (scope !== 'global' && !target() || saving) return
-    try { parseScene({ version: 1, objects: [], textures: { draft: asset() } }); const linkedId = scope === 'object' || scope === 'part' ? selectedKey : undefined; if (linkedId) await callbacks.save(linkedId, asset()); await callbacks.apply(objectId, scope === 'object' ? '' : part, previewStyle(), scope, linkedId); stage.commit(); status('Texture applied. Return to the scene to see it; Ctrl Z in the scene undoes the change.') }
+    try { parseScene({ version: 1, objects: [], textures: { draft: asset() } }); const linkedId = scope === 'object' || scope === 'part' ? selectedKey : undefined; if (linkedId) await callbacks.save(linkedId, asset()); const replaced = await callbacks.apply(objectId, scope === 'object' ? '' : part, previewStyle(), scope, linkedId); stage.commit(); status('Texture applied.' + (replaced?.length ? ' Replaced local fields: ' + replaced.join(', ') + '.' : '') + ' Ctrl Z in the scene undoes the change.') }
     catch (error) { status(String(error)) }
   }
   get<HTMLSelectElement>('object').onchange = e => { const id = (e.target as HTMLSelectElement).value; callbacks.select(id); if (assetOnly) { assetOnly = false; objectId = id; baseline = appearance(); beginEdits(); render(); void stage.show(callbacks.document(), id); applyPreview(part, previewStyle(), scope) } else void showObject(id) }

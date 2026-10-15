@@ -33,7 +33,7 @@ export const commandSchema = z.discriminatedUnion('op', [
   z.object({ op: z.literal('asset.define'), id: key, name: z.string().min(1), source: z.string().startsWith('data:') }).strict(),
   z.object({ op: z.literal('resource.remove'), kind: z.enum(['assets', 'effects', 'atmospheres', 'textures']), id: key }).strict(),
   z.object({ op: z.literal('texture.define'), id: key, name: z.string().trim().min(1), style: json.describe('GlyphStyle recipe: surface/body world letters or legacy character screen. Omitted fields preserve mixed techniques. Screen uses scene cellSize and the legacy atlas.'), previewLighting: json.optional().describe('Optional studio lights. Applying the texture preserves scene lighting.') }).strict(),
-  z.object({ op: z.literal('texture.apply'), id: key, objectId: key, part: key.optional(), link: z.boolean().optional().describe('True stores a live asset reference below local overrides. Omitted copies fields for compatibility.') }).strict(),
+  z.object({ op: z.literal('texture.apply'), id: key, objectId: key, part: key.optional(), link: z.boolean().optional().describe('True stores a live asset reference and removes local fields the recipe defines at that level, so the link is visible. Omitted copies fields for compatibility.') }).strict(),
   z.object({ op: z.literal('texture.detach'), objectId: key, part: key.optional().describe('Omitted bakes all object and part links. Appearance is preserved.') }).strict(),
   z.object({ op: z.literal('atmosphere.define'), id: key, name: z.string().trim().min(1), style: json.describe('Lighting to save to Assets; omitted fields come from the current scene.') }).strict(),
   z.object({ op: z.literal('atmosphere.apply'), id: key }).strict(),

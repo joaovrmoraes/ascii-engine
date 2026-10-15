@@ -375,3 +375,15 @@ preserves the old fallback label and visible mesh. Position is `shape.x`,
 `level` (Y) and `shape.z`; update with `water.update` or a complete scene patch.
 These fields round-trip without migrating old documents. Weather intensity
 already belongs to `environment.intensity` (0–1); Environment exposes it now.
+
+### Linking and replacing local texture fields
+
+The final layers are object texture → instance → part texture → instance part.
+`texture.apply link:true` removes local fields defined by the linked recipe at
+that level. Object links also remove those fields from parts without a separate
+link; a part link leaves all other parts untouched. Unrelated local overrides
+remain. This makes relinking after Detach or a copied recipe visible. Detach
+bakes the result without changing appearance. The core `linkTexture` returns the
+new options and the replaced field names; `engine.setInstanceOptions` replaces
+the full layer rather than merging deleted fields back in. Existing unlinked
+styles are unchanged; no saved document is migrated.

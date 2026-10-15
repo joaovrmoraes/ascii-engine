@@ -93,6 +93,7 @@ export {
   textureStyle,
   textureUsers,
   detachTexture,
+  linkTexture,
   type TextureAsset,
 } from './texture'
 export {

@@ -29,6 +29,18 @@ describe('atomic authoring', () => {
     }
     expect(source.objects[0].options?.texture).toBeUndefined()
   })
+  it('makes a new link visible over copied or detached local fields', () => {
+    const resolved = (doc: ReturnType<typeof parseScene>, part?: string) => { const options = doc.objects[0].options ?? {}, recipe = (id?: string) => id ? doc.textures![id].style : undefined
+      return resolveGlyphStyle({ texture: recipe(options.texture), texturePart: recipe(part ? options.parts?.[part]?.texture : undefined), instance: textureStyle(options), instanceParts: options.parts, part }) }
+    const source = parseScene({ version: 1, objects: [{ id: 'tree', prefab: 'tree', position: [0,0,0], options: { size: .5, density: .4, parts: { crown: { color: 777 }, trunk: { alphabet: 'TT' } } } }], textures: { old: { name: 'Old', style: { alphabet: 'OO', color: 1 } }, next: { name: 'Next', style: { alphabet: 'NN', color: 2, size: .2 } } } })
+    const detached = applyCommands(source, [{ op: 'texture.apply', id: 'old', objectId: 'tree', link: true }, { op: 'texture.detach', objectId: 'tree' }])
+    const relinked = applyCommands(detached, [{ op: 'texture.apply', id: 'next', objectId: 'tree', link: true }])
+    for (const part of [undefined, 'crown', 'trunk']) expect(resolved(relinked, part)).toMatchObject({ alphabet: 'NN', color: 2, size: .2, density: .4 })
+    const partOnly = applyCommands(detached, [{ op: 'texture.apply', id: 'next', objectId: 'tree', part: 'crown', link: true }])
+    expect(resolved(partOnly, 'crown')).toMatchObject({ alphabet: 'NN', color: 2, size: .2 })
+    expect(resolved(partOnly, 'trunk')).toEqual(resolved(detached, 'trunk'))
+    for (const part of [undefined, 'crown', 'trunk']) expect(resolved(applyCommands(partOnly, [{ op: 'texture.detach', objectId: 'tree' }]), part)).toEqual(resolved(partOnly, part))
+  })
   it('keeps studio lighting separate when defining/applying an extended texture', () => {
     const source = initial(), before = JSON.stringify(source)
     const doc = applyCommands(source, [{ op: 'texture.define', id: 'symbols', name: 'Symbols', style: { alphabet: ' ↑→░▓█', font: 'monospace', fontWeight: 700, open: true, palette: [0x224466, 0xff8844] }, previewLighting: { brightness: 2, background: 0x080a12 } }, { op: 'texture.apply', id: 'symbols', objectId: 'rock' }])

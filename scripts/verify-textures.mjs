@@ -281,13 +281,15 @@ try {
   await until(`!area.document().objects[1].options.texture`)
   await check('linked resources survive reload and can detach independently', `area.document().objects[1].options.color===0xdd8822&&area.document().textures.ink.style.alphabet==='XYZ'`)
 
-  await action(`ui('[data-k=close-studio]');const dragDoc=area.document();dragDoc.objects[1].options={};await area.openDocument(dragDoc);
+  await action(`ui('[data-k=close-studio]');const dragDoc=area.document();dragDoc.textures.ink.style.alphabet='RELINK';await area.openDocument(dragDoc);
     const card=document.querySelector('.asset-card[data-texture=ink]'), transfer=new DataTransfer();
     card.dispatchEvent(new DragEvent('dragstart',{dataTransfer:transfer}));
     const row=document.querySelector('#hierarchy [data-object-id="link-b"]');
     row.dispatchEvent(new DragEvent('dragover',{dataTransfer:transfer,bubbles:true,cancelable:true}));
     row.dispatchEvent(new DragEvent('drop',{dataTransfer:transfer,bubbles:true,cancelable:true}));`)
   await check('dragging a library texture links the hierarchy object through its UI handler', `area.document().objects[1].options.texture==='ink' && !area.document().objects[1].options.alphabet`)
+  await check('relink after Detach replaces recipe fields in the actual mesh', `(()=>{let style;object('link-b').traverse(n=>{if(n.isMesh)style=n.userData.glyphResolved});return style.alphabet==='RELINK'&&style.color===0xdd8822&&!area.document().objects[1].options.color})()`)
+  await shot('10-relinked-after-detach')
   await action(`window.libraryBefore=JSON.stringify(area.document());ui('.asset-card[data-texture=ink]')`)
   await check('single click selects a texture without opening or changing the map', `!document.body.classList.contains('texture-studio-active') && JSON.stringify(area.document())===libraryBefore`)
 

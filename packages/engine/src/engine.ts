@@ -375,6 +375,13 @@ export function createAsciiEngine(canvas: HTMLCanvasElement, options: AsciiEngin
       entry.options = { ...entry.options, ...instanceStyle }
       unapply(entry); apply(entry)
     },
+    /** Replaces the whole instance layer (fields absent from `options` are removed). */
+    setInstanceOptions(object: THREE.Object3D, options: AddOptions) {
+      const entry = entries.get(object)
+      if (!entry) throw new Error('ascii-engine: object was not added with engine.add')
+      entry.options = structuredClone(options)
+      unapply(entry); apply(entry)
+    },
     /** Registers or changes an object type; `part` changes that part in every instance. */
     setTypeStyle(typeName: string, typeStyle: ObjectTypeStyle) {
       const previous = types[typeName]

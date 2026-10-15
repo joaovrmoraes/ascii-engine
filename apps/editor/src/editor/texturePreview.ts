@@ -1,6 +1,6 @@
 import * as THREE from 'three'
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
-import { atmosphereStyle, buildScene, createEffectPrefabs, loadSceneAssets, type AddOptions, type AsciiStyle, type AtmosphereStyle, type BuiltScene, type GlyphStyle, type SceneDoc } from '@ascii-engine/core'
+import { atmosphereStyle, linkTexture, buildScene, createEffectPrefabs, loadSceneAssets, type AddOptions, type AsciiStyle, type AtmosphereStyle, type BuiltScene, type GlyphStyle, type SceneDoc } from '@ascii-engine/core'
 import { createAsciiEngine } from '../engine'
 import { createPrefabs } from '../scene/prefabs'
 import type { TextureScope } from './textures'
@@ -64,9 +64,7 @@ export function createTexturePreview(selectPart: (part: string) => void) {
       engine.setTypeStyle(type, part ? { parts: { [part]: style }, authored: { parts: { [part]: fields } } } : { style, authored: { style: fields } })
     }
     if (textureId) engine.setTextures({ ...engine.textures, [textureId]: { name: 'Preview', style } })
-    const options = structuredClone(baseline)
-    if (textureId && scope === 'part') options.parts = { ...options.parts, [part]: { ...options.parts?.[part], texture: textureId } }
-    else if (textureId) options.texture = textureId
+    const options = textureId ? linkTexture(baseline, engine.textures, textureId, scope === 'part' ? part : undefined).options : structuredClone(baseline)
     engine.add(object, { ...options, ...(scope === 'type' ? { type: baseline.type ?? object.userData.prefab } : {}) })
     if (!textureId && scope === 'part' && part) engine.setPartStyle(object, part, style)
     else if (!textureId && scope === 'object') engine.setInstanceStyle(object, style)

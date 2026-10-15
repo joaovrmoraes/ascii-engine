@@ -1,6 +1,6 @@
 import { glyphLabel } from '../editor/glyphCatalog'
 import * as THREE from 'three'
-import { textureUsers, detachTexture, buildScene, createTerrainData, createHistory, createEffectPrefabs, emptyScene, createWaterPaint, paintWater, loadSceneAssets, parseScene, waterEdge, type AsciiEngine, type Brush, type BuiltScene, type SceneDoc } from '@ascii-engine/core'
+import { textureUsers, detachTexture, linkTexture, buildScene, createTerrainData, createHistory, createEffectPrefabs, emptyScene, createWaterPaint, paintWater, loadSceneAssets, parseScene, waterEdge, type AsciiEngine, type Brush, type BuiltScene, type SceneDoc } from '@ascii-engine/core'
 import { pomorog } from '@ascii-engine/core/pomorog'
 import { createPrefabs } from '../scene/prefabs'
 import { downloadDocument, importModelFiles, readImportedResource, insertSceneItem } from '../scene/files'
@@ -124,6 +124,13 @@ export async function createSandbox(engine: AsciiEngine, options: AreaOptions = 
     if (cameraEditor?.selected) { cameraEditor.remove(); return }
     if (selected) { scene.remove(selected); choose(); changed() }
     else if (selectedWater >= 0) { const doc = snapshot(); doc.waters!.splice(selectedWater, 1); await replace(doc); changed() }
+  }
+  function applyTexture(object: THREE.Object3D, id: string, part?: string) {
+    const result = linkTexture(engine.instanceStyle(object) ?? {}, snapshot().textures ?? {}, id, part)
+    engine.setInstanceOptions(object, result.options)
+    choose(object); changed()
+    message(`Texture linked.${result.replaced.length ? ' Replaced local fields: ' + result.replaced.join(', ') + '.' : ''}`)
+    return result.replaced
   }
   function exportItem() {
     if (!selected) return
@@ -388,7 +395,7 @@ export async function createSandbox(engine: AsciiEngine, options: AreaOptions = 
         const object = scene.placed.find(item => item.doc.id === id)?.object
         if (!object) throw new Error('Select an object before applying a texture.')
         if (part && !object.getObjectByName(part)) throw new Error('Part not found: ' + part)
-        if (textureId) { part ? engine.setPartStyle(object, part, { texture: textureId }) : engine.setInstanceStyle(object, { texture: textureId }); choose(object); changed(); return }
+        if (textureId) return applyTexture(object, textureId, part || undefined)
         if (scope === 'type') {
           const type = engine.instanceStyle(object)?.type ?? object.userData.prefab
           if (!type) throw new Error('This object has no shared type.')
@@ -412,7 +419,7 @@ export async function createSandbox(engine: AsciiEngine, options: AreaOptions = 
         if (!id || !object || !snapshot().textures?.[id]) return
         e.preventDefault(); e.stopPropagation()
         const part = surface === ui!.sidebar && appearanceObject === object ? appearancePart : undefined
-        part ? engine.setPartStyle(object, part, { texture: id }) : engine.setInstanceStyle(object, { texture: id }); choose(object); changed()
+        applyTexture(object, id, part)
       }, { signal: signal.signal })
     }
     const el = <T extends HTMLElement>(key: string) => ui!.get<T>(`[data-k="${key}"]`)
@@ -491,7 +498,7 @@ export async function createSandbox(engine: AsciiEngine, options: AreaOptions = 
     canvas.addEventListener('dragleave', () => { placement.clear(); gizmos!.cursor(); ui!.get('#placement-label').hidden = true }, { signal: signal.signal })
     canvas.addEventListener('drop', e => {
       const texture = e.dataTransfer?.getData('application/x-ascii-texture')
-      if (texture) { e.preventDefault(); e.stopPropagation(); const rect = canvas.getBoundingClientRect(), hit = engine.pick((e.clientX - rect.left) / rect.width * 2 - 1, 1 - (e.clientY - rect.top) / rect.height * 2); if (hit && scene.placed.some(item => item.object === hit.object)) { hit.part ? engine.setPartStyle(hit.object, hit.part, { texture }) : engine.setInstanceStyle(hit.object, { texture }); choose(hit.object); changed() } return }
+      if (texture) { e.preventDefault(); e.stopPropagation(); const rect = canvas.getBoundingClientRect(), hit = engine.pick((e.clientX - rect.left) / rect.width * 2 - 1, 1 - (e.clientY - rect.top) / rect.height * 2); if (hit && scene.placed.some(item => item.object === hit.object)) { applyTexture(hit.object, texture, hit.part) } return }
       const key = e.dataTransfer?.getData('application/x-ascii-prefab')
       if (!key || !library[key]) return
       e.preventDefault(); e.stopPropagation(); const point = groundAt(e)

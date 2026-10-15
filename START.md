@@ -82,7 +82,8 @@ different finishes for a tree's crown and trunk. Pomorog already uses
   color multiplier, strength, dark gap, shadow steps, open/occluded and
   animation such as sway/flicker.
 - More specific layers win:
-  `global preset → object type → part type → instance → instance part`.
+  `global preset → object type → part type → model declarations → authored type fields
+  → object texture → instance → part texture → instance part`.
   Changing every tree crown differs from changing this tree's crown.
 - API: `engine.add(obj, { glyph, parts: { crown: { glyph: 'body', … }, trunk: { glyph: 'surface', … } } })`,
   `engine.setPartStyle(target, part, style)` and GLTF per-node
@@ -102,6 +103,13 @@ body base size in metres; `color` optionally overrides the model's RGB colour.
 The inspector reports effective appearance and per-field sources. Edit letters opens
 Texture Studio on the selected part/object; its Apply to selector writes only changed
 fields to part, object, shared asset/type or global style, preserving mixed techniques.
+Linking a saved texture removes the local fields defined by that recipe at the
+linked level; an object link also clears those fields in parts without their own
+link. The editor reports replaced fields. Other overrides stay intact. Part links
+win over object-wide fields. Detach bakes these layers without changing appearance.
+`linkTexture` is the shared core operation; `setInstanceOptions` replaces the whole
+instance layer so removed overrides do not survive a merge.
+
 Optional type authored field masks promote explicit editor choices above procedural
 node declarations; absent masks retain legacy document ordering.
 

@@ -1,4 +1,4 @@
-import { detachTexture, textureUsers, createTerrain, createTerrainData, createWaterPaint, paintWater, waterEdge, parseScene, seededRandom, DEFAULT_ASCII_STYLE, atmosphereStyle, DEFAULT_WATER_LOOK, type SceneDoc, type SceneWater, type PlacedObject, type EffectDef } from '@ascii-engine/core'
+import { detachTexture, linkTexture, textureUsers, createTerrain, createTerrainData, createWaterPaint, paintWater, waterEdge, parseScene, seededRandom, DEFAULT_ASCII_STYLE, atmosphereStyle, DEFAULT_WATER_LOOK, type SceneDoc, type SceneWater, type PlacedObject, type EffectDef } from '@ascii-engine/core'
 import { assertSafeJson, batchSchema } from './schema'
 
 /** Merge plain JSON only, protecting object prototypes before any assignment. */
@@ -122,9 +122,9 @@ export function applyCommands(source: SceneDoc, input: unknown): SceneDoc {
         if (!asset) throw new Error('Texture not found: ' + cmd.id)
         const item = object(cmd.objectId)
         item.options ??= {}
-        const patch = cmd.link ? { texture: cmd.id } : asset.style
-        if (cmd.part) { item.options.parts ??= {}; item.options.parts[cmd.part] = { ...item.options.parts[cmd.part], ...patch } }
-        else Object.assign(item.options, patch)
+        if (cmd.link) { item.options = linkTexture(item.options, doc.textures!, cmd.id, cmd.part).options; break }
+        if (cmd.part) { item.options.parts ??= {}; item.options.parts[cmd.part] = { ...item.options.parts[cmd.part], ...asset.style } }
+        else Object.assign(item.options, asset.style)
         break
       }
       case 'texture.detach': { const item = object(cmd.objectId); item.options = detachTexture(item.options ?? {}, doc.textures ?? {}, cmd.part); break }

@@ -1,7 +1,8 @@
 import { describe, expect, it } from 'vitest'
 import { parseScene } from './validation'
-import { textureStyle } from './texture'
+import { linkTexture, detachTexture, textureStyle } from './texture'
 import { resolveGlyphStyle } from '../style'
+import type { AddOptions } from '../engine'
 
 describe('portable texture recipes', () => {
   const style = { alphabet: ' .:+#@', size: .2, spacing: 1.5, density: .7, strength: 1.2, contrast: 1.8, toneOffset: -.1, shadowSteps: 4 }
@@ -37,4 +38,31 @@ describe('portable texture recipes', () => {
     expect(parseScene(doc).style?.types?.block.authored?.style).toEqual(['size'])
     expect(() => parseScene({ ...doc, style: { types: { block: { authored: { style: ['position'] } } } } })).toThrow('unknown glyph field')
   })
+})
+
+const textures = { old: {name:'Old',style:{alphabet:'OO',color:1}}, next: {name:'Next',style:{alphabet:'NN',color:2,size:.2}} }
+const resolved = (options: AddOptions, part?: string) => resolveGlyphStyle({
+  texture: options.texture ? textures[options.texture as keyof typeof textures].style : undefined,
+  instance: textureStyle(options), part, instanceParts: options.parts,
+  texturePart: part && options.parts?.[part]?.texture ? textures[options.parts[part].texture as keyof typeof textures].style : undefined,
+})
+it('relinks detached fields and reports replacements while preserving unrelated overrides and own part links', () => {
+  const source: AddOptions={texture:'old',density:.4,parts:{crown:{alphabet:'XX',size:.7},trunk:{texture:'old',color:7}}}
+  const before=structuredClone(source), detached=detachTexture(source,textures)
+  const linked=linkTexture(detached,textures,'next')
+  expect(source).toEqual(before)
+  expect(new Set(linked.replaced)).toEqual(new Set(['alphabet','color','size']))
+  expect(resolved(linked.options,'crown')).toMatchObject({alphabet:'NN',color:2,size:.2,density:.4})
+  const own=linkTexture(source,textures,'next').options
+  expect(own.parts!.trunk).toEqual(source.parts!.trunk)
+  expect(()=>linkTexture(source,textures,'missing')).toThrow(/unknown texture/)
+})
+it('part linking leaves siblings untouched, and detaching either level preserves every resolved part', () => {
+  const source: AddOptions={texture:'old',color:8,size:.8,parts:{crown:{alphabet:'XX',size:.9},trunk:{color:9}}}
+  const {options}=linkTexture(source,textures,'next','crown')
+  expect(resolved(options,'crown')).toMatchObject({alphabet:'NN',color:2,size:.2})
+  expect(resolved(options,'trunk')).toEqual(resolved(source,'trunk'))
+  expect(resolved(detachTexture(options,textures,'crown'),'crown')).toEqual(resolved(options,'crown'))
+  const detached=detachTexture(options,textures)
+  for(const part of [undefined,'crown','trunk']) expect(resolved(detached,part)).toEqual(resolved(options,part))
 })
