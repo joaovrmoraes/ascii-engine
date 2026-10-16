@@ -1,0 +1,11 @@
+{
+  "id": "b81340c7-7eb2-4d23-8d29-7b518a30f9d8",
+  "ok": true,
+  "result": {
+    "result": "{\"captureRedraw\":false,\"time\":1.0000000000000013}",
+    "origin": "http://localhost:1440/?bench=water-scale&waters=2&water-layout=visible&water-policy=off&queue=2"
+  },
+  "_meta": {
+    "runtimeId": "38cf1741-6edd-47a2-b539-0f58b1abc24e"
+  }
+}

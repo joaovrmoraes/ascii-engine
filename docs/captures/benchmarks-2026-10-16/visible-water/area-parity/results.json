@@ -1,0 +1,51 @@
+[
+  {
+    "scene": "reference",
+    "rmse": 0,
+    "clock": "fixed injected rAF, fallback disabled, pause=3; GLTF animation waits for both models",
+    "sourceBefore": "18354af",
+    "sourceAfter": "working tree"
+  },
+  {
+    "scene": "dark_forest",
+    "rmse": 0,
+    "clock": "fixed injected rAF, fallback disabled, pause=3; GLTF animation waits for both models",
+    "sourceBefore": "18354af",
+    "sourceAfter": "working tree"
+  },
+  {
+    "scene": "rain_marsh",
+    "rmse": 0,
+    "clock": "fixed injected rAF, fallback disabled, pause=3; GLTF animation waits for both models",
+    "sourceBefore": "18354af",
+    "sourceAfter": "working tree"
+  },
+  {
+    "scene": "snow_pines",
+    "rmse": 0,
+    "clock": "fixed injected rAF, fallback disabled, pause=3; GLTF animation waits for both models",
+    "sourceBefore": "18354af",
+    "sourceAfter": "working tree"
+  },
+  {
+    "scene": "old_mine",
+    "rmse": 0,
+    "clock": "fixed injected rAF, fallback disabled, pause=3; GLTF animation waits for both models",
+    "sourceBefore": "18354af",
+    "sourceAfter": "working tree"
+  },
+  {
+    "scene": "sunken_cathedral",
+    "rmse": 0,
+    "clock": "fixed injected rAF, fallback disabled, pause=3; GLTF animation waits for both models",
+    "sourceBefore": "18354af",
+    "sourceAfter": "working tree"
+  },
+  {
+    "scene": "gltf",
+    "rmse": 0,
+    "clock": "fixed injected rAF, fallback disabled, pause=3; GLTF animation waits for both models",
+    "sourceBefore": "18354af",
+    "sourceAfter": "working tree"
+  }
+]

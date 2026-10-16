@@ -1,3 +1,4 @@
+import { updateWaterNormals } from './waterGeometry'
 import * as THREE from 'three'
 import type { WaterUpdateTimings } from '../profiling'
 import { waterMaskEdge, type WaterMask } from '../world/waterPaint'
@@ -616,7 +617,7 @@ export function createWater(shape: WaterShape, options: WaterOptions = {}) {
       )
     }
     position.needsUpdate = true
-    geometry.computeVertexNormals()
+    updateWaterNormals(geometry)
     geometry.computeBoundingSphere()
     geometry.computeBoundingBox()
   }

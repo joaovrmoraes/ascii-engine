@@ -1,0 +1,8 @@
+$ node scripts/compare.mjs
+referencia RMSE 0.0410  ACIMA DO LIMITE 0.04
+floresta   RMSE 0.0662  ACIMA DO LIMITE 0.04
+pantano    RMSE 0.1462  ok
+neve       RMSE 0.0439  ACIMA DO LIMITE 0.04
+mina       RMSE 0.0337  ok
+catedral   RMSE 0.0502  ACIMA DO LIMITE 0.04
+[ELIFECYCLE] Command failed with exit code 1.

@@ -7,10 +7,14 @@ import {
   waterMemoryDecision,
   SYSTEM_MEMORY_RESERVE_BYTES,
 } from './bench-capacity-resources.mjs'
-import { aggregatePoint, capacityAt } from './bench-capacity-data.mjs'
+import { aggregatePoint, capacityAt, visibleWaterCandidate } from './bench-capacity-data.mjs'
 const args = Object.fromEntries(
   process.argv.slice(2).map(arg => {
     const [k, ...v] = arg.replace(/^--/, '').split('=')
+    if (k === 'stop-numeric-gate') {
+      if (v.length) throw new Error('Use --stop-numeric-gate without a value')
+      return [k, true]
+    }
     if (!['out', 'axes', 'reuse-phase2'].includes(k)) throw new Error('Unknown option: ' + arg)
     if (!v.join('=')) throw new Error('Use --' + k + '=value')
     return [k, v.join('=')]
@@ -72,6 +76,9 @@ const manifest = await readFile(manifestPath, 'utf8').then(JSON.parse, () => ({
     capacity: 'worst of two round frame p95; thresholds 16.7 and 33.3 ms',
     maximum: 'largest measured passing load; no interpolation',
     reusePhase2: args['reuse-phase2'] ?? null,
+    stopNumericGate: args['stop-numeric-gate'] === true,
+    numericGateRule:
+      'After an optimized visible-water point: numeric step >=15% of median frame, CPU dominance in aggregate and both rounds; stop without a prototype',
     safety:
       'Initial guard 512; larger waters require a 4 GiB RAM reserve; stop at an FPS/resource bound or 8192 waters',
   },
@@ -107,6 +114,7 @@ for (const axis of selected) {
       'tested-range-bound',
       'particle-buffer-bound',
       'resource-bound',
+      'numeric-target-gate',
     ].includes(state.status)
   )
     continue
@@ -226,6 +234,15 @@ for (const axis of selected) {
         capped,
       }),
     )
+    const candidate =
+      args['stop-numeric-gate'] && axis === 'water-visible' ? visibleWaterCandidate(result) : null
+    if (candidate) {
+      state.status = 'numeric-target-gate'
+      state.numericCandidate = candidate
+      await save()
+      console.log('NUMERIC TARGET GATE', JSON.stringify(state.numericCandidate))
+      break
+    }
     if (capped) {
       state.status = 'particle-buffer-bound'
       await save()
@@ -236,6 +253,7 @@ for (const axis of selected) {
   if (state.status === 'running')
     state.status = state.points.at(-1)?.crossed30 ? 'both-budgets-crossed' : 'tested-range-bound'
   await save()
+  if (state.status === 'numeric-target-gate') break
 }
 await publishCapacityOutput(root, destination)
 console.log('Capacity manifest', join(destination, 'manifest.json'))

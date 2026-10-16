@@ -1,3 +1,39 @@
+## 2026-10-16 — Exact JS normal reconstruction for water
+
+Water preparation now uses direct float32 arrays for indexed normal accumulation,
+replaying Three's operation and rounding order. No per-vertex attribute/vector
+calls or allocations in that loop. Generic/non-indexed/normalized/interleaved
+attributes and custom reconstruction/accessors keep Three's implementation.
+Deformation, simulation, bounds, reflections, density and drawing order stay the
+same. Three unit cases cover changing grids 9/65/129/257, degenerate topology
+and compatibility; the collector has a tested opt-in numeric qualification stop.
+
+`pnpm check` passes (193 tests). [Fourteen parity cases](captures/benchmarks-2026-10-16/visible-water/parity/visible-water.json)
+compare 11,073,154 values (all waters, positions, normals, physics, prepared
+textures and reflection matrices) after 1/60/1,200 steps and extra 65/257 grids:
+maximum absolute error 0, every image RMSE 0.
+[Seven controlled area/GLTF comparisons](captures/benchmarks-2026-10-16/visible-water/area-parity/results.json)
+also have RMSE 0. The preserved-core server needed exact subpath priority and
+its original root tsconfig; those setup failures produced no accepted samples.
+The isolated copy now serves reference `18354af`; accepted before timing source
+remains `5880837`. [After sampling](captures/benchmarks-2026-10-16/visible-water/profile/after-4.json)
+confirms reduced generic normal work; sampling remains diagnostic only.
+
+`pnpm compare` retains the same four historical failures: reference .0410,
+forest .0662, snow .0439, cathedral .0502; marsh .1462 and mine .0337 pass.
+Values vary with the legacy wall-clock captures; equal-clock before/after images
+are exact. [Log](captures/benchmarks-2026-10-16/visible-water/validation/compare.log).
+No baseline was regenerated. Inspected page-only
+[cdpshot](captures/benchmarks-2026-10-16/visible-water/validation/cdpshot-cathedral.png).
+Orca explicit page `0025528d-b904-4204-9ec1-840854944689` runs two waters,
+checks 99,846 normal components with maximum error 0 and the same fixed-state
+hash as before: [result](captures/benchmarks-2026-10-16/visible-water/validation/orca-normal-parity.json).
+Its page screenshot still times out even with temporary zero-dt redraw; that
+redraw interval was stopped. No desktop screenshot substituted.
+
+Next: clean-source after measurements with the preregistered conditional stop.
+No extra optimization/prototype, WASM, toolchain, draft change or push.
+
 ## 2026-10-16 — Visible-water before measurements
 
 Fresh clean-source `5880837` measurements cover 1/2/4/8 visible waters under

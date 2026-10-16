@@ -44,3 +44,14 @@ preparation 3.072 ms, reflection 0.352 ms and remainder 0.175 ms. These are
 independent medians, not an additive CPU percentile. Remainder is derived per
 frame before percentiles. [Per-water p50/p95](before-breakdown.json).
 Fresh before capacity remains two waters at 60 fps / four at 30 fps.
+
+## Optimized search stop rule (registered before after measurements)
+
+Only normal reconstruction is changed, retaining float32 accumulation order and
+Three compatibility fallbacks. Simulation, texture preparation, deformation,
+bounds and reflection passes remain unchanged. Use `--stop-numeric-gate` for the
+after search: stop after the first complete stable point whose numeric water
+step occupies ≥15% of frame p50 and whose CPU dominance is established in the
+aggregate and both rounds. This follows the owner's conditional stop instruction.
+Report untested higher loads as lower bounds, rather than implying a maximum.
+No WASM or further optimization is authorized past that gate.

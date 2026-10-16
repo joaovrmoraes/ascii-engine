@@ -1,0 +1,4041 @@
+{
+  "before": "http://localhost:1445",
+  "after": "http://localhost:1440",
+  "dt": 0.016666666666666666,
+  "results": [
+    {
+      "id": "water-visible-1",
+      "steps": 1,
+      "arrays": [
+        {
+          "water": 0,
+          "field": "position",
+          "values": 49923,
+          "maximumAbsoluteDifference": 0,
+          "differentValues": 0
+        },
+        {
+          "water": 0,
+          "field": "normal",
+          "values": 49923,
+          "maximumAbsoluteDifference": 0,
+          "differentValues": 0
+        },
+        {
+          "water": 0,
+          "field": "depth",
+          "values": 16641,
+          "maximumAbsoluteDifference": 0,
+          "differentValues": 0
+        },
+        {
+          "water": 0,
+          "field": "flowX",
+          "values": 16641,
+          "maximumAbsoluteDifference": 0,
+          "differentValues": 0
+        },
+        {
+          "water": 0,
+          "field": "flowZ",
+          "values": 16641,
+          "maximumAbsoluteDifference": 0,
+          "differentValues": 0
+        },
+        {
+          "water": 0,
+          "field": "foam",
+          "values": 16641,
+          "maximumAbsoluteDifference": 0,
+          "differentValues": 0
+        },
+        {
+          "water": 0,
+          "field": "texture",
+          "values": 66564,
+          "maximumAbsoluteDifference": 0,
+          "differentValues": 0
+        },
+        {
+          "water": 0,
+          "field": "reflectionMatrix",
+          "values": 16,
+          "maximumAbsoluteDifference": 0,
+          "differentValues": 0
+        }
+      ],
+      "imageRmse": 0,
+      "before": {
+        "configuration": {
+          "name": "water-scale",
+          "seed": 4242,
+          "carpetSeed": 48017,
+          "cover": 1800,
+          "dt": 0.016666666666666666,
+          "waterCount": 1,
+          "waterResolution": 129,
+          "waterCells": 16641,
+          "waterWidth": 28,
+          "spacing": 32,
+          "mapWidth": 1024,
+          "expectedVisible": 1,
+          "reflection": true,
+          "externalImpulses": false,
+          "waterPolicy": "off"
+        },
+        "diagnostics": {
+          "waterCalls": [
+            2
+          ],
+          "visibleCreatures": 0,
+          "visibleWaters": 1,
+          "simulationResolutions": [
+            129
+          ],
+          "reflectionLevels": [
+            0.0514327444434166
+          ]
+        },
+        "fingerprint": {
+          "hash": "3f7b3544",
+          "values": 116523,
+          "skinnedPoints": 0,
+          "time": 0.016666666666666666,
+          "visibleWaterHash": "730e506e"
+        }
+      },
+      "after": {
+        "configuration": {
+          "name": "water-scale",
+          "seed": 4242,
+          "carpetSeed": 48017,
+          "cover": 1800,
+          "dt": 0.016666666666666666,
+          "waterCount": 1,
+          "waterResolution": 129,
+          "waterCells": 16641,
+          "waterWidth": 28,
+          "spacing": 32,
+          "mapWidth": 1024,
+          "expectedVisible": 1,
+          "reflection": true,
+          "externalImpulses": false,
+          "waterPolicy": "off"
+        },
+        "diagnostics": {
+          "waterCalls": [
+            2
+          ],
+          "visibleCreatures": 0,
+          "visibleWaters": 1,
+          "simulationResolutions": [
+            129
+          ],
+          "reflectionLevels": [
+            0.0514327444434166
+          ]
+        },
+        "fingerprint": {
+          "hash": "3f7b3544",
+          "values": 116523,
+          "skinnedPoints": 0,
+          "time": 0.016666666666666666,
+          "visibleWaterHash": "730e506e"
+        }
+      },
+      "storageCalls": 0
+    },
+    {
+      "id": "water-visible-1",
+      "steps": 60,
+      "arrays": [
+        {
+          "water": 0,
+          "field": "position",
+          "values": 49923,
+          "maximumAbsoluteDifference": 0,
+          "differentValues": 0
+        },
+        {
+          "water": 0,
+          "field": "normal",
+          "values": 49923,
+          "maximumAbsoluteDifference": 0,
+          "differentValues": 0
+        },
+        {
+          "water": 0,
+          "field": "depth",
+          "values": 16641,
+          "maximumAbsoluteDifference": 0,
+          "differentValues": 0
+        },
+        {
+          "water": 0,
+          "field": "flowX",
+          "values": 16641,
+          "maximumAbsoluteDifference": 0,
+          "differentValues": 0
+        },
+        {
+          "water": 0,
+          "field": "flowZ",
+          "values": 16641,
+          "maximumAbsoluteDifference": 0,
+          "differentValues": 0
+        },
+        {
+          "water": 0,
+          "field": "foam",
+          "values": 16641,
+          "maximumAbsoluteDifference": 0,
+          "differentValues": 0
+        },
+        {
+          "water": 0,
+          "field": "texture",
+          "values": 66564,
+          "maximumAbsoluteDifference": 0,
+          "differentValues": 0
+        },
+        {
+          "water": 0,
+          "field": "reflectionMatrix",
+          "values": 16,
+          "maximumAbsoluteDifference": 0,
+          "differentValues": 0
+        }
+      ],
+      "imageRmse": 0,
+      "before": {
+        "configuration": {
+          "name": "water-scale",
+          "seed": 4242,
+          "carpetSeed": 48017,
+          "cover": 1800,
+          "dt": 0.016666666666666666,
+          "waterCount": 1,
+          "waterResolution": 129,
+          "waterCells": 16641,
+          "waterWidth": 28,
+          "spacing": 32,
+          "mapWidth": 1024,
+          "expectedVisible": 1,
+          "reflection": true,
+          "externalImpulses": false,
+          "waterPolicy": "off"
+        },
+        "diagnostics": {
+          "waterCalls": [
+            61
+          ],
+          "visibleCreatures": 0,
+          "visibleWaters": 1,
+          "simulationResolutions": [
+            129
+          ],
+          "reflectionLevels": [
+            0.05253343361616135
+          ]
+        },
+        "fingerprint": {
+          "hash": "7ad4fa52",
+          "values": 116523,
+          "skinnedPoints": 0,
+          "time": 1.0000000000000013,
+          "visibleWaterHash": "e4136425"
+        }
+      },
+      "after": {
+        "configuration": {
+          "name": "water-scale",
+          "seed": 4242,
+          "carpetSeed": 48017,
+          "cover": 1800,
+          "dt": 0.016666666666666666,
+          "waterCount": 1,
+          "waterResolution": 129,
+          "waterCells": 16641,
+          "waterWidth": 28,
+          "spacing": 32,
+          "mapWidth": 1024,
+          "expectedVisible": 1,
+          "reflection": true,
+          "externalImpulses": false,
+          "waterPolicy": "off"
+        },
+        "diagnostics": {
+          "waterCalls": [
+            61
+          ],
+          "visibleCreatures": 0,
+          "visibleWaters": 1,
+          "simulationResolutions": [
+            129
+          ],
+          "reflectionLevels": [
+            0.05253343361616135
+          ]
+        },
+        "fingerprint": {
+          "hash": "7ad4fa52",
+          "values": 116523,
+          "skinnedPoints": 0,
+          "time": 1.0000000000000013,
+          "visibleWaterHash": "e4136425"
+        }
+      },
+      "storageCalls": 0
+    },
+    {
+      "id": "water-visible-1",
+      "steps": 1200,
+      "arrays": [
+        {
+          "water": 0,
+          "field": "position",
+          "values": 49923,
+          "maximumAbsoluteDifference": 0,
+          "differentValues": 0
+        },
+        {
+          "water": 0,
+          "field": "normal",
+          "values": 49923,
+          "maximumAbsoluteDifference": 0,
+          "differentValues": 0
+        },
+        {
+          "water": 0,
+          "field": "depth",
+          "values": 16641,
+          "maximumAbsoluteDifference": 0,
+          "differentValues": 0
+        },
+        {
+          "water": 0,
+          "field": "flowX",
+          "values": 16641,
+          "maximumAbsoluteDifference": 0,
+          "differentValues": 0
+        },
+        {
+          "water": 0,
+          "field": "flowZ",
+          "values": 16641,
+          "maximumAbsoluteDifference": 0,
+          "differentValues": 0
+        },
+        {
+          "water": 0,
+          "field": "foam",
+          "values": 16641,
+          "maximumAbsoluteDifference": 0,
+          "differentValues": 0
+        },
+        {
+          "water": 0,
+          "field": "texture",
+          "values": 66564,
+          "maximumAbsoluteDifference": 0,
+          "differentValues": 0
+        },
+        {
+          "water": 0,
+          "field": "reflectionMatrix",
+          "values": 16,
+          "maximumAbsoluteDifference": 0,
+          "differentValues": 0
+        }
+      ],
+      "imageRmse": 0,
+      "before": {
+        "configuration": {
+          "name": "water-scale",
+          "seed": 4242,
+          "carpetSeed": 48017,
+          "cover": 1800,
+          "dt": 0.016666666666666666,
+          "waterCount": 1,
+          "waterResolution": 129,
+          "waterCells": 16641,
+          "waterWidth": 28,
+          "spacing": 32,
+          "mapWidth": 1024,
+          "expectedVisible": 1,
+          "reflection": true,
+          "externalImpulses": false,
+          "waterPolicy": "off"
+        },
+        "diagnostics": {
+          "waterCalls": [
+            1201
+          ],
+          "visibleCreatures": 0,
+          "visibleWaters": 1,
+          "simulationResolutions": [
+            129
+          ],
+          "reflectionLevels": [
+            0.053002395510673525
+          ]
+        },
+        "fingerprint": {
+          "hash": "a902d504",
+          "values": 116523,
+          "skinnedPoints": 0,
+          "time": 20.000000000000146,
+          "visibleWaterHash": "46f3835e"
+        }
+      },
+      "after": {
+        "configuration": {
+          "name": "water-scale",
+          "seed": 4242,
+          "carpetSeed": 48017,
+          "cover": 1800,
+          "dt": 0.016666666666666666,
+          "waterCount": 1,
+          "waterResolution": 129,
+          "waterCells": 16641,
+          "waterWidth": 28,
+          "spacing": 32,
+          "mapWidth": 1024,
+          "expectedVisible": 1,
+          "reflection": true,
+          "externalImpulses": false,
+          "waterPolicy": "off"
+        },
+        "diagnostics": {
+          "waterCalls": [
+            1201
+          ],
+          "visibleCreatures": 0,
+          "visibleWaters": 1,
+          "simulationResolutions": [
+            129
+          ],
+          "reflectionLevels": [
+            0.053002395510673525
+          ]
+        },
+        "fingerprint": {
+          "hash": "a902d504",
+          "values": 116523,
+          "skinnedPoints": 0,
+          "time": 20.000000000000146,
+          "visibleWaterHash": "46f3835e"
+        }
+      },
+      "storageCalls": 0
+    },
+    {
+      "id": "water-visible-2",
+      "steps": 1,
+      "arrays": [
+        {
+          "water": 0,
+          "field": "position",
+          "values": 49923,
+          "maximumAbsoluteDifference": 0,
+          "differentValues": 0
+        },
+        {
+          "water": 0,
+          "field": "normal",
+          "values": 49923,
+          "maximumAbsoluteDifference": 0,
+          "differentValues": 0
+        },
+        {
+          "water": 0,
+          "field": "depth",
+          "values": 16641,
+          "maximumAbsoluteDifference": 0,
+          "differentValues": 0
+        },
+        {
+          "water": 0,
+          "field": "flowX",
+          "values": 16641,
+          "maximumAbsoluteDifference": 0,
+          "differentValues": 0
+        },
+        {
+          "water": 0,
+          "field": "flowZ",
+          "values": 16641,
+          "maximumAbsoluteDifference": 0,
+          "differentValues": 0
+        },
+        {
+          "water": 0,
+          "field": "foam",
+          "values": 16641,
+          "maximumAbsoluteDifference": 0,
+          "differentValues": 0
+        },
+        {
+          "water": 0,
+          "field": "texture",
+          "values": 66564,
+          "maximumAbsoluteDifference": 0,
+          "differentValues": 0
+        },
+        {
+          "water": 0,
+          "field": "reflectionMatrix",
+          "values": 16,
+          "maximumAbsoluteDifference": 0,
+          "differentValues": 0
+        },
+        {
+          "water": 1,
+          "field": "position",
+          "values": 49923,
+          "maximumAbsoluteDifference": 0,
+          "differentValues": 0
+        },
+        {
+          "water": 1,
+          "field": "normal",
+          "values": 49923,
+          "maximumAbsoluteDifference": 0,
+          "differentValues": 0
+        },
+        {
+          "water": 1,
+          "field": "depth",
+          "values": 16641,
+          "maximumAbsoluteDifference": 0,
+          "differentValues": 0
+        },
+        {
+          "water": 1,
+          "field": "flowX",
+          "values": 16641,
+          "maximumAbsoluteDifference": 0,
+          "differentValues": 0
+        },
+        {
+          "water": 1,
+          "field": "flowZ",
+          "values": 16641,
+          "maximumAbsoluteDifference": 0,
+          "differentValues": 0
+        },
+        {
+          "water": 1,
+          "field": "foam",
+          "values": 16641,
+          "maximumAbsoluteDifference": 0,
+          "differentValues": 0
+        },
+        {
+          "water": 1,
+          "field": "texture",
+          "values": 66564,
+          "maximumAbsoluteDifference": 0,
+          "differentValues": 0
+        },
+        {
+          "water": 1,
+          "field": "reflectionMatrix",
+          "values": 16,
+          "maximumAbsoluteDifference": 0,
+          "differentValues": 0
+        }
+      ],
+      "imageRmse": 0,
+      "before": {
+        "configuration": {
+          "name": "water-scale",
+          "seed": 4242,
+          "carpetSeed": 48017,
+          "cover": 1800,
+          "dt": 0.016666666666666666,
+          "waterCount": 2,
+          "waterResolution": 129,
+          "waterCells": 33282,
+          "waterWidth": 28,
+          "spacing": 32,
+          "mapWidth": 1024,
+          "expectedVisible": 2,
+          "reflection": true,
+          "externalImpulses": false,
+          "waterPolicy": "off"
+        },
+        "diagnostics": {
+          "waterCalls": [
+            2,
+            2
+          ],
+          "visibleCreatures": 0,
+          "visibleWaters": 2,
+          "simulationResolutions": [
+            129,
+            129
+          ],
+          "reflectionLevels": [
+            0.05121126475930214,
+            0.053333052277565005
+          ]
+        },
+        "fingerprint": {
+          "hash": "35ceeca1",
+          "values": 233010,
+          "skinnedPoints": 0,
+          "time": 0.016666666666666666,
+          "visibleWaterHash": "730e506e"
+        }
+      },
+      "after": {
+        "configuration": {
+          "name": "water-scale",
+          "seed": 4242,
+          "carpetSeed": 48017,
+          "cover": 1800,
+          "dt": 0.016666666666666666,
+          "waterCount": 2,
+          "waterResolution": 129,
+          "waterCells": 33282,
+          "waterWidth": 28,
+          "spacing": 32,
+          "mapWidth": 1024,
+          "expectedVisible": 2,
+          "reflection": true,
+          "externalImpulses": false,
+          "waterPolicy": "off"
+        },
+        "diagnostics": {
+          "waterCalls": [
+            2,
+            2
+          ],
+          "visibleCreatures": 0,
+          "visibleWaters": 2,
+          "simulationResolutions": [
+            129,
+            129
+          ],
+          "reflectionLevels": [
+            0.05121126475930214,
+            0.053333052277565005
+          ]
+        },
+        "fingerprint": {
+          "hash": "35ceeca1",
+          "values": 233010,
+          "skinnedPoints": 0,
+          "time": 0.016666666666666666,
+          "visibleWaterHash": "730e506e"
+        }
+      },
+      "storageCalls": 0
+    },
+    {
+      "id": "water-visible-2",
+      "steps": 60,
+      "arrays": [
+        {
+          "water": 0,
+          "field": "position",
+          "values": 49923,
+          "maximumAbsoluteDifference": 0,
+          "differentValues": 0
+        },
+        {
+          "water": 0,
+          "field": "normal",
+          "values": 49923,
+          "maximumAbsoluteDifference": 0,
+          "differentValues": 0
+        },
+        {
+          "water": 0,
+          "field": "depth",
+          "values": 16641,
+          "maximumAbsoluteDifference": 0,
+          "differentValues": 0
+        },
+        {
+          "water": 0,
+          "field": "flowX",
+          "values": 16641,
+          "maximumAbsoluteDifference": 0,
+          "differentValues": 0
+        },
+        {
+          "water": 0,
+          "field": "flowZ",
+          "values": 16641,
+          "maximumAbsoluteDifference": 0,
+          "differentValues": 0
+        },
+        {
+          "water": 0,
+          "field": "foam",
+          "values": 16641,
+          "maximumAbsoluteDifference": 0,
+          "differentValues": 0
+        },
+        {
+          "water": 0,
+          "field": "texture",
+          "values": 66564,
+          "maximumAbsoluteDifference": 0,
+          "differentValues": 0
+        },
+        {
+          "water": 0,
+          "field": "reflectionMatrix",
+          "values": 16,
+          "maximumAbsoluteDifference": 0,
+          "differentValues": 0
+        },
+        {
+          "water": 1,
+          "field": "position",
+          "values": 49923,
+          "maximumAbsoluteDifference": 0,
+          "differentValues": 0
+        },
+        {
+          "water": 1,
+          "field": "normal",
+          "values": 49923,
+          "maximumAbsoluteDifference": 0,
+          "differentValues": 0
+        },
+        {
+          "water": 1,
+          "field": "depth",
+          "values": 16641,
+          "maximumAbsoluteDifference": 0,
+          "differentValues": 0
+        },
+        {
+          "water": 1,
+          "field": "flowX",
+          "values": 16641,
+          "maximumAbsoluteDifference": 0,
+          "differentValues": 0
+        },
+        {
+          "water": 1,
+          "field": "flowZ",
+          "values": 16641,
+          "maximumAbsoluteDifference": 0,
+          "differentValues": 0
+        },
+        {
+          "water": 1,
+          "field": "foam",
+          "values": 16641,
+          "maximumAbsoluteDifference": 0,
+          "differentValues": 0
+        },
+        {
+          "water": 1,
+          "field": "texture",
+          "values": 66564,
+          "maximumAbsoluteDifference": 0,
+          "differentValues": 0
+        },
+        {
+          "water": 1,
+          "field": "reflectionMatrix",
+          "values": 16,
+          "maximumAbsoluteDifference": 0,
+          "differentValues": 0
+        }
+      ],
+      "imageRmse": 0,
+      "before": {
+        "configuration": {
+          "name": "water-scale",
+          "seed": 4242,
+          "carpetSeed": 48017,
+          "cover": 1800,
+          "dt": 0.016666666666666666,
+          "waterCount": 2,
+          "waterResolution": 129,
+          "waterCells": 33282,
+          "waterWidth": 28,
+          "spacing": 32,
+          "mapWidth": 1024,
+          "expectedVisible": 2,
+          "reflection": true,
+          "externalImpulses": false,
+          "waterPolicy": "off"
+        },
+        "diagnostics": {
+          "waterCalls": [
+            61,
+            61
+          ],
+          "visibleCreatures": 0,
+          "visibleWaters": 2,
+          "simulationResolutions": [
+            129,
+            129
+          ],
+          "reflectionLevels": [
+            0.052458089619874956,
+            0.05308079051971436
+          ]
+        },
+        "fingerprint": {
+          "hash": "92c29cc1",
+          "values": 233010,
+          "skinnedPoints": 0,
+          "time": 1.0000000000000013,
+          "visibleWaterHash": "e4136425"
+        }
+      },
+      "after": {
+        "configuration": {
+          "name": "water-scale",
+          "seed": 4242,
+          "carpetSeed": 48017,
+          "cover": 1800,
+          "dt": 0.016666666666666666,
+          "waterCount": 2,
+          "waterResolution": 129,
+          "waterCells": 33282,
+          "waterWidth": 28,
+          "spacing": 32,
+          "mapWidth": 1024,
+          "expectedVisible": 2,
+          "reflection": true,
+          "externalImpulses": false,
+          "waterPolicy": "off"
+        },
+        "diagnostics": {
+          "waterCalls": [
+            61,
+            61
+          ],
+          "visibleCreatures": 0,
+          "visibleWaters": 2,
+          "simulationResolutions": [
+            129,
+            129
+          ],
+          "reflectionLevels": [
+            0.052458089619874956,
+            0.05308079051971436
+          ]
+        },
+        "fingerprint": {
+          "hash": "92c29cc1",
+          "values": 233010,
+          "skinnedPoints": 0,
+          "time": 1.0000000000000013,
+          "visibleWaterHash": "e4136425"
+        }
+      },
+      "storageCalls": 0
+    },
+    {
+      "id": "water-visible-2",
+      "steps": 1200,
+      "arrays": [
+        {
+          "water": 0,
+          "field": "position",
+          "values": 49923,
+          "maximumAbsoluteDifference": 0,
+          "differentValues": 0
+        },
+        {
+          "water": 0,
+          "field": "normal",
+          "values": 49923,
+          "maximumAbsoluteDifference": 0,
+          "differentValues": 0
+        },
+        {
+          "water": 0,
+          "field": "depth",
+          "values": 16641,
+          "maximumAbsoluteDifference": 0,
+          "differentValues": 0
+        },
+        {
+          "water": 0,
+          "field": "flowX",
+          "values": 16641,
+          "maximumAbsoluteDifference": 0,
+          "differentValues": 0
+        },
+        {
+          "water": 0,
+          "field": "flowZ",
+          "values": 16641,
+          "maximumAbsoluteDifference": 0,
+          "differentValues": 0
+        },
+        {
+          "water": 0,
+          "field": "foam",
+          "values": 16641,
+          "maximumAbsoluteDifference": 0,
+          "differentValues": 0
+        },
+        {
+          "water": 0,
+          "field": "texture",
+          "values": 66564,
+          "maximumAbsoluteDifference": 0,
+          "differentValues": 0
+        },
+        {
+          "water": 0,
+          "field": "reflectionMatrix",
+          "values": 16,
+          "maximumAbsoluteDifference": 0,
+          "differentValues": 0
+        },
+        {
+          "water": 1,
+          "field": "position",
+          "values": 49923,
+          "maximumAbsoluteDifference": 0,
+          "differentValues": 0
+        },
+        {
+          "water": 1,
+          "field": "normal",
+          "values": 49923,
+          "maximumAbsoluteDifference": 0,
+          "differentValues": 0
+        },
+        {
+          "water": 1,
+          "field": "depth",
+          "values": 16641,
+          "maximumAbsoluteDifference": 0,
+          "differentValues": 0
+        },
+        {
+          "water": 1,
+          "field": "flowX",
+          "values": 16641,
+          "maximumAbsoluteDifference": 0,
+          "differentValues": 0
+        },
+        {
+          "water": 1,
+          "field": "flowZ",
+          "values": 16641,
+          "maximumAbsoluteDifference": 0,
+          "differentValues": 0
+        },
+        {
+          "water": 1,
+          "field": "foam",
+          "values": 16641,
+          "maximumAbsoluteDifference": 0,
+          "differentValues": 0
+        },
+        {
+          "water": 1,
+          "field": "texture",
+          "values": 66564,
+          "maximumAbsoluteDifference": 0,
+          "differentValues": 0
+        },
+        {
+          "water": 1,
+          "field": "reflectionMatrix",
+          "values": 16,
+          "maximumAbsoluteDifference": 0,
+          "differentValues": 0
+        }
+      ],
+      "imageRmse": 0,
+      "before": {
+        "configuration": {
+          "name": "water-scale",
+          "seed": 4242,
+          "carpetSeed": 48017,
+          "cover": 1800,
+          "dt": 0.016666666666666666,
+          "waterCount": 2,
+          "waterResolution": 129,
+          "waterCells": 33282,
+          "waterWidth": 28,
+          "spacing": 32,
+          "mapWidth": 1024,
+          "expectedVisible": 2,
+          "reflection": true,
+          "externalImpulses": false,
+          "waterPolicy": "off"
+        },
+        "diagnostics": {
+          "waterCalls": [
+            1201,
+            1201
+          ],
+          "visibleCreatures": 0,
+          "visibleWaters": 2,
+          "simulationResolutions": [
+            129,
+            129
+          ],
+          "reflectionLevels": [
+            0.05299128296971321,
+            0.05300562906265259
+          ]
+        },
+        "fingerprint": {
+          "hash": "301f5d49",
+          "values": 233010,
+          "skinnedPoints": 0,
+          "time": 20.000000000000146,
+          "visibleWaterHash": "46f3835e"
+        }
+      },
+      "after": {
+        "configuration": {
+          "name": "water-scale",
+          "seed": 4242,
+          "carpetSeed": 48017,
+          "cover": 1800,
+          "dt": 0.016666666666666666,
+          "waterCount": 2,
+          "waterResolution": 129,
+          "waterCells": 33282,
+          "waterWidth": 28,
+          "spacing": 32,
+          "mapWidth": 1024,
+          "expectedVisible": 2,
+          "reflection": true,
+          "externalImpulses": false,
+          "waterPolicy": "off"
+        },
+        "diagnostics": {
+          "waterCalls": [
+            1201,
+            1201
+          ],
+          "visibleCreatures": 0,
+          "visibleWaters": 2,
+          "simulationResolutions": [
+            129,
+            129
+          ],
+          "reflectionLevels": [
+            0.05299128296971321,
+            0.05300562906265259
+          ]
+        },
+        "fingerprint": {
+          "hash": "301f5d49",
+          "values": 233010,
+          "skinnedPoints": 0,
+          "time": 20.000000000000146,
+          "visibleWaterHash": "46f3835e"
+        }
+      },
+      "storageCalls": 0
+    },
+    {
+      "id": "water-visible-4",
+      "steps": 1,
+      "arrays": [
+        {
+          "water": 0,
+          "field": "position",
+          "values": 49923,
+          "maximumAbsoluteDifference": 0,
+          "differentValues": 0
+        },
+        {
+          "water": 0,
+          "field": "normal",
+          "values": 49923,
+          "maximumAbsoluteDifference": 0,
+          "differentValues": 0
+        },
+        {
+          "water": 0,
+          "field": "depth",
+          "values": 16641,
+          "maximumAbsoluteDifference": 0,
+          "differentValues": 0
+        },
+        {
+          "water": 0,
+          "field": "flowX",
+          "values": 16641,
+          "maximumAbsoluteDifference": 0,
+          "differentValues": 0
+        },
+        {
+          "water": 0,
+          "field": "flowZ",
+          "values": 16641,
+          "maximumAbsoluteDifference": 0,
+          "differentValues": 0
+        },
+        {
+          "water": 0,
+          "field": "foam",
+          "values": 16641,
+          "maximumAbsoluteDifference": 0,
+          "differentValues": 0
+        },
+        {
+          "water": 0,
+          "field": "texture",
+          "values": 66564,
+          "maximumAbsoluteDifference": 0,
+          "differentValues": 0
+        },
+        {
+          "water": 0,
+          "field": "reflectionMatrix",
+          "values": 16,
+          "maximumAbsoluteDifference": 0,
+          "differentValues": 0
+        },
+        {
+          "water": 1,
+          "field": "position",
+          "values": 49923,
+          "maximumAbsoluteDifference": 0,
+          "differentValues": 0
+        },
+        {
+          "water": 1,
+          "field": "normal",
+          "values": 49923,
+          "maximumAbsoluteDifference": 0,
+          "differentValues": 0
+        },
+        {
+          "water": 1,
+          "field": "depth",
+          "values": 16641,
+          "maximumAbsoluteDifference": 0,
+          "differentValues": 0
+        },
+        {
+          "water": 1,
+          "field": "flowX",
+          "values": 16641,
+          "maximumAbsoluteDifference": 0,
+          "differentValues": 0
+        },
+        {
+          "water": 1,
+          "field": "flowZ",
+          "values": 16641,
+          "maximumAbsoluteDifference": 0,
+          "differentValues": 0
+        },
+        {
+          "water": 1,
+          "field": "foam",
+          "values": 16641,
+          "maximumAbsoluteDifference": 0,
+          "differentValues": 0
+        },
+        {
+          "water": 1,
+          "field": "texture",
+          "values": 66564,
+          "maximumAbsoluteDifference": 0,
+          "differentValues": 0
+        },
+        {
+          "water": 1,
+          "field": "reflectionMatrix",
+          "values": 16,
+          "maximumAbsoluteDifference": 0,
+          "differentValues": 0
+        },
+        {
+          "water": 2,
+          "field": "position",
+          "values": 49923,
+          "maximumAbsoluteDifference": 0,
+          "differentValues": 0
+        },
+        {
+          "water": 2,
+          "field": "normal",
+          "values": 49923,
+          "maximumAbsoluteDifference": 0,
+          "differentValues": 0
+        },
+        {
+          "water": 2,
+          "field": "depth",
+          "values": 16641,
+          "maximumAbsoluteDifference": 0,
+          "differentValues": 0
+        },
+        {
+          "water": 2,
+          "field": "flowX",
+          "values": 16641,
+          "maximumAbsoluteDifference": 0,
+          "differentValues": 0
+        },
+        {
+          "water": 2,
+          "field": "flowZ",
+          "values": 16641,
+          "maximumAbsoluteDifference": 0,
+          "differentValues": 0
+        },
+        {
+          "water": 2,
+          "field": "foam",
+          "values": 16641,
+          "maximumAbsoluteDifference": 0,
+          "differentValues": 0
+        },
+        {
+          "water": 2,
+          "field": "texture",
+          "values": 66564,
+          "maximumAbsoluteDifference": 0,
+          "differentValues": 0
+        },
+        {
+          "water": 2,
+          "field": "reflectionMatrix",
+          "values": 16,
+          "maximumAbsoluteDifference": 0,
+          "differentValues": 0
+        },
+        {
+          "water": 3,
+          "field": "position",
+          "values": 49923,
+          "maximumAbsoluteDifference": 0,
+          "differentValues": 0
+        },
+        {
+          "water": 3,
+          "field": "normal",
+          "values": 49923,
+          "maximumAbsoluteDifference": 0,
+          "differentValues": 0
+        },
+        {
+          "water": 3,
+          "field": "depth",
+          "values": 16641,
+          "maximumAbsoluteDifference": 0,
+          "differentValues": 0
+        },
+        {
+          "water": 3,
+          "field": "flowX",
+          "values": 16641,
+          "maximumAbsoluteDifference": 0,
+          "differentValues": 0
+        },
+        {
+          "water": 3,
+          "field": "flowZ",
+          "values": 16641,
+          "maximumAbsoluteDifference": 0,
+          "differentValues": 0
+        },
+        {
+          "water": 3,
+          "field": "foam",
+          "values": 16641,
+          "maximumAbsoluteDifference": 0,
+          "differentValues": 0
+        },
+        {
+          "water": 3,
+          "field": "texture",
+          "values": 66564,
+          "maximumAbsoluteDifference": 0,
+          "differentValues": 0
+        },
+        {
+          "water": 3,
+          "field": "reflectionMatrix",
+          "values": 16,
+          "maximumAbsoluteDifference": 0,
+          "differentValues": 0
+        }
+      ],
+      "imageRmse": 0,
+      "before": {
+        "configuration": {
+          "name": "water-scale",
+          "seed": 4242,
+          "carpetSeed": 48017,
+          "cover": 1800,
+          "dt": 0.016666666666666666,
+          "waterCount": 4,
+          "waterResolution": 129,
+          "waterCells": 66564,
+          "waterWidth": 28,
+          "spacing": 32,
+          "mapWidth": 1024,
+          "expectedVisible": 4,
+          "reflection": true,
+          "externalImpulses": false,
+          "waterPolicy": "off"
+        },
+        "diagnostics": {
+          "waterCalls": [
+            2,
+            2,
+            2,
+            2
+          ],
+          "visibleCreatures": 0,
+          "visibleWaters": 4,
+          "simulationResolutions": [
+            129,
+            129,
+            129,
+            129
+          ],
+          "reflectionLevels": [
+            0.1186487812846899,
+            0.1151495769917965,
+            -0.01077330780029297,
+            -0.009498796582221986
+          ]
+        },
+        "fingerprint": {
+          "hash": "29acc81",
+          "values": 465984,
+          "skinnedPoints": 0,
+          "time": 0.016666666666666666,
+          "visibleWaterHash": "730e506e"
+        }
+      },
+      "after": {
+        "configuration": {
+          "name": "water-scale",
+          "seed": 4242,
+          "carpetSeed": 48017,
+          "cover": 1800,
+          "dt": 0.016666666666666666,
+          "waterCount": 4,
+          "waterResolution": 129,
+          "waterCells": 66564,
+          "waterWidth": 28,
+          "spacing": 32,
+          "mapWidth": 1024,
+          "expectedVisible": 4,
+          "reflection": true,
+          "externalImpulses": false,
+          "waterPolicy": "off"
+        },
+        "diagnostics": {
+          "waterCalls": [
+            2,
+            2,
+            2,
+            2
+          ],
+          "visibleCreatures": 0,
+          "visibleWaters": 4,
+          "simulationResolutions": [
+            129,
+            129,
+            129,
+            129
+          ],
+          "reflectionLevels": [
+            0.1186487812846899,
+            0.1151495769917965,
+            -0.01077330780029297,
+            -0.009498796582221986
+          ]
+        },
+        "fingerprint": {
+          "hash": "29acc81",
+          "values": 465984,
+          "skinnedPoints": 0,
+          "time": 0.016666666666666666,
+          "visibleWaterHash": "730e506e"
+        }
+      },
+      "storageCalls": 0
+    },
+    {
+      "id": "water-visible-4",
+      "steps": 60,
+      "arrays": [
+        {
+          "water": 0,
+          "field": "position",
+          "values": 49923,
+          "maximumAbsoluteDifference": 0,
+          "differentValues": 0
+        },
+        {
+          "water": 0,
+          "field": "normal",
+          "values": 49923,
+          "maximumAbsoluteDifference": 0,
+          "differentValues": 0
+        },
+        {
+          "water": 0,
+          "field": "depth",
+          "values": 16641,
+          "maximumAbsoluteDifference": 0,
+          "differentValues": 0
+        },
+        {
+          "water": 0,
+          "field": "flowX",
+          "values": 16641,
+          "maximumAbsoluteDifference": 0,
+          "differentValues": 0
+        },
+        {
+          "water": 0,
+          "field": "flowZ",
+          "values": 16641,
+          "maximumAbsoluteDifference": 0,
+          "differentValues": 0
+        },
+        {
+          "water": 0,
+          "field": "foam",
+          "values": 16641,
+          "maximumAbsoluteDifference": 0,
+          "differentValues": 0
+        },
+        {
+          "water": 0,
+          "field": "texture",
+          "values": 66564,
+          "maximumAbsoluteDifference": 0,
+          "differentValues": 0
+        },
+        {
+          "water": 0,
+          "field": "reflectionMatrix",
+          "values": 16,
+          "maximumAbsoluteDifference": 0,
+          "differentValues": 0
+        },
+        {
+          "water": 1,
+          "field": "position",
+          "values": 49923,
+          "maximumAbsoluteDifference": 0,
+          "differentValues": 0
+        },
+        {
+          "water": 1,
+          "field": "normal",
+          "values": 49923,
+          "maximumAbsoluteDifference": 0,
+          "differentValues": 0
+        },
+        {
+          "water": 1,
+          "field": "depth",
+          "values": 16641,
+          "maximumAbsoluteDifference": 0,
+          "differentValues": 0
+        },
+        {
+          "water": 1,
+          "field": "flowX",
+          "values": 16641,
+          "maximumAbsoluteDifference": 0,
+          "differentValues": 0
+        },
+        {
+          "water": 1,
+          "field": "flowZ",
+          "values": 16641,
+          "maximumAbsoluteDifference": 0,
+          "differentValues": 0
+        },
+        {
+          "water": 1,
+          "field": "foam",
+          "values": 16641,
+          "maximumAbsoluteDifference": 0,
+          "differentValues": 0
+        },
+        {
+          "water": 1,
+          "field": "texture",
+          "values": 66564,
+          "maximumAbsoluteDifference": 0,
+          "differentValues": 0
+        },
+        {
+          "water": 1,
+          "field": "reflectionMatrix",
+          "values": 16,
+          "maximumAbsoluteDifference": 0,
+          "differentValues": 0
+        },
+        {
+          "water": 2,
+          "field": "position",
+          "values": 49923,
+          "maximumAbsoluteDifference": 0,
+          "differentValues": 0
+        },
+        {
+          "water": 2,
+          "field": "normal",
+          "values": 49923,
+          "maximumAbsoluteDifference": 0,
+          "differentValues": 0
+        },
+        {
+          "water": 2,
+          "field": "depth",
+          "values": 16641,
+          "maximumAbsoluteDifference": 0,
+          "differentValues": 0
+        },
+        {
+          "water": 2,
+          "field": "flowX",
+          "values": 16641,
+          "maximumAbsoluteDifference": 0,
+          "differentValues": 0
+        },
+        {
+          "water": 2,
+          "field": "flowZ",
+          "values": 16641,
+          "maximumAbsoluteDifference": 0,
+          "differentValues": 0
+        },
+        {
+          "water": 2,
+          "field": "foam",
+          "values": 16641,
+          "maximumAbsoluteDifference": 0,
+          "differentValues": 0
+        },
+        {
+          "water": 2,
+          "field": "texture",
+          "values": 66564,
+          "maximumAbsoluteDifference": 0,
+          "differentValues": 0
+        },
+        {
+          "water": 2,
+          "field": "reflectionMatrix",
+          "values": 16,
+          "maximumAbsoluteDifference": 0,
+          "differentValues": 0
+        },
+        {
+          "water": 3,
+          "field": "position",
+          "values": 49923,
+          "maximumAbsoluteDifference": 0,
+          "differentValues": 0
+        },
+        {
+          "water": 3,
+          "field": "normal",
+          "values": 49923,
+          "maximumAbsoluteDifference": 0,
+          "differentValues": 0
+        },
+        {
+          "water": 3,
+          "field": "depth",
+          "values": 16641,
+          "maximumAbsoluteDifference": 0,
+          "differentValues": 0
+        },
+        {
+          "water": 3,
+          "field": "flowX",
+          "values": 16641,
+          "maximumAbsoluteDifference": 0,
+          "differentValues": 0
+        },
+        {
+          "water": 3,
+          "field": "flowZ",
+          "values": 16641,
+          "maximumAbsoluteDifference": 0,
+          "differentValues": 0
+        },
+        {
+          "water": 3,
+          "field": "foam",
+          "values": 16641,
+          "maximumAbsoluteDifference": 0,
+          "differentValues": 0
+        },
+        {
+          "water": 3,
+          "field": "texture",
+          "values": 66564,
+          "maximumAbsoluteDifference": 0,
+          "differentValues": 0
+        },
+        {
+          "water": 3,
+          "field": "reflectionMatrix",
+          "values": 16,
+          "maximumAbsoluteDifference": 0,
+          "differentValues": 0
+        }
+      ],
+      "imageRmse": 0,
+      "before": {
+        "configuration": {
+          "name": "water-scale",
+          "seed": 4242,
+          "carpetSeed": 48017,
+          "cover": 1800,
+          "dt": 0.016666666666666666,
+          "waterCount": 4,
+          "waterResolution": 129,
+          "waterCells": 66564,
+          "waterWidth": 28,
+          "spacing": 32,
+          "mapWidth": 1024,
+          "expectedVisible": 4,
+          "reflection": true,
+          "externalImpulses": false,
+          "waterPolicy": "off"
+        },
+        "diagnostics": {
+          "waterCalls": [
+            61,
+            61,
+            61,
+            61
+          ],
+          "visibleCreatures": 0,
+          "visibleWaters": 4,
+          "simulationResolutions": [
+            129,
+            129,
+            129,
+            129
+          ],
+          "reflectionLevels": [
+            0.11518444012105465,
+            0.11437830778956413,
+            -0.00866701376438141,
+            -0.008432976126670839
+          ]
+        },
+        "fingerprint": {
+          "hash": "25952d51",
+          "values": 465984,
+          "skinnedPoints": 0,
+          "time": 1.0000000000000013,
+          "visibleWaterHash": "e4136425"
+        }
+      },
+      "after": {
+        "configuration": {
+          "name": "water-scale",
+          "seed": 4242,
+          "carpetSeed": 48017,
+          "cover": 1800,
+          "dt": 0.016666666666666666,
+          "waterCount": 4,
+          "waterResolution": 129,
+          "waterCells": 66564,
+          "waterWidth": 28,
+          "spacing": 32,
+          "mapWidth": 1024,
+          "expectedVisible": 4,
+          "reflection": true,
+          "externalImpulses": false,
+          "waterPolicy": "off"
+        },
+        "diagnostics": {
+          "waterCalls": [
+            61,
+            61,
+            61,
+            61
+          ],
+          "visibleCreatures": 0,
+          "visibleWaters": 4,
+          "simulationResolutions": [
+            129,
+            129,
+            129,
+            129
+          ],
+          "reflectionLevels": [
+            0.11518444012105465,
+            0.11437830778956413,
+            -0.00866701376438141,
+            -0.008432976126670839
+          ]
+        },
+        "fingerprint": {
+          "hash": "25952d51",
+          "values": 465984,
+          "skinnedPoints": 0,
+          "time": 1.0000000000000013,
+          "visibleWaterHash": "e4136425"
+        }
+      },
+      "storageCalls": 0
+    },
+    {
+      "id": "water-visible-4",
+      "steps": 1200,
+      "arrays": [
+        {
+          "water": 0,
+          "field": "position",
+          "values": 49923,
+          "maximumAbsoluteDifference": 0,
+          "differentValues": 0
+        },
+        {
+          "water": 0,
+          "field": "normal",
+          "values": 49923,
+          "maximumAbsoluteDifference": 0,
+          "differentValues": 0
+        },
+        {
+          "water": 0,
+          "field": "depth",
+          "values": 16641,
+          "maximumAbsoluteDifference": 0,
+          "differentValues": 0
+        },
+        {
+          "water": 0,
+          "field": "flowX",
+          "values": 16641,
+          "maximumAbsoluteDifference": 0,
+          "differentValues": 0
+        },
+        {
+          "water": 0,
+          "field": "flowZ",
+          "values": 16641,
+          "maximumAbsoluteDifference": 0,
+          "differentValues": 0
+        },
+        {
+          "water": 0,
+          "field": "foam",
+          "values": 16641,
+          "maximumAbsoluteDifference": 0,
+          "differentValues": 0
+        },
+        {
+          "water": 0,
+          "field": "texture",
+          "values": 66564,
+          "maximumAbsoluteDifference": 0,
+          "differentValues": 0
+        },
+        {
+          "water": 0,
+          "field": "reflectionMatrix",
+          "values": 16,
+          "maximumAbsoluteDifference": 0,
+          "differentValues": 0
+        },
+        {
+          "water": 1,
+          "field": "position",
+          "values": 49923,
+          "maximumAbsoluteDifference": 0,
+          "differentValues": 0
+        },
+        {
+          "water": 1,
+          "field": "normal",
+          "values": 49923,
+          "maximumAbsoluteDifference": 0,
+          "differentValues": 0
+        },
+        {
+          "water": 1,
+          "field": "depth",
+          "values": 16641,
+          "maximumAbsoluteDifference": 0,
+          "differentValues": 0
+        },
+        {
+          "water": 1,
+          "field": "flowX",
+          "values": 16641,
+          "maximumAbsoluteDifference": 0,
+          "differentValues": 0
+        },
+        {
+          "water": 1,
+          "field": "flowZ",
+          "values": 16641,
+          "maximumAbsoluteDifference": 0,
+          "differentValues": 0
+        },
+        {
+          "water": 1,
+          "field": "foam",
+          "values": 16641,
+          "maximumAbsoluteDifference": 0,
+          "differentValues": 0
+        },
+        {
+          "water": 1,
+          "field": "texture",
+          "values": 66564,
+          "maximumAbsoluteDifference": 0,
+          "differentValues": 0
+        },
+        {
+          "water": 1,
+          "field": "reflectionMatrix",
+          "values": 16,
+          "maximumAbsoluteDifference": 0,
+          "differentValues": 0
+        },
+        {
+          "water": 2,
+          "field": "position",
+          "values": 49923,
+          "maximumAbsoluteDifference": 0,
+          "differentValues": 0
+        },
+        {
+          "water": 2,
+          "field": "normal",
+          "values": 49923,
+          "maximumAbsoluteDifference": 0,
+          "differentValues": 0
+        },
+        {
+          "water": 2,
+          "field": "depth",
+          "values": 16641,
+          "maximumAbsoluteDifference": 0,
+          "differentValues": 0
+        },
+        {
+          "water": 2,
+          "field": "flowX",
+          "values": 16641,
+          "maximumAbsoluteDifference": 0,
+          "differentValues": 0
+        },
+        {
+          "water": 2,
+          "field": "flowZ",
+          "values": 16641,
+          "maximumAbsoluteDifference": 0,
+          "differentValues": 0
+        },
+        {
+          "water": 2,
+          "field": "foam",
+          "values": 16641,
+          "maximumAbsoluteDifference": 0,
+          "differentValues": 0
+        },
+        {
+          "water": 2,
+          "field": "texture",
+          "values": 66564,
+          "maximumAbsoluteDifference": 0,
+          "differentValues": 0
+        },
+        {
+          "water": 2,
+          "field": "reflectionMatrix",
+          "values": 16,
+          "maximumAbsoluteDifference": 0,
+          "differentValues": 0
+        },
+        {
+          "water": 3,
+          "field": "position",
+          "values": 49923,
+          "maximumAbsoluteDifference": 0,
+          "differentValues": 0
+        },
+        {
+          "water": 3,
+          "field": "normal",
+          "values": 49923,
+          "maximumAbsoluteDifference": 0,
+          "differentValues": 0
+        },
+        {
+          "water": 3,
+          "field": "depth",
+          "values": 16641,
+          "maximumAbsoluteDifference": 0,
+          "differentValues": 0
+        },
+        {
+          "water": 3,
+          "field": "flowX",
+          "values": 16641,
+          "maximumAbsoluteDifference": 0,
+          "differentValues": 0
+        },
+        {
+          "water": 3,
+          "field": "flowZ",
+          "values": 16641,
+          "maximumAbsoluteDifference": 0,
+          "differentValues": 0
+        },
+        {
+          "water": 3,
+          "field": "foam",
+          "values": 16641,
+          "maximumAbsoluteDifference": 0,
+          "differentValues": 0
+        },
+        {
+          "water": 3,
+          "field": "texture",
+          "values": 66564,
+          "maximumAbsoluteDifference": 0,
+          "differentValues": 0
+        },
+        {
+          "water": 3,
+          "field": "reflectionMatrix",
+          "values": 16,
+          "maximumAbsoluteDifference": 0,
+          "differentValues": 0
+        }
+      ],
+      "imageRmse": 0,
+      "before": {
+        "configuration": {
+          "name": "water-scale",
+          "seed": 4242,
+          "carpetSeed": 48017,
+          "cover": 1800,
+          "dt": 0.016666666666666666,
+          "waterCount": 4,
+          "waterResolution": 129,
+          "waterCells": 66564,
+          "waterWidth": 28,
+          "spacing": 32,
+          "mapWidth": 1024,
+          "expectedVisible": 4,
+          "reflection": true,
+          "externalImpulses": false,
+          "waterPolicy": "off"
+        },
+        "diagnostics": {
+          "waterCalls": [
+            1201,
+            1201,
+            1201,
+            1201
+          ],
+          "visibleCreatures": 0,
+          "visibleWaters": 4,
+          "simulationResolutions": [
+            129,
+            129,
+            129,
+            129
+          ],
+          "reflectionLevels": [
+            0.10360088090598583,
+            0.10354073050618172,
+            0.0028401993513107286,
+            0.002897203743457793
+          ]
+        },
+        "fingerprint": {
+          "hash": "bfcc17e1",
+          "values": 465984,
+          "skinnedPoints": 0,
+          "time": 20.000000000000146,
+          "visibleWaterHash": "46f3835e"
+        }
+      },
+      "after": {
+        "configuration": {
+          "name": "water-scale",
+          "seed": 4242,
+          "carpetSeed": 48017,
+          "cover": 1800,
+          "dt": 0.016666666666666666,
+          "waterCount": 4,
+          "waterResolution": 129,
+          "waterCells": 66564,
+          "waterWidth": 28,
+          "spacing": 32,
+          "mapWidth": 1024,
+          "expectedVisible": 4,
+          "reflection": true,
+          "externalImpulses": false,
+          "waterPolicy": "off"
+        },
+        "diagnostics": {
+          "waterCalls": [
+            1201,
+            1201,
+            1201,
+            1201
+          ],
+          "visibleCreatures": 0,
+          "visibleWaters": 4,
+          "simulationResolutions": [
+            129,
+            129,
+            129,
+            129
+          ],
+          "reflectionLevels": [
+            0.10360088090598583,
+            0.10354073050618172,
+            0.0028401993513107286,
+            0.002897203743457793
+          ]
+        },
+        "fingerprint": {
+          "hash": "bfcc17e1",
+          "values": 465984,
+          "skinnedPoints": 0,
+          "time": 20.000000000000146,
+          "visibleWaterHash": "46f3835e"
+        }
+      },
+      "storageCalls": 0
+    },
+    {
+      "id": "water-visible-8",
+      "steps": 1,
+      "arrays": [
+        {
+          "water": 0,
+          "field": "position",
+          "values": 49923,
+          "maximumAbsoluteDifference": 0,
+          "differentValues": 0
+        },
+        {
+          "water": 0,
+          "field": "normal",
+          "values": 49923,
+          "maximumAbsoluteDifference": 0,
+          "differentValues": 0
+        },
+        {
+          "water": 0,
+          "field": "depth",
+          "values": 16641,
+          "maximumAbsoluteDifference": 0,
+          "differentValues": 0
+        },
+        {
+          "water": 0,
+          "field": "flowX",
+          "values": 16641,
+          "maximumAbsoluteDifference": 0,
+          "differentValues": 0
+        },
+        {
+          "water": 0,
+          "field": "flowZ",
+          "values": 16641,
+          "maximumAbsoluteDifference": 0,
+          "differentValues": 0
+        },
+        {
+          "water": 0,
+          "field": "foam",
+          "values": 16641,
+          "maximumAbsoluteDifference": 0,
+          "differentValues": 0
+        },
+        {
+          "water": 0,
+          "field": "texture",
+          "values": 66564,
+          "maximumAbsoluteDifference": 0,
+          "differentValues": 0
+        },
+        {
+          "water": 0,
+          "field": "reflectionMatrix",
+          "values": 16,
+          "maximumAbsoluteDifference": 0,
+          "differentValues": 0
+        },
+        {
+          "water": 1,
+          "field": "position",
+          "values": 49923,
+          "maximumAbsoluteDifference": 0,
+          "differentValues": 0
+        },
+        {
+          "water": 1,
+          "field": "normal",
+          "values": 49923,
+          "maximumAbsoluteDifference": 0,
+          "differentValues": 0
+        },
+        {
+          "water": 1,
+          "field": "depth",
+          "values": 16641,
+          "maximumAbsoluteDifference": 0,
+          "differentValues": 0
+        },
+        {
+          "water": 1,
+          "field": "flowX",
+          "values": 16641,
+          "maximumAbsoluteDifference": 0,
+          "differentValues": 0
+        },
+        {
+          "water": 1,
+          "field": "flowZ",
+          "values": 16641,
+          "maximumAbsoluteDifference": 0,
+          "differentValues": 0
+        },
+        {
+          "water": 1,
+          "field": "foam",
+          "values": 16641,
+          "maximumAbsoluteDifference": 0,
+          "differentValues": 0
+        },
+        {
+          "water": 1,
+          "field": "texture",
+          "values": 66564,
+          "maximumAbsoluteDifference": 0,
+          "differentValues": 0
+        },
+        {
+          "water": 1,
+          "field": "reflectionMatrix",
+          "values": 16,
+          "maximumAbsoluteDifference": 0,
+          "differentValues": 0
+        },
+        {
+          "water": 2,
+          "field": "position",
+          "values": 49923,
+          "maximumAbsoluteDifference": 0,
+          "differentValues": 0
+        },
+        {
+          "water": 2,
+          "field": "normal",
+          "values": 49923,
+          "maximumAbsoluteDifference": 0,
+          "differentValues": 0
+        },
+        {
+          "water": 2,
+          "field": "depth",
+          "values": 16641,
+          "maximumAbsoluteDifference": 0,
+          "differentValues": 0
+        },
+        {
+          "water": 2,
+          "field": "flowX",
+          "values": 16641,
+          "maximumAbsoluteDifference": 0,
+          "differentValues": 0
+        },
+        {
+          "water": 2,
+          "field": "flowZ",
+          "values": 16641,
+          "maximumAbsoluteDifference": 0,
+          "differentValues": 0
+        },
+        {
+          "water": 2,
+          "field": "foam",
+          "values": 16641,
+          "maximumAbsoluteDifference": 0,
+          "differentValues": 0
+        },
+        {
+          "water": 2,
+          "field": "texture",
+          "values": 66564,
+          "maximumAbsoluteDifference": 0,
+          "differentValues": 0
+        },
+        {
+          "water": 2,
+          "field": "reflectionMatrix",
+          "values": 16,
+          "maximumAbsoluteDifference": 0,
+          "differentValues": 0
+        },
+        {
+          "water": 3,
+          "field": "position",
+          "values": 49923,
+          "maximumAbsoluteDifference": 0,
+          "differentValues": 0
+        },
+        {
+          "water": 3,
+          "field": "normal",
+          "values": 49923,
+          "maximumAbsoluteDifference": 0,
+          "differentValues": 0
+        },
+        {
+          "water": 3,
+          "field": "depth",
+          "values": 16641,
+          "maximumAbsoluteDifference": 0,
+          "differentValues": 0
+        },
+        {
+          "water": 3,
+          "field": "flowX",
+          "values": 16641,
+          "maximumAbsoluteDifference": 0,
+          "differentValues": 0
+        },
+        {
+          "water": 3,
+          "field": "flowZ",
+          "values": 16641,
+          "maximumAbsoluteDifference": 0,
+          "differentValues": 0
+        },
+        {
+          "water": 3,
+          "field": "foam",
+          "values": 16641,
+          "maximumAbsoluteDifference": 0,
+          "differentValues": 0
+        },
+        {
+          "water": 3,
+          "field": "texture",
+          "values": 66564,
+          "maximumAbsoluteDifference": 0,
+          "differentValues": 0
+        },
+        {
+          "water": 3,
+          "field": "reflectionMatrix",
+          "values": 16,
+          "maximumAbsoluteDifference": 0,
+          "differentValues": 0
+        },
+        {
+          "water": 4,
+          "field": "position",
+          "values": 49923,
+          "maximumAbsoluteDifference": 0,
+          "differentValues": 0
+        },
+        {
+          "water": 4,
+          "field": "normal",
+          "values": 49923,
+          "maximumAbsoluteDifference": 0,
+          "differentValues": 0
+        },
+        {
+          "water": 4,
+          "field": "depth",
+          "values": 16641,
+          "maximumAbsoluteDifference": 0,
+          "differentValues": 0
+        },
+        {
+          "water": 4,
+          "field": "flowX",
+          "values": 16641,
+          "maximumAbsoluteDifference": 0,
+          "differentValues": 0
+        },
+        {
+          "water": 4,
+          "field": "flowZ",
+          "values": 16641,
+          "maximumAbsoluteDifference": 0,
+          "differentValues": 0
+        },
+        {
+          "water": 4,
+          "field": "foam",
+          "values": 16641,
+          "maximumAbsoluteDifference": 0,
+          "differentValues": 0
+        },
+        {
+          "water": 4,
+          "field": "texture",
+          "values": 66564,
+          "maximumAbsoluteDifference": 0,
+          "differentValues": 0
+        },
+        {
+          "water": 4,
+          "field": "reflectionMatrix",
+          "values": 16,
+          "maximumAbsoluteDifference": 0,
+          "differentValues": 0
+        },
+        {
+          "water": 5,
+          "field": "position",
+          "values": 49923,
+          "maximumAbsoluteDifference": 0,
+          "differentValues": 0
+        },
+        {
+          "water": 5,
+          "field": "normal",
+          "values": 49923,
+          "maximumAbsoluteDifference": 0,
+          "differentValues": 0
+        },
+        {
+          "water": 5,
+          "field": "depth",
+          "values": 16641,
+          "maximumAbsoluteDifference": 0,
+          "differentValues": 0
+        },
+        {
+          "water": 5,
+          "field": "flowX",
+          "values": 16641,
+          "maximumAbsoluteDifference": 0,
+          "differentValues": 0
+        },
+        {
+          "water": 5,
+          "field": "flowZ",
+          "values": 16641,
+          "maximumAbsoluteDifference": 0,
+          "differentValues": 0
+        },
+        {
+          "water": 5,
+          "field": "foam",
+          "values": 16641,
+          "maximumAbsoluteDifference": 0,
+          "differentValues": 0
+        },
+        {
+          "water": 5,
+          "field": "texture",
+          "values": 66564,
+          "maximumAbsoluteDifference": 0,
+          "differentValues": 0
+        },
+        {
+          "water": 5,
+          "field": "reflectionMatrix",
+          "values": 16,
+          "maximumAbsoluteDifference": 0,
+          "differentValues": 0
+        },
+        {
+          "water": 6,
+          "field": "position",
+          "values": 49923,
+          "maximumAbsoluteDifference": 0,
+          "differentValues": 0
+        },
+        {
+          "water": 6,
+          "field": "normal",
+          "values": 49923,
+          "maximumAbsoluteDifference": 0,
+          "differentValues": 0
+        },
+        {
+          "water": 6,
+          "field": "depth",
+          "values": 16641,
+          "maximumAbsoluteDifference": 0,
+          "differentValues": 0
+        },
+        {
+          "water": 6,
+          "field": "flowX",
+          "values": 16641,
+          "maximumAbsoluteDifference": 0,
+          "differentValues": 0
+        },
+        {
+          "water": 6,
+          "field": "flowZ",
+          "values": 16641,
+          "maximumAbsoluteDifference": 0,
+          "differentValues": 0
+        },
+        {
+          "water": 6,
+          "field": "foam",
+          "values": 16641,
+          "maximumAbsoluteDifference": 0,
+          "differentValues": 0
+        },
+        {
+          "water": 6,
+          "field": "texture",
+          "values": 66564,
+          "maximumAbsoluteDifference": 0,
+          "differentValues": 0
+        },
+        {
+          "water": 6,
+          "field": "reflectionMatrix",
+          "values": 16,
+          "maximumAbsoluteDifference": 0,
+          "differentValues": 0
+        },
+        {
+          "water": 7,
+          "field": "position",
+          "values": 49923,
+          "maximumAbsoluteDifference": 0,
+          "differentValues": 0
+        },
+        {
+          "water": 7,
+          "field": "normal",
+          "values": 49923,
+          "maximumAbsoluteDifference": 0,
+          "differentValues": 0
+        },
+        {
+          "water": 7,
+          "field": "depth",
+          "values": 16641,
+          "maximumAbsoluteDifference": 0,
+          "differentValues": 0
+        },
+        {
+          "water": 7,
+          "field": "flowX",
+          "values": 16641,
+          "maximumAbsoluteDifference": 0,
+          "differentValues": 0
+        },
+        {
+          "water": 7,
+          "field": "flowZ",
+          "values": 16641,
+          "maximumAbsoluteDifference": 0,
+          "differentValues": 0
+        },
+        {
+          "water": 7,
+          "field": "foam",
+          "values": 16641,
+          "maximumAbsoluteDifference": 0,
+          "differentValues": 0
+        },
+        {
+          "water": 7,
+          "field": "texture",
+          "values": 66564,
+          "maximumAbsoluteDifference": 0,
+          "differentValues": 0
+        },
+        {
+          "water": 7,
+          "field": "reflectionMatrix",
+          "values": 16,
+          "maximumAbsoluteDifference": 0,
+          "differentValues": 0
+        }
+      ],
+      "imageRmse": 0,
+      "before": {
+        "configuration": {
+          "name": "water-scale",
+          "seed": 4242,
+          "carpetSeed": 48017,
+          "cover": 1800,
+          "dt": 0.016666666666666666,
+          "waterCount": 8,
+          "waterResolution": 129,
+          "waterCells": 133128,
+          "waterWidth": 28,
+          "spacing": 32,
+          "mapWidth": 1024,
+          "expectedVisible": 8,
+          "reflection": true,
+          "externalImpulses": false,
+          "waterPolicy": "off"
+        },
+        "diagnostics": {
+          "waterCalls": [
+            2,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2
+          ],
+          "visibleCreatures": 0,
+          "visibleWaters": 8,
+          "simulationResolutions": [
+            129,
+            129,
+            129,
+            129,
+            129,
+            129,
+            129,
+            129
+          ],
+          "reflectionLevels": [
+            0.1186487812846899,
+            0.11678752753138542,
+            0.1151495769917965,
+            0.05121126475930214,
+            0.0514327444434166,
+            0.053333052277565005,
+            -0.01077330780029297,
+            -0.00914427560567856
+          ]
+        },
+        "fingerprint": {
+          "hash": "967fa841",
+          "values": 931932,
+          "skinnedPoints": 0,
+          "time": 0.016666666666666666,
+          "visibleWaterHash": "730e506e"
+        }
+      },
+      "after": {
+        "configuration": {
+          "name": "water-scale",
+          "seed": 4242,
+          "carpetSeed": 48017,
+          "cover": 1800,
+          "dt": 0.016666666666666666,
+          "waterCount": 8,
+          "waterResolution": 129,
+          "waterCells": 133128,
+          "waterWidth": 28,
+          "spacing": 32,
+          "mapWidth": 1024,
+          "expectedVisible": 8,
+          "reflection": true,
+          "externalImpulses": false,
+          "waterPolicy": "off"
+        },
+        "diagnostics": {
+          "waterCalls": [
+            2,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2
+          ],
+          "visibleCreatures": 0,
+          "visibleWaters": 8,
+          "simulationResolutions": [
+            129,
+            129,
+            129,
+            129,
+            129,
+            129,
+            129,
+            129
+          ],
+          "reflectionLevels": [
+            0.1186487812846899,
+            0.11678752753138542,
+            0.1151495769917965,
+            0.05121126475930214,
+            0.0514327444434166,
+            0.053333052277565005,
+            -0.01077330780029297,
+            -0.00914427560567856
+          ]
+        },
+        "fingerprint": {
+          "hash": "967fa841",
+          "values": 931932,
+          "skinnedPoints": 0,
+          "time": 0.016666666666666666,
+          "visibleWaterHash": "730e506e"
+        }
+      },
+      "storageCalls": 0
+    },
+    {
+      "id": "water-visible-8",
+      "steps": 60,
+      "arrays": [
+        {
+          "water": 0,
+          "field": "position",
+          "values": 49923,
+          "maximumAbsoluteDifference": 0,
+          "differentValues": 0
+        },
+        {
+          "water": 0,
+          "field": "normal",
+          "values": 49923,
+          "maximumAbsoluteDifference": 0,
+          "differentValues": 0
+        },
+        {
+          "water": 0,
+          "field": "depth",
+          "values": 16641,
+          "maximumAbsoluteDifference": 0,
+          "differentValues": 0
+        },
+        {
+          "water": 0,
+          "field": "flowX",
+          "values": 16641,
+          "maximumAbsoluteDifference": 0,
+          "differentValues": 0
+        },
+        {
+          "water": 0,
+          "field": "flowZ",
+          "values": 16641,
+          "maximumAbsoluteDifference": 0,
+          "differentValues": 0
+        },
+        {
+          "water": 0,
+          "field": "foam",
+          "values": 16641,
+          "maximumAbsoluteDifference": 0,
+          "differentValues": 0
+        },
+        {
+          "water": 0,
+          "field": "texture",
+          "values": 66564,
+          "maximumAbsoluteDifference": 0,
+          "differentValues": 0
+        },
+        {
+          "water": 0,
+          "field": "reflectionMatrix",
+          "values": 16,
+          "maximumAbsoluteDifference": 0,
+          "differentValues": 0
+        },
+        {
+          "water": 1,
+          "field": "position",
+          "values": 49923,
+          "maximumAbsoluteDifference": 0,
+          "differentValues": 0
+        },
+        {
+          "water": 1,
+          "field": "normal",
+          "values": 49923,
+          "maximumAbsoluteDifference": 0,
+          "differentValues": 0
+        },
+        {
+          "water": 1,
+          "field": "depth",
+          "values": 16641,
+          "maximumAbsoluteDifference": 0,
+          "differentValues": 0
+        },
+        {
+          "water": 1,
+          "field": "flowX",
+          "values": 16641,
+          "maximumAbsoluteDifference": 0,
+          "differentValues": 0
+        },
+        {
+          "water": 1,
+          "field": "flowZ",
+          "values": 16641,
+          "maximumAbsoluteDifference": 0,
+          "differentValues": 0
+        },
+        {
+          "water": 1,
+          "field": "foam",
+          "values": 16641,
+          "maximumAbsoluteDifference": 0,
+          "differentValues": 0
+        },
+        {
+          "water": 1,
+          "field": "texture",
+          "values": 66564,
+          "maximumAbsoluteDifference": 0,
+          "differentValues": 0
+        },
+        {
+          "water": 1,
+          "field": "reflectionMatrix",
+          "values": 16,
+          "maximumAbsoluteDifference": 0,
+          "differentValues": 0
+        },
+        {
+          "water": 2,
+          "field": "position",
+          "values": 49923,
+          "maximumAbsoluteDifference": 0,
+          "differentValues": 0
+        },
+        {
+          "water": 2,
+          "field": "normal",
+          "values": 49923,
+          "maximumAbsoluteDifference": 0,
+          "differentValues": 0
+        },
+        {
+          "water": 2,
+          "field": "depth",
+          "values": 16641,
+          "maximumAbsoluteDifference": 0,
+          "differentValues": 0
+        },
+        {
+          "water": 2,
+          "field": "flowX",
+          "values": 16641,
+          "maximumAbsoluteDifference": 0,
+          "differentValues": 0
+        },
+        {
+          "water": 2,
+          "field": "flowZ",
+          "values": 16641,
+          "maximumAbsoluteDifference": 0,
+          "differentValues": 0
+        },
+        {
+          "water": 2,
+          "field": "foam",
+          "values": 16641,
+          "maximumAbsoluteDifference": 0,
+          "differentValues": 0
+        },
+        {
+          "water": 2,
+          "field": "texture",
+          "values": 66564,
+          "maximumAbsoluteDifference": 0,
+          "differentValues": 0
+        },
+        {
+          "water": 2,
+          "field": "reflectionMatrix",
+          "values": 16,
+          "maximumAbsoluteDifference": 0,
+          "differentValues": 0
+        },
+        {
+          "water": 3,
+          "field": "position",
+          "values": 49923,
+          "maximumAbsoluteDifference": 0,
+          "differentValues": 0
+        },
+        {
+          "water": 3,
+          "field": "normal",
+          "values": 49923,
+          "maximumAbsoluteDifference": 0,
+          "differentValues": 0
+        },
+        {
+          "water": 3,
+          "field": "depth",
+          "values": 16641,
+          "maximumAbsoluteDifference": 0,
+          "differentValues": 0
+        },
+        {
+          "water": 3,
+          "field": "flowX",
+          "values": 16641,
+          "maximumAbsoluteDifference": 0,
+          "differentValues": 0
+        },
+        {
+          "water": 3,
+          "field": "flowZ",
+          "values": 16641,
+          "maximumAbsoluteDifference": 0,
+          "differentValues": 0
+        },
+        {
+          "water": 3,
+          "field": "foam",
+          "values": 16641,
+          "maximumAbsoluteDifference": 0,
+          "differentValues": 0
+        },
+        {
+          "water": 3,
+          "field": "texture",
+          "values": 66564,
+          "maximumAbsoluteDifference": 0,
+          "differentValues": 0
+        },
+        {
+          "water": 3,
+          "field": "reflectionMatrix",
+          "values": 16,
+          "maximumAbsoluteDifference": 0,
+          "differentValues": 0
+        },
+        {
+          "water": 4,
+          "field": "position",
+          "values": 49923,
+          "maximumAbsoluteDifference": 0,
+          "differentValues": 0
+        },
+        {
+          "water": 4,
+          "field": "normal",
+          "values": 49923,
+          "maximumAbsoluteDifference": 0,
+          "differentValues": 0
+        },
+        {
+          "water": 4,
+          "field": "depth",
+          "values": 16641,
+          "maximumAbsoluteDifference": 0,
+          "differentValues": 0
+        },
+        {
+          "water": 4,
+          "field": "flowX",
+          "values": 16641,
+          "maximumAbsoluteDifference": 0,
+          "differentValues": 0
+        },
+        {
+          "water": 4,
+          "field": "flowZ",
+          "values": 16641,
+          "maximumAbsoluteDifference": 0,
+          "differentValues": 0
+        },
+        {
+          "water": 4,
+          "field": "foam",
+          "values": 16641,
+          "maximumAbsoluteDifference": 0,
+          "differentValues": 0
+        },
+        {
+          "water": 4,
+          "field": "texture",
+          "values": 66564,
+          "maximumAbsoluteDifference": 0,
+          "differentValues": 0
+        },
+        {
+          "water": 4,
+          "field": "reflectionMatrix",
+          "values": 16,
+          "maximumAbsoluteDifference": 0,
+          "differentValues": 0
+        },
+        {
+          "water": 5,
+          "field": "position",
+          "values": 49923,
+          "maximumAbsoluteDifference": 0,
+          "differentValues": 0
+        },
+        {
+          "water": 5,
+          "field": "normal",
+          "values": 49923,
+          "maximumAbsoluteDifference": 0,
+          "differentValues": 0
+        },
+        {
+          "water": 5,
+          "field": "depth",
+          "values": 16641,
+          "maximumAbsoluteDifference": 0,
+          "differentValues": 0
+        },
+        {
+          "water": 5,
+          "field": "flowX",
+          "values": 16641,
+          "maximumAbsoluteDifference": 0,
+          "differentValues": 0
+        },
+        {
+          "water": 5,
+          "field": "flowZ",
+          "values": 16641,
+          "maximumAbsoluteDifference": 0,
+          "differentValues": 0
+        },
+        {
+          "water": 5,
+          "field": "foam",
+          "values": 16641,
+          "maximumAbsoluteDifference": 0,
+          "differentValues": 0
+        },
+        {
+          "water": 5,
+          "field": "texture",
+          "values": 66564,
+          "maximumAbsoluteDifference": 0,
+          "differentValues": 0
+        },
+        {
+          "water": 5,
+          "field": "reflectionMatrix",
+          "values": 16,
+          "maximumAbsoluteDifference": 0,
+          "differentValues": 0
+        },
+        {
+          "water": 6,
+          "field": "position",
+          "values": 49923,
+          "maximumAbsoluteDifference": 0,
+          "differentValues": 0
+        },
+        {
+          "water": 6,
+          "field": "normal",
+          "values": 49923,
+          "maximumAbsoluteDifference": 0,
+          "differentValues": 0
+        },
+        {
+          "water": 6,
+          "field": "depth",
+          "values": 16641,
+          "maximumAbsoluteDifference": 0,
+          "differentValues": 0
+        },
+        {
+          "water": 6,
+          "field": "flowX",
+          "values": 16641,
+          "maximumAbsoluteDifference": 0,
+          "differentValues": 0
+        },
+        {
+          "water": 6,
+          "field": "flowZ",
+          "values": 16641,
+          "maximumAbsoluteDifference": 0,
+          "differentValues": 0
+        },
+        {
+          "water": 6,
+          "field": "foam",
+          "values": 16641,
+          "maximumAbsoluteDifference": 0,
+          "differentValues": 0
+        },
+        {
+          "water": 6,
+          "field": "texture",
+          "values": 66564,
+          "maximumAbsoluteDifference": 0,
+          "differentValues": 0
+        },
+        {
+          "water": 6,
+          "field": "reflectionMatrix",
+          "values": 16,
+          "maximumAbsoluteDifference": 0,
+          "differentValues": 0
+        },
+        {
+          "water": 7,
+          "field": "position",
+          "values": 49923,
+          "maximumAbsoluteDifference": 0,
+          "differentValues": 0
+        },
+        {
+          "water": 7,
+          "field": "normal",
+          "values": 49923,
+          "maximumAbsoluteDifference": 0,
+          "differentValues": 0
+        },
+        {
+          "water": 7,
+          "field": "depth",
+          "values": 16641,
+          "maximumAbsoluteDifference": 0,
+          "differentValues": 0
+        },
+        {
+          "water": 7,
+          "field": "flowX",
+          "values": 16641,
+          "maximumAbsoluteDifference": 0,
+          "differentValues": 0
+        },
+        {
+          "water": 7,
+          "field": "flowZ",
+          "values": 16641,
+          "maximumAbsoluteDifference": 0,
+          "differentValues": 0
+        },
+        {
+          "water": 7,
+          "field": "foam",
+          "values": 16641,
+          "maximumAbsoluteDifference": 0,
+          "differentValues": 0
+        },
+        {
+          "water": 7,
+          "field": "texture",
+          "values": 66564,
+          "maximumAbsoluteDifference": 0,
+          "differentValues": 0
+        },
+        {
+          "water": 7,
+          "field": "reflectionMatrix",
+          "values": 16,
+          "maximumAbsoluteDifference": 0,
+          "differentValues": 0
+        }
+      ],
+      "imageRmse": 0,
+      "before": {
+        "configuration": {
+          "name": "water-scale",
+          "seed": 4242,
+          "carpetSeed": 48017,
+          "cover": 1800,
+          "dt": 0.016666666666666666,
+          "waterCount": 8,
+          "waterResolution": 129,
+          "waterCells": 133128,
+          "waterWidth": 28,
+          "spacing": 32,
+          "mapWidth": 1024,
+          "expectedVisible": 8,
+          "reflection": true,
+          "externalImpulses": false,
+          "waterPolicy": "off"
+        },
+        "diagnostics": {
+          "waterCalls": [
+            61,
+            61,
+            61,
+            61,
+            61,
+            61,
+            61,
+            61
+          ],
+          "visibleCreatures": 0,
+          "visibleWaters": 8,
+          "simulationResolutions": [
+            129,
+            129,
+            129,
+            129,
+            129,
+            129,
+            129,
+            129
+          ],
+          "reflectionLevels": [
+            0.11518444012105465,
+            0.1148095101416111,
+            0.11437830778956413,
+            0.052458089619874956,
+            0.05253343361616135,
+            0.05308079051971436,
+            -0.00866701376438141,
+            -0.008318795979022981
+          ]
+        },
+        "fingerprint": {
+          "hash": "386d3741",
+          "values": 931932,
+          "skinnedPoints": 0,
+          "time": 1.0000000000000013,
+          "visibleWaterHash": "e4136425"
+        }
+      },
+      "after": {
+        "configuration": {
+          "name": "water-scale",
+          "seed": 4242,
+          "carpetSeed": 48017,
+          "cover": 1800,
+          "dt": 0.016666666666666666,
+          "waterCount": 8,
+          "waterResolution": 129,
+          "waterCells": 133128,
+          "waterWidth": 28,
+          "spacing": 32,
+          "mapWidth": 1024,
+          "expectedVisible": 8,
+          "reflection": true,
+          "externalImpulses": false,
+          "waterPolicy": "off"
+        },
+        "diagnostics": {
+          "waterCalls": [
+            61,
+            61,
+            61,
+            61,
+            61,
+            61,
+            61,
+            61
+          ],
+          "visibleCreatures": 0,
+          "visibleWaters": 8,
+          "simulationResolutions": [
+            129,
+            129,
+            129,
+            129,
+            129,
+            129,
+            129,
+            129
+          ],
+          "reflectionLevels": [
+            0.11518444012105465,
+            0.1148095101416111,
+            0.11437830778956413,
+            0.052458089619874956,
+            0.05253343361616135,
+            0.05308079051971436,
+            -0.00866701376438141,
+            -0.008318795979022981
+          ]
+        },
+        "fingerprint": {
+          "hash": "386d3741",
+          "values": 931932,
+          "skinnedPoints": 0,
+          "time": 1.0000000000000013,
+          "visibleWaterHash": "e4136425"
+        }
+      },
+      "storageCalls": 0
+    },
+    {
+      "id": "water-visible-8",
+      "steps": 1200,
+      "arrays": [
+        {
+          "water": 0,
+          "field": "position",
+          "values": 49923,
+          "maximumAbsoluteDifference": 0,
+          "differentValues": 0
+        },
+        {
+          "water": 0,
+          "field": "normal",
+          "values": 49923,
+          "maximumAbsoluteDifference": 0,
+          "differentValues": 0
+        },
+        {
+          "water": 0,
+          "field": "depth",
+          "values": 16641,
+          "maximumAbsoluteDifference": 0,
+          "differentValues": 0
+        },
+        {
+          "water": 0,
+          "field": "flowX",
+          "values": 16641,
+          "maximumAbsoluteDifference": 0,
+          "differentValues": 0
+        },
+        {
+          "water": 0,
+          "field": "flowZ",
+          "values": 16641,
+          "maximumAbsoluteDifference": 0,
+          "differentValues": 0
+        },
+        {
+          "water": 0,
+          "field": "foam",
+          "values": 16641,
+          "maximumAbsoluteDifference": 0,
+          "differentValues": 0
+        },
+        {
+          "water": 0,
+          "field": "texture",
+          "values": 66564,
+          "maximumAbsoluteDifference": 0,
+          "differentValues": 0
+        },
+        {
+          "water": 0,
+          "field": "reflectionMatrix",
+          "values": 16,
+          "maximumAbsoluteDifference": 0,
+          "differentValues": 0
+        },
+        {
+          "water": 1,
+          "field": "position",
+          "values": 49923,
+          "maximumAbsoluteDifference": 0,
+          "differentValues": 0
+        },
+        {
+          "water": 1,
+          "field": "normal",
+          "values": 49923,
+          "maximumAbsoluteDifference": 0,
+          "differentValues": 0
+        },
+        {
+          "water": 1,
+          "field": "depth",
+          "values": 16641,
+          "maximumAbsoluteDifference": 0,
+          "differentValues": 0
+        },
+        {
+          "water": 1,
+          "field": "flowX",
+          "values": 16641,
+          "maximumAbsoluteDifference": 0,
+          "differentValues": 0
+        },
+        {
+          "water": 1,
+          "field": "flowZ",
+          "values": 16641,
+          "maximumAbsoluteDifference": 0,
+          "differentValues": 0
+        },
+        {
+          "water": 1,
+          "field": "foam",
+          "values": 16641,
+          "maximumAbsoluteDifference": 0,
+          "differentValues": 0
+        },
+        {
+          "water": 1,
+          "field": "texture",
+          "values": 66564,
+          "maximumAbsoluteDifference": 0,
+          "differentValues": 0
+        },
+        {
+          "water": 1,
+          "field": "reflectionMatrix",
+          "values": 16,
+          "maximumAbsoluteDifference": 0,
+          "differentValues": 0
+        },
+        {
+          "water": 2,
+          "field": "position",
+          "values": 49923,
+          "maximumAbsoluteDifference": 0,
+          "differentValues": 0
+        },
+        {
+          "water": 2,
+          "field": "normal",
+          "values": 49923,
+          "maximumAbsoluteDifference": 0,
+          "differentValues": 0
+        },
+        {
+          "water": 2,
+          "field": "depth",
+          "values": 16641,
+          "maximumAbsoluteDifference": 0,
+          "differentValues": 0
+        },
+        {
+          "water": 2,
+          "field": "flowX",
+          "values": 16641,
+          "maximumAbsoluteDifference": 0,
+          "differentValues": 0
+        },
+        {
+          "water": 2,
+          "field": "flowZ",
+          "values": 16641,
+          "maximumAbsoluteDifference": 0,
+          "differentValues": 0
+        },
+        {
+          "water": 2,
+          "field": "foam",
+          "values": 16641,
+          "maximumAbsoluteDifference": 0,
+          "differentValues": 0
+        },
+        {
+          "water": 2,
+          "field": "texture",
+          "values": 66564,
+          "maximumAbsoluteDifference": 0,
+          "differentValues": 0
+        },
+        {
+          "water": 2,
+          "field": "reflectionMatrix",
+          "values": 16,
+          "maximumAbsoluteDifference": 0,
+          "differentValues": 0
+        },
+        {
+          "water": 3,
+          "field": "position",
+          "values": 49923,
+          "maximumAbsoluteDifference": 0,
+          "differentValues": 0
+        },
+        {
+          "water": 3,
+          "field": "normal",
+          "values": 49923,
+          "maximumAbsoluteDifference": 0,
+          "differentValues": 0
+        },
+        {
+          "water": 3,
+          "field": "depth",
+          "values": 16641,
+          "maximumAbsoluteDifference": 0,
+          "differentValues": 0
+        },
+        {
+          "water": 3,
+          "field": "flowX",
+          "values": 16641,
+          "maximumAbsoluteDifference": 0,
+          "differentValues": 0
+        },
+        {
+          "water": 3,
+          "field": "flowZ",
+          "values": 16641,
+          "maximumAbsoluteDifference": 0,
+          "differentValues": 0
+        },
+        {
+          "water": 3,
+          "field": "foam",
+          "values": 16641,
+          "maximumAbsoluteDifference": 0,
+          "differentValues": 0
+        },
+        {
+          "water": 3,
+          "field": "texture",
+          "values": 66564,
+          "maximumAbsoluteDifference": 0,
+          "differentValues": 0
+        },
+        {
+          "water": 3,
+          "field": "reflectionMatrix",
+          "values": 16,
+          "maximumAbsoluteDifference": 0,
+          "differentValues": 0
+        },
+        {
+          "water": 4,
+          "field": "position",
+          "values": 49923,
+          "maximumAbsoluteDifference": 0,
+          "differentValues": 0
+        },
+        {
+          "water": 4,
+          "field": "normal",
+          "values": 49923,
+          "maximumAbsoluteDifference": 0,
+          "differentValues": 0
+        },
+        {
+          "water": 4,
+          "field": "depth",
+          "values": 16641,
+          "maximumAbsoluteDifference": 0,
+          "differentValues": 0
+        },
+        {
+          "water": 4,
+          "field": "flowX",
+          "values": 16641,
+          "maximumAbsoluteDifference": 0,
+          "differentValues": 0
+        },
+        {
+          "water": 4,
+          "field": "flowZ",
+          "values": 16641,
+          "maximumAbsoluteDifference": 0,
+          "differentValues": 0
+        },
+        {
+          "water": 4,
+          "field": "foam",
+          "values": 16641,
+          "maximumAbsoluteDifference": 0,
+          "differentValues": 0
+        },
+        {
+          "water": 4,
+          "field": "texture",
+          "values": 66564,
+          "maximumAbsoluteDifference": 0,
+          "differentValues": 0
+        },
+        {
+          "water": 4,
+          "field": "reflectionMatrix",
+          "values": 16,
+          "maximumAbsoluteDifference": 0,
+          "differentValues": 0
+        },
+        {
+          "water": 5,
+          "field": "position",
+          "values": 49923,
+          "maximumAbsoluteDifference": 0,
+          "differentValues": 0
+        },
+        {
+          "water": 5,
+          "field": "normal",
+          "values": 49923,
+          "maximumAbsoluteDifference": 0,
+          "differentValues": 0
+        },
+        {
+          "water": 5,
+          "field": "depth",
+          "values": 16641,
+          "maximumAbsoluteDifference": 0,
+          "differentValues": 0
+        },
+        {
+          "water": 5,
+          "field": "flowX",
+          "values": 16641,
+          "maximumAbsoluteDifference": 0,
+          "differentValues": 0
+        },
+        {
+          "water": 5,
+          "field": "flowZ",
+          "values": 16641,
+          "maximumAbsoluteDifference": 0,
+          "differentValues": 0
+        },
+        {
+          "water": 5,
+          "field": "foam",
+          "values": 16641,
+          "maximumAbsoluteDifference": 0,
+          "differentValues": 0
+        },
+        {
+          "water": 5,
+          "field": "texture",
+          "values": 66564,
+          "maximumAbsoluteDifference": 0,
+          "differentValues": 0
+        },
+        {
+          "water": 5,
+          "field": "reflectionMatrix",
+          "values": 16,
+          "maximumAbsoluteDifference": 0,
+          "differentValues": 0
+        },
+        {
+          "water": 6,
+          "field": "position",
+          "values": 49923,
+          "maximumAbsoluteDifference": 0,
+          "differentValues": 0
+        },
+        {
+          "water": 6,
+          "field": "normal",
+          "values": 49923,
+          "maximumAbsoluteDifference": 0,
+          "differentValues": 0
+        },
+        {
+          "water": 6,
+          "field": "depth",
+          "values": 16641,
+          "maximumAbsoluteDifference": 0,
+          "differentValues": 0
+        },
+        {
+          "water": 6,
+          "field": "flowX",
+          "values": 16641,
+          "maximumAbsoluteDifference": 0,
+          "differentValues": 0
+        },
+        {
+          "water": 6,
+          "field": "flowZ",
+          "values": 16641,
+          "maximumAbsoluteDifference": 0,
+          "differentValues": 0
+        },
+        {
+          "water": 6,
+          "field": "foam",
+          "values": 16641,
+          "maximumAbsoluteDifference": 0,
+          "differentValues": 0
+        },
+        {
+          "water": 6,
+          "field": "texture",
+          "values": 66564,
+          "maximumAbsoluteDifference": 0,
+          "differentValues": 0
+        },
+        {
+          "water": 6,
+          "field": "reflectionMatrix",
+          "values": 16,
+          "maximumAbsoluteDifference": 0,
+          "differentValues": 0
+        },
+        {
+          "water": 7,
+          "field": "position",
+          "values": 49923,
+          "maximumAbsoluteDifference": 0,
+          "differentValues": 0
+        },
+        {
+          "water": 7,
+          "field": "normal",
+          "values": 49923,
+          "maximumAbsoluteDifference": 0,
+          "differentValues": 0
+        },
+        {
+          "water": 7,
+          "field": "depth",
+          "values": 16641,
+          "maximumAbsoluteDifference": 0,
+          "differentValues": 0
+        },
+        {
+          "water": 7,
+          "field": "flowX",
+          "values": 16641,
+          "maximumAbsoluteDifference": 0,
+          "differentValues": 0
+        },
+        {
+          "water": 7,
+          "field": "flowZ",
+          "values": 16641,
+          "maximumAbsoluteDifference": 0,
+          "differentValues": 0
+        },
+        {
+          "water": 7,
+          "field": "foam",
+          "values": 16641,
+          "maximumAbsoluteDifference": 0,
+          "differentValues": 0
+        },
+        {
+          "water": 7,
+          "field": "texture",
+          "values": 66564,
+          "maximumAbsoluteDifference": 0,
+          "differentValues": 0
+        },
+        {
+          "water": 7,
+          "field": "reflectionMatrix",
+          "values": 16,
+          "maximumAbsoluteDifference": 0,
+          "differentValues": 0
+        }
+      ],
+      "imageRmse": 0,
+      "before": {
+        "configuration": {
+          "name": "water-scale",
+          "seed": 4242,
+          "carpetSeed": 48017,
+          "cover": 1800,
+          "dt": 0.016666666666666666,
+          "waterCount": 8,
+          "waterResolution": 129,
+          "waterCells": 133128,
+          "waterWidth": 28,
+          "spacing": 32,
+          "mapWidth": 1024,
+          "expectedVisible": 8,
+          "reflection": true,
+          "externalImpulses": false,
+          "waterPolicy": "off"
+        },
+        "diagnostics": {
+          "waterCalls": [
+            1201,
+            1201,
+            1201,
+            1201,
+            1201,
+            1201,
+            1201,
+            1201
+          ],
+          "visibleCreatures": 0,
+          "visibleWaters": 8,
+          "simulationResolutions": [
+            129,
+            129,
+            129,
+            129,
+            129,
+            129,
+            129,
+            129
+          ],
+          "reflectionLevels": [
+            0.10360088090598583,
+            0.10355903658270836,
+            0.10354073050618172,
+            0.05299128296971321,
+            0.053002395510673525,
+            0.05300562906265259,
+            0.0028401993513107286,
+            0.002881147742271422
+          ]
+        },
+        "fingerprint": {
+          "hash": "505fa661",
+          "values": 931932,
+          "skinnedPoints": 0,
+          "time": 20.000000000000146,
+          "visibleWaterHash": "46f3835e"
+        }
+      },
+      "after": {
+        "configuration": {
+          "name": "water-scale",
+          "seed": 4242,
+          "carpetSeed": 48017,
+          "cover": 1800,
+          "dt": 0.016666666666666666,
+          "waterCount": 8,
+          "waterResolution": 129,
+          "waterCells": 133128,
+          "waterWidth": 28,
+          "spacing": 32,
+          "mapWidth": 1024,
+          "expectedVisible": 8,
+          "reflection": true,
+          "externalImpulses": false,
+          "waterPolicy": "off"
+        },
+        "diagnostics": {
+          "waterCalls": [
+            1201,
+            1201,
+            1201,
+            1201,
+            1201,
+            1201,
+            1201,
+            1201
+          ],
+          "visibleCreatures": 0,
+          "visibleWaters": 8,
+          "simulationResolutions": [
+            129,
+            129,
+            129,
+            129,
+            129,
+            129,
+            129,
+            129
+          ],
+          "reflectionLevels": [
+            0.10360088090598583,
+            0.10355903658270836,
+            0.10354073050618172,
+            0.05299128296971321,
+            0.053002395510673525,
+            0.05300562906265259,
+            0.0028401993513107286,
+            0.002881147742271422
+          ]
+        },
+        "fingerprint": {
+          "hash": "505fa661",
+          "values": 931932,
+          "skinnedPoints": 0,
+          "time": 20.000000000000146,
+          "visibleWaterHash": "46f3835e"
+        }
+      },
+      "storageCalls": 0
+    },
+    {
+      "id": "water-grid-65",
+      "steps": 1200,
+      "arrays": [
+        {
+          "water": 0,
+          "field": "position",
+          "values": 12675,
+          "maximumAbsoluteDifference": 0,
+          "differentValues": 0
+        },
+        {
+          "water": 0,
+          "field": "normal",
+          "values": 12675,
+          "maximumAbsoluteDifference": 0,
+          "differentValues": 0
+        },
+        {
+          "water": 0,
+          "field": "depth",
+          "values": 4225,
+          "maximumAbsoluteDifference": 0,
+          "differentValues": 0
+        },
+        {
+          "water": 0,
+          "field": "flowX",
+          "values": 4225,
+          "maximumAbsoluteDifference": 0,
+          "differentValues": 0
+        },
+        {
+          "water": 0,
+          "field": "flowZ",
+          "values": 4225,
+          "maximumAbsoluteDifference": 0,
+          "differentValues": 0
+        },
+        {
+          "water": 0,
+          "field": "foam",
+          "values": 4225,
+          "maximumAbsoluteDifference": 0,
+          "differentValues": 0
+        },
+        {
+          "water": 0,
+          "field": "texture",
+          "values": 16900,
+          "maximumAbsoluteDifference": 0,
+          "differentValues": 0
+        },
+        {
+          "water": 0,
+          "field": "reflectionMatrix",
+          "values": 16,
+          "maximumAbsoluteDifference": 0,
+          "differentValues": 0
+        }
+      ],
+      "imageRmse": 0,
+      "before": {
+        "configuration": {
+          "name": "water-scale",
+          "seed": 4242,
+          "carpetSeed": 48017,
+          "cover": 1800,
+          "dt": 0.016666666666666666,
+          "waterCount": 1,
+          "waterResolution": 65,
+          "waterCells": 4225,
+          "waterWidth": 28,
+          "spacing": 64,
+          "mapWidth": 1024,
+          "expectedVisible": 1,
+          "reflection": true,
+          "externalImpulses": false,
+          "waterPolicy": "off"
+        },
+        "diagnostics": {
+          "waterCalls": [
+            1201
+          ],
+          "visibleCreatures": 0,
+          "visibleWaters": 1,
+          "simulationResolutions": [
+            65
+          ],
+          "reflectionLevels": [
+            0.05465529936552048
+          ]
+        },
+        "fingerprint": {
+          "hash": "3e2182fd",
+          "values": 29611,
+          "skinnedPoints": 0,
+          "time": 20.000000000000146,
+          "visibleWaterHash": "e5e69336"
+        }
+      },
+      "after": {
+        "configuration": {
+          "name": "water-scale",
+          "seed": 4242,
+          "carpetSeed": 48017,
+          "cover": 1800,
+          "dt": 0.016666666666666666,
+          "waterCount": 1,
+          "waterResolution": 65,
+          "waterCells": 4225,
+          "waterWidth": 28,
+          "spacing": 64,
+          "mapWidth": 1024,
+          "expectedVisible": 1,
+          "reflection": true,
+          "externalImpulses": false,
+          "waterPolicy": "off"
+        },
+        "diagnostics": {
+          "waterCalls": [
+            1201
+          ],
+          "visibleCreatures": 0,
+          "visibleWaters": 1,
+          "simulationResolutions": [
+            65
+          ],
+          "reflectionLevels": [
+            0.05465529936552048
+          ]
+        },
+        "fingerprint": {
+          "hash": "3e2182fd",
+          "values": 29611,
+          "skinnedPoints": 0,
+          "time": 20.000000000000146,
+          "visibleWaterHash": "e5e69336"
+        }
+      },
+      "storageCalls": 0
+    },
+    {
+      "id": "water-grid-257",
+      "steps": 1200,
+      "arrays": [
+        {
+          "water": 0,
+          "field": "position",
+          "values": 198147,
+          "maximumAbsoluteDifference": 0,
+          "differentValues": 0
+        },
+        {
+          "water": 0,
+          "field": "normal",
+          "values": 198147,
+          "maximumAbsoluteDifference": 0,
+          "differentValues": 0
+        },
+        {
+          "water": 0,
+          "field": "depth",
+          "values": 16641,
+          "maximumAbsoluteDifference": 0,
+          "differentValues": 0
+        },
+        {
+          "water": 0,
+          "field": "flowX",
+          "values": 16641,
+          "maximumAbsoluteDifference": 0,
+          "differentValues": 0
+        },
+        {
+          "water": 0,
+          "field": "flowZ",
+          "values": 16641,
+          "maximumAbsoluteDifference": 0,
+          "differentValues": 0
+        },
+        {
+          "water": 0,
+          "field": "foam",
+          "values": 16641,
+          "maximumAbsoluteDifference": 0,
+          "differentValues": 0
+        },
+        {
+          "water": 0,
+          "field": "texture",
+          "values": 66564,
+          "maximumAbsoluteDifference": 0,
+          "differentValues": 0
+        },
+        {
+          "water": 0,
+          "field": "reflectionMatrix",
+          "values": 16,
+          "maximumAbsoluteDifference": 0,
+          "differentValues": 0
+        }
+      ],
+      "imageRmse": 0,
+      "before": {
+        "configuration": {
+          "name": "water-scale",
+          "seed": 4242,
+          "carpetSeed": 48017,
+          "cover": 1800,
+          "dt": 0.016666666666666666,
+          "waterCount": 1,
+          "waterResolution": 257,
+          "waterCells": 66049,
+          "waterWidth": 28,
+          "spacing": 64,
+          "mapWidth": 1024,
+          "expectedVisible": 1,
+          "reflection": true,
+          "externalImpulses": false,
+          "waterPolicy": "off"
+        },
+        "diagnostics": {
+          "waterCalls": [
+            1201
+          ],
+          "visibleCreatures": 0,
+          "visibleWaters": 1,
+          "simulationResolutions": [
+            129
+          ],
+          "reflectionLevels": [
+            0.053002395510673525
+          ]
+        },
+        "fingerprint": {
+          "hash": "20b32c3e",
+          "values": 264747,
+          "skinnedPoints": 0,
+          "time": 20.000000000000146,
+          "visibleWaterHash": "709533c3"
+        }
+      },
+      "after": {
+        "configuration": {
+          "name": "water-scale",
+          "seed": 4242,
+          "carpetSeed": 48017,
+          "cover": 1800,
+          "dt": 0.016666666666666666,
+          "waterCount": 1,
+          "waterResolution": 257,
+          "waterCells": 66049,
+          "waterWidth": 28,
+          "spacing": 64,
+          "mapWidth": 1024,
+          "expectedVisible": 1,
+          "reflection": true,
+          "externalImpulses": false,
+          "waterPolicy": "off"
+        },
+        "diagnostics": {
+          "waterCalls": [
+            1201
+          ],
+          "visibleCreatures": 0,
+          "visibleWaters": 1,
+          "simulationResolutions": [
+            129
+          ],
+          "reflectionLevels": [
+            0.053002395510673525
+          ]
+        },
+        "fingerprint": {
+          "hash": "20b32c3e",
+          "values": 264747,
+          "skinnedPoints": 0,
+          "time": 20.000000000000146,
+          "visibleWaterHash": "709533c3"
+        }
+      },
+      "storageCalls": 0
+    }
+  ]
+}

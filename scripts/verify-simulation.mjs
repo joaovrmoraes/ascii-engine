@@ -10,7 +10,8 @@ const args = Object.fromEntries(
 const mode = args.mode ?? 'skinning',
   before = args.before ?? 'http://localhost:1445',
   after = args.after ?? 'http://localhost:1440'
-if (!['skinning', 'water'].includes(mode)) throw new Error('Use --mode=skinning|water')
+if (!['skinning', 'water', 'visible-water'].includes(mode))
+  throw new Error('Use --mode=skinning|water|visible-water')
 const output = args.out ?? 'docs/captures/benchmarks-2026-10-15/phase-2/parity'
 await mkdir(output, { recursive: true })
 const browser = await benchmarkBrowser({ uncapped: true }),
@@ -36,11 +37,26 @@ try {
           { id: 'skinning', query: 'skinning', steps: 240 },
           { id: 'skinning', query: 'skinning', steps: 1200 },
         ]
-      : [1, 2, 4, 8].map(n => ({
-          id: 'water-scale-' + n,
-          query: 'water-scale&waters=' + n,
-          steps: 1200,
-        }))
+      : mode === 'visible-water'
+        ? [
+            ...[1, 2, 4, 8].flatMap(n =>
+              [1, 60, 1200].map(steps => ({
+                id: 'water-visible-' + n,
+                query: 'water-scale&waters=' + n + '&water-layout=visible&water-policy=off',
+                steps,
+              })),
+            ),
+            ...[65, 257].map(n => ({
+              id: 'water-grid-' + n,
+              query: 'water-scale&waters=1&resolution=' + n + '&water-policy=off',
+              steps: 1200,
+            })),
+          ]
+        : [1, 2, 4, 8].map(n => ({
+            id: 'water-scale-' + n,
+            query: 'water-scale&waters=' + n,
+            steps: 1200,
+          }))
   for (const { id, query, steps } of variants) {
     const snapshots = []
     for (const [label, url] of [
@@ -53,7 +69,11 @@ try {
       const metadata = await browser.evaluate(
         `benchmark.run(0,${steps}).then(({samples,...metadata})=>metadata)`,
       )
-      const snapshot = await browser.evaluate('benchmark.snapshot()')
+      const snapshot = await browser.evaluate(
+        mode === 'visible-water'
+          ? `(()=>{const s=benchmark.snapshot();s.waters.forEach((w,i)=>{const u=engine.waters[i].uniforms;w.texture=Array.from(u.waterDynamics.value.image.data);w.reflectionMatrix=Array.from(u.reflectionMatrix.value.elements)});return s})()`
+          : 'benchmark.snapshot()',
+      )
       snapshots.push({ snapshot, metadata })
       await browser.check()
       const png = await browser.send('Page.captureScreenshot', { format: 'png' })
@@ -71,13 +91,20 @@ try {
             field,
             ...compare(a.snapshot.bodies[i][field], b.snapshot.bodies[i][field]),
           })
-    } else
-      for (const field of ['position', 'normal', 'depth', 'flowX', 'flowZ', 'foam'])
-        arrays.push({
-          water: 0,
-          field,
-          ...compare(a.snapshot.waters[0][field], b.snapshot.waters[0][field]),
-        })
+    } else {
+      const count = mode === 'visible-water' ? a.snapshot.waters.length : 1,
+        fields = ['position', 'normal', 'depth', 'flowX', 'flowZ', 'foam']
+      if (a.snapshot.waters.length !== b.snapshot.waters.length)
+        throw new Error('Water count changed')
+      if (mode === 'visible-water') fields.push('texture', 'reflectionMatrix')
+      for (let water = 0; water < count; water++)
+        for (const field of fields)
+          arrays.push({
+            water,
+            field,
+            ...compare(a.snapshot.waters[water][field], b.snapshot.waters[water][field]),
+          })
+    }
     if (arrays.some(a => a.maximumAbsoluteDifference > 1e-5)) throw new Error('Parity exceeds 1e-5')
     const image = spawnSync(
       'magick',

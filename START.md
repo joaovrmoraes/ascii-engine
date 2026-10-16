@@ -557,8 +557,10 @@ benchmark documents receive isolation headers for high-resolution timers.
 Core `createAsciiEngine(canvas, { profiling: true })` exposes `engine.stats`:
 CPU sections, summed render draw calls and asynchronous GPU elapsed queries.
 Profiling is disabled by default, with no clocks/queries created. Water step
-and CPU texture/geometry preparation are separate; actual GPU transfer/submission
-belongs to the remaining render. Skinning measures vertex math, with scene-graph
+and CPU texture/geometry preparation are separate. Water reflection uniforms,
+culling, mirror selection and render submission have their own `waterReflection`
+CPU section; other submission remains in the remainder. Actual GPU transfers
+occur during renderer submission, not during CPU texture-array preparation. Skinning measures vertex math, with scene-graph
 preparation left in the remainder. GPU ranges overlap CPU work; do not add them.
 
 `pnpm bench` uses 1920×1080 at DPR 1, 600 warm-up and 600 measured frames on five
@@ -596,6 +598,20 @@ checked with scripts/verify-simulation.mjs against the preserved original core.
 (one visible 129×129 water, others 64 m apart). `pnpm bench --uncapped
 --scenes=skinning,water-scale-8-off` selects workloads without changing the
 Phase 1 defaults. Phase 2 evidence is retained in the dated capture directory.
+
+Visible-water normal reconstruction now replays Three's indexed accumulation
+with direct float32-array reads/writes and the same rounding/order, without
+per-vertex attribute/vector calls. Nonstandard attributes, non-indexed geometry
+and custom methods retain Three's path. Physics, deformation, bounds, mesh density
+and reflection passes are unchanged. The dated
+[visible-water follow-up](docs/captures/benchmarks-2026-10-16/visible-water/README.md)
+retains the instrumented before baseline and parity evidence.
+
+`pnpm bench:capacity --axes=water-visible --stop-numeric-gate` supports the owner's
+follow-up stop rule: after a complete stable point, stop when remaining water-step
+numeric work is at least 15% of the median frame and CPU dominance holds in the
+aggregate and both rounds. This reports a qualification gate and untested higher
+loads; it never starts a prototype or claims an FPS ceiling. The flag is opt-in.
 
 The generic core defaults to full simulation. The editor wrapper and exported
 player default to `{ offscreenWater: { mode: 'pause', margin: 4 } }`, following

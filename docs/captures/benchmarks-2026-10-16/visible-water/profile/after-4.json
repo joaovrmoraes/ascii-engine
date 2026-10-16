@@ -1,0 +1,1438 @@
+{
+  "warning": "Sampling perturbs timing; diagnostic only. Includes warm-up and final fingerprint work.",
+  "source": "4ec882f3f4017339ebf74f6435f2d2035473b47c",
+  "trackedChanges": "M START.md\n M docs/captures/benchmarks-2026-10-16/visible-water/README.md\nM  packages/engine/src/techniques/water.ts\nA  packages/engine/src/techniques/waterGeometry.test.ts\nA  packages/engine/src/techniques/waterGeometry.ts\nM  scripts/bench-capacity-data.mjs\nM  scripts/bench-capacity-data.test.mjs\nM  scripts/bench-capacity.mjs\nA  scripts/bench-visible-water-report.mjs\nM  scripts/verify-area-parity.mjs\nM  scripts/verify-simulation.mjs",
+  "chromium": {
+    "protocolVersion": "1.3",
+    "product": "Chrome/152.0.7977.82",
+    "revision": "@d04cdb24d67b081f6cf80200ffc5233f44b61109",
+    "userAgent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/152.0.0.0 Safari/537.36",
+    "jsVersion": "15.2.124.21"
+  },
+  "flags": [
+    "--disable-extensions",
+    "--disable-component-extensions-with-background-pages",
+    "--headless=new",
+    "--no-sandbox",
+    "--use-angle=gl",
+    "--enable-gpu",
+    "--ignore-gpu-blocklist",
+    "--hide-scrollbars",
+    "--window-size=1920,1080",
+    "--force-device-scale-factor=1",
+    "--disable-gpu-vsync",
+    "--disable-frame-rate-limit",
+    "--remote-debugging-port=0",
+    "--user-data-dir=<isolated temporary profile>",
+    "about:blank"
+  ],
+  "affinity": [
+    {
+      "pid": 3951107,
+      "mainThreadCpu": 6,
+      "allowed": "6",
+      "probeMs": 150,
+      "probeTicks": 15,
+      "unchangedOtherThreads": 16,
+      "scope": "active benchmark page main thread only; spares excluded"
+    }
+  ],
+  "configuration": {
+    "name": "water-scale",
+    "seed": 4242,
+    "carpetSeed": 48017,
+    "cover": 1800,
+    "dt": 0.016666666666666666,
+    "waterCount": 4,
+    "waterResolution": 129,
+    "waterCells": 66564,
+    "waterWidth": 28,
+    "spacing": 32,
+    "mapWidth": 1024,
+    "expectedVisible": 4,
+    "reflection": true,
+    "externalImpulses": false,
+    "waterPolicy": "off"
+  },
+  "diagnostics": {
+    "waterCalls": [
+      1201,
+      1201,
+      1201,
+      1201
+    ],
+    "visibleCreatures": 0,
+    "visibleWaters": 4,
+    "simulationResolutions": [
+      129,
+      129,
+      129,
+      129
+    ],
+    "reflectionLevels": [
+      0.10360088090598583,
+      0.10354073050618172,
+      0.0028401993513107286,
+      0.002897203743457793
+    ]
+  },
+  "fingerprint": {
+    "hash": "bfcc17e1",
+    "values": 465984,
+    "skinnedPoints": 0,
+    "time": 20.000000000000146,
+    "visibleWaterHash": "46f3835e"
+  },
+  "stats": {
+    "cpuMs": {
+      "p50": 15.105000004172325,
+      "p95": 15.965000003576279,
+      "p99": 20.07999999821186
+    },
+    "timings": {
+      "p50": null,
+      "p95": null,
+      "p99": null
+    },
+    "drawCalls": {
+      "p50": 11,
+      "p95": 11,
+      "p99": 11
+    },
+    "triangles": {
+      "p50": 133160,
+      "p95": 133160,
+      "p99": 133160
+    },
+    "points": {
+      "p50": 0,
+      "p95": 0,
+      "p99": 0
+    },
+    "frameMs": {
+      "p50": 15.484999999403954,
+      "p95": 16.359999999403954,
+      "p99": 20.45999999344349
+    },
+    "rafIntervalMs": {
+      "p50": null,
+      "p95": null,
+      "p99": null
+    },
+    "frameCpuMs": {
+      "p50": 15.120000004768372,
+      "p95": 15.984999999403954,
+      "p99": 20.094999998807907
+    },
+    "sceneCpuMs": {
+      "p50": 0.015000000596046448,
+      "p95": 0.030000001192092896,
+      "p99": 0.04500000178813934
+    },
+    "gpuMs": {
+      "p50": 6.957812,
+      "p95": 9.678593,
+      "p99": 10.144583
+    },
+    "schedulerCpuMs": {
+      "p50": 0.025000005960464478,
+      "p95": 0.04999998211860657,
+      "p99": 0.05500002205371857
+    },
+    "completedFrameMs": {
+      "p50": 15.480000004172325,
+      "p95": 16.364999994635582,
+      "p99": 20.45999999344349
+    },
+    "gpuLatencyMs": {
+      "p50": 30.989999994635582,
+      "p95": 32.56999999284744,
+      "p99": 38.75999999046326
+    },
+    "waterStep": {
+      "p50": 6.189999967813492,
+      "p95": 6.635000005364418,
+      "p99": 8.020000025629997
+    },
+    "waterUpload": {
+      "p50": 6.875,
+      "p95": 7.215000003576279,
+      "p99": 8.814999997615814
+    },
+    "waterReflection": {
+      "p50": 1.4299999922513962,
+      "p95": 1.6449999958276749,
+      "p99": 1.810000017285347
+    },
+    "skinning": {
+      "p50": 0,
+      "p95": 0,
+      "p99": 0
+    },
+    "effects": {
+      "p50": 0,
+      "p95": 0.004999995231628418,
+      "p99": 0.005000010132789612
+    },
+    "carpet": {
+      "p50": 0,
+      "p95": 0.005000010132789612,
+      "p99": 0.015000000596046448
+    },
+    "bodyUniforms": {
+      "p50": 0,
+      "p95": 0.004999995231628418,
+      "p99": 0.005000010132789612
+    },
+    "renderRest": {
+      "p50": 0.5750000029802322,
+      "p95": 0.7600000351667404,
+      "p99": 0.9799999892711639
+    }
+  },
+  "hot": [
+    {
+      "functionName": "step",
+      "scriptId": "37",
+      "url": "http://localhost:1440/@fs/home/joao/orca/workspaces/ascii-engine/threadfin/packages/engine/src/world/waterDynamics.ts",
+      "lineNumber": 28,
+      "columnNumber": 15,
+      "milliseconds": 5281.63,
+      "stack": [
+        "step",
+        "updateDynamics",
+        "water.updateDynamics",
+        "render",
+        "step",
+        "pollChannel.port1.onmessage",
+        "(root)"
+      ]
+    },
+    {
+      "functionName": "upload",
+      "scriptId": "32",
+      "url": "http://localhost:1440/@fs/home/joao/orca/workspaces/ascii-engine/threadfin/packages/engine/src/techniques/water.ts?t=1792153280438",
+      "lineNumber": 411,
+      "columnNumber": 17,
+      "milliseconds": 3578.268,
+      "stack": [
+        "upload",
+        "updateDynamics",
+        "water.updateDynamics",
+        "render",
+        "step",
+        "pollChannel.port1.onmessage",
+        "(root)"
+      ]
+    },
+    {
+      "functionName": "updateWaterNormals",
+      "scriptId": "67",
+      "url": "http://localhost:1440/@fs/home/joao/orca/workspaces/ascii-engine/threadfin/packages/engine/src/techniques/waterGeometry.ts",
+      "lineNumber": 5,
+      "columnNumber": 34,
+      "milliseconds": 1927.646,
+      "stack": [
+        "updateWaterNormals",
+        "upload",
+        "updateDynamics",
+        "water.updateDynamics",
+        "render",
+        "step",
+        "pollChannel.port1.onmessage",
+        "(root)"
+      ]
+    },
+    {
+      "functionName": "sample",
+      "scriptId": "37",
+      "url": "http://localhost:1440/@fs/home/joao/orca/workspaces/ascii-engine/threadfin/packages/engine/src/world/waterDynamics.ts",
+      "lineNumber": 113,
+      "columnNumber": 17,
+      "milliseconds": 1405.497,
+      "stack": [
+        "sample",
+        "upload",
+        "updateDynamics",
+        "water.updateDynamics",
+        "render",
+        "step",
+        "pollChannel.port1.onmessage",
+        "(root)"
+      ]
+    },
+    {
+      "functionName": "sample",
+      "scriptId": "37",
+      "url": "http://localhost:1440/@fs/home/joao/orca/workspaces/ascii-engine/threadfin/packages/engine/src/world/waterDynamics.ts",
+      "lineNumber": 113,
+      "columnNumber": 17,
+      "milliseconds": 1195.163,
+      "stack": [
+        "sample",
+        "step",
+        "updateDynamics",
+        "water.updateDynamics",
+        "render",
+        "step",
+        "pollChannel.port1.onmessage",
+        "(root)"
+      ]
+    },
+    {
+      "functionName": "flux",
+      "scriptId": "37",
+      "url": "http://localhost:1440/@fs/home/joao/orca/workspaces/ascii-engine/threadfin/packages/engine/src/world/waterDynamics.ts",
+      "lineNumber": 43,
+      "columnNumber": 29,
+      "milliseconds": 839.356,
+      "stack": [
+        "flux",
+        "step",
+        "updateDynamics",
+        "water.updateDynamics",
+        "render",
+        "step",
+        "pollChannel.port1.onmessage",
+        "(root)"
+      ]
+    },
+    {
+      "functionName": "reflectionLevel",
+      "scriptId": "32",
+      "url": "http://localhost:1440/@fs/home/joao/orca/workspaces/ascii-engine/threadfin/packages/engine/src/techniques/water.ts?t=1792153280438",
+      "lineNumber": 527,
+      "columnNumber": 19,
+      "milliseconds": 818.47,
+      "stack": [
+        "reflectionLevel",
+        "render",
+        "step",
+        "pollChannel.port1.onmessage",
+        "(root)"
+      ]
+    },
+    {
+      "functionName": "surface",
+      "scriptId": "32",
+      "url": "http://localhost:1440/@fs/home/joao/orca/workspaces/ascii-engine/threadfin/packages/engine/src/techniques/water.ts?t=1792153280438",
+      "lineNumber": 537,
+      "columnNumber": 26,
+      "milliseconds": 397.552,
+      "stack": [
+        "surface",
+        "reflectionLevel",
+        "render",
+        "step",
+        "pollChannel.port1.onmessage",
+        "(root)"
+      ]
+    },
+    {
+      "functionName": "(program)",
+      "scriptId": "0",
+      "url": "",
+      "lineNumber": -1,
+      "columnNumber": -1,
+      "milliseconds": 381.424,
+      "stack": [
+        "(program)",
+        "(root)"
+      ]
+    },
+    {
+      "functionName": "(garbage collector)",
+      "scriptId": "0",
+      "url": "",
+      "lineNumber": -1,
+      "columnNumber": -1,
+      "milliseconds": 374.576,
+      "stack": [
+        "(garbage collector)",
+        "(root)"
+      ]
+    },
+    {
+      "functionName": "bufferSubData",
+      "scriptId": "0",
+      "url": "",
+      "lineNumber": -1,
+      "columnNumber": -1,
+      "milliseconds": 238.278,
+      "stack": [
+        "bufferSubData",
+        "updateBuffer",
+        "update",
+        "update",
+        "update",
+        "projectObject",
+        "projectObject",
+        "WebGLRenderer.render",
+        "render",
+        "step",
+        "pollChannel.port1.onmessage",
+        "(root)"
+      ]
+    },
+    {
+      "functionName": "min",
+      "scriptId": "21",
+      "url": "http://localhost:1440/node_modules/.vite/deps/chunk-V7KZFINS.js?v=5e7097f4",
+      "lineNumber": 2437,
+      "columnNumber": 5,
+      "milliseconds": 191.243,
+      "stack": [
+        "min",
+        "expandByPoint",
+        "setFromBufferAttribute",
+        "computeBoundingSphere",
+        "upload",
+        "updateDynamics",
+        "water.updateDynamics",
+        "render",
+        "step",
+        "pollChannel.port1.onmessage",
+        "(root)"
+      ]
+    },
+    {
+      "functionName": "min",
+      "scriptId": "21",
+      "url": "http://localhost:1440/node_modules/.vite/deps/chunk-V7KZFINS.js?v=5e7097f4",
+      "lineNumber": 2437,
+      "columnNumber": 5,
+      "milliseconds": 179.586,
+      "stack": [
+        "min",
+        "expandByPoint",
+        "setFromBufferAttribute",
+        "computeBoundingBox",
+        "upload",
+        "updateDynamics",
+        "water.updateDynamics",
+        "render",
+        "step",
+        "pollChannel.port1.onmessage",
+        "(root)"
+      ]
+    },
+    {
+      "functionName": "texSubImage2D",
+      "scriptId": "0",
+      "url": "",
+      "lineNumber": -1,
+      "columnNumber": -1,
+      "milliseconds": 174.799,
+      "stack": [
+        "texSubImage2D",
+        "texSubImage2D",
+        "updateTexture",
+        "uploadTexture",
+        "setTexture2D",
+        "setValueT1",
+        "upload",
+        "setProgram",
+        "WebGLRenderer.renderBufferDirect",
+        "renderObject",
+        "renderObjects",
+        "renderScene",
+        "WebGLRenderer.render",
+        "render",
+        "step",
+        "pollChannel.port1.onmessage",
+        "(root)"
+      ]
+    },
+    {
+      "functionName": "setY",
+      "scriptId": "21",
+      "url": "http://localhost:1440/node_modules/.vite/deps/chunk-V7KZFINS.js?v=5e7097f4",
+      "lineNumber": 10050,
+      "columnNumber": 6,
+      "milliseconds": 135.567,
+      "stack": [
+        "setY",
+        "upload",
+        "updateDynamics",
+        "water.updateDynamics",
+        "render",
+        "step",
+        "pollChannel.port1.onmessage",
+        "(root)"
+      ]
+    },
+    {
+      "functionName": "fromBufferAttribute",
+      "scriptId": "21",
+      "url": "http://localhost:1440/node_modules/.vite/deps/chunk-V7KZFINS.js?v=5e7097f4",
+      "lineNumber": 2908,
+      "columnNumber": 21,
+      "milliseconds": 104.313,
+      "stack": [
+        "fromBufferAttribute",
+        "setFromBufferAttribute",
+        "computeBoundingSphere",
+        "upload",
+        "updateDynamics",
+        "water.updateDynamics",
+        "render",
+        "step",
+        "pollChannel.port1.onmessage",
+        "(root)"
+      ]
+    },
+    {
+      "functionName": "max",
+      "scriptId": "21",
+      "url": "http://localhost:1440/node_modules/.vite/deps/chunk-V7KZFINS.js?v=5e7097f4",
+      "lineNumber": 2450,
+      "columnNumber": 5,
+      "milliseconds": 101.75,
+      "stack": [
+        "max",
+        "expandByPoint",
+        "setFromBufferAttribute",
+        "computeBoundingSphere",
+        "upload",
+        "updateDynamics",
+        "water.updateDynamics",
+        "render",
+        "step",
+        "pollChannel.port1.onmessage",
+        "(root)"
+      ]
+    },
+    {
+      "functionName": "max",
+      "scriptId": "21",
+      "url": "http://localhost:1440/node_modules/.vite/deps/chunk-V7KZFINS.js?v=5e7097f4",
+      "lineNumber": 2450,
+      "columnNumber": 5,
+      "milliseconds": 98.346,
+      "stack": [
+        "max",
+        "expandByPoint",
+        "setFromBufferAttribute",
+        "computeBoundingBox",
+        "upload",
+        "updateDynamics",
+        "water.updateDynamics",
+        "render",
+        "step",
+        "pollChannel.port1.onmessage",
+        "(root)"
+      ]
+    },
+    {
+      "functionName": "distanceToSquared",
+      "scriptId": "21",
+      "url": "http://localhost:1440/node_modules/.vite/deps/chunk-V7KZFINS.js?v=5e7097f4",
+      "lineNumber": 2729,
+      "columnNumber": 19,
+      "milliseconds": 93.169,
+      "stack": [
+        "distanceToSquared",
+        "computeBoundingSphere",
+        "upload",
+        "updateDynamics",
+        "water.updateDynamics",
+        "render",
+        "step",
+        "pollChannel.port1.onmessage",
+        "(root)"
+      ]
+    },
+    {
+      "functionName": "fromBufferAttribute",
+      "scriptId": "21",
+      "url": "http://localhost:1440/node_modules/.vite/deps/chunk-V7KZFINS.js?v=5e7097f4",
+      "lineNumber": 2908,
+      "columnNumber": 21,
+      "milliseconds": 85.14,
+      "stack": [
+        "fromBufferAttribute",
+        "setFromBufferAttribute",
+        "computeBoundingBox",
+        "upload",
+        "updateDynamics",
+        "water.updateDynamics",
+        "render",
+        "step",
+        "pollChannel.port1.onmessage",
+        "(root)"
+      ]
+    },
+    {
+      "functionName": "getX",
+      "scriptId": "21",
+      "url": "http://localhost:1440/node_modules/.vite/deps/chunk-V7KZFINS.js?v=5e7097f4",
+      "lineNumber": 10015,
+      "columnNumber": 6,
+      "milliseconds": 82.71,
+      "stack": [
+        "getX",
+        "fromBufferAttribute",
+        "setFromBufferAttribute",
+        "computeBoundingBox",
+        "upload",
+        "updateDynamics",
+        "water.updateDynamics",
+        "render",
+        "step",
+        "pollChannel.port1.onmessage",
+        "(root)"
+      ]
+    },
+    {
+      "functionName": "updateDynamics",
+      "scriptId": "32",
+      "url": "http://localhost:1440/@fs/home/joao/orca/workspaces/ascii-engine/threadfin/packages/engine/src/techniques/water.ts?t=1792153280438",
+      "lineNumber": 468,
+      "columnNumber": 18,
+      "milliseconds": 80.134,
+      "stack": [
+        "updateDynamics",
+        "water.updateDynamics",
+        "render",
+        "step",
+        "pollChannel.port1.onmessage",
+        "(root)"
+      ]
+    },
+    {
+      "functionName": "getX",
+      "scriptId": "21",
+      "url": "http://localhost:1440/node_modules/.vite/deps/chunk-V7KZFINS.js?v=5e7097f4",
+      "lineNumber": 10015,
+      "columnNumber": 6,
+      "milliseconds": 76.583,
+      "stack": [
+        "getX",
+        "fromBufferAttribute",
+        "setFromBufferAttribute",
+        "computeBoundingSphere",
+        "upload",
+        "updateDynamics",
+        "water.updateDynamics",
+        "render",
+        "step",
+        "pollChannel.port1.onmessage",
+        "(root)"
+      ]
+    },
+    {
+      "functionName": "getX",
+      "scriptId": "21",
+      "url": "http://localhost:1440/node_modules/.vite/deps/chunk-V7KZFINS.js?v=5e7097f4",
+      "lineNumber": 10015,
+      "columnNumber": 6,
+      "milliseconds": 68.017,
+      "stack": [
+        "getX",
+        "fromBufferAttribute",
+        "computeBoundingSphere",
+        "upload",
+        "updateDynamics",
+        "water.updateDynamics",
+        "render",
+        "step",
+        "pollChannel.port1.onmessage",
+        "(root)"
+      ]
+    },
+    {
+      "functionName": "getX",
+      "scriptId": "21",
+      "url": "http://localhost:1440/node_modules/.vite/deps/chunk-V7KZFINS.js?v=5e7097f4",
+      "lineNumber": 10015,
+      "columnNumber": 6,
+      "milliseconds": 66.494,
+      "stack": [
+        "getX",
+        "upload",
+        "updateDynamics",
+        "water.updateDynamics",
+        "render",
+        "step",
+        "pollChannel.port1.onmessage",
+        "(root)"
+      ]
+    },
+    {
+      "functionName": "(idle)",
+      "scriptId": "0",
+      "url": "",
+      "lineNumber": -1,
+      "columnNumber": -1,
+      "milliseconds": 59.108,
+      "stack": [
+        "(idle)",
+        "(root)"
+      ]
+    },
+    {
+      "functionName": "step",
+      "scriptId": "6",
+      "url": "http://localhost:1440/src/benchmark/main.ts?t=1792153280438",
+      "lineNumber": 178,
+      "columnNumber": 19,
+      "milliseconds": 55.815,
+      "stack": [
+        "step",
+        "pollChannel.port1.onmessage",
+        "(root)"
+      ]
+    },
+    {
+      "functionName": "computeBoundingSphere",
+      "scriptId": "21",
+      "url": "http://localhost:1440/node_modules/.vite/deps/chunk-V7KZFINS.js?v=5e7097f4",
+      "lineNumber": 11027,
+      "columnNumber": 23,
+      "milliseconds": 52.975,
+      "stack": [
+        "computeBoundingSphere",
+        "upload",
+        "updateDynamics",
+        "water.updateDynamics",
+        "render",
+        "step",
+        "pollChannel.port1.onmessage",
+        "(root)"
+      ]
+    },
+    {
+      "functionName": "render",
+      "scriptId": "13",
+      "url": "http://localhost:1440/@fs/home/joao/orca/workspaces/ascii-engine/threadfin/packages/engine/src/engine.ts?t=1792153280438",
+      "lineNumber": 719,
+      "columnNumber": 10,
+      "milliseconds": 50.014,
+      "stack": [
+        "render",
+        "step",
+        "pollChannel.port1.onmessage",
+        "(root)"
+      ]
+    },
+    {
+      "functionName": "fromBufferAttribute",
+      "scriptId": "21",
+      "url": "http://localhost:1440/node_modules/.vite/deps/chunk-V7KZFINS.js?v=5e7097f4",
+      "lineNumber": 2908,
+      "columnNumber": 21,
+      "milliseconds": 45.334,
+      "stack": [
+        "fromBufferAttribute",
+        "computeBoundingSphere",
+        "upload",
+        "updateDynamics",
+        "water.updateDynamics",
+        "render",
+        "step",
+        "pollChannel.port1.onmessage",
+        "(root)"
+      ]
+    },
+    {
+      "functionName": "getZ",
+      "scriptId": "21",
+      "url": "http://localhost:1440/node_modules/.vite/deps/chunk-V7KZFINS.js?v=5e7097f4",
+      "lineNumber": 10061,
+      "columnNumber": 6,
+      "milliseconds": 35.649,
+      "stack": [
+        "getZ",
+        "upload",
+        "updateDynamics",
+        "water.updateDynamics",
+        "render",
+        "step",
+        "pollChannel.port1.onmessage",
+        "(root)"
+      ]
+    },
+    {
+      "functionName": "copy",
+      "scriptId": "21",
+      "url": "http://localhost:1440/node_modules/.vite/deps/chunk-V7KZFINS.js?v=5e7097f4",
+      "lineNumber": 7583,
+      "columnNumber": 6,
+      "milliseconds": 28.208,
+      "stack": [
+        "copy",
+        "copy",
+        "copy",
+        "updateReflectionCamera",
+        "render",
+        "render",
+        "step",
+        "pollChannel.port1.onmessage",
+        "(root)"
+      ]
+    },
+    {
+      "functionName": "clear",
+      "scriptId": "0",
+      "url": "",
+      "lineNumber": -1,
+      "columnNumber": -1,
+      "milliseconds": 27.281,
+      "stack": [
+        "clear",
+        "WebGLRenderer.clear",
+        "render",
+        "WebGLRenderer.render",
+        "render",
+        "step",
+        "pollChannel.port1.onmessage",
+        "(root)"
+      ]
+    },
+    {
+      "functionName": "upload",
+      "scriptId": "32",
+      "url": "http://localhost:1440/@fs/home/joao/orca/workspaces/ascii-engine/threadfin/packages/engine/src/techniques/water.ts?t=1792153280438",
+      "lineNumber": 411,
+      "columnNumber": 17,
+      "milliseconds": 26.162,
+      "stack": [
+        "upload",
+        "upload",
+        "updateDynamics",
+        "water.updateDynamics",
+        "render",
+        "step",
+        "pollChannel.port1.onmessage",
+        "(root)"
+      ]
+    },
+    {
+      "functionName": "getY",
+      "scriptId": "21",
+      "url": "http://localhost:1440/node_modules/.vite/deps/chunk-V7KZFINS.js?v=5e7097f4",
+      "lineNumber": 10038,
+      "columnNumber": 6,
+      "milliseconds": 26.027,
+      "stack": [
+        "getY",
+        "fromBufferAttribute",
+        "computeBoundingSphere",
+        "upload",
+        "updateDynamics",
+        "water.updateDynamics",
+        "render",
+        "step",
+        "pollChannel.port1.onmessage",
+        "(root)"
+      ]
+    },
+    {
+      "functionName": "getZ",
+      "scriptId": "21",
+      "url": "http://localhost:1440/node_modules/.vite/deps/chunk-V7KZFINS.js?v=5e7097f4",
+      "lineNumber": 10061,
+      "columnNumber": 6,
+      "milliseconds": 24.258,
+      "stack": [
+        "getZ",
+        "fromBufferAttribute",
+        "computeBoundingSphere",
+        "upload",
+        "updateDynamics",
+        "water.updateDynamics",
+        "render",
+        "step",
+        "pollChannel.port1.onmessage",
+        "(root)"
+      ]
+    },
+    {
+      "functionName": "bindFramebuffer",
+      "scriptId": "0",
+      "url": "",
+      "lineNumber": -1,
+      "columnNumber": -1,
+      "milliseconds": 23.456,
+      "stack": [
+        "bindFramebuffer",
+        "bindFramebuffer",
+        "WebGLRenderer.setRenderTarget",
+        "render",
+        "render",
+        "step",
+        "pollChannel.port1.onmessage",
+        "(root)"
+      ]
+    },
+    {
+      "functionName": "getY",
+      "scriptId": "21",
+      "url": "http://localhost:1440/node_modules/.vite/deps/chunk-V7KZFINS.js?v=5e7097f4",
+      "lineNumber": 10038,
+      "columnNumber": 6,
+      "milliseconds": 22.677,
+      "stack": [
+        "getY",
+        "fromBufferAttribute",
+        "setFromBufferAttribute",
+        "computeBoundingBox",
+        "upload",
+        "updateDynamics",
+        "water.updateDynamics",
+        "render",
+        "step",
+        "pollChannel.port1.onmessage",
+        "(root)"
+      ]
+    },
+    {
+      "functionName": "pollChannel.port1.onmessage",
+      "scriptId": "6",
+      "url": "http://localhost:1440/src/benchmark/main.ts?t=1792153280438",
+      "lineNumber": 163,
+      "columnNumber": 38,
+      "milliseconds": 21.741,
+      "stack": [
+        "pollChannel.port1.onmessage",
+        "(root)"
+      ]
+    },
+    {
+      "functionName": "getY",
+      "scriptId": "21",
+      "url": "http://localhost:1440/node_modules/.vite/deps/chunk-V7KZFINS.js?v=5e7097f4",
+      "lineNumber": 10038,
+      "columnNumber": 6,
+      "milliseconds": 20.724,
+      "stack": [
+        "getY",
+        "fromBufferAttribute",
+        "setFromBufferAttribute",
+        "computeBoundingSphere",
+        "upload",
+        "updateDynamics",
+        "water.updateDynamics",
+        "render",
+        "step",
+        "pollChannel.port1.onmessage",
+        "(root)"
+      ]
+    },
+    {
+      "functionName": "step",
+      "scriptId": "37",
+      "url": "http://localhost:1440/@fs/home/joao/orca/workspaces/ascii-engine/threadfin/packages/engine/src/world/waterDynamics.ts",
+      "lineNumber": 28,
+      "columnNumber": 15,
+      "milliseconds": 19.875,
+      "stack": [
+        "step",
+        "step",
+        "updateDynamics",
+        "water.updateDynamics",
+        "render",
+        "step",
+        "pollChannel.port1.onmessage",
+        "(root)"
+      ]
+    },
+    {
+      "functionName": "setFromBufferAttribute",
+      "scriptId": "21",
+      "url": "http://localhost:1440/node_modules/.vite/deps/chunk-V7KZFINS.js?v=5e7097f4",
+      "lineNumber": 9180,
+      "columnNumber": 24,
+      "milliseconds": 19.375,
+      "stack": [
+        "setFromBufferAttribute",
+        "computeBoundingBox",
+        "upload",
+        "updateDynamics",
+        "water.updateDynamics",
+        "render",
+        "step",
+        "pollChannel.port1.onmessage",
+        "(root)"
+      ]
+    },
+    {
+      "functionName": "WebGLRenderer.renderBufferDirect",
+      "scriptId": "21",
+      "url": "http://localhost:1440/node_modules/.vite/deps/chunk-V7KZFINS.js?v=5e7097f4",
+      "lineNumber": 42251,
+      "columnNumber": 38,
+      "milliseconds": 18.775,
+      "stack": [
+        "WebGLRenderer.renderBufferDirect",
+        "renderObject",
+        "renderObjects",
+        "renderScene",
+        "WebGLRenderer.render",
+        "render",
+        "render",
+        "step",
+        "pollChannel.port1.onmessage",
+        "(root)"
+      ]
+    },
+    {
+      "functionName": "setProgram",
+      "scriptId": "21",
+      "url": "http://localhost:1440/node_modules/.vite/deps/chunk-V7KZFINS.js?v=5e7097f4",
+      "lineNumber": 42831,
+      "columnNumber": 23,
+      "milliseconds": 18.653,
+      "stack": [
+        "setProgram",
+        "WebGLRenderer.renderBufferDirect",
+        "renderObject",
+        "renderObjects",
+        "renderScene",
+        "WebGLRenderer.render",
+        "render",
+        "render",
+        "step",
+        "pollChannel.port1.onmessage",
+        "(root)"
+      ]
+    },
+    {
+      "functionName": "setup",
+      "scriptId": "21",
+      "url": "http://localhost:1440/node_modules/.vite/deps/chunk-V7KZFINS.js?v=5e7097f4",
+      "lineNumber": 37262,
+      "columnNumber": 16,
+      "milliseconds": 18.368,
+      "stack": [
+        "setup",
+        "setupLights",
+        "WebGLRenderer.render",
+        "render",
+        "render",
+        "step",
+        "pollChannel.port1.onmessage",
+        "(root)"
+      ]
+    },
+    {
+      "functionName": "getZ",
+      "scriptId": "21",
+      "url": "http://localhost:1440/node_modules/.vite/deps/chunk-V7KZFINS.js?v=5e7097f4",
+      "lineNumber": 10061,
+      "columnNumber": 6,
+      "milliseconds": 16.83,
+      "stack": [
+        "getZ",
+        "fromBufferAttribute",
+        "setFromBufferAttribute",
+        "computeBoundingSphere",
+        "upload",
+        "updateDynamics",
+        "water.updateDynamics",
+        "render",
+        "step",
+        "pollChannel.port1.onmessage",
+        "(root)"
+      ]
+    },
+    {
+      "functionName": "add",
+      "scriptId": "6",
+      "url": "http://localhost:1440/src/benchmark/main.ts?t=1792153280438",
+      "lineNumber": 72,
+      "columnNumber": 14,
+      "milliseconds": 16.801,
+      "stack": [
+        "add",
+        "",
+        "traverse",
+        "traverse",
+        "fingerprint",
+        "run",
+        "(root)"
+      ]
+    },
+    {
+      "functionName": "flatten",
+      "scriptId": "21",
+      "url": "http://localhost:1440/node_modules/.vite/deps/chunk-V7KZFINS.js?v=5e7097f4",
+      "lineNumber": 35110,
+      "columnNumber": 16,
+      "milliseconds": 15.753,
+      "stack": [
+        "flatten",
+        "setValueM4Array",
+        "upload",
+        "setProgram",
+        "WebGLRenderer.renderBufferDirect",
+        "renderObject",
+        "renderObjects",
+        "renderScene",
+        "WebGLRenderer.render",
+        "render",
+        "render",
+        "step",
+        "pollChannel.port1.onmessage",
+        "(root)"
+      ]
+    },
+    {
+      "functionName": "add",
+      "scriptId": "6",
+      "url": "http://localhost:1440/src/benchmark/main.ts?t=1792153280438",
+      "lineNumber": 72,
+      "columnNumber": 14,
+      "milliseconds": 14.996,
+      "stack": [
+        "add",
+        "fingerprint",
+        "run",
+        "(root)"
+      ]
+    },
+    {
+      "functionName": "getZ",
+      "scriptId": "21",
+      "url": "http://localhost:1440/node_modules/.vite/deps/chunk-V7KZFINS.js?v=5e7097f4",
+      "lineNumber": 10061,
+      "columnNumber": 6,
+      "milliseconds": 13.65,
+      "stack": [
+        "getZ",
+        "fromBufferAttribute",
+        "setFromBufferAttribute",
+        "computeBoundingBox",
+        "upload",
+        "updateDynamics",
+        "water.updateDynamics",
+        "render",
+        "step",
+        "pollChannel.port1.onmessage",
+        "(root)"
+      ]
+    }
+  ],
+  "allocations": [
+    {
+      "functionName": "step",
+      "scriptId": "37",
+      "url": "http://localhost:1440/@fs/home/joao/orca/workspaces/ascii-engine/threadfin/packages/engine/src/world/waterDynamics.ts",
+      "lineNumber": 28,
+      "columnNumber": 15,
+      "bytes": 4937723204
+    },
+    {
+      "functionName": "step",
+      "scriptId": "37",
+      "url": "http://localhost:1440/@fs/home/joao/orca/workspaces/ascii-engine/threadfin/packages/engine/src/world/waterDynamics.ts",
+      "lineNumber": 28,
+      "columnNumber": 15,
+      "bytes": 1179823144
+    },
+    {
+      "functionName": "hypot",
+      "scriptId": "0",
+      "url": "",
+      "lineNumber": -1,
+      "columnNumber": -1,
+      "bytes": 772942020
+    },
+    {
+      "functionName": "hypot",
+      "scriptId": "0",
+      "url": "",
+      "lineNumber": -1,
+      "columnNumber": -1,
+      "bytes": 179245528
+    },
+    {
+      "functionName": "next",
+      "scriptId": "0",
+      "url": "",
+      "lineNumber": -1,
+      "columnNumber": -1,
+      "bytes": 15831780
+    },
+    {
+      "functionName": "next",
+      "scriptId": "0",
+      "url": "",
+      "lineNumber": -1,
+      "columnNumber": -1,
+      "bytes": 9112960
+    },
+    {
+      "functionName": "next",
+      "scriptId": "0",
+      "url": "",
+      "lineNumber": -1,
+      "columnNumber": -1,
+      "bytes": 9079060
+    },
+    {
+      "functionName": "next",
+      "scriptId": "0",
+      "url": "",
+      "lineNumber": -1,
+      "columnNumber": -1,
+      "bytes": 8718512
+    },
+    {
+      "functionName": "add",
+      "scriptId": "6",
+      "url": "http://localhost:1440/src/benchmark/main.ts?t=1792153280438",
+      "lineNumber": 72,
+      "columnNumber": 14,
+      "bytes": 8586792
+    },
+    {
+      "functionName": "add",
+      "scriptId": "6",
+      "url": "http://localhost:1440/src/benchmark/main.ts?t=1792153280438",
+      "lineNumber": 72,
+      "columnNumber": 14,
+      "bytes": 6980868
+    },
+    {
+      "functionName": "from",
+      "scriptId": "0",
+      "url": "",
+      "lineNumber": -1,
+      "columnNumber": -1,
+      "bytes": 6660064
+    },
+    {
+      "functionName": "next",
+      "scriptId": "0",
+      "url": "",
+      "lineNumber": -1,
+      "columnNumber": -1,
+      "bytes": 6194772
+    },
+    {
+      "functionName": "from",
+      "scriptId": "0",
+      "url": "",
+      "lineNumber": -1,
+      "columnNumber": -1,
+      "bytes": 6132096
+    },
+    {
+      "functionName": "from",
+      "scriptId": "0",
+      "url": "",
+      "lineNumber": -1,
+      "columnNumber": -1,
+      "bytes": 5408112
+    },
+    {
+      "functionName": "flux",
+      "scriptId": "37",
+      "url": "http://localhost:1440/@fs/home/joao/orca/workspaces/ascii-engine/threadfin/packages/engine/src/world/waterDynamics.ts",
+      "lineNumber": 43,
+      "columnNumber": 29,
+      "bytes": 3900108
+    },
+    {
+      "functionName": "max",
+      "scriptId": "0",
+      "url": "",
+      "lineNumber": -1,
+      "columnNumber": -1,
+      "bytes": 3605136
+    },
+    {
+      "functionName": "upload",
+      "scriptId": "32",
+      "url": "http://localhost:1440/@fs/home/joao/orca/workspaces/ascii-engine/threadfin/packages/engine/src/techniques/water.ts?t=1792153280438",
+      "lineNumber": 411,
+      "columnNumber": 17,
+      "bytes": 2294184
+    },
+    {
+      "functionName": "setFromProjectionMatrix",
+      "scriptId": "21",
+      "url": "http://localhost:1440/node_modules/.vite/deps/chunk-V7KZFINS.js?v=5e7097f4",
+      "lineNumber": 14592,
+      "columnNumber": 25,
+      "bytes": 1671480
+    },
+    {
+      "functionName": "render",
+      "scriptId": "32",
+      "url": "http://localhost:1440/@fs/home/joao/orca/workspaces/ascii-engine/threadfin/packages/engine/src/techniques/water.ts?t=1792153280438",
+      "lineNumber": 248,
+      "columnNumber": 10,
+      "bytes": 1409528
+    },
+    {
+      "functionName": "setFromProjectionMatrix",
+      "scriptId": "21",
+      "url": "http://localhost:1440/node_modules/.vite/deps/chunk-V7KZFINS.js?v=5e7097f4",
+      "lineNumber": 14592,
+      "columnNumber": 25,
+      "bytes": 1147092
+    },
+    {
+      "functionName": "render",
+      "scriptId": "13",
+      "url": "http://localhost:1440/@fs/home/joao/orca/workspaces/ascii-engine/threadfin/packages/engine/src/engine.ts?t=1792153280438",
+      "lineNumber": 719,
+      "columnNumber": 10,
+      "bytes": 1114624
+    },
+    {
+      "functionName": "",
+      "scriptId": "32",
+      "url": "http://localhost:1440/@fs/home/joao/orca/workspaces/ascii-engine/threadfin/packages/engine/src/techniques/water.ts?t=1792153280438",
+      "lineNumber": 265,
+      "columnNumber": 28,
+      "bytes": 1082568
+    },
+    {
+      "functionName": "reflectionLevel",
+      "scriptId": "32",
+      "url": "http://localhost:1440/@fs/home/joao/orca/workspaces/ascii-engine/threadfin/packages/engine/src/techniques/water.ts?t=1792153280438",
+      "lineNumber": 527,
+      "columnNumber": 19,
+      "bytes": 1016208
+    },
+    {
+      "functionName": "sample",
+      "scriptId": "37",
+      "url": "http://localhost:1440/@fs/home/joao/orca/workspaces/ascii-engine/threadfin/packages/engine/src/world/waterDynamics.ts",
+      "lineNumber": 113,
+      "columnNumber": 17,
+      "bytes": 983220
+    },
+    {
+      "functionName": "setValueV3f",
+      "scriptId": "21",
+      "url": "http://localhost:1440/node_modules/.vite/deps/chunk-V7KZFINS.js?v=5e7097f4",
+      "lineNumber": 35171,
+      "columnNumber": 20,
+      "bytes": 950448
+    },
+    {
+      "functionName": "projectObject",
+      "scriptId": "21",
+      "url": "http://localhost:1440/node_modules/.vite/deps/chunk-V7KZFINS.js?v=5e7097f4",
+      "lineNumber": 42551,
+      "columnNumber": 26,
+      "bytes": 885780
+    },
+    {
+      "functionName": "setValueV3f",
+      "scriptId": "21",
+      "url": "http://localhost:1440/node_modules/.vite/deps/chunk-V7KZFINS.js?v=5e7097f4",
+      "lineNumber": 35171,
+      "columnNumber": 20,
+      "bytes": 753804
+    },
+    {
+      "functionName": "min",
+      "scriptId": "0",
+      "url": "",
+      "lineNumber": -1,
+      "columnNumber": -1,
+      "bytes": 622704
+    },
+    {
+      "functionName": "updateTexture",
+      "scriptId": "21",
+      "url": "http://localhost:1440/node_modules/.vite/deps/chunk-V7KZFINS.js?v=5e7097f4",
+      "lineNumber": 39133,
+      "columnNumber": 24,
+      "bytes": 557548
+    },
+    {
+      "functionName": "fingerprint",
+      "scriptId": "6",
+      "url": "http://localhost:1440/src/benchmark/main.ts?t=1792153280438",
+      "lineNumber": 70,
+      "columnNumber": 20,
+      "bytes": 557160
+    },
+    {
+      "functionName": "end",
+      "scriptId": "14",
+      "url": "http://localhost:1440/@fs/home/joao/orca/workspaces/ascii-engine/threadfin/packages/engine/src/profiling.ts?t=1792151846117",
+      "lineNumber": 75,
+      "columnNumber": 7,
+      "bytes": 524516
+    },
+    {
+      "functionName": "next",
+      "scriptId": "0",
+      "url": "",
+      "lineNumber": -1,
+      "columnNumber": -1,
+      "bytes": 524440
+    },
+    {
+      "functionName": "setFromProjectionMatrix",
+      "scriptId": "21",
+      "url": "http://localhost:1440/node_modules/.vite/deps/chunk-V7KZFINS.js?v=5e7097f4",
+      "lineNumber": 14592,
+      "columnNumber": 25,
+      "bytes": 524388
+    },
+    {
+      "functionName": "copyArray",
+      "scriptId": "21",
+      "url": "http://localhost:1440/node_modules/.vite/deps/chunk-V7KZFINS.js?v=5e7097f4",
+      "lineNumber": 35135,
+      "columnNumber": 18,
+      "bytes": 524388
+    },
+    {
+      "functionName": "(V8 API)",
+      "scriptId": "0",
+      "url": "",
+      "lineNumber": -1,
+      "columnNumber": -1,
+      "bytes": 492216
+    },
+    {
+      "functionName": "exp",
+      "scriptId": "0",
+      "url": "",
+      "lineNumber": -1,
+      "columnNumber": -1,
+      "bytes": 491832
+    },
+    {
+      "functionName": "copyArray",
+      "scriptId": "21",
+      "url": "http://localhost:1440/node_modules/.vite/deps/chunk-V7KZFINS.js?v=5e7097f4",
+      "lineNumber": 35135,
+      "columnNumber": 18,
+      "bytes": 458832
+    },
+    {
+      "functionName": "setValueM4",
+      "scriptId": "21",
+      "url": "http://localhost:1440/node_modules/.vite/deps/chunk-V7KZFINS.js?v=5e7097f4",
+      "lineNumber": 35237,
+      "columnNumber": 19,
+      "bytes": 458832
+    },
+    {
+      "functionName": "copyArray",
+      "scriptId": "21",
+      "url": "http://localhost:1440/node_modules/.vite/deps/chunk-V7KZFINS.js?v=5e7097f4",
+      "lineNumber": 35135,
+      "columnNumber": 18,
+      "bytes": 458832
+    },
+    {
+      "functionName": "computeBoundingSphere",
+      "scriptId": "21",
+      "url": "http://localhost:1440/node_modules/.vite/deps/chunk-V7KZFINS.js?v=5e7097f4",
+      "lineNumber": 11027,
+      "columnNumber": 23,
+      "bytes": 426060
+    }
+  ]
+}

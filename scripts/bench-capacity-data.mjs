@@ -1,6 +1,6 @@
 import { readFile } from 'node:fs/promises'
 import { resolve } from 'node:path'
-import { summarize, relativeDifference, classifyBottleneck } from './bench-stats.mjs'
+import { summarize, relativeDifference, classifyBottleneck, qualifyTarget } from './bench-stats.mjs'
 
 export async function aggregatePoint(root, point) {
   const rounds = await Promise.all(
@@ -152,5 +152,30 @@ export function capacityAt(points, budget) {
     frameP95: maximum?.capacityP95 ?? null,
     nextFail: nextFail?.load ?? null,
     lowerBound: !!maximum && !nextFail,
+  }
+}
+
+/** Stop only on measured numeric work with CPU dominance in both complete rounds. */
+export function visibleWaterCandidate(point) {
+  const step = point.stats.waterStep?.p50,
+    frame = point.stats.frameMs.p50
+  if (
+    point.stable !== true ||
+    !Number.isFinite(step) ||
+    !Number.isFinite(frame) ||
+    frame <= 0 ||
+    !qualifyTarget('waterStep', step, frame, point.bottleneck).qualifies ||
+    point.rounds.length !== 2 ||
+    !point.rounds.every(r => classifyBottleneck(r.cpu.p50, r.gpu.p50) === 'CPU')
+  )
+    return null
+  return {
+    load: point.load,
+    subsystem: 'waterStep',
+    frameShare: step / frame,
+    stepP50: step,
+    frameP50: frame,
+    reason:
+      'Remaining numeric CPU work passes the original qualification rule; stop for owner review, no WASM',
   }
 }
