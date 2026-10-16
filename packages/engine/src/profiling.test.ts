@@ -55,6 +55,9 @@ it('accounts for disjoint CPU sections and the remaining render without changing
   p.startSection()
   f.time(5)
   p.endSection('skinning')
+  p.startSection()
+  f.time(7)
+  p.endSection('waterReflection')
   p.timings.waterStep = 4
   f.renderer.info.render.calls = 42
   f.time(20)
@@ -62,7 +65,7 @@ it('accounts for disjoint CPU sections and the remaining render without changing
   expect(p.latest).toMatchObject({
     cpuMs: 20,
     drawCalls: 42,
-    timings: { skinning: 3, waterStep: 4, renderRest: 13 },
+    timings: { skinning: 3, waterStep: 4, waterReflection: 2, renderRest: 11 },
   })
   expect(f.renderer.info.autoReset).toBe(true)
   expect(p.gpu.status).toBe('unsupported')

@@ -1,3 +1,19 @@
+## 2026-10-16 — Separate visible-water reflection CPU work
+
+Optional profiling now times water reflection setup/selection/render submission
+separately from simulation, preparation and the remaining render. Reset and
+remainder accounting has unit coverage; non-profiled rendering creates no clocks.
+The existing on/off profiling verification retains exact state/image parity and
+zero IndexedDB calls for four visible waters.
+[Parity](captures/benchmarks-2026-10-16/visible-water/instrumentation/parity.json),
+[capture](captures/benchmarks-2026-10-16/visible-water/instrumentation/water-visible-4-on.png),
+[sampling diagnostic](captures/benchmarks-2026-10-16/visible-water/profile/before-4.json),
+[protocol](captures/benchmarks-2026-10-16/visible-water/README.md).
+CPU/heap sampling points to generic normal reconstruction in preparation;
+sampling includes warm-up/final fingerprint work and is not a benchmark baseline.
+`pnpm check` passes. Collect clean before measurements next; no kernel, baseline,
+SceneDoc or owner draft change. No push.
+
 ## 2026-10-16 — Capacity plots show measured doubling loads
 
 Capacity plots now use log2 load spacing, with the actual measured load labels

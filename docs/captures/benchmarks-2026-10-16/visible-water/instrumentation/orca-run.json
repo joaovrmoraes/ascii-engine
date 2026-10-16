@@ -1,0 +1,11 @@
+{
+  "id": "795a4f07-2c7b-432c-b51f-d171c7a0f4ab",
+  "ok": true,
+  "result": {
+    "result": "{\"configuration\":{\"carpetSeed\":48017,\"cover\":1800,\"dt\":0.016666666666666666,\"expectedVisible\":2,\"externalImpulses\":false,\"mapWidth\":1024,\"name\":\"water-scale\",\"reflection\":true,\"seed\":4242,\"spacing\":32,\"waterCells\":33282,\"waterCount\":2,\"waterPolicy\":\"off\",\"waterResolution\":129,\"waterWidth\":28},\"diagnostics\":{\"reflectionLevels\":[0.052458089619874956,0.05308079051971436],\"simulationResolutions\":[129,129],\"visibleCreatures\":0,\"visibleWaters\":2,\"waterCalls\":[61,61]},\"hash\":\"92c29cc1\"}",
+    "origin": "http://localhost:1440/?bench=water-scale&waters=2&water-layout=visible&water-policy=off&queue=2"
+  },
+  "_meta": {
+    "runtimeId": "38cf1741-6edd-47a2-b539-0f58b1abc24e"
+  }
+}

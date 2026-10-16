@@ -150,6 +150,7 @@ const columns = [
   'sceneCpuMs',
   'waterStep',
   'waterUpload',
+  'waterReflection',
   'skinning',
   'effects',
   'carpet',

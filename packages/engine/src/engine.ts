@@ -1015,45 +1015,50 @@ export function createAsciiEngine(canvas: HTMLCanvasElement, options: AsciiEngin
           if (actors.foe) water.interact?.('foe', actors.foe)
           water.updateDynamics?.(dt, time, profiler?.timings)
         }
-        water.uniforms.time.value = time
-        if (water.uniforms.waterViewDirection)
-          camera.getWorldDirection(water.uniforms.waterViewDirection.value).negate()
-        if (water.uniforms.waterLightDirection) {
-          moon.getWorldPosition(water.uniforms.waterLightDirection.value)
-          moon.target.getWorldPosition(lightPosition)
-          water.uniforms.waterLightDirection.value.sub(lightPosition).normalize()
+        profiler?.startSection()
+        try {
+          water.uniforms.time.value = time
+          if (water.uniforms.waterViewDirection)
+            camera.getWorldDirection(water.uniforms.waterViewDirection.value).negate()
+          if (water.uniforms.waterLightDirection) {
+            moon.getWorldPosition(water.uniforms.waterLightDirection.value)
+            moon.target.getWorldPosition(lightPosition)
+            water.uniforms.waterLightDirection.value.sub(lightPosition).normalize()
+          }
+          water.uniforms.waterLightColor?.value.copy(moon.color)
+          if (water.uniforms.waterLightPower)
+            water.uniforms.waterLightPower.value = moon.intensity / 2.2
+          if (water.uniforms.reflectionOn) water.uniforms.reflectionOn.value = 0
+          if (!water.mesh.parent || !water.mesh.visible || !water.look.reflection.enabled) continue
+          water.mesh.updateWorldMatrix(true, false)
+          if (!frustum.intersectsObject(water.mesh)) continue
+          if (
+            water.distance(near.x, near.z) >
+            reflectionRange + (camera.right - camera.left) / camera.zoom
+          )
+            continue
+          const level =
+            water.reflectionLevel?.(near.x, near.z) ?? water.mesh.getWorldPosition(lightPosition).y
+          water.mesh.userData.waterReflectionLevel = level
+          if (water.uniforms.waterReflectionLevel) water.uniforms.waterReflectionLevel.value = level
+          const previous = mirrors.get(level)
+          if (
+            previous?.uniforms.reflection &&
+            previous.uniforms.reflectionMatrix &&
+            water.uniforms.reflection &&
+            water.uniforms.reflectionMatrix
+          ) {
+            water.uniforms.reflection.value = previous.uniforms.reflection.value
+            water.uniforms.reflectionMatrix.value.copy(previous.uniforms.reflectionMatrix.value)
+          } else {
+            profiler?.startGpu()
+            water.reflection.render(renderer, scene, camera)
+            mirrors.set(level, water)
+          }
+          if (water.uniforms.reflectionOn) water.uniforms.reflectionOn.value = 1
+        } finally {
+          profiler?.endSection('waterReflection')
         }
-        water.uniforms.waterLightColor?.value.copy(moon.color)
-        if (water.uniforms.waterLightPower)
-          water.uniforms.waterLightPower.value = moon.intensity / 2.2
-        if (water.uniforms.reflectionOn) water.uniforms.reflectionOn.value = 0
-        if (!water.mesh.parent || !water.mesh.visible || !water.look.reflection.enabled) continue
-        water.mesh.updateWorldMatrix(true, false)
-        if (!frustum.intersectsObject(water.mesh)) continue
-        if (
-          water.distance(near.x, near.z) >
-          reflectionRange + (camera.right - camera.left) / camera.zoom
-        )
-          continue
-        const level =
-          water.reflectionLevel?.(near.x, near.z) ?? water.mesh.getWorldPosition(lightPosition).y
-        water.mesh.userData.waterReflectionLevel = level
-        if (water.uniforms.waterReflectionLevel) water.uniforms.waterReflectionLevel.value = level
-        const previous = mirrors.get(level)
-        if (
-          previous?.uniforms.reflection &&
-          previous.uniforms.reflectionMatrix &&
-          water.uniforms.reflection &&
-          water.uniforms.reflectionMatrix
-        ) {
-          water.uniforms.reflection.value = previous.uniforms.reflection.value
-          water.uniforms.reflectionMatrix.value.copy(previous.uniforms.reflectionMatrix.value)
-        } else {
-          profiler?.startGpu()
-          water.reflection.render(renderer, scene, camera)
-          mirrors.set(level, water)
-        }
-        if (water.uniforms.reflectionOn) water.uniforms.reflectionOn.value = 1
       }
       ascii.material.uniforms.debugScreen.value = debug.screen ? 1 : 0
       profiler?.startGpu()

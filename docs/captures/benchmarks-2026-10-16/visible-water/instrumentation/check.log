@@ -1,0 +1,134 @@
+$ pnpm format:check && node scripts/check-package-boundaries.mjs && pnpm typecheck && pnpm test && pnpm build
+$ node scripts/format.mjs --check
+Checking formatting...
+All matched files use Prettier code style!
+PASS package imports use public contracts; 45 generic core modules contain no optional preset or application dependency.
+$ pnpm -r typecheck
+Scope: 4 of 5 workspace projects
+packages/engine typecheck$ tsc -p tsconfig.json --noEmit
+packages/engine typecheck: Done
+packages/authoring typecheck$ tsc --noEmit
+packages/authoring typecheck: Done
+apps/automation typecheck$ tsc --noEmit
+apps/automation typecheck: Done
+apps/editor typecheck$ tsc -p tsconfig.json --noEmit
+apps/editor typecheck: Done
+$ node --test scripts/export-args.test.mjs scripts/bench-stats.test.mjs scripts/bench-cases.test.mjs scripts/bench-capacity-data.test.mjs scripts/bench-capacity-files.test.mjs scripts/bench-capacity-resources.test.mjs && pnpm -r test
+✔ uses the worse round p95, inclusive budget, and only observed stable uncapped loads (1.213155ms)
+✔ does not infer capacity when even the smallest measured load fails (0.913217ms)
+✔ measurement stays in staging until explicit publication; historical symlinks resolve portably (17.674524ms)
+✔ rejects recursive publication and output ancestors before copying (1.580854ms)
+✔ water growth preserves a 4 GiB system reserve and fails closed without a measured peak (0.746987ms)
+✔ reads the live process high-water RSS used for allocation planning (7.621532ms)
+✔ keeps reference URLs and exposes explicit capacity axes (1.014934ms)
+✔ rejects malformed, unbounded or ambiguous cases before launching Chromium (0.310094ms)
+✔ nearest-rank percentiles retain zero samples and exclude unavailable GPU data (0.844397ms)
+✔ summary keeps absent GPU measurements absent and reports observed frame tails (0.987204ms)
+✔ round differences are symmetric, including zero and missing values (3.826565ms)
+✔ bottleneck classification preserves uncertainty and compares overlapping CPU/GPU ranges (0.207382ms)
+✔ CPU share alone cannot qualify numeric work in a GPU-limited scene (0.225515ms)
+✔ qualification still requires numeric work and at least 15% of uncapped frame (0.144103ms)
+✔ consumes the literal title --desktop (5.829068ms)
+✔ consumes the literal title --scene (0.155875ms)
+✔ consumes the literal title --bundle (0.07499ms)
+✔ consumes the literal title A title with spaces (0.079179ms)
+✔ consumes the literal title --out=elsewhere (0.103454ms)
+✔ supports equals values and independent boolean flags (0.16111ms)
+✔ rejects invalid arguments ["--title"] (0.196755ms)
+✔ rejects invalid arguments ["--out="] (0.067357ms)
+✔ rejects invalid arguments ["--unknown"] (0.096602ms)
+✔ rejects invalid arguments ["unexpected"] (0.144498ms)
+✔ rejects invalid arguments ["--desktop=maybe"] (0.154796ms)
+ℹ tests 25
+ℹ suites 0
+ℹ pass 25
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 84.419927
+Scope: 4 of 5 workspace projects
+packages/engine test$ vitest run
+packages/engine test:  RUN  v3.2.7 /home/joao/orca/workspaces/ascii-engine/threadfin/packages/engine
+packages/engine test:  ✓ src/style.test.ts (8 tests) 7ms
+packages/engine test:  ✓ src/import/gltf.test.ts (3 tests) 10ms
+packages/engine test:  ✓ src/world/camera.test.ts (8 tests) 9ms
+packages/engine test:  ✓ src/world/texture.test.ts (30 tests) 21ms
+packages/engine test:  ✓ src/world/componentLooks.test.ts (19 tests) 31ms
+packages/engine test:  ✓ src/world/scene.test.ts (5 tests) 61ms
+packages/engine test:  ✓ src/world/authoring.test.ts (20 tests) 57ms
+packages/engine test:  ✓ src/world/waterPaint.test.ts (3 tests) 96ms
+packages/engine test:  ✓ src/fx/effects.test.ts (11 tests) 110ms
+packages/engine test:  ✓ src/profiling.test.ts (2 tests) 7ms
+packages/engine test:  ✓ src/world/waterScheduling.test.ts (3 tests) 9ms
+packages/engine test:  ✓ src/config.test.ts (3 tests) 4ms
+packages/engine test:  ✓ src/techniques/body.test.ts (7 tests) 361ms
+packages/engine test:  ✓ src/surface.test.ts (4 tests) 5ms
+packages/engine test:  ✓ src/world/waterDynamics.test.ts (6 tests) 383ms
+packages/engine test:  ✓ src/presets/defaults.test.ts (2 tests) 4ms
+packages/engine test:  ✓ src/world/world.test.ts (4 tests) 4ms
+packages/engine test:  ✓ src/index.test.ts (1 test) 2ms
+packages/engine test:  Test Files  18 passed (18)
+packages/engine test:       Tests  139 passed (139)
+packages/engine test:    Start at  09:00:02
+packages/engine test:    Duration  1.07s (transform 1.28s, setup 0ms, collect 3.25s, tests 1.18s, environment 4ms, prepare 1.69s)
+packages/engine test: Done
+packages/authoring test$ vitest run
+packages/authoring test:  RUN  v3.2.7 /home/joao/orca/workspaces/ascii-engine/threadfin/packages/authoring
+packages/authoring test:  ✓ src/commands.test.ts (15 tests) 92ms
+packages/authoring test:  Test Files  1 passed (1)
+packages/authoring test:       Tests  15 passed (15)
+packages/authoring test:    Start at  09:00:03
+packages/authoring test:    Duration  751ms (transform 286ms, setup 0ms, collect 421ms, tests 92ms, environment 0ms, prepare 63ms)
+packages/authoring test: Done
+apps/automation test$ vitest run
+apps/automation test:  RUN  v3.2.7 /home/joao/orca/workspaces/ascii-engine/threadfin/apps/automation
+apps/automation test:  ✓ src/projectExport.test.ts (2 tests) 39ms
+apps/automation test:  ✓ src/bridge.test.ts (1 test) 61ms
+apps/automation test:  Test Files  2 passed (2)
+apps/automation test:       Tests  3 passed (3)
+apps/automation test:    Start at  09:00:04
+apps/automation test:    Duration  446ms (transform 89ms, setup 0ms, collect 159ms, tests 99ms, environment 0ms, prepare 110ms)
+apps/automation test: Done
+apps/editor test$ vitest run
+apps/editor test:  RUN  v3.2.7 /home/joao/orca/workspaces/ascii-engine/threadfin/apps/editor
+apps/editor test:  ✓ src/waterPolicy.test.ts (4 tests) 5ms
+apps/editor test:  ✓ src/scene/files.test.ts (3 tests) 6ms
+apps/editor test:  Test Files  2 passed (2)
+apps/editor test:       Tests  7 passed (7)
+apps/editor test:    Start at  09:00:05
+apps/editor test:    Duration  605ms (transform 251ms, setup 0ms, collect 359ms, tests 12ms, environment 0ms, prepare 118ms)
+apps/editor test: Done
+$ pnpm -r build
+Scope: 4 of 5 workspace projects
+packages/engine build$ tsc -p tsconfig.json --noEmit
+packages/engine build: Done
+packages/authoring build$ tsc --noEmit
+packages/authoring build: Done
+apps/automation build$ tsc --noEmit
+apps/automation build: Done
+apps/editor build$ tsc -p tsconfig.json --noEmit && vite build
+apps/editor build: vite v6.4.4 building for production...
+apps/editor build: transforming...
+apps/editor build: ../../node_modules/.pnpm/zod@4.6.5/node_modules/zod/v4/core/util.js (400:0): A comment
+apps/editor build: "// Wrapped in a `@__PURE__` IIFE: esbuild never tree-shakes a top-level initializer that contains a member access on `Number`, so the bare object literal survived into every bundle."
+apps/editor build: in "../../node_modules/.pnpm/zod@4.6.5/node_modules/zod/v4/core/util.js" contains an annotation that Rollup cannot interpret due to the position of the comment. The comment will be removed to avoid issues.
+apps/editor build: ../../node_modules/.pnpm/zod@4.6.5/node_modules/zod/v4/core/regexes.js (74:0): A comment
+apps/editor build: "/** Anchors a pattern source. The interpolation lives here rather than at the call site because
+apps/editor build:  * esbuild will not drop a `@__PURE__` call whose own argument interpolates a variable, but it
+apps/editor build:  * will drop `anchor(dateSource)`. Keeping it inline pinned `date` into every bundle. */"
+apps/editor build: in "../../node_modules/.pnpm/zod@4.6.5/node_modules/zod/v4/core/regexes.js" contains an annotation that Rollup cannot interpret due to the position of the comment. The comment will be removed to avoid issues.
+apps/editor build: ✓ 223 modules transformed.
+apps/editor build: rendering chunks...
+apps/editor build: computing gzip size...
+apps/editor build: dist/index.html                      3.28 kB │ gzip:   1.05 kB
+apps/editor build: dist/assets/index-7kgZHBnq.css      26.74 kB │ gzip:   6.39 kB
+apps/editor build: dist/assets/client-C1iqv6NR.js     121.42 kB │ gzip:  36.22 kB
+apps/editor build: dist/assets/index-1RiOi-QP.js      424.66 kB │ gzip: 144.52 kB
+apps/editor build: dist/assets/transport-C6m2nnua.js  737.06 kB │ gzip: 198.27 kB
+apps/editor build: ✓ built in 1.97s
+apps/editor build: (!) Some chunks are larger than 500 kB after minification. Consider:
+apps/editor build: - Using dynamic import() to code-split the application
+apps/editor build: - Use build.rollupOptions.output.manualChunks to improve chunking: https://rollupjs.org/configuration-options/#output-manualchunks
+apps/editor build: - Adjust chunk size limit for this warning via build.chunkSizeWarningLimit.
+apps/editor build: Done

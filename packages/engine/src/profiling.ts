@@ -3,6 +3,7 @@ import type * as THREE from 'three'
 export const CPU_SUBSYSTEMS = [
   'waterStep',
   'waterUpload',
+  'waterReflection',
   'skinning',
   'effects',
   'carpet',

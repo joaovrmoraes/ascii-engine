@@ -1,0 +1,1445 @@
+{
+  "warning": "Sampling perturbs timing; diagnostic only. Includes warm-up and final fingerprint work.",
+  "source": "1b66fb03ddd2992d0f693b060a88a30820c1eb20",
+  "trackedChanges": "M packages/engine/src/engine.ts\n M packages/engine/src/profiling.test.ts\n M packages/engine/src/profiling.ts\n M scripts/bench.mjs",
+  "chromium": {
+    "protocolVersion": "1.3",
+    "product": "Chrome/152.0.7977.82",
+    "revision": "@d04cdb24d67b081f6cf80200ffc5233f44b61109",
+    "userAgent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/152.0.0.0 Safari/537.36",
+    "jsVersion": "15.2.124.21"
+  },
+  "flags": [
+    "--disable-extensions",
+    "--disable-component-extensions-with-background-pages",
+    "--headless=new",
+    "--no-sandbox",
+    "--use-angle=gl",
+    "--enable-gpu",
+    "--ignore-gpu-blocklist",
+    "--hide-scrollbars",
+    "--window-size=1920,1080",
+    "--force-device-scale-factor=1",
+    "--disable-gpu-vsync",
+    "--disable-frame-rate-limit",
+    "--remote-debugging-port=0",
+    "--user-data-dir=<isolated temporary profile>",
+    "about:blank"
+  ],
+  "affinity": [
+    {
+      "pid": 2760946,
+      "mainThreadCpu": 6,
+      "allowed": "6",
+      "probeMs": 150,
+      "probeTicks": 15,
+      "unchangedOtherThreads": 17,
+      "scope": "active benchmark page main thread only; spares excluded"
+    }
+  ],
+  "configuration": {
+    "name": "water-scale",
+    "seed": 4242,
+    "carpetSeed": 48017,
+    "cover": 1800,
+    "dt": 0.016666666666666666,
+    "waterCount": 4,
+    "waterResolution": 129,
+    "waterCells": 66564,
+    "waterWidth": 28,
+    "spacing": 32,
+    "mapWidth": 1024,
+    "expectedVisible": 4,
+    "reflection": true,
+    "externalImpulses": false,
+    "waterPolicy": "off"
+  },
+  "diagnostics": {
+    "waterCalls": [
+      1201,
+      1201,
+      1201,
+      1201
+    ],
+    "visibleCreatures": 0,
+    "visibleWaters": 4,
+    "simulationResolutions": [
+      129,
+      129,
+      129,
+      129
+    ],
+    "reflectionLevels": [
+      0.10360088090598583,
+      0.10354073050618172,
+      0.0028401993513107286,
+      0.002897203743457793
+    ]
+  },
+  "fingerprint": {
+    "hash": "bfcc17e1",
+    "values": 465984,
+    "skinnedPoints": 0,
+    "time": 20.000000000000146,
+    "visibleWaterHash": "46f3835e"
+  },
+  "stats": {
+    "cpuMs": {
+      "p50": 21.804999992251396,
+      "p95": 25.07499998807907,
+      "p99": 27.5
+    },
+    "timings": {
+      "p50": null,
+      "p95": null,
+      "p99": null
+    },
+    "drawCalls": {
+      "p50": 11,
+      "p95": 11,
+      "p99": 11
+    },
+    "triangles": {
+      "p50": 133160,
+      "p95": 133160,
+      "p99": 133160
+    },
+    "points": {
+      "p50": 0,
+      "p95": 0,
+      "p99": 0
+    },
+    "frameMs": {
+      "p50": 22.20999999344349,
+      "p95": 25.46500000357628,
+      "p99": 27.984999999403954
+    },
+    "rafIntervalMs": {
+      "p50": null,
+      "p95": null,
+      "p99": null
+    },
+    "frameCpuMs": {
+      "p50": 21.825000002980232,
+      "p95": 25.105000004172325,
+      "p99": 27.519999995827675
+    },
+    "sceneCpuMs": {
+      "p50": 0.015000000596046448,
+      "p95": 0.03000001609325409,
+      "p99": 0.04999999701976776
+    },
+    "gpuMs": {
+      "p50": 10.394583,
+      "p95": 14.9825,
+      "p99": 16.573229
+    },
+    "schedulerCpuMs": {
+      "p50": 0.025000005960464478,
+      "p95": 0.050000011920928955,
+      "p99": 0.060000017285346985
+    },
+    "completedFrameMs": {
+      "p50": 22.20499999821186,
+      "p95": 25.45999999344349,
+      "p99": 27.984999999403954
+    },
+    "gpuLatencyMs": {
+      "p50": 44.224999994039536,
+      "p95": 50.5,
+      "p99": 54.62999999523163
+    },
+    "waterStep": {
+      "p50": 6.290000006556511,
+      "p95": 7.325000002980232,
+      "p99": 8.215000003576279
+    },
+    "waterUpload": {
+      "p50": 13.344999983906746,
+      "p95": 15.515000000596046,
+      "p99": 17.03499999642372
+    },
+    "waterReflection": {
+      "p50": 1.5099999904632568,
+      "p95": 1.905000001192093,
+      "p99": 2.1200000047683716
+    },
+    "skinning": {
+      "p50": 0,
+      "p95": 0,
+      "p99": 0
+    },
+    "effects": {
+      "p50": 0,
+      "p95": 0.004999995231628418,
+      "p99": 0.005000010132789612
+    },
+    "carpet": {
+      "p50": 0,
+      "p95": 0.005000010132789612,
+      "p99": 0.01000000536441803
+    },
+    "bodyUniforms": {
+      "p50": 0,
+      "p95": 0.005000010132789612,
+      "p99": 0.009999990463256836
+    },
+    "renderRest": {
+      "p50": 0.5900000035762787,
+      "p95": 0.7850000262260437,
+      "p99": 1.020000010728836
+    }
+  },
+  "hot": [
+    {
+      "functionName": "step",
+      "scriptId": "25",
+      "url": "http://localhost:1440/@fs/home/joao/orca/workspaces/ascii-engine/threadfin/packages/engine/src/world/waterDynamics.ts",
+      "lineNumber": 28,
+      "columnNumber": 15,
+      "milliseconds": 5453.471,
+      "stack": [
+        "step",
+        "updateDynamics",
+        "water.updateDynamics",
+        "render",
+        "step",
+        "pollChannel.port1.onmessage",
+        "(root)"
+      ]
+    },
+    {
+      "functionName": "upload",
+      "scriptId": "48",
+      "url": "http://localhost:1440/@fs/home/joao/orca/workspaces/ascii-engine/threadfin/packages/engine/src/techniques/water.ts",
+      "lineNumber": 410,
+      "columnNumber": 17,
+      "milliseconds": 3602.552,
+      "stack": [
+        "upload",
+        "updateDynamics",
+        "water.updateDynamics",
+        "render",
+        "step",
+        "pollChannel.port1.onmessage",
+        "(root)"
+      ]
+    },
+    {
+      "functionName": "fromBufferAttribute",
+      "scriptId": "22",
+      "url": "http://localhost:1440/node_modules/.vite/deps/chunk-V7KZFINS.js?v=5e7097f4",
+      "lineNumber": 2908,
+      "columnNumber": 21,
+      "milliseconds": 3134.389,
+      "stack": [
+        "fromBufferAttribute",
+        "computeVertexNormals",
+        "upload",
+        "updateDynamics",
+        "water.updateDynamics",
+        "render",
+        "step",
+        "pollChannel.port1.onmessage",
+        "(root)"
+      ]
+    },
+    {
+      "functionName": "computeVertexNormals",
+      "scriptId": "22",
+      "url": "http://localhost:1440/node_modules/.vite/deps/chunk-V7KZFINS.js?v=5e7097f4",
+      "lineNumber": 11182,
+      "columnNumber": 22,
+      "milliseconds": 2503.078,
+      "stack": [
+        "computeVertexNormals",
+        "upload",
+        "updateDynamics",
+        "water.updateDynamics",
+        "render",
+        "step",
+        "pollChannel.port1.onmessage",
+        "(root)"
+      ]
+    },
+    {
+      "functionName": "sample",
+      "scriptId": "25",
+      "url": "http://localhost:1440/@fs/home/joao/orca/workspaces/ascii-engine/threadfin/packages/engine/src/world/waterDynamics.ts",
+      "lineNumber": 113,
+      "columnNumber": 17,
+      "milliseconds": 1552.629,
+      "stack": [
+        "sample",
+        "upload",
+        "updateDynamics",
+        "water.updateDynamics",
+        "render",
+        "step",
+        "pollChannel.port1.onmessage",
+        "(root)"
+      ]
+    },
+    {
+      "functionName": "sample",
+      "scriptId": "25",
+      "url": "http://localhost:1440/@fs/home/joao/orca/workspaces/ascii-engine/threadfin/packages/engine/src/world/waterDynamics.ts",
+      "lineNumber": 113,
+      "columnNumber": 17,
+      "milliseconds": 1213.252,
+      "stack": [
+        "sample",
+        "step",
+        "updateDynamics",
+        "water.updateDynamics",
+        "render",
+        "step",
+        "pollChannel.port1.onmessage",
+        "(root)"
+      ]
+    },
+    {
+      "functionName": "setXYZ",
+      "scriptId": "22",
+      "url": "http://localhost:1440/node_modules/.vite/deps/chunk-V7KZFINS.js?v=5e7097f4",
+      "lineNumber": 10128,
+      "columnNumber": 8,
+      "milliseconds": 1117.841,
+      "stack": [
+        "setXYZ",
+        "computeVertexNormals",
+        "upload",
+        "updateDynamics",
+        "water.updateDynamics",
+        "render",
+        "step",
+        "pollChannel.port1.onmessage",
+        "(root)"
+      ]
+    },
+    {
+      "functionName": "flux",
+      "scriptId": "25",
+      "url": "http://localhost:1440/@fs/home/joao/orca/workspaces/ascii-engine/threadfin/packages/engine/src/world/waterDynamics.ts",
+      "lineNumber": 43,
+      "columnNumber": 29,
+      "milliseconds": 883.075,
+      "stack": [
+        "flux",
+        "step",
+        "updateDynamics",
+        "water.updateDynamics",
+        "render",
+        "step",
+        "pollChannel.port1.onmessage",
+        "(root)"
+      ]
+    },
+    {
+      "functionName": "reflectionLevel",
+      "scriptId": "48",
+      "url": "http://localhost:1440/@fs/home/joao/orca/workspaces/ascii-engine/threadfin/packages/engine/src/techniques/water.ts",
+      "lineNumber": 526,
+      "columnNumber": 19,
+      "milliseconds": 855.522,
+      "stack": [
+        "reflectionLevel",
+        "render",
+        "step",
+        "pollChannel.port1.onmessage",
+        "(root)"
+      ]
+    },
+    {
+      "functionName": "add",
+      "scriptId": "22",
+      "url": "http://localhost:1440/node_modules/.vite/deps/chunk-V7KZFINS.js?v=5e7097f4",
+      "lineNumber": 2180,
+      "columnNumber": 5,
+      "milliseconds": 616.656,
+      "stack": [
+        "add",
+        "computeVertexNormals",
+        "upload",
+        "updateDynamics",
+        "water.updateDynamics",
+        "render",
+        "step",
+        "pollChannel.port1.onmessage",
+        "(root)"
+      ]
+    },
+    {
+      "functionName": "(garbage collector)",
+      "scriptId": "0",
+      "url": "",
+      "lineNumber": -1,
+      "columnNumber": -1,
+      "milliseconds": 548.991,
+      "stack": [
+        "(garbage collector)",
+        "(root)"
+      ]
+    },
+    {
+      "functionName": "subVectors",
+      "scriptId": "22",
+      "url": "http://localhost:1440/node_modules/.vite/deps/chunk-V7KZFINS.js?v=5e7097f4",
+      "lineNumber": 2255,
+      "columnNumber": 12,
+      "milliseconds": 539.976,
+      "stack": [
+        "subVectors",
+        "computeVertexNormals",
+        "upload",
+        "updateDynamics",
+        "water.updateDynamics",
+        "render",
+        "step",
+        "pollChannel.port1.onmessage",
+        "(root)"
+      ]
+    },
+    {
+      "functionName": "crossVectors",
+      "scriptId": "22",
+      "url": "http://localhost:1440/node_modules/.vite/deps/chunk-V7KZFINS.js?v=5e7097f4",
+      "lineNumber": 2660,
+      "columnNumber": 14,
+      "milliseconds": 479.583,
+      "stack": [
+        "crossVectors",
+        "cross",
+        "computeVertexNormals",
+        "upload",
+        "updateDynamics",
+        "water.updateDynamics",
+        "render",
+        "step",
+        "pollChannel.port1.onmessage",
+        "(root)"
+      ]
+    },
+    {
+      "functionName": "getX",
+      "scriptId": "22",
+      "url": "http://localhost:1440/node_modules/.vite/deps/chunk-V7KZFINS.js?v=5e7097f4",
+      "lineNumber": 10015,
+      "columnNumber": 6,
+      "milliseconds": 391.564,
+      "stack": [
+        "getX",
+        "computeVertexNormals",
+        "upload",
+        "updateDynamics",
+        "water.updateDynamics",
+        "render",
+        "step",
+        "pollChannel.port1.onmessage",
+        "(root)"
+      ]
+    },
+    {
+      "functionName": "surface",
+      "scriptId": "48",
+      "url": "http://localhost:1440/@fs/home/joao/orca/workspaces/ascii-engine/threadfin/packages/engine/src/techniques/water.ts",
+      "lineNumber": 536,
+      "columnNumber": 26,
+      "milliseconds": 389.2,
+      "stack": [
+        "surface",
+        "reflectionLevel",
+        "render",
+        "step",
+        "pollChannel.port1.onmessage",
+        "(root)"
+      ]
+    },
+    {
+      "functionName": "fromBufferAttribute",
+      "scriptId": "22",
+      "url": "http://localhost:1440/node_modules/.vite/deps/chunk-V7KZFINS.js?v=5e7097f4",
+      "lineNumber": 2908,
+      "columnNumber": 21,
+      "milliseconds": 378.977,
+      "stack": [
+        "fromBufferAttribute",
+        "upload",
+        "updateDynamics",
+        "water.updateDynamics",
+        "render",
+        "step",
+        "pollChannel.port1.onmessage",
+        "(root)"
+      ]
+    },
+    {
+      "functionName": "(program)",
+      "scriptId": "0",
+      "url": "",
+      "lineNumber": -1,
+      "columnNumber": -1,
+      "milliseconds": 376.52,
+      "stack": [
+        "(program)",
+        "(root)"
+      ]
+    },
+    {
+      "functionName": "bufferSubData",
+      "scriptId": "0",
+      "url": "",
+      "lineNumber": -1,
+      "columnNumber": -1,
+      "milliseconds": 233.633,
+      "stack": [
+        "bufferSubData",
+        "updateBuffer",
+        "update",
+        "update",
+        "update",
+        "projectObject",
+        "projectObject",
+        "WebGLRenderer.render",
+        "render",
+        "step",
+        "pollChannel.port1.onmessage",
+        "(root)"
+      ]
+    },
+    {
+      "functionName": "texSubImage2D",
+      "scriptId": "0",
+      "url": "",
+      "lineNumber": -1,
+      "columnNumber": -1,
+      "milliseconds": 183.442,
+      "stack": [
+        "texSubImage2D",
+        "texSubImage2D",
+        "updateTexture",
+        "uploadTexture",
+        "setTexture2D",
+        "setValueT1",
+        "upload",
+        "setProgram",
+        "WebGLRenderer.renderBufferDirect",
+        "renderObject",
+        "renderObjects",
+        "renderScene",
+        "WebGLRenderer.render",
+        "render",
+        "step",
+        "pollChannel.port1.onmessage",
+        "(root)"
+      ]
+    },
+    {
+      "functionName": "min",
+      "scriptId": "22",
+      "url": "http://localhost:1440/node_modules/.vite/deps/chunk-V7KZFINS.js?v=5e7097f4",
+      "lineNumber": 2437,
+      "columnNumber": 5,
+      "milliseconds": 162.039,
+      "stack": [
+        "min",
+        "expandByPoint",
+        "setFromBufferAttribute",
+        "computeBoundingBox",
+        "upload",
+        "updateDynamics",
+        "water.updateDynamics",
+        "render",
+        "step",
+        "pollChannel.port1.onmessage",
+        "(root)"
+      ]
+    },
+    {
+      "functionName": "min",
+      "scriptId": "22",
+      "url": "http://localhost:1440/node_modules/.vite/deps/chunk-V7KZFINS.js?v=5e7097f4",
+      "lineNumber": 2437,
+      "columnNumber": 5,
+      "milliseconds": 143.091,
+      "stack": [
+        "min",
+        "expandByPoint",
+        "setFromBufferAttribute",
+        "computeBoundingSphere",
+        "upload",
+        "updateDynamics",
+        "water.updateDynamics",
+        "render",
+        "step",
+        "pollChannel.port1.onmessage",
+        "(root)"
+      ]
+    },
+    {
+      "functionName": "getX",
+      "scriptId": "22",
+      "url": "http://localhost:1440/node_modules/.vite/deps/chunk-V7KZFINS.js?v=5e7097f4",
+      "lineNumber": 10015,
+      "columnNumber": 6,
+      "milliseconds": 126.657,
+      "stack": [
+        "getX",
+        "fromBufferAttribute",
+        "setFromBufferAttribute",
+        "computeBoundingSphere",
+        "upload",
+        "updateDynamics",
+        "water.updateDynamics",
+        "render",
+        "step",
+        "pollChannel.port1.onmessage",
+        "(root)"
+      ]
+    },
+    {
+      "functionName": "getX",
+      "scriptId": "22",
+      "url": "http://localhost:1440/node_modules/.vite/deps/chunk-V7KZFINS.js?v=5e7097f4",
+      "lineNumber": 10015,
+      "columnNumber": 6,
+      "milliseconds": 121.391,
+      "stack": [
+        "getX",
+        "fromBufferAttribute",
+        "setFromBufferAttribute",
+        "computeBoundingBox",
+        "upload",
+        "updateDynamics",
+        "water.updateDynamics",
+        "render",
+        "step",
+        "pollChannel.port1.onmessage",
+        "(root)"
+      ]
+    },
+    {
+      "functionName": "setY",
+      "scriptId": "22",
+      "url": "http://localhost:1440/node_modules/.vite/deps/chunk-V7KZFINS.js?v=5e7097f4",
+      "lineNumber": 10050,
+      "columnNumber": 6,
+      "milliseconds": 118.888,
+      "stack": [
+        "setY",
+        "upload",
+        "updateDynamics",
+        "water.updateDynamics",
+        "render",
+        "step",
+        "pollChannel.port1.onmessage",
+        "(root)"
+      ]
+    },
+    {
+      "functionName": "setXYZ",
+      "scriptId": "22",
+      "url": "http://localhost:1440/node_modules/.vite/deps/chunk-V7KZFINS.js?v=5e7097f4",
+      "lineNumber": 10128,
+      "columnNumber": 8,
+      "milliseconds": 116.071,
+      "stack": [
+        "setXYZ",
+        "normalizeNormals",
+        "computeVertexNormals",
+        "upload",
+        "updateDynamics",
+        "water.updateDynamics",
+        "render",
+        "step",
+        "pollChannel.port1.onmessage",
+        "(root)"
+      ]
+    },
+    {
+      "functionName": "fromBufferAttribute",
+      "scriptId": "22",
+      "url": "http://localhost:1440/node_modules/.vite/deps/chunk-V7KZFINS.js?v=5e7097f4",
+      "lineNumber": 2908,
+      "columnNumber": 21,
+      "milliseconds": 98.145,
+      "stack": [
+        "fromBufferAttribute",
+        "(root)"
+      ]
+    },
+    {
+      "functionName": "max",
+      "scriptId": "22",
+      "url": "http://localhost:1440/node_modules/.vite/deps/chunk-V7KZFINS.js?v=5e7097f4",
+      "lineNumber": 2450,
+      "columnNumber": 5,
+      "milliseconds": 98.011,
+      "stack": [
+        "max",
+        "expandByPoint",
+        "setFromBufferAttribute",
+        "computeBoundingSphere",
+        "upload",
+        "updateDynamics",
+        "water.updateDynamics",
+        "render",
+        "step",
+        "pollChannel.port1.onmessage",
+        "(root)"
+      ]
+    },
+    {
+      "functionName": "max",
+      "scriptId": "22",
+      "url": "http://localhost:1440/node_modules/.vite/deps/chunk-V7KZFINS.js?v=5e7097f4",
+      "lineNumber": 2450,
+      "columnNumber": 5,
+      "milliseconds": 92.644,
+      "stack": [
+        "max",
+        "expandByPoint",
+        "setFromBufferAttribute",
+        "computeBoundingBox",
+        "upload",
+        "updateDynamics",
+        "water.updateDynamics",
+        "render",
+        "step",
+        "pollChannel.port1.onmessage",
+        "(root)"
+      ]
+    },
+    {
+      "functionName": "distanceToSquared",
+      "scriptId": "22",
+      "url": "http://localhost:1440/node_modules/.vite/deps/chunk-V7KZFINS.js?v=5e7097f4",
+      "lineNumber": 2729,
+      "columnNumber": 19,
+      "milliseconds": 90.56,
+      "stack": [
+        "distanceToSquared",
+        "computeBoundingSphere",
+        "upload",
+        "updateDynamics",
+        "water.updateDynamics",
+        "render",
+        "step",
+        "pollChannel.port1.onmessage",
+        "(root)"
+      ]
+    },
+    {
+      "functionName": "updateDynamics",
+      "scriptId": "48",
+      "url": "http://localhost:1440/@fs/home/joao/orca/workspaces/ascii-engine/threadfin/packages/engine/src/techniques/water.ts",
+      "lineNumber": 467,
+      "columnNumber": 18,
+      "milliseconds": 84.795,
+      "stack": [
+        "updateDynamics",
+        "water.updateDynamics",
+        "render",
+        "step",
+        "pollChannel.port1.onmessage",
+        "(root)"
+      ]
+    },
+    {
+      "functionName": "getX",
+      "scriptId": "22",
+      "url": "http://localhost:1440/node_modules/.vite/deps/chunk-V7KZFINS.js?v=5e7097f4",
+      "lineNumber": 10015,
+      "columnNumber": 6,
+      "milliseconds": 80.187,
+      "stack": [
+        "getX",
+        "upload",
+        "updateDynamics",
+        "water.updateDynamics",
+        "render",
+        "step",
+        "pollChannel.port1.onmessage",
+        "(root)"
+      ]
+    },
+    {
+      "functionName": "fromBufferAttribute",
+      "scriptId": "22",
+      "url": "http://localhost:1440/node_modules/.vite/deps/chunk-V7KZFINS.js?v=5e7097f4",
+      "lineNumber": 2908,
+      "columnNumber": 21,
+      "milliseconds": 75.013,
+      "stack": [
+        "fromBufferAttribute",
+        "setFromBufferAttribute",
+        "computeBoundingBox",
+        "upload",
+        "updateDynamics",
+        "water.updateDynamics",
+        "render",
+        "step",
+        "pollChannel.port1.onmessage",
+        "(root)"
+      ]
+    },
+    {
+      "functionName": "fromBufferAttribute",
+      "scriptId": "22",
+      "url": "http://localhost:1440/node_modules/.vite/deps/chunk-V7KZFINS.js?v=5e7097f4",
+      "lineNumber": 2908,
+      "columnNumber": 21,
+      "milliseconds": 67.479,
+      "stack": [
+        "fromBufferAttribute",
+        "setFromBufferAttribute",
+        "computeBoundingSphere",
+        "upload",
+        "updateDynamics",
+        "water.updateDynamics",
+        "render",
+        "step",
+        "pollChannel.port1.onmessage",
+        "(root)"
+      ]
+    },
+    {
+      "functionName": "getX",
+      "scriptId": "22",
+      "url": "http://localhost:1440/node_modules/.vite/deps/chunk-V7KZFINS.js?v=5e7097f4",
+      "lineNumber": 10015,
+      "columnNumber": 6,
+      "milliseconds": 63.776,
+      "stack": [
+        "getX",
+        "fromBufferAttribute",
+        "normalizeNormals",
+        "computeVertexNormals",
+        "upload",
+        "updateDynamics",
+        "water.updateDynamics",
+        "render",
+        "step",
+        "pollChannel.port1.onmessage",
+        "(root)"
+      ]
+    },
+    {
+      "functionName": "computeBoundingSphere",
+      "scriptId": "22",
+      "url": "http://localhost:1440/node_modules/.vite/deps/chunk-V7KZFINS.js?v=5e7097f4",
+      "lineNumber": 11027,
+      "columnNumber": 23,
+      "milliseconds": 62.739,
+      "stack": [
+        "computeBoundingSphere",
+        "upload",
+        "updateDynamics",
+        "water.updateDynamics",
+        "render",
+        "step",
+        "pollChannel.port1.onmessage",
+        "(root)"
+      ]
+    },
+    {
+      "functionName": "(idle)",
+      "scriptId": "0",
+      "url": "",
+      "lineNumber": -1,
+      "columnNumber": -1,
+      "milliseconds": 60.636,
+      "stack": [
+        "(idle)",
+        "(root)"
+      ]
+    },
+    {
+      "functionName": "getX",
+      "scriptId": "22",
+      "url": "http://localhost:1440/node_modules/.vite/deps/chunk-V7KZFINS.js?v=5e7097f4",
+      "lineNumber": 10015,
+      "columnNumber": 6,
+      "milliseconds": 59.601,
+      "stack": [
+        "getX",
+        "fromBufferAttribute",
+        "computeBoundingSphere",
+        "upload",
+        "updateDynamics",
+        "water.updateDynamics",
+        "render",
+        "step",
+        "pollChannel.port1.onmessage",
+        "(root)"
+      ]
+    },
+    {
+      "functionName": "getY",
+      "scriptId": "22",
+      "url": "http://localhost:1440/node_modules/.vite/deps/chunk-V7KZFINS.js?v=5e7097f4",
+      "lineNumber": 10038,
+      "columnNumber": 6,
+      "milliseconds": 56.94,
+      "stack": [
+        "getY",
+        "fromBufferAttribute",
+        "setFromBufferAttribute",
+        "computeBoundingSphere",
+        "upload",
+        "updateDynamics",
+        "water.updateDynamics",
+        "render",
+        "step",
+        "pollChannel.port1.onmessage",
+        "(root)"
+      ]
+    },
+    {
+      "functionName": "setXYZ",
+      "scriptId": "22",
+      "url": "http://localhost:1440/node_modules/.vite/deps/chunk-V7KZFINS.js?v=5e7097f4",
+      "lineNumber": 10128,
+      "columnNumber": 8,
+      "milliseconds": 55.238,
+      "stack": [
+        "setXYZ",
+        "upload",
+        "updateDynamics",
+        "water.updateDynamics",
+        "render",
+        "step",
+        "pollChannel.port1.onmessage",
+        "(root)"
+      ]
+    },
+    {
+      "functionName": "step",
+      "scriptId": "6",
+      "url": "http://localhost:1440/src/benchmark/main.ts?t=1792151846734",
+      "lineNumber": 178,
+      "columnNumber": 19,
+      "milliseconds": 54.897,
+      "stack": [
+        "step",
+        "pollChannel.port1.onmessage",
+        "(root)"
+      ]
+    },
+    {
+      "functionName": "normalizeNormals",
+      "scriptId": "22",
+      "url": "http://localhost:1440/node_modules/.vite/deps/chunk-V7KZFINS.js?v=5e7097f4",
+      "lineNumber": 11240,
+      "columnNumber": 18,
+      "milliseconds": 54.584,
+      "stack": [
+        "normalizeNormals",
+        "computeVertexNormals",
+        "upload",
+        "updateDynamics",
+        "water.updateDynamics",
+        "render",
+        "step",
+        "pollChannel.port1.onmessage",
+        "(root)"
+      ]
+    },
+    {
+      "functionName": "render",
+      "scriptId": "13",
+      "url": "http://localhost:1440/@fs/home/joao/orca/workspaces/ascii-engine/threadfin/packages/engine/src/engine.ts?t=1792151846734",
+      "lineNumber": 719,
+      "columnNumber": 10,
+      "milliseconds": 53.511,
+      "stack": [
+        "render",
+        "step",
+        "pollChannel.port1.onmessage",
+        "(root)"
+      ]
+    },
+    {
+      "functionName": "multiplyScalar",
+      "scriptId": "22",
+      "url": "http://localhost:1440/node_modules/.vite/deps/chunk-V7KZFINS.js?v=5e7097f4",
+      "lineNumber": 2279,
+      "columnNumber": 16,
+      "milliseconds": 50.986,
+      "stack": [
+        "multiplyScalar",
+        "divideScalar",
+        "normalize",
+        "normalizeNormals",
+        "computeVertexNormals",
+        "upload",
+        "updateDynamics",
+        "water.updateDynamics",
+        "render",
+        "step",
+        "pollChannel.port1.onmessage",
+        "(root)"
+      ]
+    },
+    {
+      "functionName": "getZ",
+      "scriptId": "22",
+      "url": "http://localhost:1440/node_modules/.vite/deps/chunk-V7KZFINS.js?v=5e7097f4",
+      "lineNumber": 10061,
+      "columnNumber": 6,
+      "milliseconds": 50.776,
+      "stack": [
+        "getZ",
+        "upload",
+        "updateDynamics",
+        "water.updateDynamics",
+        "render",
+        "step",
+        "pollChannel.port1.onmessage",
+        "(root)"
+      ]
+    },
+    {
+      "functionName": "getY",
+      "scriptId": "22",
+      "url": "http://localhost:1440/node_modules/.vite/deps/chunk-V7KZFINS.js?v=5e7097f4",
+      "lineNumber": 10038,
+      "columnNumber": 6,
+      "milliseconds": 49.982,
+      "stack": [
+        "getY",
+        "fromBufferAttribute",
+        "setFromBufferAttribute",
+        "computeBoundingBox",
+        "upload",
+        "updateDynamics",
+        "water.updateDynamics",
+        "render",
+        "step",
+        "pollChannel.port1.onmessage",
+        "(root)"
+      ]
+    },
+    {
+      "functionName": "fromBufferAttribute",
+      "scriptId": "22",
+      "url": "http://localhost:1440/node_modules/.vite/deps/chunk-V7KZFINS.js?v=5e7097f4",
+      "lineNumber": 2908,
+      "columnNumber": 21,
+      "milliseconds": 40.687,
+      "stack": [
+        "fromBufferAttribute",
+        "computeBoundingSphere",
+        "upload",
+        "updateDynamics",
+        "water.updateDynamics",
+        "render",
+        "step",
+        "pollChannel.port1.onmessage",
+        "(root)"
+      ]
+    },
+    {
+      "functionName": "getY",
+      "scriptId": "22",
+      "url": "http://localhost:1440/node_modules/.vite/deps/chunk-V7KZFINS.js?v=5e7097f4",
+      "lineNumber": 10038,
+      "columnNumber": 6,
+      "milliseconds": 32.469,
+      "stack": [
+        "getY",
+        "fromBufferAttribute",
+        "normalizeNormals",
+        "computeVertexNormals",
+        "upload",
+        "updateDynamics",
+        "water.updateDynamics",
+        "render",
+        "step",
+        "pollChannel.port1.onmessage",
+        "(root)"
+      ]
+    },
+    {
+      "functionName": "divideScalar",
+      "scriptId": "22",
+      "url": "http://localhost:1440/node_modules/.vite/deps/chunk-V7KZFINS.js?v=5e7097f4",
+      "lineNumber": 2427,
+      "columnNumber": 14,
+      "milliseconds": 31.328,
+      "stack": [
+        "divideScalar",
+        "normalize",
+        "normalizeNormals",
+        "computeVertexNormals",
+        "upload",
+        "updateDynamics",
+        "water.updateDynamics",
+        "render",
+        "step",
+        "pollChannel.port1.onmessage",
+        "(root)"
+      ]
+    },
+    {
+      "functionName": "getY",
+      "scriptId": "22",
+      "url": "http://localhost:1440/node_modules/.vite/deps/chunk-V7KZFINS.js?v=5e7097f4",
+      "lineNumber": 10038,
+      "columnNumber": 6,
+      "milliseconds": 28.292,
+      "stack": [
+        "getY",
+        "fromBufferAttribute",
+        "computeBoundingSphere",
+        "upload",
+        "updateDynamics",
+        "water.updateDynamics",
+        "render",
+        "step",
+        "pollChannel.port1.onmessage",
+        "(root)"
+      ]
+    },
+    {
+      "functionName": "upload",
+      "scriptId": "48",
+      "url": "http://localhost:1440/@fs/home/joao/orca/workspaces/ascii-engine/threadfin/packages/engine/src/techniques/water.ts",
+      "lineNumber": 410,
+      "columnNumber": 17,
+      "milliseconds": 27.379,
+      "stack": [
+        "upload",
+        "upload",
+        "updateDynamics",
+        "water.updateDynamics",
+        "render",
+        "step",
+        "pollChannel.port1.onmessage",
+        "(root)"
+      ]
+    }
+  ],
+  "allocations": [
+    {
+      "functionName": "step",
+      "scriptId": "25",
+      "url": "http://localhost:1440/@fs/home/joao/orca/workspaces/ascii-engine/threadfin/packages/engine/src/world/waterDynamics.ts",
+      "lineNumber": 28,
+      "columnNumber": 15,
+      "bytes": 4938414344
+    },
+    {
+      "functionName": "computeVertexNormals",
+      "scriptId": "22",
+      "url": "http://localhost:1440/node_modules/.vite/deps/chunk-V7KZFINS.js?v=5e7097f4",
+      "lineNumber": 11182,
+      "columnNumber": 22,
+      "bytes": 4607271912
+    },
+    {
+      "functionName": "step",
+      "scriptId": "25",
+      "url": "http://localhost:1440/@fs/home/joao/orca/workspaces/ascii-engine/threadfin/packages/engine/src/world/waterDynamics.ts",
+      "lineNumber": 28,
+      "columnNumber": 15,
+      "bytes": 1167074052
+    },
+    {
+      "functionName": "computeVertexNormals",
+      "scriptId": "22",
+      "url": "http://localhost:1440/node_modules/.vite/deps/chunk-V7KZFINS.js?v=5e7097f4",
+      "lineNumber": 11182,
+      "columnNumber": 22,
+      "bytes": 1051572188
+    },
+    {
+      "functionName": "hypot",
+      "scriptId": "0",
+      "url": "",
+      "lineNumber": -1,
+      "columnNumber": -1,
+      "bytes": 778185880
+    },
+    {
+      "functionName": "hypot",
+      "scriptId": "0",
+      "url": "",
+      "lineNumber": -1,
+      "columnNumber": -1,
+      "bytes": 179110772
+    },
+    {
+      "functionName": "next",
+      "scriptId": "0",
+      "url": "",
+      "lineNumber": -1,
+      "columnNumber": -1,
+      "bytes": 15504000
+    },
+    {
+      "functionName": "add",
+      "scriptId": "6",
+      "url": "http://localhost:1440/src/benchmark/main.ts?t=1792151846734",
+      "lineNumber": 72,
+      "columnNumber": 14,
+      "bytes": 9832200
+    },
+    {
+      "functionName": "next",
+      "scriptId": "0",
+      "url": "",
+      "lineNumber": -1,
+      "columnNumber": -1,
+      "bytes": 9013960
+    },
+    {
+      "functionName": "add",
+      "scriptId": "6",
+      "url": "http://localhost:1440/src/benchmark/main.ts?t=1792151846734",
+      "lineNumber": 72,
+      "columnNumber": 14,
+      "bytes": 8521236
+    },
+    {
+      "functionName": "next",
+      "scriptId": "0",
+      "url": "",
+      "lineNumber": -1,
+      "columnNumber": -1,
+      "bytes": 8063020
+    },
+    {
+      "functionName": "next",
+      "scriptId": "0",
+      "url": "",
+      "lineNumber": -1,
+      "columnNumber": -1,
+      "bytes": 7636956
+    },
+    {
+      "functionName": "next",
+      "scriptId": "0",
+      "url": "",
+      "lineNumber": -1,
+      "columnNumber": -1,
+      "bytes": 6424192
+    },
+    {
+      "functionName": "from",
+      "scriptId": "0",
+      "url": "",
+      "lineNumber": -1,
+      "columnNumber": -1,
+      "bytes": 6331064
+    },
+    {
+      "functionName": "from",
+      "scriptId": "0",
+      "url": "",
+      "lineNumber": -1,
+      "columnNumber": -1,
+      "bytes": 5790624
+    },
+    {
+      "functionName": "from",
+      "scriptId": "0",
+      "url": "",
+      "lineNumber": -1,
+      "columnNumber": -1,
+      "bytes": 5579376
+    },
+    {
+      "functionName": "flux",
+      "scriptId": "25",
+      "url": "http://localhost:1440/@fs/home/joao/orca/workspaces/ascii-engine/threadfin/packages/engine/src/world/waterDynamics.ts",
+      "lineNumber": 43,
+      "columnNumber": 29,
+      "bytes": 3379364
+    },
+    {
+      "functionName": "upload",
+      "scriptId": "48",
+      "url": "http://localhost:1440/@fs/home/joao/orca/workspaces/ascii-engine/threadfin/packages/engine/src/techniques/water.ts",
+      "lineNumber": 410,
+      "columnNumber": 17,
+      "bytes": 2785788
+    },
+    {
+      "functionName": "max",
+      "scriptId": "0",
+      "url": "",
+      "lineNumber": -1,
+      "columnNumber": -1,
+      "bytes": 2720244
+    },
+    {
+      "functionName": "normalizeNormals",
+      "scriptId": "22",
+      "url": "http://localhost:1440/node_modules/.vite/deps/chunk-V7KZFINS.js?v=5e7097f4",
+      "lineNumber": 11240,
+      "columnNumber": 18,
+      "bytes": 2425272
+    },
+    {
+      "functionName": "render",
+      "scriptId": "48",
+      "url": "http://localhost:1440/@fs/home/joao/orca/workspaces/ascii-engine/threadfin/packages/engine/src/techniques/water.ts",
+      "lineNumber": 247,
+      "columnNumber": 10,
+      "bytes": 1507912
+    },
+    {
+      "functionName": "setFromProjectionMatrix",
+      "scriptId": "22",
+      "url": "http://localhost:1440/node_modules/.vite/deps/chunk-V7KZFINS.js?v=5e7097f4",
+      "lineNumber": 14592,
+      "columnNumber": 25,
+      "bytes": 1212636
+    },
+    {
+      "functionName": "setFromProjectionMatrix",
+      "scriptId": "22",
+      "url": "http://localhost:1440/node_modules/.vite/deps/chunk-V7KZFINS.js?v=5e7097f4",
+      "lineNumber": 14592,
+      "columnNumber": 25,
+      "bytes": 1179864
+    },
+    {
+      "functionName": "_Vector3",
+      "scriptId": "22",
+      "url": "http://localhost:1440/node_modules/.vite/deps/chunk-V7KZFINS.js?v=5e7097f4",
+      "lineNumber": 2051,
+      "columnNumber": 13,
+      "bytes": 1049040
+    },
+    {
+      "functionName": "sample",
+      "scriptId": "25",
+      "url": "http://localhost:1440/@fs/home/joao/orca/workspaces/ascii-engine/threadfin/packages/engine/src/world/waterDynamics.ts",
+      "lineNumber": 113,
+      "columnNumber": 17,
+      "bytes": 1015992
+    },
+    {
+      "functionName": "setValueV3f",
+      "scriptId": "22",
+      "url": "http://localhost:1440/node_modules/.vite/deps/chunk-V7KZFINS.js?v=5e7097f4",
+      "lineNumber": 35171,
+      "columnNumber": 20,
+      "bytes": 852120
+    },
+    {
+      "functionName": "projectObject",
+      "scriptId": "22",
+      "url": "http://localhost:1440/node_modules/.vite/deps/chunk-V7KZFINS.js?v=5e7097f4",
+      "lineNumber": 42551,
+      "columnNumber": 26,
+      "bytes": 787360
+    },
+    {
+      "functionName": "min",
+      "scriptId": "0",
+      "url": "",
+      "lineNumber": -1,
+      "columnNumber": -1,
+      "bytes": 786576
+    },
+    {
+      "functionName": "reflectionLevel",
+      "scriptId": "48",
+      "url": "http://localhost:1440/@fs/home/joao/orca/workspaces/ascii-engine/threadfin/packages/engine/src/techniques/water.ts",
+      "lineNumber": 526,
+      "columnNumber": 19,
+      "bytes": 753960
+    },
+    {
+      "functionName": "",
+      "scriptId": "48",
+      "url": "http://localhost:1440/@fs/home/joao/orca/workspaces/ascii-engine/threadfin/packages/engine/src/techniques/water.ts",
+      "lineNumber": 264,
+      "columnNumber": 28,
+      "bytes": 721636
+    },
+    {
+      "functionName": "Plane",
+      "scriptId": "22",
+      "url": "http://localhost:1440/node_modules/.vite/deps/chunk-V7KZFINS.js?v=5e7097f4",
+      "lineNumber": 11951,
+      "columnNumber": 13,
+      "bytes": 721200
+    },
+    {
+      "functionName": "render",
+      "scriptId": "13",
+      "url": "http://localhost:1440/@fs/home/joao/orca/workspaces/ascii-engine/threadfin/packages/engine/src/engine.ts?t=1792151846734",
+      "lineNumber": 719,
+      "columnNumber": 10,
+      "bytes": 655720
+    },
+    {
+      "functionName": "fingerprint",
+      "scriptId": "6",
+      "url": "http://localhost:1440/src/benchmark/main.ts?t=1792151846734",
+      "lineNumber": 70,
+      "columnNumber": 20,
+      "bytes": 622896
+    },
+    {
+      "functionName": "setValueM4",
+      "scriptId": "22",
+      "url": "http://localhost:1440/node_modules/.vite/deps/chunk-V7KZFINS.js?v=5e7097f4",
+      "lineNumber": 35237,
+      "columnNumber": 19,
+      "bytes": 524388
+    },
+    {
+      "functionName": "copyArray",
+      "scriptId": "22",
+      "url": "http://localhost:1440/node_modules/.vite/deps/chunk-V7KZFINS.js?v=5e7097f4",
+      "lineNumber": 35135,
+      "columnNumber": 18,
+      "bytes": 524388
+    },
+    {
+      "functionName": "next",
+      "scriptId": "0",
+      "url": "",
+      "lineNumber": -1,
+      "columnNumber": -1,
+      "bytes": 491680
+    },
+    {
+      "functionName": "copyArray",
+      "scriptId": "22",
+      "url": "http://localhost:1440/node_modules/.vite/deps/chunk-V7KZFINS.js?v=5e7097f4",
+      "lineNumber": 35135,
+      "columnNumber": 18,
+      "bytes": 458832
+    },
+    {
+      "functionName": "next",
+      "scriptId": "0",
+      "url": "",
+      "lineNumber": -1,
+      "columnNumber": -1,
+      "bytes": 426120
+    },
+    {
+      "functionName": "setValueV3f",
+      "scriptId": "22",
+      "url": "http://localhost:1440/node_modules/.vite/deps/chunk-V7KZFINS.js?v=5e7097f4",
+      "lineNumber": 35171,
+      "columnNumber": 20,
+      "bytes": 426060
+    },
+    {
+      "functionName": "updateTexture",
+      "scriptId": "22",
+      "url": "http://localhost:1440/node_modules/.vite/deps/chunk-V7KZFINS.js?v=5e7097f4",
+      "lineNumber": 39133,
+      "columnNumber": 24,
+      "bytes": 393540
+    }
+  ]
+}
