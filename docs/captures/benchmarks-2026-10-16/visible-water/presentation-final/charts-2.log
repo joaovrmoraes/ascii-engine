@@ -1,0 +1,3 @@
+Wrote capacity/results.md
+Generated skinning-before-after.svg, cpu-vs-gpu.svg, water-scale.svg, capacity-skinning.svg, capacity-water-loaded-off.svg, capacity-water-loaded-pause.svg, capacity-water-visible.svg, capacity-effects.svg, capacity-water-grid.svg
+$ node scripts/bench-charts.mjs

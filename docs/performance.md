@@ -2,14 +2,15 @@
 
 Skinning is **45× faster in JavaScript** after eliminating repeated vertex work.
 Offscreen-water cost is addressed by pausing hidden simulation and preparation.
-Visible water is the next limit: **two simultaneous waters at 60 fps**, with CPU work dominating this fixture.
+Visible water is the next CPU limit: the original run sustained **two simultaneous waters at 60 fps**, and the optimized follow-up stops at a numeric-target review gate.
 
 How much can this engine render at 60 fps using JavaScript on this machine?
 The study found that the reference skinning bottleneck could be removed in JS,
 and that hidden-water work should be skipped before considering another language.
 GPU-heavy rain/water and particles do not become faster simply by moving CPU
-code to WASM. [ADR 0004](decisions/0004-webassembly-for-simulation.md) records
-**Rejected for now**, with measured triggers for another investigation.
+code to WASM. [ADR 0004](decisions/0004-webassembly-for-simulation.md) retains
+the original decision rule; its visible-water simulation question is now
+reopened for owner review, with no WASM implementation.
 
 ## Method
 
@@ -38,16 +39,25 @@ physical display scanout or a promise of equal performance in another browser.
 
 ## Capacity
 
-| Axis                                  | Maximum measured at 60 fps · p95 ≤16.7 ms | Maximum measured at 30 fps · p95 ≤33.3 ms |
-| ------------------------------------- | ----------------------------------------: | ----------------------------------------: |
-| Visible skinned creatures             |                           128 · 15.000 ms |                           256 · 23.025 ms |
-| Loaded waters, pause off              |                             2 · 13.440 ms |                             4 · 24.375 ms |
-| Loaded waters, pause on (one visible) |                         2,048 · 15.865 ms |                        ≥4,096 · 21.510 ms |
-| Simultaneously visible waters         |                             2 · 12.385 ms |                             4 · 23.515 ms |
-| Effect groups (three effects each)    |         4 groups = 12 effects · 15.795 ms |        24 groups = 72 effects · 32.720 ms |
-| Water mesh/mask width                 |                       129×129 · 10.840 ms |                       257×257 · 18.110 ms |
+| Axis                                             | Maximum measured at 60 fps · p95 ≤16.7 ms | Maximum measured at 30 fps · p95 ≤33.3 ms |
+| ------------------------------------------------ | ----------------------------------------: | ----------------------------------------: |
+| Visible skinned creatures                        |                           128 · 15.000 ms |                           256 · 23.025 ms |
+| Loaded waters, pause off                         |                             2 · 13.440 ms |                             4 · 24.375 ms |
+| Loaded waters, pause on (one visible)            |                         2,048 · 15.865 ms |                        ≥4,096 · 21.510 ms |
+| Simultaneously visible waters, optimized normals |                            ≥2 · 14.160 ms |                            ≥2 · 14.160 ms |
+| Effect groups (three effects each)               |         4 groups = 12 effects · 15.795 ms |        24 groups = 72 effects · 32.720 ms |
+| Water mesh/mask width                            |                       129×129 · 10.840 ms |                       257×257 · 18.110 ms |
 
-The paused-water 30 fps entry is a **lower bound**, not an observed FPS ceiling.
+Visible water uses the October 16 follow-up: collection stopped at two waters
+because remaining numeric CPU work qualifies for owner review. Both entries
+are tested **lower bounds**, not newly measured maxima; four/eight optimized
+waters were not timed. The fresh before control sustained two/four waters at
+60/30 fps (worst-round p95 12.530/27.260 ms).
+
+All other rows retain the October 15 implementation and data. In particular,
+loaded-water and mesh-grid axes have not been remeasured after the normal
+optimization; they are historical bounds, not updated ceilings for that code.
+The paused-water 30 fps entry is also a **lower bound**, not an observed FPS ceiling.
 The next 8,192-water load was not allocated: projected renderer peak RSS was
 13.173 GiB versus 11.595 GiB currently available, before the required 4 GiB
 system reserve. Peak VmHWM includes state-fingerprint allocations outside timed
@@ -56,7 +66,9 @@ frames. Physics width remains capped at 129 even for larger mesh/mask grids.
 Each axis is measured independently. Combining the maxima in one scene has not
 been tested. See the [complete point tables](captures/benchmarks-2026-10-15/capacity/results.md)
 for frame, CPU and GPU p50/p95, round repeatability, actual letter counts,
-configuration, raw data links and the bounds of each workload.
+configuration, raw data links and the bounds of each historical workload. The
+[visible-water follow-up](captures/benchmarks-2026-10-16/visible-water/results.md)
+contains the new matched before/after values and raw rounds.
 
 ## Skinning: optimize the repeated work
 
@@ -90,6 +102,53 @@ fixed steps, external inputs **and camera path, including projection/viewport**;
 they differ from full simulation after different camera histories. Offline/parity views simulate all
 loaded waters. The Display control or `?water-policy=off` selects full live
 simulation; see the [editor guide](guia-editor-visual.md#water-flow-reflections-and-interaction).
+
+## Visible water: optimize normal reconstruction, then stop for review
+
+At two visible waters the before control used **5.023 ms active CPU per water**.
+Preparation was the largest section; CPU sampling located repeated generic
+attribute/vector calls in Three's indexed normal reconstruction. The JS change
+uses direct float32 arrays, preserving the original accumulation and rounding
+order. Nonstandard attributes and custom methods retain the Three path.
+Simulation, deformation, texture inputs, bounds and reflection passes are unchanged.
+
+| CPU p50 per water, ms              | Before | Optimized JS |
+| ---------------------------------- | -----: | -----------: |
+| Numeric simulation                 |  1.385 |        1.587 |
+| Geometry/texture preparation       |  3.072 |        1.810 |
+| Mirror setup/reflection submission |  0.352 |        0.450 |
+| Remaining scene/render work        |  0.175 |        0.280 |
+| Active CPU per water               |  5.023 |        4.170 |
+
+Sections are independent medians; remainder is calculated per frame before
+percentiles. Actual GPU uploads happen during render submission. Preparation
+p50 falls **41.09%**, active CPU p50 **16.97%**. The full frame result is smaller:
+
+| Visible waters | Before frame p50 / p95 ms | After frame p50 / p95 ms | After CPU / GPU p50 ms |
+| -------------: | ------------------------: | -----------------------: | ---------------------: |
+|              1 |            7.835 / 10.375 |           8.345 / 10.935 |    3.310 / 4.490 · GPU |
+|              2 |           10.420 / 12.430 |           9.580 / 13.710 |    8.340 / 4.312 · CPU |
+
+At two waters frame p50 improves **8.06%**, but p95 worsens **10.30%**; at one,
+the frame is slower despite lower CPU cost. This is not a general frame or tail
+improvement claim. Four complete failed points (round differences 5.06%,
+10.76%, 6.30%, 8.34%) remain as scheduling diagnostics. Passive sampling shows
+variable activity on CPU 6's SMT sibling and renderer scheduling delays; it
+does not establish a single cause for every spike. The first complete passing
+point at each load is retained: round differences **4.47% / 1.30%** at one/two
+waters. No runs within a point were filtered or combined with another attempt.
+
+The remaining water step is **3.175 ms / 9.580 ms = 33.14% of frame p50**,
+with CPU dominance in the aggregate and both rounds. This meets the original
+numeric-CPU qualification rule after JS optimization. Following the owner's
+instruction, collection stops here: no higher-load timing, further optimization
+or WASM prototype. Qualification does not establish 2× isolated acceleration,
+≥15% frame improvement, p95 stability or fallback for an alternative.
+
+Fourteen water cases compare 11,073,154 values with **maximum error 0** and
+identical images; seven existing area/GLTF images also have RMSE 0. See the
+[follow-up protocol, profiles, diagnostics and validation](captures/benchmarks-2026-10-16/visible-water/README.md)
+and [all p50/p95 values](captures/benchmarks-2026-10-16/visible-water/results.md).
 
 ## CPU and GPU bottlenecks
 

@@ -1,0 +1,8 @@
+{
+  "command": "node scripts/preview-readme.mjs --github-pages --generate-only",
+  "identical": true,
+  "files": {
+    "docs/index.html": "c6423cc9c5a7bbdcd2a0ad90c5e59a3e2393da410efb1314b1a101ae9e060f32",
+    "docs/watch.html": "c6423cc9c5a7bbdcd2a0ad90c5e59a3e2393da410efb1314b1a101ae9e060f32"
+  }
+}

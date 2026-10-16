@@ -1,0 +1,9 @@
+{
+  "localLinksChecked": 306,
+  "missing": [],
+  "preservedPlans": {
+    "docs/editor-consolidation-plan.md": "902a2dc97c95e8f5ffb90e79c1b09f1bc48230d610cdbf78d5e3316154b53916",
+    "docs/wasm-performance-study-plan.md": "b96faa37b3d657add64b4513e1822ff04c72cd4365f21690c0299254873884b4"
+  },
+  "historicalBaselinesChanged": false
+}

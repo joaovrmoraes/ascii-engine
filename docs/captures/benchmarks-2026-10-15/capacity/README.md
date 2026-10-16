@@ -1,9 +1,14 @@
 # Optimized JavaScript capacity
 
-Status: complete. [Point tables](results.md), [raw manifest](manifest.json),
+Status: complete (historical October 15 implementation). [Point tables](results.md), [raw manifest](manifest.json),
 [derived summary](summary.json), [SVG charts](../charts/index.json),
 [particle-budget audit](validation/effect-budget-audit.json).
 The original protocol below was registered before measurements. No WASM/GPU skinning.
+The [October 16 visible-water follow-up](../../benchmarks-2026-10-16/visible-water/README.md)
+optimizes normal reconstruction and stops at a remaining numeric-target gate.
+Its before/after curve replaces only the visible-water SVG; the tables and
+manifest here retain this historical capacity run. Other water axes have not
+been remeasured after the normals change.
 
 Use the accepted Phase 2 uncapped protocol: i5-12450H, Chromium headless,
 ANGLE GL, 1920×1080/DPR 1, seed 4242, fixed dt 1/60 s, two asynchronous GPU

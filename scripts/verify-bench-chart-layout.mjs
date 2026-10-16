@@ -45,8 +45,11 @@ try {
       throw new Error('Chart layout failed: ' + JSON.stringify(layout))
     results.push({ file: chart.file, sha256: hash, ...layout })
     if (
-      chart.file === 'skinning-before-after.svg' ||
-      chart.file === 'capacity-water-loaded-pause.svg'
+      [
+        'skinning-before-after.svg',
+        'capacity-water-loaded-pause.svg',
+        'capacity-water-visible.svg',
+      ].includes(chart.file)
     ) {
       const shot = await browser.send('Page.captureScreenshot', {
         format: 'png',

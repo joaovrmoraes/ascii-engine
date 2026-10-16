@@ -569,8 +569,10 @@ fresh loads per scene, serially. Results, environment and raw samples go under
 `pnpm bench --verify --out=.cache/bench-study` checks exact state/visual parity
 with profiling on/off and forbids IndexedDB calls. The report applies the
 owner-confirmed [ADR 0004](docs/decisions/0004-webassembly-for-simulation.md),
-now **Rejected for now** after optimized JS, algorithmic water scheduling and
-capacity measurements. No WASM/GPU skinning or additional toolchain was needed.
+originally **Rejected for now** after optimized JS, algorithmic water scheduling
+and capacity measurements. The October 16 visible-water follow-up reopens only
+the remaining numeric solver target for owner review. No WASM/GPU skinning or
+additional toolchain was implemented or installed.
 See the [performance page](docs/performance.md) for measured bounds and plots.
 
 The Phase 1 methodology amendment adds `--uncapped`, launching Chromium with
@@ -605,13 +607,23 @@ per-vertex attribute/vector calls. Nonstandard attributes, non-indexed geometry
 and custom methods retain Three's path. Physics, deformation, bounds, mesh density
 and reflection passes are unchanged. The dated
 [visible-water follow-up](docs/captures/benchmarks-2026-10-16/visible-water/README.md)
-retains the instrumented before baseline and parity evidence.
+retains both clean-source baselines and parity evidence. At two visible waters,
+preparation p50 per water falls 3.072 → 1.810 ms (41.09%), active CPU 5.023 →
+4.170 ms, frame p50 10.420 → 9.580 ms (8.06%). Frame p95 worsens 12.430 →
+13.710 ms; one-water frame timing is also worse despite lower active CPU.
+Report this limitation, not a general frame/tail improvement. Maximum array
+error and controlled image RMSE are both 0.
 
 `pnpm bench:capacity --axes=water-visible --stop-numeric-gate` supports the owner's
 follow-up stop rule: after a complete stable point, stop when remaining water-step
 numeric work is at least 15% of the median frame and CPU dominance holds in the
 aggregate and both rounds. This reports a qualification gate and untested higher
 loads; it never starts a prototype or claims an FPS ceiling. The flag is opt-in.
+The follow-up hits this gate at two waters (3.175 ms numeric step, 33.14% of
+frame p50, CPU-dominant in both rounds). Collection stops for owner review;
+new 60/30 fps entries are both ≥2. Higher optimized loads are unmeasured.
+The original rule's 2× isolated / ≥15% frame / no p95 regression / parity /
+fallback adoption requirements remain unproven for any alternative.
 
 The generic core defaults to full simulation. The editor wrapper and exported
 player default to `{ offscreenWater: { mode: 'pause', margin: 4 } }`, following
@@ -673,11 +685,12 @@ records optimized JS as the skinning baseline (45.38× isolated, 52.41% frame
 p50 gain), exact parity and water results for all four map sizes. All ten
 before/after cases repeat within 5%. The water decision depends on map size;
 four paused waters remain a borderline numeric target. This report preserves
-its Phase 2 decision point; the final ADR now rejects WASM for now. Regenerate
+its Phase 2 decision point; the October 15 closure rejected WASM, and the October
+16 visible-water follow-up reopens only its numeric target for review. Regenerate
 the historical tables with `node scripts/bench-phase2-report.mjs`.
 
 The completed [capacity study](docs/captures/benchmarks-2026-10-15/capacity/README.md)
-and [performance page](docs/performance.md) close the investigation with nine
+and [performance page](docs/performance.md) initially closed the investigation with nine
 static SVG charts. Capacity is the largest measured load meeting the worse-round
 p95 budget (16.7/33.3 ms), using the Phase 2 uncapped controls. At 60/30 fps:
 128/256 fixture creatures, 2/4 all-updating or simultaneously visible waters,
@@ -689,6 +702,10 @@ are independent-axis, fitted-fixture results on this hardware, not a combined
 scene promise. Offline/parity modes keep full simulation; the generic core
 stays full. Larger visible workloads and weaker platforms trigger profiling
 under the unchanged ADR rule, rather than automatic WASM adoption.
+Those October 15 water bounds predate direct normal reconstruction. The
+visible-water chart now overlays the fresh October 16 before/after cohorts;
+other water axes remain historical. The follow-up stops at the qualification
+gate, so its ≥2 bounds do not replace an unmeasured maximum with a guess.
 
 The capacity collector stages per-run JSON in Git-ignored `.cache/bench-capacity/`
 and publishes to the requested capture folder after collection. Child runners use

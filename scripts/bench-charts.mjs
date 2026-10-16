@@ -3,6 +3,7 @@ import { resolve, join } from 'node:path'
 import { createHash } from 'node:crypto'
 import { writeCapacityReport } from './bench-capacity-report.mjs'
 import { aggregatePoint, capacityAt } from './bench-capacity-data.mjs'
+import { writeVisibleWaterReport } from './bench-visible-water-report.mjs'
 import { summarize, classifyBottleneck } from './bench-stats.mjs'
 
 const root = resolve(
@@ -111,6 +112,13 @@ for (const name of axisNames) {
     capacity30: capacityAt(points, 33.3),
   }
 }
+const inputs = await load('chart-inputs.json').catch(error => {
+  if (error.code === 'ENOENT') return {}
+  throw error
+})
+const visibleStudy = inputs.visibleWaterStudy
+  ? await writeVisibleWaterReport(resolve(root, inputs.visibleWaterStudy))
+  : null
 const artifacts = []
 function footer(datasets) {
   const env = datasets[0].environment,
@@ -331,12 +339,20 @@ async function curve(
       `Largest tested passing load — 60 fps: ${bound(capacity.capacity60)} | 30 fps: ${bound(capacity.capacity30)}. ${capacity.status}.`,
     )
   }
-  const resource = capacity?.resourceLimit
+  const resource = capacity?.resourceLimit,
+    candidate = capacity?.numericCandidate
   if (resource)
     body += text(
       80,
       544,
       `Resource stop before ${resource.load}: projected ${(resource.projectedPeakBytes / 1024 ** 3).toFixed(2)} GiB RSS; ${(resource.availableBytes / 1024 ** 3).toFixed(2)} GiB available; 4 GiB system reserve.`,
+      'font-size="11"',
+    )
+  if (candidate)
+    body += text(
+      80,
+      544,
+      `Stopped for owner review: numeric water step qualifies at ${candidate.load} waters (${(candidate.frameShare * 100).toFixed(2)}% of frame); higher loads untested.`,
       'font-size="11"',
     )
   body += table(
@@ -350,9 +366,9 @@ async function curve(
       { x: 800, label: 'GPU p50 ms' },
       { x: 940, label: 'Bottleneck' },
     ],
-    resource ? 568 : 544,
+    resource || candidate ? 568 : 544,
   )
-  const height = 640 + rows.length * 23 + (resource ? 24 : 0)
+  const height = 640 + rows.length * 23 + (resource || candidate ? 24 : 0)
   await save(name, title, subtitle, body, height, datasets)
 }
 await curve(
@@ -402,13 +418,21 @@ for (const [axis, name, subtitle] of [
     name,
     `Capacity: ${axes[axis].label}`,
     subtitle,
-    [{ label: 'Optimized JS', points: axes[axis].points }],
+    axis === 'water-visible' && visibleStudy
+      ? [
+          { label: 'Before normals', color: colors.orange, points: visibleStudy.before.points },
+          { label: 'After normals', color: colors.blue, points: visibleStudy.after.points },
+        ]
+      : [{ label: 'Optimized JS', points: axes[axis].points }],
     axis === 'water-grid'
       ? 'Mesh/mask grid width (samples per side)'
       : axis === 'particles'
         ? 'Simultaneous effect groups (3 effects per group)'
         : 'Load count',
-    { p95Curves: true, capacity: axes[axis] },
+    {
+      p95Curves: true,
+      capacity: axis === 'water-visible' && visibleStudy ? visibleStudy.after : axes[axis],
+    },
   )
 const compactAxes = Object.fromEntries(
   Object.entries(axes).map(([k, a]) => [

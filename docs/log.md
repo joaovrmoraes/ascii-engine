@@ -1,3 +1,28 @@
+## 2026-10-16 — Publish the visible-water evidence locally and reopen only its target
+
+The performance page, capacity row, README/Pages, START and ADR now report
+the exact before/after limits, including worse p95 and lower-bound capacity.
+ADR 0004 is **Proposed — reopened for visible-water simulation review** under
+the owner's exception; other reference targets remain rejected for now. No
+WASM work is started. The original study plan is byte-identical, and the
+owner's untracked editor-consolidation plan is untouched.
+
+The visible-water SVG overlays fresh before/after samples, with log2 loads,
+light dotted reading guides and no extrapolated blue points. Other axes and
+their raw manifests/tables remain historical. An explicit chart-input index
+connects the follow-up without overwriting those raw measurements.
+[Inspected graph](captures/benchmarks-2026-10-16/visible-water/presentation-final/capacity-water-visible-preview.png),
+[nine layout checks](captures/benchmarks-2026-10-16/visible-water/presentation-final/chart-layout.json),
+[byte-identical SVG/index and derived reports](captures/benchmarks-2026-10-16/visible-water/presentation-final/idempotence.json).
+README-generated Pages also reproduce across two runs:
+[checksums](captures/benchmarks-2026-10-16/visible-water/validation/pages-idempotence.json).
+Final [pnpm check](captures/benchmarks-2026-10-16/visible-water/validation/check-final.log)
+passes (193 tests). Exact numeric/image parity, Orca explicit-page normal check,
+page-capture timeout limitation and four historical compare failures are linked
+in the follow-up report. No baseline regeneration, Tauri, draft change or push.
+Owned passive monitor and preserved-core parity server were stopped; the
+existing development server remains available.
+
 ## 2026-10-16 — Visible-water after measurements reach the numeric review gate
 
 Clean optimized source `da5b85b` retains the first complete passing point at

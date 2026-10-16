@@ -1,8 +1,9 @@
 # Simulation performance study — Phase 2
 
 > Historical report. The final [performance page](../../../performance.md) and
-> [ADR 0004](../../../decisions/0004-webassembly-for-simulation.md) close the study
-> as **Rejected for now**. Live editor/player water pausing is now enabled by
+> [ADR 0004](../../../decisions/0004-webassembly-for-simulation.md) initially closed the study
+> as **Rejected for now**; the October 16 visible-water follow-up reopens only
+> its remaining numeric target for owner review. Live editor/player water pausing is now enabled by
 > the owner; the measurements and original stopping-point text below are preserved.
 
 Status: completed JS skinning and optional water scheduling; ADR 0004 stays **Proposed**. No GPU
