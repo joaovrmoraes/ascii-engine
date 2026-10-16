@@ -1,12 +1,17 @@
 # 0004 — WebAssembly for simulation
 
-Status: **Proposed — reopened for visible-water simulation review**. Updated: 2026-10-16.
+Status: **Deferred**. Updated: 2026-10-16.
 
-The October 15 decision was **Rejected for now**. That remains the conclusion
-for the reference skinning, rain-water and particle targets. The owner asked
-to stop and notify them if numeric CPU work still qualifies after optimizing
-visible-water JS. The October 16 follow-up reaches that gate; only that target
-is reopened. No WASM prototype or adoption is authorized by this status.
+The owner paused the WASM study because other project work has higher priority.
+The visible-water numeric step qualifies: **33.14% of frame p50 with two visible
+waters, CPU-dominant**. Its dedicated JS step baseline and a WASM prototype are
+both deferred. Existing renderer/normal-reconstruction measurements remain
+evidence; they are not an isolated baseline of the numeric solver step.
+
+The October 15 decision was **Rejected for now**, followed by qualification of
+visible-water simulation on October 16. Deferral preserves that finding and
+the decision thresholds below. No new measurements or toolchain installation
+accompany this closure, and no WASM implementation has been started.
 
 ## Question and confirmed decision rule
 
@@ -106,10 +111,11 @@ JS. Collection stops at two waters under the owner's conditional instruction;
 no further optimization, higher-load timing or prototype was started. The
 optimized 60/30 fps entries are both **≥2**, not exact maxima.
 
-This reopens a candidate, not an adoption decision: no alternative has shown
+This qualifies a candidate, not an adoption decision: no alternative has shown
 2× isolated acceleration, ≥15% frame improvement without p95 regression,
-numeric/image parity and a maintained JS fallback. Owner review is the next
-step. The worse tail in these JS measurements must remain visible in any
+numeric/image parity and a maintained JS fallback. The owner has deferred the
+dedicated numeric-step JS baseline and WASM prototype by project priority.
+The worse tail in these JS measurements must remain visible in any
 future comparison. [Report and raw links](../captures/benchmarks-2026-10-16/visible-water/results.md).
 
 ### Particles and effects: GPU-dominant reference
@@ -132,7 +138,7 @@ records actual point counts; capped output cannot prove unlimited capacity.
 | Water mesh/mask width                            |                       129×129 · 10.840 ms |                       257×257 · 18.110 ms |
 
 Visible-water entries use the October 16 follow-up's worse-round p95 and stop
-at owner review, not an FPS ceiling. Its fresh before control sustains two/four
+at the qualification gate, not an FPS ceiling. Its fresh before control sustains two/four
 waters at 60/30 fps (12.530/27.260 ms worst-round p95). All other rows retain
 October 15 data; loaded-water and larger mesh-grid axes were not remeasured
 after the normals change and are historical bounds for that implementation.
@@ -163,6 +169,29 @@ A missed budget triggers profiling, not automatic adoption of WASM. A new
 candidate must show a numeric CPU bottleneck and pass the original rule against
 the optimized JS baseline, including the whole frame and p95.
 
+## Resumption triggers and first step
+
+Resume only when project priorities allow and the intended workload warrants it:
+
+- More simultaneously visible waters per map; the optimized follow-up tested
+  two and stopped at qualification, so **≥2 is a lower bound**, not a ceiling.
+- Water mesh/mask grids above 129, or a future simulation grid above 129.
+  The current solver remains capped at 129; larger mesh tests did not measure
+  a larger physics grid.
+- Weaker hardware, including mobile devices or a less capable CPU/GPU.
+- Native Tauri / WebKitGTK, especially Linux, where the native window and
+  this performance profile have not been tested.
+
+**First step on resumption:** establish an environment with an isolated physical
+core, including its SMT sibling, with observers/background work kept off it;
+record the isolation and machine/browser configuration. Existing CPU-6 pinning
+did not isolate the core from sibling contention. Then collect a dedicated JS
+baseline of the numeric water step with the same initial arrays, seed and fixed
+dt, warm-up, repeated rounds and parity checks, together with full-frame CPU/GPU
+context. Resolve scheduling noise before accepting that baseline. Only after
+that work should a WASM prototype be considered under the unchanged rule.
+These steps are pending work, not actions performed for this closure.
+
 ## Owner-authorized water policy
 
 The live editor and exported player now pause offscreen waters by default with
@@ -187,8 +216,8 @@ Keeping JS without a separate WASM implementation avoids a Rust/WASM toolchain, 
 binary/interface, marshalling and memory ownership, two maintained execution
 paths, cross-platform fallback selection, duplicate tests, and ongoing numeric
 and visual parity work. Those costs should be paid only after demonstrated
-frame benefit under the actual bottleneck. No push or deployment accompanies
-this decision.
+frame benefit under the actual bottleneck. The owner authorized publication of
+this deferred decision on branch `threadfin`; no merge to `main` is included.
 
 Numbers apply to **Intel i5-12450H, Mesa Intel ADL GT2, Chromium 152.0.7977.82
 headless, ANGLE GL**,

@@ -192,7 +192,8 @@ reproducible charts for this i5-12450H / Chromium headless / ANGLE GL profile.
 Optimized JavaScript makes the reference skinning step 45× faster and frame p50
 52% lower. Hidden water pauses in the editor and exported player; offline/parity
 views simulate everything. No WebAssembly is used; the remaining visible-water
-numeric step is [under owner review](docs/decisions/0004-webassembly-for-simulation.md).
+numeric step qualified, but its JS baseline and WASM prototype are
+[deferred by project priority](docs/decisions/0004-webassembly-for-simulation.md).
 
 ## Project status
 

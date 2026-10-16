@@ -9,6 +9,9 @@ optimizes normal reconstruction and stops at a remaining numeric-target gate.
 Its before/after curve replaces only the visible-water SVG; the tables and
 manifest here retain this historical capacity run. Other water axes have not
 been remeasured after the normals change.
+The owner has since deferred the dedicated numeric-step JS baseline and WASM
+prototype by project priority; [ADR 0004](../../../decisions/0004-webassembly-for-simulation.md)
+records the resumption triggers and isolated-core first step.
 
 Use the accepted Phase 2 uncapped protocol: i5-12450H, Chromium headless,
 ANGLE GL, 1920×1080/DPR 1, seed 4242, fixed dt 1/60 s, two asynchronous GPU

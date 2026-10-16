@@ -2,15 +2,16 @@
 
 Skinning is **45× faster in JavaScript** after eliminating repeated vertex work.
 Offscreen-water cost is addressed by pausing hidden simulation and preparation.
-Visible water is the next CPU limit: the original run sustained **two simultaneous waters at 60 fps**, and the optimized follow-up stops at a numeric-target review gate.
+Visible water is the next CPU limit, and **WASM is deferred** while higher-priority project work proceeds.
 
 How much can this engine render at 60 fps using JavaScript on this machine?
 The study found that the reference skinning bottleneck could be removed in JS,
 and that hidden-water work should be skipped before considering another language.
 GPU-heavy rain/water and particles do not become faster simply by moving CPU
 code to WASM. [ADR 0004](decisions/0004-webassembly-for-simulation.md) retains
-the original decision rule; its visible-water simulation question is now
-reopened for owner review, with no WASM implementation.
+the original decision rule with status **Deferred**: the qualified visible-water
+step's dedicated JS baseline and WASM prototype are postponed by project priority.
+No new measurements or toolchain installation accompany this closure.
 
 ## Method
 
@@ -37,19 +38,38 @@ reflection passes; they are not exclusive GPU busy time. Frame time also
 includes dispatch/polling. These are headless throughput measurements, not
 physical display scanout or a promise of equal performance in another browser.
 
+### Measurement cohorts
+
+The figures combine historical protocols and code revisions. Labels identify
+their scope; values across cohorts are not interchangeable before/after pairs.
+All numbers apply only to this **i5-12450H / Chromium headless / ANGLE GL**
+machine, not to mobile, Tauri or WebKitGTK.
+
+| Label | Figures or axes                                              | Protocol and code scope                                                                                                                                                                                             |
+| ----- | ------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| H     | Skinning before/after bars; reference CPU/GPU bars           | Historical OS-default affinity and launch configuration. Skinning sources `5bc6077` / `5fd0824`; Phase 1 reference source `af0413f`. Compare the matched skinning pair within H, not against the capacity fixtures. |
+| P2    | Water-scale pause off/on lines                               | Phase 2 controlled CPU-6, fresh-process, extensions-disabled protocol; before direct water-normal reconstruction.                                                                                                   |
+| C     | Creature, loaded-water, effects and water-grid capacity axes | October 15 controlled protocol, optimized skinning, original water-normal reconstruction. Raw rounds record each source revision; some identical Phase 2 controls are reused.                                       |
+| V     | Simultaneously visible-water follow-up                       | October 16 controlled protocol with separate reflection timing; fresh before `5880837` / optimized normals `da5b85b`. Only one/two optimized waters were timed.                                                     |
+
+CPU-6 affinity in P2/C/V pins the renderer thread; it does **not isolate the
+physical core or its SMT sibling**. A future numeric-step JS baseline first
+requires an isolated-core environment. The paced/vsync Phase 1 results remain
+historical context and are not used for these uncapped capacity budgets.
+
 ## Capacity
 
-| Axis                                             | Maximum measured at 60 fps · p95 ≤16.7 ms | Maximum measured at 30 fps · p95 ≤33.3 ms |
-| ------------------------------------------------ | ----------------------------------------: | ----------------------------------------: |
-| Visible skinned creatures                        |                           128 · 15.000 ms |                           256 · 23.025 ms |
-| Loaded waters, pause off                         |                             2 · 13.440 ms |                             4 · 24.375 ms |
-| Loaded waters, pause on (one visible)            |                         2,048 · 15.865 ms |                        ≥4,096 · 21.510 ms |
-| Simultaneously visible waters, optimized normals |                            ≥2 · 14.160 ms |                            ≥2 · 14.160 ms |
-| Effect groups (three effects each)               |         4 groups = 12 effects · 15.795 ms |        24 groups = 72 effects · 32.720 ms |
-| Water mesh/mask width                            |                       129×129 · 10.840 ms |                       257×257 · 18.110 ms |
+| Axis                                                 | Maximum measured at 60 fps · p95 ≤16.7 ms | Maximum measured at 30 fps · p95 ≤33.3 ms |
+| ---------------------------------------------------- | ----------------------------------------: | ----------------------------------------: |
+| C · Visible skinned creatures                        |                           128 · 15.000 ms |                           256 · 23.025 ms |
+| C · Loaded waters, pause off                         |                             2 · 13.440 ms |                             4 · 24.375 ms |
+| C · Loaded waters, pause on (one visible)            |                         2,048 · 15.865 ms |                        ≥4,096 · 21.510 ms |
+| V · Simultaneously visible waters, optimized normals |                            ≥2 · 14.160 ms |                            ≥2 · 14.160 ms |
+| C · Effect groups (three effects each)               |         4 groups = 12 effects · 15.795 ms |        24 groups = 72 effects · 32.720 ms |
+| C · Water mesh/mask width                            |                       129×129 · 10.840 ms |                       257×257 · 18.110 ms |
 
 Visible water uses the October 16 follow-up: collection stopped at two waters
-because remaining numeric CPU work qualifies for owner review. Both entries
+because remaining numeric CPU work qualifies; the study is now deferred. Both entries
 are tested **lower bounds**, not newly measured maxima; four/eight optimized
 waters were not timed. The fresh before control sustained two/four waters at
 60/30 fps (worst-round p95 12.530/27.260 ms).
@@ -72,7 +92,9 @@ contains the new matched before/after values and raw rounds.
 
 ## Skinning: optimize the repeated work
 
-![Skinning before and after JS optimization](captures/benchmarks-2026-10-15/charts/skinning-before-after.svg)
+**H · Historical matched skinning pair**, using its original affinity/launch setup.
+
+![H: skinning before and after JS optimization](captures/benchmarks-2026-10-15/charts/skinning-before-after.svg)
 
 The fixed 16-creature scene originally repeated skinning for three corners of
 every letter: 54,537 generic vertex calls for 2,302 distinct source vertices.
@@ -84,7 +106,9 @@ no WASM or GPU-skinning implementation was needed.
 
 ## Water: loaded is different from visible
 
-![Water scale, pause off versus on](captures/benchmarks-2026-10-15/charts/water-scale.svg)
+**P2 · Phase 2 controlled water-scale comparison**, before direct normal reconstruction.
+
+![P2: water scale, pause off versus on](captures/benchmarks-2026-10-15/charts/water-scale.svg)
 
 With one water visible, eight loaded 129×129 waters take frame p50/p95
 37.010/42.990 ms (pooled percentiles) when all are updated, versus
@@ -103,7 +127,7 @@ they differ from full simulation after different camera histories. Offline/parit
 loaded waters. The Display control or `?water-policy=off` selects full live
 simulation; see the [editor guide](guia-editor-visual.md#water-flow-reflections-and-interaction).
 
-## Visible water: optimize normal reconstruction, then stop for review
+## Visible water: optimize normal reconstruction, then defer WASM
 
 At two visible waters the before control used **5.023 ms active CPU per water**.
 Preparation was the largest section; CPU sampling located repeated generic
@@ -144,6 +168,11 @@ numeric-CPU qualification rule after JS optimization. Following the owner's
 instruction, collection stops here: no higher-load timing, further optimization
 or WASM prototype. Qualification does not establish 2× isolated acceleration,
 ≥15% frame improvement, p95 stability or fallback for an alternative.
+The owner subsequently deferred the dedicated JS step baseline and WASM
+prototype by project priority. The 3.175 ms section measurement is qualification
+evidence, not an isolated solver baseline. If resumed, first isolate the core
+and collect that JS baseline; [ADR 0004](decisions/0004-webassembly-for-simulation.md#resumption-triggers-and-first-step)
+lists the workload/platform triggers and unchanged adoption requirements.
 
 Fourteen water cases compare 11,073,154 values with **maximum error 0** and
 identical images; seven existing area/GLTF images also have RMSE 0. See the
@@ -152,7 +181,9 @@ and [all p50/p95 values](captures/benchmarks-2026-10-16/visible-water/results.md
 
 ## CPU and GPU bottlenecks
 
-![CPU versus GPU reference ranges](captures/benchmarks-2026-10-15/charts/cpu-vs-gpu.svg)
+**H · Historical reference scenes**, separate from the controlled capacity axes.
+
+![H: CPU versus GPU reference ranges](captures/benchmarks-2026-10-15/charts/cpu-vs-gpu.svg)
 
 Particles in the reference scene are GPU-dominant. Reducing JavaScript work
 cannot count as a frame gain while the GPU remains the longer side of the
@@ -171,18 +202,20 @@ untested loads. The tables
 inside each SVG label every load and its frame/CPU/GPU values in milliseconds.
 Non-monotonic intervals are retained: dispatch/queue timing and scheduling can
 affect headless intervals. Do not interpolate an exact capacity between loads.
+Creature, loaded-water, effects and grid plots use **C**; the visible-water
+before/after plot uses **V**. Their protocols/code scope are listed above.
 
-![Visible skinned creatures](captures/benchmarks-2026-10-15/charts/capacity-skinning.svg)
+![C: visible skinned creatures](captures/benchmarks-2026-10-15/charts/capacity-skinning.svg)
 
-![Loaded waters with full simulation](captures/benchmarks-2026-10-15/charts/capacity-water-loaded-off.svg)
+![C: loaded waters with full simulation](captures/benchmarks-2026-10-15/charts/capacity-water-loaded-off.svg)
 
-![Loaded waters with hidden simulation paused](captures/benchmarks-2026-10-15/charts/capacity-water-loaded-pause.svg)
+![C: loaded waters with hidden simulation paused](captures/benchmarks-2026-10-15/charts/capacity-water-loaded-pause.svg)
 
-![All waters visible](captures/benchmarks-2026-10-15/charts/capacity-water-visible.svg)
+![V: all waters visible](captures/benchmarks-2026-10-15/charts/capacity-water-visible.svg)
 
-![Simultaneous effects](captures/benchmarks-2026-10-15/charts/capacity-effects.svg)
+![C: simultaneous effects](captures/benchmarks-2026-10-15/charts/capacity-effects.svg)
 
-![Water mesh grid resolution](captures/benchmarks-2026-10-15/charts/capacity-water-grid.svg)
+![C: water mesh grid resolution](captures/benchmarks-2026-10-15/charts/capacity-water-grid.svg)
 
 ## Limits and reproduction
 
@@ -209,13 +242,14 @@ affect headless intervals. Do not interpolate an exact capacity between loads.
   A weaker platform or a workload beyond the measured budgets is a reason to
   profile again, not proof that WASM will help.
 
-Run `pnpm dev`, then `pnpm bench:capacity --out=.cache/capacity-new-study`
+The study is deferred; the following commands document reproduction, not a
+request to resume it. Run `pnpm dev`, then `pnpm bench:capacity --out=.cache/capacity-new-study`
 with a fresh output path to collect new measurements. The collector resumes
 complete points when reusing an existing output. Raw samples, environment and source
 revisions are retained in the [capacity manifest](captures/benchmarks-2026-10-15/capacity/manifest.json).
 `pnpm bench:charts` regenerates the SVGs and derived tables from those JSONs,
 using only Node’s standard library; two runs produce identical bytes. The retained
-42 axis points reference 40 distinct two-round case cohorts; the identical
+October 15 C dataset's 42 axis points reference 40 distinct two-round case cohorts; the identical
 one-water control is reused across three axes. All accepted frame-p50 round
 differences are within 5% (maximum 4.50%); complete failed points remain available
 as scheduling diagnostics. See [Phase 1](captures/benchmarks-2026-10-15/README.md),

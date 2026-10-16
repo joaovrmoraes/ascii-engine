@@ -1,6 +1,11 @@
 # Visible-water CPU investigation
 
-Status: **stopped for owner review at the remaining numeric-CPU gate**.
+Status: **Deferred by project priority**; no new measurements or toolchain.
+The numeric-CPU gate qualified (33.14% with two visible waters, CPU-dominant),
+but the dedicated JS step baseline and WASM prototype are postponed. Resume
+with an isolated physical core and a repeatable JS step baseline; see
+[ADR 0004](../../../decisions/0004-webassembly-for-simulation.md#resumption-triggers-and-first-step).
+The results and original stopping-point protocol below remain historical.
 The protocol below was recorded before optimization and accepted after samples.
 Original capacity data remain in
 [the previous study](../../benchmarks-2026-10-15/capacity/results.md).

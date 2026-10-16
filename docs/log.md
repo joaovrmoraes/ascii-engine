@@ -1,3 +1,40 @@
+## Handoff — 2026-10-16
+
+Final WASM study status: **Deferred**, by owner decision because other project
+work has higher priority. [ADR 0004](decisions/0004-webassembly-for-simulation.md)
+retains the visible-water qualification: numeric step 3.175 ms / frame p50
+9.580 ms = 33.14% with two visible waters, CPU-dominant. The dedicated JS step
+baseline and WASM prototype are both postponed. No new measurements or
+Rust/WASM toolchain installation accompany this documentation-only closure.
+
+[Performance](performance.md) opens with the three final findings: skinning
+45× faster in JS, hidden-water work addressed by pausing, visible-water CPU
+work the next limit with WASM deferred. H/P2/C/V labels distinguish protocols
+and code revisions; the numbers apply only to i5-12450H / Chromium headless /
+ANGLE GL. Existing raw results, charts, parity evidence and captures are retained.
+
+Pending work:
+
+- Resume the WASM study only when priorities allow. Triggers: more visible
+  waters per map, grids above 129, weaker hardware, or native Tauri/WebKitGTK.
+  First establish an isolated physical core including its SMT sibling and
+  collect a repeatable JS numeric-step baseline with frame/CPU/GPU context.
+- Four historical `pnpm compare` baselines still fail: reference, forest,
+  snow and cathedral. They need the owner's visual review before regeneration;
+  no baseline was changed or compare rerun for this closure. Prior
+  [compare evidence](captures/benchmarks-2026-10-16/visible-water/validation/compare.log).
+- The native Tauri window is **not tested**. Native desktop/window and
+  WebKitGTK performance validation remain pending; no Tauri run was performed.
+
+The [editor consolidation plan](editor-consolidation-plan.md) is archived as a
+separate docs-only commit, byte-identical to the owner's original record
+(SHA-256 `902a2dc97c95e8f5ffb90e79c1b09f1bc48230d610cdbf78d5e3316154b53916`).
+Its explicit Prettier exception preserves the historical audit, like the
+original WASM plan. Validation: `pnpm check` passes (193 tests); generated
+README Pages reproduce across two runs. Existing screenshots/parity were not
+recaptured for a documentation-only change. Delivery is limited to the owner's
+requested `git push origin threadfin`; no `main` update or force push.
+
 ## 2026-10-16 — Publish the visible-water evidence locally and reopen only its target
 
 The performance page, capacity row, README/Pages, START and ADR now report

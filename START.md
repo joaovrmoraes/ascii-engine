@@ -570,9 +570,15 @@ fresh loads per scene, serially. Results, environment and raw samples go under
 with profiling on/off and forbids IndexedDB calls. The report applies the
 owner-confirmed [ADR 0004](docs/decisions/0004-webassembly-for-simulation.md),
 originally **Rejected for now** after optimized JS, algorithmic water scheduling
-and capacity measurements. The October 16 visible-water follow-up reopens only
-the remaining numeric solver target for owner review. No WASM/GPU skinning or
-additional toolchain was implemented or installed.
+and capacity measurements. The October 16 visible-water follow-up qualified
+the remaining numeric solver target (33.14% of frame at two visible waters,
+CPU-dominant). The owner then set the study to **Deferred** by project priority:
+the dedicated JS step baseline and WASM prototype are postponed. On resumption,
+first establish an isolated physical core including its SMT sibling, then a
+repeatable JS solver-step baseline with full-frame context. More visible waters
+per map, grids above 129, weaker hardware and Tauri/WebKitGTK are resumption
+triggers; the current solver still caps width at 129. No new measurements,
+WASM/GPU skinning or toolchain installation accompany this closure.
 See the [performance page](docs/performance.md) for measured bounds and plots.
 
 The Phase 1 methodology amendment adds `--uncapped`, launching Chromium with
@@ -620,10 +626,12 @@ numeric work is at least 15% of the median frame and CPU dominance holds in the
 aggregate and both rounds. This reports a qualification gate and untested higher
 loads; it never starts a prototype or claims an FPS ceiling. The flag is opt-in.
 The follow-up hits this gate at two waters (3.175 ms numeric step, 33.14% of
-frame p50, CPU-dominant in both rounds). Collection stops for owner review;
+frame p50, CPU-dominant in both rounds). Collection stopped at qualification;
 new 60/30 fps entries are both ≥2. Higher optimized loads are unmeasured.
 The original rule's 2× isolated / ≥15% frame / no p95 regression / parity /
 fallback adoption requirements remain unproven for any alternative.
+The owner has deferred the study; the stop flag documents the protocol and
+does not authorize new measurements or a prototype.
 
 The generic core defaults to full simulation. The editor wrapper and exported
 player default to `{ offscreenWater: { mode: 'pause', margin: 4 } }`, following
@@ -686,7 +694,8 @@ p50 gain), exact parity and water results for all four map sizes. All ten
 before/after cases repeat within 5%. The water decision depends on map size;
 four paused waters remain a borderline numeric target. This report preserves
 its Phase 2 decision point; the October 15 closure rejected WASM, and the October
-16 visible-water follow-up reopens only its numeric target for review. Regenerate
+16 visible-water follow-up qualified its numeric target before the owner
+deferred its dedicated JS step baseline and WASM prototype. Regenerate
 the historical tables with `node scripts/bench-phase2-report.mjs`.
 
 The completed [capacity study](docs/captures/benchmarks-2026-10-15/capacity/README.md)
