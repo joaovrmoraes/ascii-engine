@@ -1,0 +1,69 @@
+{
+  "active": [
+    {
+      "pid": "9182",
+      "name": "brave",
+      "ticksPerSecond": 82
+    },
+    {
+      "pid": "4166274",
+      "name": "gh",
+      "ticksPerSecond": 37
+    },
+    {
+      "pid": "3442610",
+      "name": "brave",
+      "ticksPerSecond": 20
+    },
+    {
+      "pid": "2271213",
+      "name": "brave",
+      "ticksPerSecond": 9
+    },
+    {
+      "pid": "1186",
+      "name": "Hyprland",
+      "ticksPerSecond": 7
+    },
+    {
+      "pid": "270392",
+      "name": "spotify",
+      "ticksPerSecond": 6
+    },
+    {
+      "pid": "9861",
+      "name": "orca-ide",
+      "ticksPerSecond": 4
+    },
+    {
+      "pid": "36491",
+      "name": "codex",
+      "ticksPerSecond": 4
+    },
+    {
+      "pid": "214821",
+      "name": "codex",
+      "ticksPerSecond": 4
+    },
+    {
+      "pid": "8924",
+      "name": "brave",
+      "ticksPerSecond": 3
+    },
+    {
+      "pid": "10474",
+      "name": "orca-ide",
+      "ticksPerSecond": 3
+    },
+    {
+      "pid": "29796",
+      "name": "codex",
+      "ticksPerSecond": 3
+    }
+  ],
+  "freqKHz": {
+    "0": "4100000",
+    "6": "3556882",
+    "7": "2759462"
+  }
+}

@@ -1,0 +1,38 @@
+[
+  {
+    "attempt": 1,
+    "load": 2,
+    "round": 1,
+    "run": 2,
+    "pid": 225665,
+    "samples": 2,
+    "intervalSeconds": 10.00833535194397,
+    "runtimeNs": 9196951982,
+    "runDelayNs": 271035478,
+    "delayFractionOfRuntimePlusDelay": 0.028626514256071902
+  },
+  {
+    "attempt": 1,
+    "load": 2,
+    "round": 1,
+    "run": 5,
+    "pid": 256483,
+    "samples": 2,
+    "intervalSeconds": 10.010719776153564,
+    "runtimeNs": 9402830446,
+    "runDelayNs": 242167550,
+    "delayFractionOfRuntimePlusDelay": 0.02510809749265188
+  },
+  {
+    "attempt": 1,
+    "load": 2,
+    "round": 2,
+    "run": 3,
+    "pid": 291253,
+    "samples": 2,
+    "intervalSeconds": 10.015017986297607,
+    "runtimeNs": 8781992577,
+    "runDelayNs": 418039431,
+    "delayFractionOfRuntimePlusDelay": 0.045438910499060084
+  }
+]

@@ -1,0 +1,24 @@
+Raw data stays in ignored staging until collection completes: /home/joao/orca/workspaces/ascii-engine/threadfin/.cache/bench-capacity/727aaeb292a7
+START water-visible-2-round-1 water-visible-2 1/5; 600 warm-up + 600 measured frames
+DONE water-visible-2 1: frame p50/p95=9.270/19.960 ms; CPU p50=8.065 ms; GPU p50=4.261 ms
+START water-visible-2-round-1 water-visible-2 2/5; 600 warm-up + 600 measured frames
+DONE water-visible-2 2: frame p50/p95=8.560/12.695 ms; CPU p50=7.830 ms; GPU p50=4.227 ms
+START water-visible-2-round-1 water-visible-2 3/5; 600 warm-up + 600 measured frames
+DONE water-visible-2 3: frame p50/p95=9.625/13.710 ms; CPU p50=8.475 ms; GPU p50=4.260 ms
+START water-visible-2-round-1 water-visible-2 4/5; 600 warm-up + 600 measured frames
+DONE water-visible-2 4: frame p50/p95=9.775/13.385 ms; CPU p50=8.345 ms; GPU p50=4.427 ms
+START water-visible-2-round-1 water-visible-2 5/5; 600 warm-up + 600 measured frames
+DONE water-visible-2 5: frame p50/p95=9.800/13.390 ms; CPU p50=8.635 ms; GPU p50=4.447 ms
+START water-visible-2-round-2 water-visible-2 1/5; 600 warm-up + 600 measured frames
+DONE water-visible-2 1: frame p50/p95=9.850/13.545 ms; CPU p50=8.845 ms; GPU p50=4.449 ms
+START water-visible-2-round-2 water-visible-2 2/5; 600 warm-up + 600 measured frames
+DONE water-visible-2 2: frame p50/p95=9.995/13.310 ms; CPU p50=8.430 ms; GPU p50=5.046 ms
+START water-visible-2-round-2 water-visible-2 3/5; 600 warm-up + 600 measured frames
+DONE water-visible-2 3: frame p50/p95=9.725/13.290 ms; CPU p50=8.360 ms; GPU p50=4.276 ms
+START water-visible-2-round-2 water-visible-2 4/5; 600 warm-up + 600 measured frames
+DONE water-visible-2 4: frame p50/p95=8.820/13.435 ms; CPU p50=7.860 ms; GPU p50=4.205 ms
+START water-visible-2-round-2 water-visible-2 5/5; 600 warm-up + 600 measured frames
+DONE water-visible-2 5: frame p50/p95=9.635/13.740 ms; CPU p50=8.550 ms; GPU p50=4.236 ms
+CAPACITY water-visible 2 {"frame":{"p50":9.57999999821186,"p95":13.709999993443489,"p99":17.939999997615814},"p95WorstRound":14.159999996423721,"bottleneck":"CPU","repeatability":0.013044612560401408,"capped":false}
+NUMERIC TARGET GATE {"load":2,"subsystem":"waterStep","frameShare":0.33141962396789065,"stepP50":3.1749999970197678,"frameP50":9.57999999821186,"reason":"Remaining numeric CPU work passes the original qualification rule; stop for owner review, no WASM"}
+Capacity manifest /home/joao/orca/workspaces/ascii-engine/threadfin/.cache/visible-water-study/after-capacity-repeat-4/manifest.json

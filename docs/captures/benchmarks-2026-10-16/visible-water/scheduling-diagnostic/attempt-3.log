@@ -1,0 +1,29 @@
+Raw data stays in ignored staging until collection completes: /home/joao/orca/workspaces/ascii-engine/threadfin/.cache/bench-capacity/b03226775e6b
+START water-visible-2-round-1 water-visible-2 1/5; 600 warm-up + 600 measured frames
+DONE water-visible-2 1: frame p50/p95=7.955/11.775 ms; CPU p50=7.555 ms; GPU p50=4.198 ms
+START water-visible-2-round-1 water-visible-2 2/5; 600 warm-up + 600 measured frames
+DONE water-visible-2 2: frame p50/p95=7.940/11.580 ms; CPU p50=7.535 ms; GPU p50=4.193 ms
+START water-visible-2-round-1 water-visible-2 3/5; 600 warm-up + 600 measured frames
+DONE water-visible-2 3: frame p50/p95=7.850/9.460 ms; CPU p50=7.510 ms; GPU p50=4.354 ms
+START water-visible-2-round-1 water-visible-2 4/5; 600 warm-up + 600 measured frames
+DONE water-visible-2 4: frame p50/p95=8.040/10.180 ms; CPU p50=7.670 ms; GPU p50=4.206 ms
+START water-visible-2-round-1 water-visible-2 5/5; 600 warm-up + 600 measured frames
+DONE water-visible-2 5: frame p50/p95=8.965/12.425 ms; CPU p50=8.070 ms; GPU p50=4.263 ms
+START water-visible-2-round-2 water-visible-2 1/5; 600 warm-up + 600 measured frames
+DONE water-visible-2 1: frame p50/p95=8.290/10.210 ms; CPU p50=7.795 ms; GPU p50=4.411 ms
+START water-visible-2-round-2 water-visible-2 2/5; 600 warm-up + 600 measured frames
+DONE water-visible-2 2: frame p50/p95=8.680/12.200 ms; CPU p50=7.950 ms; GPU p50=4.264 ms
+START water-visible-2-round-2 water-visible-2 3/5; 600 warm-up + 600 measured frames
+DONE water-visible-2 3: frame p50/p95=9.665/13.805 ms; CPU p50=8.465 ms; GPU p50=4.264 ms
+START water-visible-2-round-2 water-visible-2 4/5; 600 warm-up + 600 measured frames
+DONE water-visible-2 4: frame p50/p95=8.525/12.825 ms; CPU p50=7.895 ms; GPU p50=4.241 ms
+START water-visible-2-round-2 water-visible-2 5/5; 600 warm-up + 600 measured frames
+DONE water-visible-2 5: frame p50/p95=9.245/11.595 ms; CPU p50=8.110 ms; GPU p50=4.610 ms
+file:///home/joao/orca/workspaces/ascii-engine/threadfin/scripts/bench-capacity.mjs:184
+      throw new Error(
+            ^
+
+Error: Frame p50 gate failed for water-visible-2: 8.34%; raw rounds preserved
+    at file:///home/joao/orca/workspaces/ascii-engine/threadfin/scripts/bench-capacity.mjs:184:13
+
+Node.js v26.10.0

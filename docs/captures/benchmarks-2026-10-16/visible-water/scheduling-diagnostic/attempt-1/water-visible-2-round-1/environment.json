@@ -1,0 +1,63 @@
+{
+  "timestamp": "2026-10-16T12:40:50.720Z",
+  "sourceCommit": "da5b85b61227585bf96497cac3cebe000845bda6",
+  "trackedChanges": "",
+  "browserIsolation": "fresh Chromium process and temporary profile per execution",
+  "rendererCpu": 6,
+  "extensionsDisabled": true,
+  "rendererAffinityScope": "active benchmark page main thread only; spare/GPU/browser/other existing threads unchanged",
+  "framePacing": "uncapped",
+  "scheduler": "task-with-gpu-backpressure",
+  "cpu": {
+    "model": "12th Gen Intel(R) Core(TM) i5-12450H",
+    "logicalCores": 12
+  },
+  "os": {
+    "platform": "linux",
+    "release": "7.2.3-arch1-3",
+    "arch": "x64",
+    "distribution": "NAME=\"Omarchy\"\nPRETTY_NAME=\"Omarchy\"\nID=omarchy\nID_LIKE=arch\nBUILD_ID=\"4.0.4\"\nVERSION_ID=\"4.0.4\"\nANSI_COLOR=\"38;2;158;206;106\"\nHOME_URL=\"https://omarchy.org/\"\nDOCUMENTATION_URL=\"https://learn.omacom.io/2/the-omarchy-manual\"\nSUPPORT_URL=\"https://discord.gg/tXFUdasqhY\"\nBUG_REPORT_URL=\"https://github.com/basecamp/omarchy/issues\"\nLOGO=omarchy"
+  },
+  "memoryBytes": 24901357568,
+  "power": {
+    "profile": "performance",
+    "governor": "powersave",
+    "driver": "intel_pstate",
+    "energyPreference": "performance"
+  },
+  "chromium": {
+    "protocolVersion": "1.3",
+    "product": "Chrome/152.0.7977.82",
+    "revision": "@d04cdb24d67b081f6cf80200ffc5233f44b61109",
+    "userAgent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/152.0.0.0 Safari/537.36",
+    "jsVersion": "15.2.124.21"
+  },
+  "flags": [
+    "--disable-extensions",
+    "--disable-component-extensions-with-background-pages",
+    "--headless=new",
+    "--no-sandbox",
+    "--use-angle=gl",
+    "--enable-gpu",
+    "--ignore-gpu-blocklist",
+    "--hide-scrollbars",
+    "--window-size=1920,1080",
+    "--force-device-scale-factor=1",
+    "--disable-gpu-vsync",
+    "--disable-frame-rate-limit",
+    "--remote-debugging-port=0",
+    "--user-data-dir=<isolated temporary profile>",
+    "about:blank"
+  ],
+  "gpu": {
+    "renderer": "ANGLE (Intel, Mesa Intel(R) Graphics (ADL GT2), OpenGL ES 3.2)",
+    "vendor": "Google Inc. (Intel)",
+    "timer": {
+      "available": true,
+      "status": "ready",
+      "disjointEvents": 0,
+      "dropped": 0
+    }
+  },
+  "timerResolutionMs": 0.004999995231628418
+}

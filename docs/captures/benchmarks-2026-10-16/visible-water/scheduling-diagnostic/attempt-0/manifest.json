@@ -1,0 +1,46 @@
+{
+  "protocol": {
+    "seed": 4242,
+    "dt": 0.016666666666666666,
+    "warmup": 600,
+    "frames": 600,
+    "runs": 5,
+    "rounds": 2,
+    "uncapped": true,
+    "rendererCpu": 6,
+    "extensions": false,
+    "freshProcess": true,
+    "observerControl": "Write raw samples in Git-ignored staging; publish once the selected axes complete; launch children through process.execPath",
+    "queue": 2,
+    "capacity": "worst of two round frame p95; thresholds 16.7 and 33.3 ms",
+    "maximum": "largest measured passing load; no interpolation",
+    "reusePhase2": null,
+    "stopNumericGate": true,
+    "numericGateRule": "After an optimized visible-water point: numeric step >=15% of median frame, CPU dominance in aggregate and both rounds; stop without a prototype",
+    "safety": "Larger waters require the 4 GiB memory reserve below; stop at an FPS/resource bound or 8192 waters",
+    "initialSafety": "Initial guard 512; larger waters require a 4 GiB RAM reserve; stop at an FPS/resource bound or 8192 waters",
+    "waterMemorySafety": {
+      "initialGuard": 512,
+      "maximumWaters": 8192,
+      "reserveBytes": 4294967296,
+      "rule": "Beyond 512, require previous measured maximum renderer VmHWM scaled by count to fit available memory minus the reserve; stop as resource-bound otherwise"
+    }
+  },
+  "source": "da5b85b61227585bf96497cac3cebe000845bda6",
+  "axes": {
+    "water-visible": {
+      "label": "Simultaneously visible waters",
+      "points": [],
+      "status": "repeatability-failed",
+      "failed": {
+        "id": "water-visible-1",
+        "axis": "water-visible",
+        "load": 1,
+        "files": [
+          "water-visible-1-round-1/water-visible-1.json",
+          "water-visible-1-round-2/water-visible-1.json"
+        ]
+      }
+    }
+  }
+}

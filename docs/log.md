@@ -1,3 +1,30 @@
+## 2026-10-16 — Visible-water after measurements reach the numeric review gate
+
+Clean optimized source `da5b85b` retains the first complete passing point at
+each load: one/two waters, round-p50 differences 4.47%/1.30%. Four complete
+failed points (5.06%, 10.76%, 6.30%, 8.34%) and every run remain as
+[scheduling diagnostics](captures/benchmarks-2026-10-16/visible-water/scheduling-diagnostic/failures.json).
+No within-point filtering/splicing or relaxed threshold. Passive CPU 6/7 samples
+show variable SMT-sibling activity and renderer run delay; a unique cause for
+every spike is unconfirmed. No user application/power setting was changed.
+
+At two visible waters, CPU p50 per water changes: step 1.385 → 1.587 ms,
+preparation 3.072 → 1.810 ms, mirror/reflection submission .352 → .450 ms,
+remainder .175 → .280 ms, total 5.023 → 4.170 ms. Preparation falls 41.09%,
+active CPU 16.97%; frame p50 10.420 → 9.580 ms (8.06%), but p95 worsens
+12.430 → 13.710 ms (10.30%). One-water frame timing also worsens despite lower
+CPU. These data do not establish a general frame/tail improvement or larger
+capacity. [All percentiles and raw links](captures/benchmarks-2026-10-16/visible-water/results.md).
+
+Remaining numeric step is 3.175 ms / 9.580 ms = 33.14% of frame, with CPU
+dominance in both rounds and aggregate. The preregistered gate stops at two
+waters for owner review; no optimized four/eight-water timing or extra
+optimization/prototype followed. Both new capacity entries are ≥2 lower bounds;
+fresh before capacity was two/four at 60/30 fps. Numeric/image parity and the
+inspected [page-only capture](captures/benchmarks-2026-10-16/visible-water/validation/cdpshot-cathedral.png)
+are recorded in the kernel entry below; final `pnpm check` passes (193 tests).
+No WASM/GPU skinning/toolchain, owner draft/baseline change or push.
+
 ## 2026-10-16 — Exact JS normal reconstruction for water
 
 Water preparation now uses direct float32 arrays for indexed normal accumulation,

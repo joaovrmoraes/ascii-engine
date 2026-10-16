@@ -1,0 +1,50 @@
+Raw data stays in ignored staging until collection completes: /home/joao/orca/workspaces/ascii-engine/threadfin/.cache/bench-capacity/2a27492859b5
+START water-visible-1-round-1 water-visible-1 1/5; 600 warm-up + 600 measured frames
+DONE water-visible-1 1: frame p50/p95=7.355/8.395 ms; CPU p50=2.915 ms; GPU p50=4.424 ms
+START water-visible-1-round-1 water-visible-1 2/5; 600 warm-up + 600 measured frames
+DONE water-visible-1 2: frame p50/p95=7.720/9.220 ms; CPU p50=2.950 ms; GPU p50=4.434 ms
+START water-visible-1-round-1 water-visible-1 3/5; 600 warm-up + 600 measured frames
+DONE water-visible-1 3: frame p50/p95=7.600/8.795 ms; CPU p50=2.915 ms; GPU p50=4.429 ms
+START water-visible-1-round-1 water-visible-1 4/5; 600 warm-up + 600 measured frames
+DONE water-visible-1 4: frame p50/p95=7.875/11.275 ms; CPU p50=2.885 ms; GPU p50=4.443 ms
+START water-visible-1-round-1 water-visible-1 5/5; 600 warm-up + 600 measured frames
+DONE water-visible-1 5: frame p50/p95=7.950/9.075 ms; CPU p50=2.960 ms; GPU p50=4.467 ms
+START water-visible-1-round-2 water-visible-1 1/5; 600 warm-up + 600 measured frames
+DONE water-visible-1 1: frame p50/p95=7.985/9.000 ms; CPU p50=2.960 ms; GPU p50=4.468 ms
+START water-visible-1-round-2 water-visible-1 2/5; 600 warm-up + 600 measured frames
+DONE water-visible-1 2: frame p50/p95=7.950/8.555 ms; CPU p50=2.915 ms; GPU p50=4.465 ms
+START water-visible-1-round-2 water-visible-1 3/5; 600 warm-up + 600 measured frames
+DONE water-visible-1 3: frame p50/p95=8.025/10.815 ms; CPU p50=2.950 ms; GPU p50=4.473 ms
+START water-visible-1-round-2 water-visible-1 4/5; 600 warm-up + 600 measured frames
+DONE water-visible-1 4: frame p50/p95=8.070/10.770 ms; CPU p50=3.025 ms; GPU p50=4.471 ms
+START water-visible-1-round-2 water-visible-1 5/5; 600 warm-up + 600 measured frames
+DONE water-visible-1 5: frame p50/p95=8.770/11.400 ms; CPU p50=3.140 ms; GPU p50=4.470 ms
+CAPACITY water-visible 1 {"frame":{"p50":7.909999996423721,"p95":10.174999997019768,"p99":11.640000000596046},"p95WorstRound":10.54500000178814,"bottleneck":"GPU","repeatability":0.03929024111036337,"capped":false}
+START water-visible-2-round-1 water-visible-2 1/5; 600 warm-up + 600 measured frames
+DONE water-visible-2 1: frame p50/p95=7.990/10.775 ms; CPU p50=7.575 ms; GPU p50=4.195 ms
+START water-visible-2-round-1 water-visible-2 2/5; 600 warm-up + 600 measured frames
+DONE water-visible-2 2: frame p50/p95=7.765/9.350 ms; CPU p50=7.420 ms; GPU p50=4.193 ms
+START water-visible-2-round-1 water-visible-2 3/5; 600 warm-up + 600 measured frames
+DONE water-visible-2 3: frame p50/p95=8.105/10.715 ms; CPU p50=7.605 ms; GPU p50=4.209 ms
+START water-visible-2-round-1 water-visible-2 4/5; 600 warm-up + 600 measured frames
+DONE water-visible-2 4: frame p50/p95=7.975/11.470 ms; CPU p50=7.570 ms; GPU p50=4.198 ms
+START water-visible-2-round-1 water-visible-2 5/5; 600 warm-up + 600 measured frames
+DONE water-visible-2 5: frame p50/p95=7.825/10.665 ms; CPU p50=7.395 ms; GPU p50=4.206 ms
+START water-visible-2-round-2 water-visible-2 1/5; 600 warm-up + 600 measured frames
+DONE water-visible-2 1: frame p50/p95=9.865/13.455 ms; CPU p50=7.995 ms; GPU p50=4.281 ms
+START water-visible-2-round-2 water-visible-2 2/5; 600 warm-up + 600 measured frames
+DONE water-visible-2 2: frame p50/p95=8.915/12.860 ms; CPU p50=8.065 ms; GPU p50=4.255 ms
+START water-visible-2-round-2 water-visible-2 3/5; 600 warm-up + 600 measured frames
+DONE water-visible-2 3: frame p50/p95=8.020/10.600 ms; CPU p50=7.630 ms; GPU p50=4.194 ms
+START water-visible-2-round-2 water-visible-2 4/5; 600 warm-up + 600 measured frames
+DONE water-visible-2 4: frame p50/p95=7.950/11.630 ms; CPU p50=7.525 ms; GPU p50=4.194 ms
+START water-visible-2-round-2 water-visible-2 5/5; 600 warm-up + 600 measured frames
+DONE water-visible-2 5: frame p50/p95=8.265/12.640 ms; CPU p50=7.480 ms; GPU p50=4.198 ms
+file:///home/joao/orca/workspaces/ascii-engine/threadfin/scripts/bench-capacity.mjs:184
+      throw new Error(
+            ^
+
+Error: Frame p50 gate failed for water-visible-2: 6.30%; raw rounds preserved
+    at file:///home/joao/orca/workspaces/ascii-engine/threadfin/scripts/bench-capacity.mjs:184:13
+
+Node.js v26.10.0
