@@ -1,6 +1,6 @@
 # Visible-water CPU investigation
 
-Status: profiling and baseline collection. This protocol is recorded before the
+Status: before baseline complete; optimization/parity follow. This protocol is recorded before the
 optimization and new accepted samples. Original capacity data remain in
 [the previous study](../../benchmarks-2026-10-15/capacity/results.md).
 
@@ -33,3 +33,14 @@ Benchmark pages never load the editor IndexedDB draft. The preserved original
 core is served from a Git-ignored copy on port 1445 for parity only; accepted
 measurements run source committed before samples on port 1440. No baselines
 are regenerated and no push occurs.
+
+## Measured before baseline
+
+All 1/2/4/8-water points pass the unchanged round-p50 gate (1.34%, 1.54%,
+2.52%, 2.37%). The clean measured source is `5880837`; raw rounds and full
+machine/environment records are in [before-capacity/manifest.json](before-capacity/manifest.json).
+At two visible waters, per-water CPU p50 is 5.023 ms: step 1.385 ms,
+preparation 3.072 ms, reflection 0.352 ms and remainder 0.175 ms. These are
+independent medians, not an additive CPU percentile. Remainder is derived per
+frame before percentiles. [Per-water p50/p95](before-breakdown.json).
+Fresh before capacity remains two waters at 60 fps / four at 30 fps.

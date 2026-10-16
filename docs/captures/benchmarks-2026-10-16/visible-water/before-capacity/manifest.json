@@ -1,0 +1,194 @@
+{
+  "protocol": {
+    "seed": 4242,
+    "dt": 0.016666666666666666,
+    "warmup": 600,
+    "frames": 600,
+    "runs": 5,
+    "rounds": 2,
+    "uncapped": true,
+    "rendererCpu": 6,
+    "extensions": false,
+    "freshProcess": true,
+    "observerControl": "Write raw samples in Git-ignored staging; publish once the selected axes complete; launch children through process.execPath",
+    "queue": 2,
+    "capacity": "worst of two round frame p95; thresholds 16.7 and 33.3 ms",
+    "maximum": "largest measured passing load; no interpolation",
+    "reusePhase2": null,
+    "safety": "Larger waters require the 4 GiB memory reserve below; stop at an FPS/resource bound or 8192 waters",
+    "initialSafety": "Initial guard 512; larger waters require a 4 GiB RAM reserve; stop at an FPS/resource bound or 8192 waters",
+    "waterMemorySafety": {
+      "initialGuard": 512,
+      "maximumWaters": 8192,
+      "reserveBytes": 4294967296,
+      "rule": "Beyond 512, require previous measured maximum renderer VmHWM scaled by count to fit available memory minus the reserve; stop as resource-bound otherwise"
+    }
+  },
+  "source": "588083708b6f87d8057bf42b8c20aabdf400f27c",
+  "axes": {
+    "water-visible": {
+      "label": "Simultaneously visible waters",
+      "points": [
+        {
+          "id": "water-visible-1",
+          "axis": "water-visible",
+          "load": 1,
+          "files": [
+            "water-visible-1-round-1/water-visible-1.json",
+            "water-visible-1-round-2/water-visible-1.json"
+          ],
+          "frame": {
+            "p50": 7.83500000834465,
+            "p95": 10.375,
+            "p99": 11.290000006556511
+          },
+          "cpu": {
+            "p50": 4.625,
+            "p95": 6.989999994635582,
+            "p99": 7.590000003576279
+          },
+          "gpu": {
+            "p50": 4.432031,
+            "p95": 6.74,
+            "p99": 7.172239
+          },
+          "capacityP95": 10.394999995827675,
+          "repeatability": 0.013388586452687727,
+          "bottleneck": "mixed",
+          "stable": true,
+          "capped": false,
+          "crossed30": false,
+          "hash": "a902d504",
+          "pointCountRange": [
+            0,
+            0
+          ],
+          "peakRendererRssBytes": 188628992
+        },
+        {
+          "id": "water-visible-2",
+          "axis": "water-visible",
+          "load": 2,
+          "files": [
+            "water-visible-2-round-1/water-visible-2.json",
+            "water-visible-2-round-2/water-visible-2.json"
+          ],
+          "frame": {
+            "p50": 10.419999986886978,
+            "p95": 12.430000007152557,
+            "p99": 16.67000000178814
+          },
+          "cpu": {
+            "p50": 10.04500000178814,
+            "p95": 11.695000007748604,
+            "p99": 16.29500000178814
+          },
+          "gpu": {
+            "p50": 5.009739,
+            "p95": 7.245677,
+            "p99": 7.99125
+          },
+          "capacityP95": 12.530000001192093,
+          "repeatability": 0.015362457662209856,
+          "bottleneck": "CPU",
+          "stable": true,
+          "capped": false,
+          "crossed30": false,
+          "hash": "301f5d49",
+          "pointCountRange": [
+            0,
+            0
+          ],
+          "peakRendererRssBytes": 196341760
+        },
+        {
+          "id": "water-visible-4",
+          "axis": "water-visible",
+          "load": 4,
+          "files": [
+            "water-visible-4-round-1/water-visible-4.json",
+            "water-visible-4-round-2/water-visible-4.json"
+          ],
+          "frame": {
+            "p50": 22.08500000834465,
+            "p95": 26.890000000596046,
+            "p99": 33.14000000059605
+          },
+          "cpu": {
+            "p50": 21.650000005960464,
+            "p95": 26.385000005364418,
+            "p99": 32.59000000357628
+          },
+          "gpu": {
+            "p50": 9.638541,
+            "p95": 13.726354,
+            "p99": 15.036406
+          },
+          "capacityP95": 27.260000005364418,
+          "repeatability": 0.025172922425107682,
+          "bottleneck": "CPU",
+          "stable": true,
+          "capped": false,
+          "crossed30": false,
+          "hash": "bfcc17e1",
+          "pointCountRange": [
+            0,
+            0
+          ],
+          "peakRendererRssBytes": 203317248
+        },
+        {
+          "id": "water-visible-8",
+          "axis": "water-visible",
+          "load": 8,
+          "files": [
+            "water-visible-8-round-1/water-visible-8.json",
+            "water-visible-8-round-2/water-visible-8.json"
+          ],
+          "frame": {
+            "p50": 41.36499999463558,
+            "p95": 49.314999997615814,
+            "p99": 57.60999999940395
+          },
+          "cpu": {
+            "p50": 40.95499999821186,
+            "p95": 48.80500000715256,
+            "p99": 56.9750000089407
+          },
+          "gpu": {
+            "p50": 11.836354,
+            "p95": 17.862708,
+            "p99": 24.537812
+          },
+          "capacityP95": 49.87999999523163,
+          "repeatability": 0.023657870643579583,
+          "bottleneck": "CPU",
+          "stable": true,
+          "capped": false,
+          "crossed30": true,
+          "hash": "505fa661",
+          "pointCountRange": [
+            0,
+            0
+          ],
+          "peakRendererRssBytes": 237613056
+        }
+      ],
+      "status": "both-budgets-crossed",
+      "capacity60": {
+        "budget": 16.7,
+        "maximum": 2,
+        "frameP95": 12.530000001192093,
+        "nextFail": 4,
+        "lowerBound": false
+      },
+      "capacity30": {
+        "budget": 33.3,
+        "maximum": 4,
+        "frameP95": 27.260000005364418,
+        "nextFail": 8,
+        "lowerBound": false
+      }
+    }
+  }
+}

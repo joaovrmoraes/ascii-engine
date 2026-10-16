@@ -1,3 +1,17 @@
+## 2026-10-16 — Visible-water before measurements
+
+Fresh clean-source `5880837` measurements cover 1/2/4/8 visible waters under
+the accepted uncapped protocol. All two-round frame gates pass (maximum 2.52%).
+[Raw manifest](captures/benchmarks-2026-10-16/visible-water/before-capacity/manifest.json),
+[per-water breakdown](captures/benchmarks-2026-10-16/visible-water/before-breakdown.json).
+Two waters cost active CPU p50 5.023 ms each: simulation 1.385, preparation
+3.072, reflection 0.352, remainder 0.175 ms. Remainder is calculated per sample;
+independent medians need not sum. Largest passing loads remain two/four at
+60/30 fps; worst-round p95 at four is 27.260 ms, at eight 49.880 ms.
+This fresh baseline precedes kernel changes. The preceding source check,
+profiling parity and inspected capture remain applicable; data-only change.
+No baseline update, draft change, machine setting change or push.
+
 ## 2026-10-16 — Separate visible-water reflection CPU work
 
 Optional profiling now times water reflection setup/selection/render submission
