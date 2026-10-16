@@ -4,7 +4,9 @@ import { resolve, join } from 'node:path'
 import { createHash } from 'node:crypto'
 import { benchmarkBrowser } from './bench-browser.mjs'
 const root = resolve('docs/captures/benchmarks-2026-10-15'),
-  output = join(root, 'capacity/validation')
+  output = resolve(
+    process.argv.find(a => a.startsWith('--out='))?.slice(6) ?? join(root, 'capacity/validation'),
+  )
 await mkdir(output, { recursive: true })
 const index = JSON.parse(await readFile(join(root, 'charts/index.json'), 'utf8'))
 const allowed = new Map(

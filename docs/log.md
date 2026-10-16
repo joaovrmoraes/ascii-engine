@@ -1,3 +1,19 @@
+## 2026-10-16 — Capacity plots show measured doubling loads
+
+Capacity plots now use log2 load spacing, with the actual measured load labels
+(including non-power-of-two effect/grid points). Time axes still start at zero.
+Measured p95 dots and p50 whiskers remain prominent; faint dashed connectors
+are reading guides, with no interpolation claim. The performance page opens
+with the requested three-sentence summary. No raw samples or capacity values
+changed. `pnpm bench:charts` produces byte-identical SVGs/index across two runs;
+all nine text layouts fit their viewboxes.
+[Idempotence](captures/benchmarks-2026-10-16/visible-water/presentation/idempotence.json),
+[layout](captures/benchmarks-2026-10-16/visible-water/presentation/chart-layout.json),
+[inspected log2 preview](captures/benchmarks-2026-10-16/visible-water/presentation/capacity-water-loaded-pause-preview.png).
+`pnpm check` passes. Visible-water profiling/optimization follows; the four
+historical compare baselines and the owner's untracked draft remain untouched.
+No push.
+
 ## 2026-10-15 — Close the performance study: JavaScript capacity, no WASM
 
 [Performance](performance.md) now presents the question, accepted uncapped

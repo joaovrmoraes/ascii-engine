@@ -262,22 +262,26 @@ async function curve(
   { p95Curves = false, capacity } = {},
 ) {
   const datasets = series.flatMap(s => s.points),
+    xMin = Math.min(...datasets.map(p => p.load)),
     xMax = Math.max(...datasets.map(p => p.load)),
     max = Math.max(33.3, ...datasets.map(p => p.capacityP95 ?? p.stats.frameMs.p95)),
     yMax = Math.ceil((max * 1.18) / 5) * 5,
     p = plot(80, 125, 990, 300, yMax, xMax)
+  if (p95Curves)
+    p.px = value =>
+      p.x + ((Math.log2(value) - Math.log2(xMin)) / (Math.log2(xMax) - Math.log2(xMin))) * p.width
   let body = p.body + budgets(p),
     rows = []
   const loads = [...new Set(datasets.map(p => p.load))].sort((a, b) => a - b)
   let lastTick = -Infinity
-  for (const n of [0, ...loads]) {
+  for (const n of p95Curves ? loads : [0, ...loads]) {
     if (p.px(n) - lastTick < 42 && n !== xMax) continue
     lastTick = p.px(n)
     body +=
       line(p.px(n), 425, p.px(n), 431, colors.ink) +
       text(p.px(n), 449, n, 'text-anchor="middle" font-size="10"')
   }
-  body += text(575, 478, axisLabel, 'text-anchor="middle"')
+  body += text(575, 478, axisLabel + (p95Curves ? ' (log2 scale)' : ''), 'text-anchor="middle"')
   series.forEach((s, index) => {
     const color = s.color ?? (index ? colors.orange : colors.blue),
       points = [...s.points].sort((a, b) => a.load - b.load)
@@ -287,7 +291,7 @@ async function curve(
           `${i ? 'L' : 'M'}${p.px(r.load)} ${p.py(p95Curves ? r.capacityP95 : r.stats.frameMs.p50)}`,
       )
       .join(' ')
-    body += `<path d="${path}" fill="none" stroke="${color}" stroke-width="2.5"/>`
+    body += `<path d="${path}" fill="none" stroke="${color}" stroke-width="${p95Curves ? 1 : 2.5}"${p95Curves ? ' stroke-opacity="0.35" stroke-dasharray="3 5"' : ''}/>`
     for (const r of points) {
       const med = r.stats.frameMs.p50,
         tail = r.capacityP95 ?? r.stats.frameMs.p95,
@@ -314,7 +318,7 @@ async function curve(
     80,
     503,
     p95Curves
-      ? 'Lines: worse round p95. Lower whisker end: pooled p50. All values are tabulated below.'
+      ? 'Dots: measured worse-round p95; lower whisker: pooled p50. Faint connectors are reading guides, not interpolation.'
       : 'Lines: pooled p50. Upper whisker: pooled p95. All values are tabulated below.',
     'fill="' + colors.muted + '"',
   )

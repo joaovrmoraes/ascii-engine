@@ -1,5 +1,9 @@
 # Performance without WebAssembly
 
+Skinning is **45× faster in JavaScript** after eliminating repeated vertex work.
+Offscreen-water cost is addressed by pausing hidden simulation and preparation.
+Visible water is the next limit: **two simultaneous waters at 60 fps**, with CPU work dominating this fixture.
+
 How much can this engine render at 60 fps using JavaScript on this machine?
 The study found that the reference skinning bottleneck could be removed in JS,
 and that hidden-water work should be skipped before considering another language.
@@ -102,7 +106,9 @@ JS fallback.
 
 ## Capacity curves
 
-Lines show the worse round p95; the lower whisker end is pooled p50. The tables
+Capacity dots show the worse round p95; the lower whisker end is pooled p50.
+Load axes use log2 spacing; faint connectors guide reading, without interpolating
+untested loads. The tables
 inside each SVG label every load and its frame/CPU/GPU values in milliseconds.
 Non-monotonic intervals are retained: dispatch/queue timing and scheduling can
 affect headless intervals. Do not interpolate an exact capacity between loads.

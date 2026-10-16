@@ -26,21 +26,21 @@
     },
     {
       "file": "capacity-skinning.svg",
-      "sha256": "12a8404ba2da06b94738351e8b19e224d83e8c502a605b41c7243abdd3847133",
+      "sha256": "e9b61f1b5002a35cd027ffed0784675902d6ba847d580da8f8b39965686f35da",
       "sources": [
         "4264ce1316b22e69ea745a393d43c4627fe72cab"
       ]
     },
     {
       "file": "capacity-water-loaded-off.svg",
-      "sha256": "a299adaad0c1dbf0ccbd4d3acf874f14c712f53580552112d5da5547957731aa",
+      "sha256": "a4f77a1a4a1886e6581a41f0ca18c7428de7ccb02bc3f4b4a68d2853ac1a0e73",
       "sources": [
         "4f5120c7cc5245d6f12b66354eb691a6f65244c2"
       ]
     },
     {
       "file": "capacity-water-loaded-pause.svg",
-      "sha256": "d96b9e0faf61311e1d852816fe425439677ec7b53066718c5c66f0e5beb5276c",
+      "sha256": "a88c31ca527afc856d9871f3937b7dab590a6652902a8a80b1238294b361b205",
       "sources": [
         "4264ce1316b22e69ea745a393d43c4627fe72cab",
         "4f5120c7cc5245d6f12b66354eb691a6f65244c2",
@@ -49,7 +49,7 @@
     },
     {
       "file": "capacity-water-visible.svg",
-      "sha256": "0cdaa105f2d2cc51ed32c11b52cb64a89d64e4487937c3d651c8a5acd9da081d",
+      "sha256": "d193364b0dbe08d776072eccca916d4effc96da7517d2c4bc050b4f477793dff",
       "sources": [
         "4264ce1316b22e69ea745a393d43c4627fe72cab",
         "4f5120c7cc5245d6f12b66354eb691a6f65244c2"
@@ -57,14 +57,14 @@
     },
     {
       "file": "capacity-effects.svg",
-      "sha256": "fdafd1c5dea25c47e8719834b33a74cbdfae0871dc7a84ff0537ca2c9992dd02",
+      "sha256": "eabd250f7068c300a245da91c792547ed9849a839fd8b7c9c91c549dd212d2af",
       "sources": [
         "4264ce1316b22e69ea745a393d43c4627fe72cab"
       ]
     },
     {
       "file": "capacity-water-grid.svg",
-      "sha256": "811bb1c89ccaab6bdb6d4d23109cc07fb98b8a6c0cbdab8f3e43e1f32c4fa4ad",
+      "sha256": "26b605803dc581df4824cf92bbd61579889120cb6afc3da9a772fd7a4723139e",
       "sources": [
         "4264ce1316b22e69ea745a393d43c4627fe72cab",
         "4f5120c7cc5245d6f12b66354eb691a6f65244c2"

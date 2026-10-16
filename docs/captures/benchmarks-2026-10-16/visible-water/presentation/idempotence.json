@@ -1,0 +1,16 @@
+{
+  "command": "pnpm bench:charts",
+  "identical": true,
+  "files": {
+    "capacity-effects.svg": "eabd250f7068c300a245da91c792547ed9849a839fd8b7c9c91c549dd212d2af",
+    "capacity-skinning.svg": "e9b61f1b5002a35cd027ffed0784675902d6ba847d580da8f8b39965686f35da",
+    "capacity-water-grid.svg": "26b605803dc581df4824cf92bbd61579889120cb6afc3da9a772fd7a4723139e",
+    "capacity-water-loaded-off.svg": "a4f77a1a4a1886e6581a41f0ca18c7428de7ccb02bc3f4b4a68d2853ac1a0e73",
+    "capacity-water-loaded-pause.svg": "a88c31ca527afc856d9871f3937b7dab590a6652902a8a80b1238294b361b205",
+    "capacity-water-visible.svg": "d193364b0dbe08d776072eccca916d4effc96da7517d2c4bc050b4f477793dff",
+    "cpu-vs-gpu.svg": "dcac659982fc0ec3993cfb70eda82e683ec82d72b3f655341e2146680a6ff1e1",
+    "index.json": "784bf3be5c46c67d1b81e8a7f4656bd2db50148a4a80a13ec6914397ebe9312f",
+    "skinning-before-after.svg": "0079efde1912a64814bc71d25877ad6e0be9a92008544d23c329a44a311e1932",
+    "water-scale.svg": "0c5400005aa4160d91aed5a45fca919c379626268b66072be8956f1a8a838b78"
+  }
+}
